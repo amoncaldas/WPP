@@ -1,0 +1,88 @@
+.destinosCoordinates
+{
+	width:600px;
+    display: none;
+    
+}
+#local
+{
+	width: 100%;
+	height: 30px;
+	margin-top: 10px;
+    display: none;
+}	
+#travelpoints
+{
+	border:1px solid #CCC;
+	padding:5px;
+}
+#travelpoints ul li 
+{
+	border: 1px solid #CCC;
+	padding: 5px;
+	background: #DFDFDF;
+    height:30px;
+    
+}	
+
+#travelpoints ul li:last-child .deleteTrajeto
+{
+	display:block;
+    
+}	
+#travelpoints .trajetoValue
+{
+	display:none;
+}
+
+#travelpoints .trajetoDisplay {
+    width:95%;
+    height:25px;
+}
+#trajetoForm {
+    display: none;
+}
+
+.deleteTrajeto {
+    height: 20px;
+    width: 20px;
+    border: 1px solid red;
+    float: right;
+    margin-top: -19px;
+    text-align: center;
+    font-size: 18px;
+    background: #FFEBE8;
+    border-radius: 3px;
+    cursor: pointer;
+    position:relative;
+    top:-7px;
+    display:none;
+}
+
+#locationmap {
+    height: 450px;
+}
+
+.labelMarker {
+    
+}
+
+#addTrajetoDiv {
+    margin-top: 20px;
+    height: 40px;
+}
+
+#adicionarTrajeto {
+    border: 3px solid #DFDFDF;
+    padding: 10px;
+    background: #21759B;
+    color: white;
+    font-size: 18px;
+    text-decoration: none;
+    cursor:pointer;
+}
+
+#footer-thankyou {
+    display:none;
+}
+

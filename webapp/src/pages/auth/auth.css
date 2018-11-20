@@ -1,0 +1,100 @@
+h1,
+h2 {
+  font-weight: normal;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+a {
+  color: #42b983;
+}
+
+.well {
+  border-top: 5px solid #C62828
+}
+
+.quote {
+  margin-top: 40px
+}
+
+
+.social-gh  {
+  background: #222;
+  display: block;
+  color: #fff;
+  background: #000;
+  font-size: 15px;
+  line-height: 21px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: bold;
+  padding: 12px 18px;
+  text-decoration: none;
+  margin-bottom: 10px;
+  text-align: left;
+  overflow: hidden;
+}
+
+a.social-gh div {
+  background-image: url('../../assets/img/github-logo.png');
+}
+
+a.social-gh div {
+  width: 32px;
+  height: 32px;
+  background-size: 32px 32px;
+  display: block;
+  margin-right: 18px;
+  float: left;
+}
+
+.social-or {
+  display: block;
+  overflow: hidden;
+  position: relative;
+  height: 14px;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.social-orText {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin-left: -20px;
+  width: 40px;
+  height: 14px;
+  font-size: 14px;
+  line-height: 14px;
+  background: #fff;
+  color: #555;
+  -font-family: georgia, times, serif;
+  -font-style: italic;
+  font-weight: bold;
+  text-align: center;
+  z-index: 2;
+}
+
+.social-orStroke {
+  position: absolute;
+  top: 7px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 1;
+  background: #ddd;
+}
+
+.social-gh-title {
+  padding-top: 6px;
+  display: block;
+}
+

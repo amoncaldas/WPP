@@ -1,0 +1,44 @@
+version: '3.1'
+
+networks:
+  ors:
+    driver: bridge
+
+services:
+    wordpress:
+        container_name: fam-website-local
+        image: custom-wordpress-local
+        networks:
+          - ors
+        build:
+          context: wordpress/build
+          args:
+            DEBUG_SUPPORT: "true" # builds an image with/without debug support (xdebug)
+        ports:
+          - 5002:80
+        environment:
+          WORDPRESS_DB_PASSWORD: admin
+          SITE_URL: http://localhost:5002
+          ENABLE_DEBUG: "true" # enable/disable debug mode in wordpress at run time
+        volumes:
+          - ./wordpress/wp-content:/var/www/html/wp-content
+          - ./webapp:/var/www/webapp
+    mysql:
+        container_name: fam-mysql-local
+        image: custom-mysql-5.7-local
+        networks:
+          - ors
+        build:
+          context: mysql/
+          args:
+            IMPORT_DB: "true" # Remember: the import will only work if the wordpress/db dir is empty
+            MYSQL_ROOT_PASS: admin # Used during the build and internally is defined as ENV MYSQL_ROOT_PASSWORD
+        volumes:
+          - ./wordpress/db:/var/lib/mysql
+    adminer:
+      image: adminer
+      container_name: ors-adminer
+      networks:
+        - ors
+      ports:
+        - 5001:8080

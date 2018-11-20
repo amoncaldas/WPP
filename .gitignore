@@ -1,0 +1,55 @@
+### Editors ###
+.vscode/
+.settings
+.project
+
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
+.idea/
+.idea_modules/
+/out/
+*.ipr
+*.iws
+*.iml
+
+### mac os x ####
+.DS_Store
+
+## WordPress ##
+wordpress/wp-content/debug.log
+wordpress/wp-content/plugins/*
+
+!wordpress/wp-content/plugins/fam
+!wordpress/wp-content/plugins/fam-oauth
+
+
+wordpress/wp-config.php
+wordpress/wp-content/advanced-cache.php
+wordpress/wp-content/backup-db/
+wordpress/wp-content/backups/
+wordpress/wp-content/blogs.dir/
+wordpress/wp-content/cache/
+wordpress/wp-content/upgrade/
+wordpress/wp-content/uploads/
+wordpress/wp-content/mu-plugins/
+wordpress/wp-content/wp-cache-config.php
+wordpress/wp-content/plugins/hello.php
+
+wordpress/.htaccess
+wordpress/license.txt
+wordpress/readme.html
+wordpress/sitemap.xml
+wordpress/sitemap.xml.gz
+
+# Do not version the db files #
+wordpress/db/*
+!wordpress/db/.gitkeep
+
+## keys ##
+keys/
+
+## Scripts ##
+scripts/clean-docker-images.sh
+
+## Web apps ##
+webapp/*/node_modules/*
+webapp/*/test/unit/coverage/*

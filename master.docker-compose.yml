@@ -1,0 +1,50 @@
+version: '3.1'
+
+networks:
+  ors:
+    driver: bridge
+
+services:
+    wordpress-c:
+        container_name: fam-website-production
+        image: custom-wordpress-prod
+        networks:
+          - ors
+        restart: always
+        build:
+          context: wordpress/build
+          args:
+            DEBUG_SUPPORT: "false" # builds an image with/without debug support (xdebug)
+        ports:
+          - 8083:80
+        environment:
+          WORDPRESS_DB_PASSWORD: admin
+          SITE_URL: http://fazendoasmalas.com
+          ENABLE_DEBUG: "false" # enable/disable debug mode in wordpress at run time
+        volumes:
+          - ./wordpress/wp-content:/var/www/html/wp-content
+          - ./webapp:/var/www/webapp
+        logging:
+          driver: "json-file"
+          options:
+            max-size: "500m"
+            max-file: "3"
+        
+    mysql:
+        container_name: fam-mysql-production
+        image: custom-mysql-5.7-prod
+        networks:
+          - ors
+        restart: always
+        build:
+          context: mysql/
+          args:
+            IMPORT_DB: "true" # Remember: the import will only work if the wordpress/db dir is empty
+            MYSQL_ROOT_PASS: admin # Used during the build and internally is defined as ENV MYSQL_ROOT_PASSWORD
+        volumes:
+          - ./wordpress/db:/var/lib/mysql
+        logging:
+          driver: "json-file"
+          options:
+            max-size: "500m"
+            max-file: "3"

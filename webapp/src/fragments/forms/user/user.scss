@@ -1,0 +1,12 @@
+form .valid i {
+  color: green !important
+}
+
+form .checking i {
+  color: black !important;
+  // @extend .animated .infinite .rotateIn delay-2s
+}
+
+form .warn i {
+  color: red !important
+}

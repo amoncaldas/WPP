@@ -1,0 +1,59 @@
+/* Customize the ORS header menu */
+
+.app-btn-mh {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-transform: capitalize;
+  content: unset;
+}
+
+.app-btn-mh > .btn__content {
+  color: #828282;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+.app-hm-list .app-btn-mh .btn__content {
+  padding-left: 0px;
+  text-align: left;
+  display: block;
+}
+
+.app-btn-mh > .btn__content:hover {
+  background-color: #fff !important
+}
+.app-btn-mh > .btn__content:before {
+ opacity: 0;
+}
+
+.ors-toolbar .app-btn-mh:hover > .btn__content:after, .ors-toolbar .app-btn-mh > .btn__content:hover:after, .ors-toolbar .app-btn-mh.active > .btn__content:after {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  content: '';
+  width: 20px;
+  height: 2px;
+  margin-left: -10px;
+  background-color: #b5152b;
+}
+
+.ors-toolbar .app-btn-mh.has-icon:hover > .btn__content:after {
+  background-color: transparent
+}
+
+.list__tile .app-btn-mh > .btn__content:hover:after {
+  position: absolute;
+  bottom: 1px;
+  left: 0;
+  content: '';
+  width: 20px;
+  height: 2px;
+  margin-left: 0px;
+  background-color: #b5152b;
+}
+
+.hm-content {
+  margin-top: -10px;
+}
+
+/* End customize the ORS header menu */

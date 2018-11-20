@@ -1,0 +1,56 @@
+.imagemPrincipal img {
+    border: 1px solid #777777;
+    max-width: 95%;
+}
+
+.projectMainImage img {
+    border: 2px solid #777777;
+    max-width: 95%;
+}
+
+.detalhesAdicionais span {
+    font-weight: bold;
+}
+
+.atividadesETecnologias li {
+    list-style-image: url('../img/c2logo_2.0-sem-web-18x18-gray.png');
+}
+
+.projectItem 
+{
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #777777;
+}
+
+
+.imagensAdicionais {
+    
+}
+
+.imagensProjeto {
+    
+}
+
+.imagensProjeto img {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border: 2px solid #777777;
+     max-width: 95%;
+}
+
+.moreInfo a {
+    font-size: 16px;
+}
+
+.moreInfo  {
+    
+}
+
+.imagensProjeto a {
+    text-decoration: none;
+}
+
+.outros_projetos {
+    list-style-image: url('../img/c2logo_2.0-sem-web-18x18-gray.png');
+}
+

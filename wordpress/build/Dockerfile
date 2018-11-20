@@ -1,0 +1,55 @@
+# Author: Amon Caldas <amon@fazendoasmalas.com>
+# Version 0.1
+# 26.01.2018
+
+FROM wordpress:php7.1-apache
+
+ARG DEBUG_SUPPORT=false
+
+
+# Install nano
+RUN apt-get update && apt-get install nano -y
+
+RUN if ($DEBUG_SUPPORT == "true"); \
+    then \
+    echo "## DEBUG SUPPORT ENABLED, INSTALLING XDEBUG ###"; \
+    pecl install xdebug-2.5.0 && docker-php-ext-enable xdebug; \
+    fi
+
+# Install gnupg
+RUN apt-get update && apt-get install -y gnupg2 && apt-get install -y git
+
+# Setup Apache
+RUN sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+RUN sed -i 's/VirtualHost \*:80/VirtualHost \*:\*/' /etc/apache2/sites-available/000-default.conf
+RUN sed -i 's/<\/VirtualHost>/Alias \/app \/var\/www\/webapp \n <directory \/var\/www\/webapp >\nOptions Indexes FollowSymLinks MultiViews\nRequire all granted\n<\/directory>\n<\/VirtualHost>/' /etc/apache2/sites-available/000-default.conf
+
+
+# Setup XDebug
+RUN if ($DEBUG_SUPPORT == "true"); then \
+    echo "### CONFIGURING XDEBUG...###"; \
+    echo "xdebug.max_nesting_level = 300" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+    echo "xdebug.remote_enable = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+    echo "xdebug.remote_autostart = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+    echo "xdebug.remote_host=172.17.0.1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+    # if your IDE has problems with the debug idekey you can comment out the following line
+    echo "xdebug.idekey=docker" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+    sed -i 's/display_errors = Off/display_errors = On/' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+    fi
+
+COPY ["wp-config.php", "/var/www/html/wp-config.php"]
+
+# Install wp cli
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x wp-cli.phar && \
+    mv wp-cli.phar /usr/local/bin/wp
+
+# Install NODEJS/NPM
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
+	apt-get update && \
+	apt-get install -y nodejs && \
+    npm install -g npm@5.8.0
+
+
+
+

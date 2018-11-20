@@ -1,0 +1,22 @@
+.welcome {
+  text-align: right;
+  height: 30px;
+}
+
+/* Set the page root container padding according the media size  */
+@media (max-width: 599px) {
+  .welcome {
+    padding: 5px;
+  }
+}
+@media (min-width: 600px) and (max-width: 999px) {
+  .welcome {
+    padding: 10px;
+  }
+}
+
+@media (min-width: 1000px) {
+  .welcome {
+    padding: 20px;
+  }
+}
