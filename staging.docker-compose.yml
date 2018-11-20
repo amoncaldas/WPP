@@ -5,34 +5,28 @@ networks:
     driver: bridge
 
 services:
-    wordpress-c:
-        container_name: fam-website-production
-        image: custom-wordpress-prod
+    wordpress:
+        container_name: fam-website-staging
+        image: custom-wordpress-staging
         networks:
           - fam
         restart: always
         build:
           context: wordpress/build
           args:
-            DEBUG_SUPPORT: "false" # builds an image with/without debug support (xdebug)
+            DEBUG_SUPPORT: "false"
         ports:
-          - 8083:80
+          - 8081:80        
         environment:
           WORDPRESS_DB_PASSWORD: admin
-          SITE_URL: http://fazendoasmalas.com
-          ENABLE_DEBUG: "false" # enable/disable debug mode in wordpress at run time
+          SITE_URL: http://staging.fazendoasmalas.com
+          ENABLE_DEBUG: "false" # enable/disable debug mode in wordpress at run time     
         volumes:
           - ./wordpress/wp-content:/var/www/html/wp-content
           - ./webapp:/var/www/webapp
-        logging:
-          driver: "json-file"
-          options:
-            max-size: "500m"
-            max-file: "3"
-        
     mysql:
-        container_name: fam-mysql-production
-        image: custom-mysql-5.7-prod
+        container_name: fam-mysql-staging
+        image: custom-mysql-5.7-staging
         networks:
           - fam
         restart: always
@@ -43,8 +37,3 @@ services:
             MYSQL_ROOT_PASS: admin # Used during the build and internally is defined as ENV MYSQL_ROOT_PASSWORD
         volumes:
           - ./wordpress/db:/var/lib/mysql
-        logging:
-          driver: "json-file"
-          options:
-            max-size: "500m"
-            max-file: "3"

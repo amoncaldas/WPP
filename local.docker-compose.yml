@@ -9,7 +9,7 @@ services:
         container_name: fam-website-local
         image: custom-wordpress-local
         networks:
-          - ors
+          - fam
         build:
           context: wordpress/build
           args:
@@ -27,7 +27,7 @@ services:
         container_name: fam-mysql-local
         image: custom-mysql-5.7-local
         networks:
-          - ors
+          - fam
         build:
           context: mysql/
           args:
@@ -37,8 +37,8 @@ services:
           - ./wordpress/db:/var/lib/mysql
     adminer:
       image: adminer
-      container_name: ors-adminer
+      container_name: fam-adminer
       networks:
-        - ors
+        - fam
       ports:
         - 5001:8080

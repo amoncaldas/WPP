@@ -17,6 +17,12 @@
 ## WordPress ##
 wordpress/wp-content/debug.log
 wordpress/wp-content/plugins/*
+wordpress/wp-content/themes/*
+
+## Do not ignore FAM themes
+!wordpress/wp-content/themes/FAM
+!wordpress/wp-content/themes/FAMRoot
+!wordpress/wp-content/themes/FAMMobile
 
 !wordpress/wp-content/plugins/fam
 !wordpress/wp-content/plugins/fam-oauth
