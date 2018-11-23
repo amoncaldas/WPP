@@ -428,7 +428,7 @@ All the VueJS components created (including the fragments) will have, by default
 ### Menu ###
 
 The menu displayed in the header and in the sidebar (low resolution and mobile devices) is loaded from the back-end server and adjusted to be show according the app status (user authenticated or not).
-The menu items retrieval is fetched by the on the `created` event of the `@fragments/Header` component. So, it dispatch the store `fetchHeadMenu` and the menu is retrieved by the `@common/main-menu.js` that internally uses the `@support/menu-manager.js` and the `@support/model-service.js`. Once the items form the back-end are loaded, they are treated to add/remove custom items and define sidebar items icons in the `@common/main-menu.js`.
+The menu items retrieval is fetched by the on the `created` event of the `@fragments/Header` component. So, it dispatch the store `fetchMainMenu` and the menu is retrieved by the `@common/main-menu.js` that internally uses the `@support/menu-manager.js` and the `@support/model-service.js`. Once the items form the back-end are loaded, they are treated to add/remove custom items and define sidebar items icons in the `@common/main-menu.js`.
 
 ## Debug ##
 

@@ -1,16 +1,17 @@
 <template>
-  <v-snackbar
+  <v-snackbar v-if="render" ref="vSnack"
     :color="snackbarTheme"
-    :timeout="snackbarTimeout"
+    :timeout="timeout"
     :top="snackbarY === 'top'"
     :bottom="snackbarY === 'bottom'"
     :right="snackbarX === 'right'"
     :left="snackbarX === 'left'"
     :multi-line="snackbarMode === 'multi-line'"
     :vertical="snackbarMode === 'vertical'"
-    v-model="snackbar">
+    :auto-height="true"
+    v-model="visible">
       {{ snackbarText }}
-    <v-btn flat @click.native="snackbar = false">{{ $t('global.close') }}</v-btn>
+    <v-btn flat @click.native="visible = false">{{ $t('global.close') }}</v-btn>
     </v-snackbar>
 </template>
 

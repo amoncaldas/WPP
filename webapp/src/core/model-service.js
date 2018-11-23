@@ -244,17 +244,15 @@ const wrapAsNewModelInstance = (rawObj, arrayInst, context) => {
  * @param {*} context
  */
 const modelCollection = (value, context) => {
-  value = value || []
+  value = Array.isArray(value) ? value : []
 
-  // wrap each obj
+  // Transform each value item in a Model object with active record strategy
   value.forEach((v, i) => {
     // this should not happen but prevent blow up
     if (v === null || v === undefined) return
-
     // reset to new instance
     value[i] = wrapAsNewModelInstance(v, value, context)
   })
-
   return value
 }
 

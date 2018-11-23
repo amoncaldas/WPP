@@ -20,8 +20,8 @@ export default {
     }
   },
   created () {
-    this.$store.dispatch('fetchSideMenu').then(() => {
-      this.menuItems = this.$store.getters.sideMenu
+    this.$store.dispatch('fetchMainMenu').then(() => {
+      this.menuItems = this.$store.getters.mainMenu
     })
   }
 }

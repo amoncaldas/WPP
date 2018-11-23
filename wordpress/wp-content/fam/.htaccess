@@ -1,7 +1,7 @@
 # 2 days
-<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
-Header set Cache-Control "max-age=1209600, private"
-</FilesMatch>
+#<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
+#    Header set Cache-Control "max-age=1209600, private"
+#</FilesMatch>
 
 <IfModule mod_speling.c>
     CheckCaseOnly on
@@ -12,23 +12,40 @@ Header set Cache-Control "max-age=1209600, private"
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /
-RewriteRule ^costadocacauemduasrodas(.*) http://fazendoasmalas.com/costadocacau/$1 [QSA,L,R=301]
+RewriteRule ^costadocacauemduasrodas(.*) costadocacau/$1 [QSA,L,R=301]
 
 RewriteRule ^index\.php$ - [L]
 
-# uploaded files
-RewriteRule ^([_0-9a-zA-Z-]+/)?files/(.+) wp-includes/ms-files.php?file=$2 [L]
-
 # add a trailing slash to /wp-admin
-RewriteRule ^([_0-9a-zA-Z-]+/)?wp-admin$ $1wp-admin/ [R=301,L]
-
+RewriteRule ^admin$ wp-admin/ [R=301,L]
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
-RewriteRule  ^[_0-9a-zA-Z-]+/(wp-(content|admin|includes).*) $1 [L]
-RewriteRule  ^[_0-9a-zA-Z-]+/(.*\.php)$ $1 [L]
+# RewriteCond %{REQUEST_URI} !^/static
+# RewriteCond %{REQUEST_URI} !^/wp-admin
+# RewriteCond %{REQUEST_URI} !^/wp-content
+# RewriteCond %{REQUEST_URI} !^/wp-json
 RewriteRule . index.php [L]
+</IfModule>
+# END WordPress
+
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
+
+# ORIGINAL BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
 SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 </IfModule>
 # END WordPress
+
+
+
+
+
 

@@ -32,8 +32,7 @@ echo '<?xml version="1.0" encoding="'.get_option('blog_charset').'"?'.'>'; ?>
 	<?php do_action('rss2_head'); ?>
 	
 	<?php 
-		require_once( FAM_PLUGIN_PATH . '/includes/FAMCore/BO/Conteudo.php' );
-		$posts = Conteudo::GetFeedItens();
+		$posts = getFeedItems();
 		foreach($posts as $post)
 		{							
 			?>

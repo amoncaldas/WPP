@@ -1,6 +1,6 @@
 export default {
   reset: {
-    pageTitle: 'Reset your password | ORS',
+    pageTitle: 'Request a password reset | ORS',
     requestPasswordReset: 'Request a password reset link',
     resetPassword: 'Reset password',
     login: 'Log in',

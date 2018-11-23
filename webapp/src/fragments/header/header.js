@@ -14,8 +14,8 @@ export default {
     }
   },
   created () {
-    this.$store.dispatch('fetchHeadMenu').then(() => {
-      this.menuItems = this.$store.getters.headMenu
+    this.$store.dispatch('fetchMainMenu').then(() => {
+      this.menuItems = this.$store.getters.mainMenu
     })
 
     this.eventBus.$on('routeChanged', (routeParams) => {

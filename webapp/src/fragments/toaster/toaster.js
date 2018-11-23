@@ -1,13 +1,14 @@
 export default {
   data () {
     return {
-      snackbar: false,
+      visible: false,
       snackbarY: 'top',
       snackbarX: 'right',
       snackbarMode: '',
       snackbarTimeout: 6000,
       snackbarText: null,
-      snackbarTheme: null
+      snackbarTheme: null,
+      render: true
     }
   },
   methods: {
@@ -21,7 +22,23 @@ export default {
         this.snackbarMode = snack.options.mode || this.snackbarMode
         this.snackbarTimeout = snack.options.timeout || this.snackbarTimeout
       }
-      this.snackbar = true
+
+      // Restart the timeout if it was already visible
+      // after a while so that the computed timeout
+      // is read by the component before we run the
+      // component setTimeout
+      if (this.visible) {
+        setTimeout(() => {
+          this.$refs.vSnack.setTimeout()
+        }, 100)
+      } else {
+        this.visible = true
+      }
+    }
+  },
+  computed: {
+    timeout () {
+      return this.snackbarTimeout
     }
   },
   created () {

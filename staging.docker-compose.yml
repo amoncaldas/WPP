@@ -7,7 +7,7 @@ networks:
 services:
     wordpress:
         container_name: fam-website-staging
-        image: custom-wordpress-staging
+        image: fam-custom-wordpress-staging
         networks:
           - fam
         restart: always
@@ -26,7 +26,7 @@ services:
           - ./webapp:/var/www/webapp
     mysql:
         container_name: fam-mysql-staging
-        image: custom-mysql-5.7-staging
+        image: fam-custom-mysql-staging
         networks:
           - fam
         restart: always

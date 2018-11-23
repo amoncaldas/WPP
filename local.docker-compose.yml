@@ -7,7 +7,7 @@ networks:
 services:
     wordpress:
         container_name: fam-website-local
-        image: custom-wordpress-local
+        image: fam-custom-wordpress-local
         networks:
           - fam
         build:
@@ -27,7 +27,7 @@ services:
           - ./webapp:/var/www/webapp
     mysql:
         container_name: fam-mysql-local
-        image: custom-mysql-5.7-local
+        image: fam-custom-mysql-local
         networks:
           - fam
         build:

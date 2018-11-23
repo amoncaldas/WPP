@@ -1,4 +1,4 @@
-# Author: Amon Caldas <amon@openrouteservice.org>
+# Author: Amon Caldas <amoncaldas@gmail.com>
 # Version 0.2
 # 26.01.2018
 

@@ -1,6 +1,6 @@
 export default {
   changePassword: {
-    pageTitle: 'Change your password | ORS',
+    pageTitle: 'Reset your password | ORS',
     resetYourPassword: 'Change your password',
     login: 'Log in',
     passwordRequired: 'Password is required',

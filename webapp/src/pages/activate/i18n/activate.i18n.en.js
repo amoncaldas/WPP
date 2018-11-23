@@ -7,7 +7,7 @@ export default {
     accountAlreadyActivated: 'The account is already activated. You can login.',
     accountActivated: 'Account activated',
     wrongUserId: 'Wrong user id used for activation',
-    wrongUserIdOrActivationCode: 'The activation code is not valid for this user or expired',
+    wrongUserIdOrActivationCode: 'The activation link you clicked is expired or invalid.',
     youAreAlreadyAuthenticated: 'You are already authenticated, so your account is also already  activated ;-)',
     resetPassword: 'Reset password',
     login: 'Login',

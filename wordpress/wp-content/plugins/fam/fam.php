@@ -22,52 +22,132 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-define('FAM_PLUGIN_PATH', dirname( __FILE__ ));
+ class Fam {
 
-// Import custom api endpoint classes
-require_once(FAM_PLUGIN_PATH . '/includes/user/ors-user-data-wp-api.php');
-require_once(FAM_PLUGIN_PATH . '/includes/global/update-url.php');
+	function __construct () {
+		$this->defineConstants();
+		$this->requiredDependencies();
+		$this->runClasses();
+		$this->registerEndpoints();
+		$this->register_hooks();		
+	}
 
-if(get_current_blog_id() === 1) {
-	require_once(FAM_PLUGIN_PATH . '/includes/main-site/main-site.php');
-}
-else {
-	require_once(FAM_PLUGIN_PATH . '/includes/sub-site/sub-site.php');
-}
+	/**
+	 * Register plugin hooks
+	 *
+	 * @return void
+	 */
+	public function register_hooks() {
+		add_action( 'wp_insert_post', array($this,'after_insert_post'), 10, 2 );
+	}
 
-// Import custom listeners starters
-require_once(FAM_PLUGIN_PATH . '/includes/user/user-events-listener.php');
+	/**
+	 * run custom adjustments after a new post is created
+	 *
+	 * @param Integer $post_id
+	 * @param WP_Post $post
+	 * @return void
+	 */
+	public function after_insert_post( $post_id, $post ) {
+		$this->set_default_taxonomy($post, "trip");
+		$this->set_default_taxonomy($post, "lang");
+		return $post;
+	}
 
-//Define the environment
-$serverName = strpos($_SERVER["SERVER_NAME"]);
-define('FAM_ENV_PRODUCTION', strpos($serverName,"teste.") === false && strpos($serverName,"staging.") === false && strpos($serverName,"dev.") === false);
+	/**
+	 * Set default taxonomy for a fresh created post
+	 *
+	 * @param WP_Post $post
+	 * @param string $taxonomy_slug
+	 * @return void
+	 */
+	public function set_default_taxonomy($post, $taxonomy_slug) {
+		$post_id = $post->ID;
 
-// Load ors api routes/endpoints
-if ( ! defined( 'JSON_API_VERSION' ) && ! in_array( 'json-rest-api/plugin.php', get_option( 'active_plugins' ) ) ) {
+		// Get the possible taxonomies to this kind of post
+		$taxonomies = get_object_taxonomies($post);
+		
+		// If the post supports the passed taxonomy slug
+		// we will make sure it has one assigned
+		if (in_array($taxonomy_slug, $taxonomies)) {
+			$term_list = wp_get_post_terms($post_id, $taxonomy_slug, array("fields" => "all"));	
+			
+			// If the post has not such taxonomy assigned
+			if ( empty( $term_list ) ) {				
+				// Get all available terms, and select the first one as default
+				$available_tax_terms = get_terms( array('taxonomy' => $taxonomy_slug, 'hide_empty' => false, 'orderby' => 'id', 'order' => 'ASC'));
+				if (isset($available_tax_terms[0])) {
+					// Assign the default (the first one available)
+					$term_arr = [$available_tax_terms[0]->term_id];
+					wp_set_post_terms($post_id, $term_arr, $taxonomy_slug);
+				}				
+			}
+		}
+	}
+	
 
-	// Base api namespace that represents also the url
-	$baseNamespace = 'fam-api/v1';
+	/**
+	 * Import plugins dependencies from includes
+	 *
+	 * @return void
+	 */
+	public function requiredDependencies () {		
+		require_once(FAM_PLUGIN_PATH . '/includes/user/fam-user-data-wp-api.php');
+		require_once(FAM_PLUGIN_PATH . '/includes/global/update-url.php');
+		require_once(FAM_PLUGIN_PATH . '/includes/global/getters.php');
+		require_once(FAM_PLUGIN_PATH . '/includes/feed/feed-loader.php');
 
-	$orsUserData = new OrsUserData($baseNamespace);
-	add_action('rest_api_init', array(&$orsUserData, 'register_routes'));
-} 
+		// Import custom listeners starters
+		require_once(FAM_PLUGIN_PATH . '/includes/user/user-events-listener.php');
+	}
 
-// Start the user hooks listeners
-$userEventsListener = new UserEventsListener();
+	/**
+	 * Instantiate the classes part of the plugin that will add listeners
+	 *
+	 * @return void
+	 */
+	public function runClasses () {
+		// Start the user hooks listeners
+		new UserEventsListener();
+	}
+
+	/**
+	 * Define plugin constants
+	 *
+	 * @return void
+	 */
+	public function defineConstants () {
+		define('FAM_PLUGIN_PATH', dirname( __FILE__ ));
+
+		//Define the environment
+		$serverName = $_SERVER["SERVER_NAME"];
+		define('FAM_ENV_PRODUCTION', strpos($serverName,"teste.") === false && strpos($serverName,"staging.") === false && strpos($serverName,"dev.") === false);
+	}
+
+	/**
+	 * Register custom wp api plugin endpoints
+	 *
+	 * @return void
+	 */
+	public function registerEndpoints () {
+		// Load ors api routes/endpoints
+		if ( ! defined( 'JSON_API_VERSION' ) && ! in_array( 'json-rest-api/plugin.php', get_option( 'active_plugins' ) ) ) {
+
+			// Base api namespace that represents also the url
+			$baseNamespace = 'fam-api/v1';
+
+			$orsUserData = new FamUserData($baseNamespace);
+			add_action('rest_api_init', array(&$orsUserData, 'register_routes'));
+		} 
+	}
+ }
+
+ // Start the plugin
+ new Fam();
 
 
-function callback($buffer) {
-	// modify buffer here, and then return the updated code
-	$index = file_get_contents("/var/www/webapp/index.html");
-	return $index;
-  }
-  
-  function buffer_start() { ob_start("callback"); }
-  
-  function buffer_end() { ob_end_flush(); }
-  
-  add_action('wp_loaded', 'buffer_start');
-  add_action('shutdown', 'buffer_end');
+
+
 
 
 

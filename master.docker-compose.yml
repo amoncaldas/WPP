@@ -7,7 +7,7 @@ networks:
 services:
     wordpress-c:
         container_name: fam-website-production
-        image: custom-wordpress-prod
+        image: fam-custom-wordpress-prod
         networks:
           - fam
         restart: always
@@ -32,7 +32,7 @@ services:
         
     mysql:
         container_name: fam-mysql-production
-        image: custom-mysql-5.7-prod
+        image: fam-custom-mysql-prod
         networks:
           - fam
         restart: always

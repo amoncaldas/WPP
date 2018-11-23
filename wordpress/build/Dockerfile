@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y gnupg2 && apt-get install -y git
 # Setup Apache
 RUN sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 RUN sed -i 's/VirtualHost \*:80/VirtualHost \*:\*/' /etc/apache2/sites-available/000-default.conf
-RUN sed -i 's/<\/VirtualHost>/Alias \/app \/var\/www\/webapp \n <directory \/var\/www\/webapp >\nOptions Indexes FollowSymLinks MultiViews\nRequire all granted\n<\/directory>\n<\/VirtualHost>/' /etc/apache2/sites-available/000-default.conf
+RUN sed -i 's/<\/VirtualHost>/Alias \/static \/var\/www\/webapp\/static \n <directory \/var\/www\/webapp\/static >\nOptions Indexes FollowSymLinks MultiViews\nRequire all granted\n<\/directory>\n<\/VirtualHost>/' /etc/apache2/sites-available/000-default.conf
 
 
 # Setup XDebug

@@ -19,8 +19,13 @@ export default {
       this.resource.$post({endPointAppend: append}).then(() => {
         this.showSuccess(this.$t('activate.activationLinkResent'))
       },
-      () => {
-        this.showError(this.$t('activate.failWhileResendingActivationLink'))
+      (error) => {
+        if (error.status === 410) {
+          // GONE - activation code is not valid anymore because the user is already activated
+          this.showError(this.$t('activate.accountAlreadyActivated'))
+        } else {
+          this.showError(this.$t('activate.failWhileResendingActivationLink'))
+        }
       })
     },
     goToSignup () {
@@ -30,8 +35,10 @@ export default {
       this.loaded = true
       this.$router.push({name: 'Login'})
     },
+    afterError () {
+      this.loaded = this.activationError = true
+    },
     alreadyActivatedError () {
-      this.loaded = true
       // 410 = GONE - activation code is not valid anymore because the user is already activated
       this.showInfo(this.$t('activate.accountAlreadyActivated'))
       this.$router.push({name: 'Login'})

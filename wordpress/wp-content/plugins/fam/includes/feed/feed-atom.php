@@ -26,8 +26,8 @@ echo '<?xml version="1.0" encoding="'.get_option('blog_charset').'"?'.'>'; ?>
 	<link rel="self" type="application/atom+xml" href="<?php self_link(); ?>" />
 
 	<?php do_action('atom_head'); ?>
-	<?php require_once( FAM_PLUGIN_PATH . '/includes/FAMCore/BO/Conteudo.php' );
-		$posts = Conteudo::GetFeedItens();
+	<?php
+		$posts = getFeedItems();
 		foreach($posts as $post)
 			{ ?>
 				<entry>
