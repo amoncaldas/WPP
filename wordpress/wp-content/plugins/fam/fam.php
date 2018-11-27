@@ -39,6 +39,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 */
 	public function register_hooks() {
 		add_action( 'wp_insert_post', array($this,'after_insert_post'), 10, 2 );
+		// add_filter('post_link', array($this, 'set_permalink'), 10, 3);
+		// add_filter('pre_post_link', array($this, 'set_permalink'), 10, 3);
+		add_filter('post_type_link', array($this, 'set_permalink'), 10, 3);	
+
+		// add_filter('cptp_post_type_link_priority', array($this, 'cptp_post_type_link_priority'), 0, 1);
 	}
 
 	/**
@@ -49,9 +54,56 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 * @return void
 	 */
 	public function after_insert_post( $post_id, $post ) {
-		$this->set_default_taxonomy($post, "trip");
 		$this->set_default_taxonomy($post, "lang");
+		$this->set_default_section($post, "lang");		
 		return $post;
+	}
+
+	public function set_permalink ($permalink, $post, $leavename) {
+
+		// It is not the friendly url yet
+		if (strpos($permalink, '?post_type=') !== false) {
+			return $permalink;
+		}
+		// https://www.blogstand.com/remove-parent-slug-from-child-page-url-in-wordpress/
+
+		$no_post_type_in_permalink_post_types = get_post_types_by_support("no_post_type_in_permalink");
+		$post_type_after_section_in_permalink = get_post_types_by_support(array("section","post_type_after_section_in_permalink"));
+
+		if (in_array($post->post_type, $no_post_type_in_permalink_post_types)) {
+			$permalink = str_replace("/$post->post_type/", "/", $permalink);
+		} elseif (in_array($post->post_type, $post_type_after_section_in_permalink)) {
+			$permalink = str_replace("/$post->post_type/", "/", $permalink);
+			$post_type = get_post_type_object($post->post_type);
+			$slug = $post_type->rewrite["slug"];
+			$parent = get_post($post->post_parent);
+
+			$post_name = isset($post->post_name) && $post->post_name !== ""? $post->post_name : "%$slug%";
+			$permalink = str_replace("/%$slug%/", "/$parent->post_name/$post->post_type/$post_name/$post->ID", $permalink);
+		}
+		return $permalink;	
+	}
+
+	/**
+	 * Set post default section, if supports section
+	 *
+	 * @param WP_Post $post
+	 * @return void
+	 */
+	public function set_default_section($post) {
+		$post_types_with_section = get_post_types_by_support("section");
+
+		if (in_array($post->post_type, $post_types_with_section)) {
+
+			if ($post->post_parent === 0) {								
+				$sections = get_posts( array( 'post_type' => 'section', 'orderby'  => 'id', 'order' => 'ASC'));
+		
+				if (count($sections) > 0) {
+					wp_update_post( array('ID' => $post->ID, 'post_parent' => $sections[0]->ID));
+					$post ->post_parent = $sections[0]->ID;
+				}
+			}
+		}
 	}
 
 	/**

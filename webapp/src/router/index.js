@@ -8,7 +8,7 @@ import VueInstance from '@/main'
 Vue.use(Router)
 
 const router = new Router({
-  mode: 'hash',
+  mode: 'history',
   // Initially the routes ARRAY is declared only with
   // the root/abstract route. It is gonna be populated below.
   // The route `/` will be matched whenever the app loads any route
