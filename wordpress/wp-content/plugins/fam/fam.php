@@ -72,11 +72,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		// This covers the section post type
 		if (in_array($post->post_type, $no_post_type_in_permalink_types)) {
+			// TODO: Instead of using the post type, we could get the custom post type rewrite slug
 			$permalink = str_replace("/$post->post_type/", "/", $permalink);
 		} 
 		// This covers all custom post types with support for `post_type_after_section_in_permalink`
 		elseif (in_array($post->post_type, $section_in_permalink_types)) {			
 			// The translations starts as the default post type slug
+			// TODO: Instead of using the post type, we could get the custom post type rewrite slug
 			$post_slug_translation = $post->post_type;
 
 			// Get the post `lang` list
