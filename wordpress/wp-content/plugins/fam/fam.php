@@ -39,11 +39,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 */
 	public function register_hooks() {
 		add_action( 'wp_insert_post', array($this,'after_insert_post'), 10, 2 );
-		// add_filter('post_link', array($this, 'set_permalink'), 10, 3);
-		// add_filter('pre_post_link', array($this, 'set_permalink'), 10, 3);
-		add_filter('post_type_link', array($this, 'set_permalink'), 10, 3);	
-
-		// add_filter('cptp_post_type_link_priority', array($this, 'cptp_post_type_link_priority'), 0, 1);
+		add_filter('post_type_link', array($this, 'set_permalink'), 10, 2);
+		add_filter('preview_post_link', array($this, 'set_preview_permalink'), 10, 2);
 	}
 
 	/**
@@ -55,33 +52,95 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 */
 	public function after_insert_post( $post_id, $post ) {
 		$this->set_default_taxonomy($post, "lang");
-		$this->set_default_section($post, "lang");		
+		$this->set_default_section($post);		
 		return $post;
 	}
 
-	public function set_permalink ($permalink, $post, $leavename) {
+	/**
+	 * Set the custom post type permalink for published posts
+	 *
+	 * @param string $permalink
+	 * @param WP_Post $post
+	 * @return string
+	 */
+	public function set_permalink ($permalink, $post) {
+		// Get the pos types that supports `no_post_type_in_permalink`
+		$no_post_type_in_permalink_types = get_post_types_by_support("no_post_type_in_permalink");
 
-		// It is not the friendly url yet
-		if (strpos($permalink, '?post_type=') !== false) {
-			return $permalink;
-		}
-		// https://www.blogstand.com/remove-parent-slug-from-child-page-url-in-wordpress/
+		// Get the post types that supports `section` and `post_type_after_section_in_permalink`
+		$section_in_permalink_types = get_post_types_by_support(array("section","post_type_after_section_in_permalink"));					
 
-		$no_post_type_in_permalink_post_types = get_post_types_by_support("no_post_type_in_permalink");
-		$post_type_after_section_in_permalink = get_post_types_by_support(array("section","post_type_after_section_in_permalink"));
-
-		if (in_array($post->post_type, $no_post_type_in_permalink_post_types)) {
+		// This covers the section post type
+		if (in_array($post->post_type, $no_post_type_in_permalink_types)) {
 			$permalink = str_replace("/$post->post_type/", "/", $permalink);
-		} elseif (in_array($post->post_type, $post_type_after_section_in_permalink)) {
-			$permalink = str_replace("/$post->post_type/", "/", $permalink);
-			$post_type = get_post_type_object($post->post_type);
-			$slug = $post_type->rewrite["slug"];
+		} 
+		// This covers all custom post types with support for `post_type_after_section_in_permalink`
+		elseif (in_array($post->post_type, $section_in_permalink_types)) {			
+			// The translations starts as the default post type slug
+			$post_slug_translation = $post->post_type;
+
+			// Get the post `lang` list
+			$lang_list = wp_get_post_terms($post->ID, "lang", array("fields" => "all"));	
+				
+			// If the post has not such taxonomy assigned
+			if ( !empty( $lang_list ) ) {
+				// Should contains always one
+				$lang = $lang_list[0]->slug;
+				$post_slug_translation = $this->get_post_type_translation($post->post_type, $lang);
+			}	
+
 			$parent = get_post($post->post_parent);
-
-			$post_name = isset($post->post_name) && $post->post_name !== ""? $post->post_name : "%$slug%";
-			$permalink = str_replace("/%$slug%/", "/$parent->post_name/$post->post_type/$post_name/$post->ID", $permalink);
+			if($parent) {
+				if (isset($post->post_name) && $post->post_name !== "") {
+					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post->post_name/$post->ID");
+				} elseif (isset($_POST['new_title'])) {
+					$post_name = sanitize_title($_POST['new_title']);
+					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post_name/$post->ID");
+				} else {
+					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post->ID");
+				}
+			}
 		}
 		return $permalink;	
+	}
+
+	/**
+	 * Translate a post type slug
+	 *
+	 * @param string $post_type
+	 * @param string $lang
+	 * @return void
+	 */
+	public function get_post_type_translation($post_type, $lang) {
+		$dictionary = [
+			"story" => [ 
+				"pt-br" => "relatos",
+				"en-us" => "stories"
+			]			
+		];
+
+		if (!isset($dictionary[$post_type])) {
+			return $post_type;
+		} elseif (!isset($dictionary[$post_type][$lang])) {
+			return $post_type;
+		} else {
+			return $dictionary[$post_type][$lang];
+		}
+	}
+
+	/**
+	 * Set the permalink for post preview
+	 *
+	 * @param string $preview_link
+	 * @param WP_Post $post
+	 * @return string
+	 */
+	public function set_preview_permalink($preview_link, $post) {
+		$permalink = $this->set_permalink($preview_link, $post);
+		
+		// Add the preview query
+		$preview_link = add_query_arg( array("preview" => 'true'), $preview_link );
+		return $preview_link;
 	}
 
 	/**
