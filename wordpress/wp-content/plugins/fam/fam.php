@@ -38,9 +38,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 * @return void
 	 */
 	public function register_hooks() {
-		add_action( 'wp_insert_post', array($this,'after_insert_post'), 10, 2 );
+		add_action( 'wp_insert_post', array($this,'after_insert_content'), 10, 2 );
 		add_filter('post_type_link', array($this, 'set_permalink'), 10, 2);
 		add_filter('preview_post_link', array($this, 'set_preview_permalink'), 10, 2);
+	}
+
+	public function after_insert_content( $content_id, $content) {
+		if ($content->post_type === "page") {
+			return $this->after_insert_page($content_id, $content);
+		} else {
+			return $this->after_insert_post($content_id, $content);
+		}
 	}
 
 	/**
@@ -52,8 +60,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 */
 	public function after_insert_post( $post_id, $post ) {
 		$this->set_default_taxonomy($post, "lang");
-		$this->set_default_section($post);		
+		$this->set_default_section($post);	
+		$this->set_valid_post_name($post);
 		return $post;
+	}
+
+	/**
+	 * Make sure that the post has not a name/slug conflicting with an existing page
+	 *
+	 * @param WP_Post $post
+	 * @return void
+	 */
+	public function set_valid_post_name ($post) {
+		$get_valid_name = function($name) use (&$get_valid_name) {
+			$page = get_page_by_path($name);
+			if ($page) {
+				$integer_append = 1;
+				$segments = explode("-", $name);
+				$last_segment = $segments[count($segments)-1];
+				if (is_int($last_segment)) {
+					$integer_append = $last_segment + 1;
+					$name = str_replace("-$last_segment", "", $name);
+				}
+				
+				$name .= "-$integer_append";
+				return $get_valid_name($name);
+			}
+			return $name;
+		};
+
+		if(isset($post->post_name) && $post->post_name !== "") {
+			$valid_post_name = $get_valid_name($post->post_name);
+			if($valid_post_name !== $post->post_name) {
+				$post->post_name = $valid_post_name;
+				wp_update_post( array('ID' => $post->ID, 'post_name' => $valid_post_name));
+			}
+		}
 	}
 
 	/**
@@ -67,38 +109,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 		// Get the pos types that supports `no_post_type_in_permalink`
 		$no_post_type_in_permalink_types = get_post_types_by_support("no_post_type_in_permalink");
 
-		// Get the post types that supports `section` and `post_type_after_section_in_permalink`
-		$section_in_permalink_types = get_post_types_by_support(array("section","post_type_after_section_in_permalink"));					
-
-		// This covers the section post type
+		// Get the post types that supports `parent_section` and `section_in_permalink`
+		$section_in_permalink_types = get_post_types_by_support(array("parent_section","section_in_permalink"));				
+		
+		// This covers the post types with no post type in permalink
 		if (in_array($post->post_type, $no_post_type_in_permalink_types)) {
-			// TODO: Instead of using the post type, we could get the custom post type rewrite slug
-			$permalink = str_replace("/$post->post_type/", "/", $permalink);
+			$permalink = $this->get_permalink_with_no_post_type_in_it($post, $permalink);
 		} 
 		// This covers all custom post types with support for `post_type_after_section_in_permalink`
-		elseif (in_array($post->post_type, $section_in_permalink_types)) {			
-			// The translations starts as the default post type slug
-			// TODO: Instead of using the post type, we could get the custom post type rewrite slug
-			$post_slug_translation = $post->post_type;
-
-			// Get the post `lang` list
-			$lang_list = wp_get_post_terms($post->ID, "lang", array("fields" => "all"));	
-				
-			// If the post has not such taxonomy assigned
-			if ( !empty( $lang_list ) ) {
-				// Should contains always one
-				$lang = $lang_list[0]->slug;
-				$post_slug_translation = $this->get_post_type_translation($post->post_type, $lang);
-			}	
+		elseif (in_array($post->post_type, $section_in_permalink_types)) {
 
 			$parent = get_post($post->post_parent);
+
+			// We only set the custom permalink when the the parent is already defined
+			// In the normal wordpress post save flow this hook is fired twice, and in the second time
+			// have the parent already defined, after running the `set_default_section` as a trigger for `wp_insert_post`
 			if($parent) {
-				if (isset($post->post_name) && $post->post_name !== "") {
-					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post->post_name/$post->ID");
-				} elseif (isset($_POST['new_title'])) {
+				// Some post type may support translations in url: /stories/meu-conteudo/123 => /relatos/meu-conteudo/123
+				$post_slug_translation = $this->get_post_url_slug($post);
+
+				if (isset($_POST['new_title']) && $_POST['new_title'] !== "") {
 					$post_name = sanitize_title($_POST['new_title']);
 					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post_name/$post->ID");
-				} else {
+				}
+				elseif (isset($post->post_title)  && $post->post_title !== "") {
+					$post_name = sanitize_title($post->post_title);
+					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post_name/$post->ID");
+				} 
+				elseif (isset($post->post_name) && $post->post_name !== "") {
+					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post->post_name/$post->ID");
+				}  else {
 					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post->ID");
 				}
 			}
@@ -107,13 +147,91 @@ if ( ! defined( 'ABSPATH' ) ) {
 	}
 
 	/**
-	 * Translate a post type slug
+	 * Mke sure that the page has a valid post url/slug that does not conflicts with other custom post types having similar permalink structure 
+	 *
+	 * @param WP_Post $post
+	 * @param string $permalink
+	 * @return string
+	 */
+	public function after_insert_page( $page_id, $page) {
+		
+		$get_valid_name = function($name, $post_types) use (&$get_valid_name)  {
+			foreach ($post_types as $key => $post_type) {
+				$post = get_page_by_path($name, OBJECT, $post_type);
+				if ($post) {
+					$integer_append = 1;
+					$segments = explode("-", $name);
+					$last_segment = $segments[count($segments)-1];
+					if (is_int($last_segment)) {
+						$integer_append = $last_segment + 1;
+						$name = str_replace("-$last_segment", "", $name);
+					}
+					$name .= "-$integer_append";
+					return $get_valid_name($name, $post_types);
+				}
+				return $name;
+			}
+		};
+
+		if(isset($page->post_name) && $page->post_name !== "") {
+			$no_post_type_in_permalink_types = get_post_types_by_support("no_post_type_in_permalink");
+			$valid_page_name = $get_valid_name($page->post_name, $no_post_type_in_permalink_types);
+			if($valid_page_name !== $page->post_name) {
+				$page->post_name = $valid_page_name;
+				wp_update_post( array('ID' => $page->ID, 'post_name' => $valid_page_name));
+			}
+		}		
+
+		return $page;
+	}
+	
+
+	/**
+	 * Get permalink with no post_type in it 
+	 *
+	 * @param WP_Post $post
+	 * @param string $permalink
+	 * @return string
+	 */
+	public function get_permalink_with_no_post_type_in_it($post, $permalink) {
+		$post_type_obj = get_post_type_object($post->post_type);
+		$post_url_slug = $post_type_obj->rewrite["slug"];
+		$permalink = str_replace("/$post_url_slug/", "/", $permalink);
+		return $permalink;
+	}
+
+	/**
+	 * Get the post type rewrite slug translation
 	 *
 	 * @param string $post_type
+	 * @return string
+	 */
+	public function get_post_url_slug($post) {
+		$post_type_obj = get_post_type_object($post->post_type);
+		$post_slug = $post_type_obj->rewrite["slug"];
+
+		// Get the post `lang` list
+		$lang_list = wp_get_post_terms($post->ID, "lang", array("fields" => "all"));	
+				
+		// If the post has not such taxonomy assigned
+		if ( !empty( $lang_list ) ) {
+			// Should contains always one
+			$lang = $lang_list[0]->slug;
+			$post_slug_translation = $this->get_post_slug_url_translation($post_slug, $lang);
+			return $post_slug_translation;
+		}
+
+		return $post_slug;
+	}
+
+	/**
+	 * Translate a post type slug
+	 *
+	 * @param string $post_url_slug
 	 * @param string $lang
 	 * @return void
 	 */
-	public function get_post_type_translation($post_type, $lang) {
+	public function get_post_slug_url_translation($post_url_slug, $lang) {
 		$dictionary = [
 			"story" => [ 
 				"pt-br" => "relatos",
@@ -121,12 +239,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 			]			
 		];
 
-		if (!isset($dictionary[$post_type])) {
-			return $post_type;
-		} elseif (!isset($dictionary[$post_type][$lang])) {
-			return $post_type;
+		if (!isset($dictionary[$post_url_slug])) {
+			return $post_url_slug;
+		} elseif (!isset($dictionary[$post_url_slug][$lang])) {
+			return $post_url_slug;
 		} else {
-			return $dictionary[$post_type][$lang];
+			return $dictionary[$post_url_slug][$lang];
 		}
 	}
 
@@ -152,7 +270,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 * @return void
 	 */
 	public function set_default_section($post) {
-		$post_types_with_section = get_post_types_by_support("section");
+		$post_types_with_section = get_post_types_by_support("parent_section");
 
 		if (in_array($post->post_type, $post_types_with_section)) {
 
