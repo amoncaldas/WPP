@@ -1,5 +1,12 @@
 # Creating ORS site environment #
 
+## Dump the latest db to the file system ##
+
+```sh
+docker exec fam-mysql-local /bin/sh -c "mysqldump -u root -padmin wordpress > fam-dump.sql"
+docker cp fam-mysql-local:/fam-dump.sql $PWD/mysql/db-backup.sql
+```
+
 ## Access STAGING server ##
 
 ```sh
