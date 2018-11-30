@@ -1,46 +1,46 @@
-# How to run a local sql file in remote server #
+# Steps to run a local sql file in remote server #
 
 1. Send the file via scp
 
 ```sh
 # example how to sent to staging server
-scp ~/apps/ors/mysql/tyk-user-update.sql ubuntu@129.206.7.40:~/tyk-user-update.sql
+scp ~/local-folder/sql-file-name.sql user@server:~/sql-file-name.sql
 
 # production example:
 # sudo scp -i keys/ssh_access.pem ~/apps/ors/mysql/tyk-user-update.sql ubuntu@129.206.7.180:~/tyk-user-update.sql
 ```
 
-2. Access the remove server via ssh
+1. Access the remove server via ssh
 
 ```sh
 # example accessing staging
-ssh ubuntu@129.206.7.40
+ssh user@server
 ```
 
-3. Copy the file to the mysql container
+1. Copy the file to the mysql container
 
 ```sh
 # copying file to mysql staging container
-docker cp tyk-user-update.sql ors-website-mysql-staging:tyk-user-update.sql
+docker cp sql-file-name.sql fam-mysql-staging:sql-file-name.sql
 ```
 
-4. Go to mysql container on the server
+1. Go to mysql container on the server
 
 ```sh
 # example how to to connect to mysql container on staging
-docker exec -it ors-website-mysql-staging bash
+docker exec -it ors-mysql-staging bash
 ```
 
-5. Backup the database
+1. Backup the database
 
 ```sh
 # backing up the staging database
-mysqldump -u root -padmin wordpress > ors-dump.sql
+mysqldump -u root -padmin wordpress > fam-dump.sql
 ```
 
-6. Run the sql file
+1. Run the sql file
 
 ```sh
 # running the sql update on mysql staging container
-mysql -u root -padmin wordpress < tyk-user-update.sql
+mysql -u root -padmin wordpress < sql-file-name.sql
 ```

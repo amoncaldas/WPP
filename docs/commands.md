@@ -1,4 +1,4 @@
-# Creating ORS site environment #
+# Commands to configure, run and manipulate environment and content #
 
 ## Dump the latest db to the file system ##
 
@@ -7,37 +7,19 @@ docker exec fam-mysql-local /bin/sh -c "mysqldump -u root -padmin wordpress > fa
 docker cp fam-mysql-local:/fam-dump.sql $PWD/mysql/db-backup.sql
 ```
 
-## Access STAGING server ##
+## Copy remote file to local file system ##
 
 ```sh
-sudo ssh -i keys/ssh_ors_pelias.key ubuntu@129.206.7.40
+scp  user@server:~/folder/file.ext ~/local-folder
 ```
 
-## Access remove PRODUCTION server ##
-
-```sh
-sudo ssh -i keys/ssh_access.pem ubuntu@129.206.7.180
-```
-
-## copy remote wp-content.zip ##
-
-```sh
-scp -i keys/ssh_access.pem ubuntu@129.206.7.180:~/page/page-wordpress/wp-content.zip ~/apps/ors
-```
-
-## copy remote wp db backup ##
-
-```sh
-scp -i keys/ssh_access.pem ubuntu@129.206.7.180:~/wp_backups/go.openrouteservice.org.2018-01-29-0625.tar.gz ~/apps/ors
-```
-
-## run docker compose ##
+## Run docker compose ##
 
 ```sh
 cd ~/apps/ors
 docker-compose -f docker-compose.yml up
 
-# starting already created:
+# Starting already created:
 docker-compose -f docker-compose.yml start
 ```
 
@@ -45,41 +27,41 @@ docker-compose -f docker-compose.yml start
 
 ```sh
 # import from file `db-backup.sql` in `mysql` folder
-docker exec -i ors-mysql-local  mysql -uroot -padmin wordpress < mysql/db-backup.sql
+docker exec -i fam-mysql-local  mysql -uroot -padmin wordpress < mysql/db-backup.sql
 ```
 
 ## create and import database file in staging ##
 
 ```sh
 # dump database
-docker exec ors-website-mysql-staging /bin/sh -c "mysqldump -u root -padmin wordpress > ors-dump.sql"
-docker cp ors-website-mysql-staging:/ors-dump.sql $PWD/ors-dump.sql
+docker exec fam-mysql-staging /bin/sh -c "mysqldump -u root -padmin wordpress > fam-dump.sql"
+docker cp fam-mysql-staging:/fam-dump.sql $PWD/fam-dump.sql
 
 # connect and show databases
-docker exec ors-website-mysql-staging /bin/sh -c "echo 'show databases' | mysql -uroot -padmin"
+docker exec fam-mysql-staging /bin/sh -c "echo 'show databases' | mysql -uroot -padmin"
 # create database
-docker exec ors-website-mysql-staging /bin/sh -c "echo 'create database wordpress' | mysql -uroot -padmin"
+docker exec fam-mysql-staging /bin/sh -c "echo 'create database wordpress' | mysql -uroot -padmin"
 # import database
-docker exec -i ors-website-mysql-staging mysql -uroot -padmin wordpress < mysql/db-backup.sql
+docker exec -i fam-mysql-staging mysql -uroot -padmin wordpress < mysql/db-backup.sql
 ```
 
 ## create and import database file in production ##
 
 ```sh
 # connect and show databases
-docker exec ors-website-mysql-production /bin/sh -c "echo 'show databases' | mysql -uroot -padmin"
+docker exec fam-mysql-production /bin/sh -c "echo 'show databases' | mysql -uroot -padmin"
 # create database
-docker exec ors-website-mysql-production /bin/sh -c "echo 'create database wordpress' | mysql -uroot -padmin"
+docker exec fam-mysql-production /bin/sh -c "echo 'create database wordpress' | mysql -uroot -padmin"
 # import database
-docker exec -i ors-website-mysql-staging mysql -uroot -padmin wordpress < mysql/db-backup.sql
+docker exec -i fam-mysql-staging mysql -uroot -padmin wordpress < mysql/db-backup.sql
 ```
 
 ## backup old and rebuild with restored db in production ##
 
 ```sh
 # dump database
-docker exec ors-website-mysql-production /bin/sh -c "mysqldump -u root -padmin wordpress > ors-dump.sql"
-docker cp ors-website-mysql-production:/ors-dump.sql $PWD/ors-dump.sql
+docker exec fam-mysql-production /bin/sh -c "mysqldump -u root -padmin wordpress > fam-dump.sql"
+docker cp fam-mysql-production:/fam-dump.sql $PWD/fam-dump.sql
 
 # stop docker compose
 docker-compose -f master.docker-compose.yml down
@@ -88,7 +70,7 @@ docker-compose -f master.docker-compose.yml down
 sudo rm -rf ~/ors_web/wordpress/db/*
 
 # move to auto restore location
-sudo mv ors-dump.sql ~/ors_web/mysql/db-backup.sql
+sudo mv fam-dump.sql ~/ors_web/mysql/db-backup.sql
 docker-compose -f master.docker-compose.yml up -d
 ```
 
@@ -96,11 +78,11 @@ docker-compose -f master.docker-compose.yml up -d
 
 ```sh
 # dump database
-docker exec ors-website-mysql-production /bin/sh -c "mysqldump -u root -padmin wordpress > ors-dump.sql"
-docker cp ors-website-mysql-production:/ors-dump.sql $PWD/ors-dump.sql
+docker exec fam-mysql-production /bin/sh -c "mysqldump -u root -padmin wordpress > fam-dump.sql"
+docker cp fam-mysql-production:/fam-dump.sql $PWD/fam-dump.sql
 
 # copy from remote to local
-scp -i keys/ssh_access.pem ubuntu@129.206.7.180:~/ors-dump.sql ~/apps/ors-dump.sql
+scp -i keys/ssh_access.pem ubuntu@129.206.7.180:~/fam-dump.sql ~/apps/fam-dump.sql
 ```
 
 ## Copy wp-config from container ##
@@ -112,25 +94,24 @@ docker cp 0a0:/var/www/html/wp-config.php $PWD/wp-config.php
 ## User management via wp-cli ##
 
 ```sh
-# Create a user as admin
-docker exec --user root ors-website-staging /bin/sh -c "wp user create amon amon@openrouteservice.org --role=administrator --allow-root"
+# create a user as admin
+docker exec --user root fam-website-staging /bin/sh -c "wp user create <user-login> user@domain.tld --role=administrator --allow-root"
 # get the password printed out!
 
 # update existing user password:
-docker exec --user root ors-website-staging /bin/sh -c 'wp user update 1005 --user_pass="123456" --allow-root'
+docker exec --user root fam-website-staging /bin/sh -c 'wp user update 1005 --user_pass="123456" --allow-root'
 
 # activate user:
-docker exec --user root ors-website-staging /bin/sh -c 'wp user meta update <username-or-id> pending 0 --allow-root'
-docker exec --user root ors-website-staging /bin/sh -c 'wp user meta update <username-or-id> pp_email_verified true --allow-root'
+docker exec --user root fam-website-staging /bin/sh -c 'wp user meta update <username-or-id> pending 0 --allow-root'
 
 # list user metas #
-docker exec --user root ors-website-staging /bin/sh -c 'wp user meta list <username-or-id> --allow-root'
+docker exec --user root fam-website-staging /bin/sh -c 'wp user meta list <username-or-id> --allow-root'
 ```
 
 ## Install a plugin via wp-cli ##
 
 ```sh
-docker exec --user root ors-website-local /bin/sh -c 'wp plugin install easy-modal --allow-root'
+docker exec --user root fam-website-local /bin/sh -c 'wp plugin install <plugin-sanitized-name> --allow-root'
 ```
 
 ## Write permission on upload/download folder ##

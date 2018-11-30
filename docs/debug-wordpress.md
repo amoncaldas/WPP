@@ -1,4 +1,4 @@
-# Debug WordPress #
+# Debug WordPress PHP #
 
 We can debug our source code using Xdebug component, that is already installed in the Docker image. To do so, you need to use an editor/IDE that supports a XDebug plugin. We do recommend [VSCode](https://code.visualstudio.com/Download). It's really great tool and works on Linux, Windows and Mac.
 
@@ -11,7 +11,7 @@ If you run into errors regarding the xdebug.idekey you might have to comment out
 ### VSCode ###
 
 1. Press F1, type *ext install php-debug* and hit enter.
-2. After that just, click in the debug icon in the left side bar, then click in the gear, select PHP. Be sure that your launcher.json file has the following content:
+1. After that just, click in the debug icon in the left side bar, then click in the gear, select PHP. Be sure that your launcher.json file has the following content:
 
 ```json
 {
@@ -39,7 +39,7 @@ If you run into errors regarding the xdebug.idekey you might have to comment out
 }
 ```
 
-3. Save the launcher.json. Restart VSCode.
+1. Save the launcher.json. Restart VSCode.
 
 To debug a source code just open a .php file, click before the line number (in the left side) and run some request/url that should execute this php file.
 
