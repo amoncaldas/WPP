@@ -22,8 +22,6 @@ services:
           ENABLE_DEBUG: "true" # enable/disable debug mode in wordpress at run time
         volumes:
           - ./wordpress/wp-content:/var/www/html/wp-content
-          - ./wordpress/wp-admin:/var/www/html/wp-admin
-          - ./wordpress/wp-includes:/var/www/html/wp-includes
           - ./webapp:/var/www/webapp
     mysql:
         container_name: fam-mysql-local

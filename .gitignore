@@ -21,6 +21,8 @@ wordpress/wp-content/debug.log
 
 # Ignore wordpress plugins
 wordpress/wp-content/themes/*
+!wordpress/wp-content/themes/fam
+
 
 # Ignore all plugins ...
 wordpress/wp-content/plugins/*

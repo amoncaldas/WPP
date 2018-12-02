@@ -97,16 +97,6 @@ define('WP_DEBUG_DISPLAY', false);
 define('JWT_AUTH_SECRET_KEY', 'He7yRIA!AKUOoj3I`=QzKZ|077~YVs7W2A-!`Vb?z~/|[0xfPXQIm$2)ICA(VN&]');
 define('JWT_AUTH_CORS_ENABLE', true);
 
-/* Multi-site */
-define('WP_ALLOW_MULTISITE', true);
-define('MULTISITE', true);
-define('SUBDOMAIN_INSTALL', false);
-define('DOMAIN_CURRENT_SITE', getenv('SITE_URL'));
-define('PATH_CURRENT_SITE', '/');
-define('SITE_ID_CURRENT_SITE', 1);
-define('BLOG_ID_CURRENT_SITE', 1);
-define( 'WP_POST_REVISIONS', 20 );
-
 /**
  * WordPress store in db absolute urls and this is the way to update this
  * @see https://codex.wordpress.org/Changing_The_Site_URL
