@@ -9,6 +9,7 @@
  class FamWebApp {
 
 	function __construct () {
+		$this->add_menu_support();
 		$this->set_output();
 		$this->register_hooks();		
   }
@@ -19,7 +20,8 @@
    * @return void
    */
   public function set_output () {
-    if (!is_admin() && strrpos($_SERVER["REQUEST_URI"], "wp-json/") === false ) {
+		$uri = $_SERVER["REQUEST_URI"];
+    if (!is_admin() && strrpos($uri, "wp-json/") === false && strrpos($uri, "wp-login.php") === false ) {
 			$webapp = file_get_contents("/var/www/webapp/index.html");
 			$webapp = str_replace("=static/", "=/static/", $webapp);
 			$webapp = str_replace("{{title}}", "Fazendo as Malas", $webapp);
@@ -308,6 +310,24 @@
 				}				
 			}
 		}
+	}
+
+	/**
+	 * Add menu support to thetheme
+	 *
+	 * @return void
+	 */
+	public function add_menu_support() {
+		add_theme_support( 'menus' );
+    add_action( 'init', 'register_my_menus' );
+    function register_my_menus() {
+			register_nav_menus(
+				array(
+						'primary-menu' => __( 'Primary Menu' ),
+						'secondary-menu' => __( 'Secondary Menu' )
+				)
+			);
+    }
 	}
  }
 
