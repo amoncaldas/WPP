@@ -1,6 +1,8 @@
 export default {
   global: {
     send: 'Send',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
     appName: 'OpenRouteService',
     close: 'Close',
     select: 'Select',

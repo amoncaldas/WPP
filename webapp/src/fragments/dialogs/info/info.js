@@ -25,7 +25,7 @@ export default {
       this.resizable = info.resizable
       this.textIsMarkdown = info.markdown
       this.code = info.code // if an additional json object is provided it will be displayed beyond the infoText
-      this.zIndex = info.zIndex || 1003
+      this.zIndex = info.zIndex || 3
     },
     onOk () {
       this.show = false

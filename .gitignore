@@ -21,6 +21,8 @@ wordpress/wp-content/debug.log
 
 # Ignore wordpress plugins
 wordpress/wp-content/themes/*
+
+# do not ignore FAM theme
 !wordpress/wp-content/themes/fam
 
 

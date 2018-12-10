@@ -30,7 +30,7 @@ export default {
       this.resizable = confirm.resizable
       this.textIsMarkdown = confirm.markdown // if the infoText should b rendered from a markdown
       this.code = confirm.code // if an additional json object is provided it will be displayed beyond the infoText
-      this.zIndex = confirm.zIndex || 1003
+      this.zIndex = confirm.zIndex || 3
     },
     onYes () {
       this.show = false

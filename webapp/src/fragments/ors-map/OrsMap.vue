@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-alert :value="info" outline type="info" style="color:white" >{{ info }}</v-alert>
-    <l-map ref="map" :max-zoom="maxZoom" :zoom="zoom" style="min-height:300px; width: 100%" :style="{height: mapHeight + 'px'}">
+    <l-map ref="map" :max-zoom="maxZoom" :zoom="zoom" class="ors-map" :style="{height: mapHeight + 'px'}">
       <l-geo-json v-if="geoJson" :geojson="geoJson" :options="options"></l-geo-json>
       <l-marker v-for="(marker, index) in markers" :lat-lng="marker.position" :key="index+'-marker'" :icon="marker.icon">
         <l-popup v-if="marker.label">

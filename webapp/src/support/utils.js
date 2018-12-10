@@ -47,6 +47,10 @@ const utils = {
     let random = s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
     let dateTime = new Date().getTime()
     return `${prefix}${random}-${dateTime}`
+  },
+
+  getValidId: (str) => {
+    return str.replace(/\./g, '').replace(/}/g, '').replace(/{/g, '').replace(/\//g, '_')
   }
 }
 export default utils

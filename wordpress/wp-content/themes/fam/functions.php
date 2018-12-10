@@ -12,7 +12,7 @@
 		$this->add_menu_support();
 		$this->set_output();
 		$this->register_hooks();		
-  }
+  	}
   
   /**
    * Set the ouput of the theme
@@ -20,14 +20,17 @@
    * @return void
    */
   public function set_output () {
-		$uri = $_SERVER["REQUEST_URI"];
+	$uri = $_SERVER["REQUEST_URI"];
     if (!is_admin() && strrpos($uri, "wp-json/") === false && strrpos($uri, "wp-login.php") === false ) {
-			$webapp = file_get_contents("/var/www/webapp/index.html");
-			$webapp = str_replace("=static/", "=/static/", $webapp);
-			$webapp = str_replace("{{title}}", "Fazendo as Malas", $webapp);
-      echo $webapp;
-      exit;
+		$crawlers_user_agents = ["googlebot","bingbot","msnbot","yahoo","Baidu","aolbuild","facebookexternalhit","iaskspider","DuckDuckBot","Applebot","Almaden","iarchive","archive.org_bot"];
+
+		if (isset($_GET["_escaped_fragment_"]) || in_array($_SERVER['HTTP_USER_AGENT'], $crawlers_user_agents)) {
+			define('RENDER_AUDIENCE', 'CRAWLER_BROWSER');
+		} else {
+			define('RENDER_AUDIENCE', 'USER_BROWSER');
 		}
+		require_once("index.php");
+	}
   }
 	/**
 	 * Register plugin hooks
@@ -319,15 +322,15 @@
 	 */
 	public function add_menu_support() {
 		add_theme_support( 'menus' );
-    add_action( 'init', 'register_my_menus' );
-    function register_my_menus() {
-			register_nav_menus(
-				array(
-						'primary-menu' => __( 'Primary Menu' ),
-						'secondary-menu' => __( 'Secondary Menu' )
-				)
-			);
-    }
+		add_action( 'init', 'register_my_menus' );
+		function register_my_menus() {
+				register_nav_menus(
+					array(
+							'primary-menu' => __( 'Primary Menu' ),
+							'secondary-menu' => __( 'Secondary Menu' )
+					)
+				);
+		}
 	}
  }
 
