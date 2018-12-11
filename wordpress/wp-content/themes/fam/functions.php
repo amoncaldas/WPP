@@ -15,7 +15,7 @@
   	}
   
   /**
-   * Set the ouput of the theme
+   * Set the output of the theme
    *
    * @return void
    */
@@ -24,12 +24,20 @@
     if (!is_admin() && strrpos($uri, "wp-json/") === false && strrpos($uri, "wp-login.php") === false ) {
 		$crawlers_user_agents = ["googlebot","bingbot","msnbot","yahoo","Baidu","aolbuild","facebookexternalhit","iaskspider","DuckDuckBot","Applebot","Almaden","iarchive","archive.org_bot"];
 
-		if (isset($_GET["_escaped_fragment_"]) || in_array($_SERVER['HTTP_USER_AGENT'], $crawlers_user_agents)) {
+		$is_crawler_request = false;
+		foreach ($crawlers_user_agents as $crawler) {
+			if (strpos($_SERVER['HTTP_USER_AGENT'], $crawler) !== false) {
+				$is_crawler_request = true;
+				break;
+			}
+		}
+
+		if (isset($_GET["_escaped_fragment_"]) || $is_crawler_request) {
 			define('RENDER_AUDIENCE', 'CRAWLER_BROWSER');
 		} else {
 			define('RENDER_AUDIENCE', 'USER_BROWSER');
 		}
-		require_once("index.php");
+		require_once("app-renderer.php");
 	}
   }
 	/**
@@ -38,7 +46,7 @@
 	 * @return void
 	 */
 	public function register_hooks() {
-		add_action( 'wp_insert_post', array($this,'after_insert_content'), 10, 2 );
+		add_action('wp_insert_post', array($this,'after_insert_content'), 10, 2 );
 		add_filter('post_type_link', array($this, 'set_permalink'), 10, 2);
 		add_filter('preview_post_link', array($this, 'set_preview_permalink'), 10, 2);
 	}
