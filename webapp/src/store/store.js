@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ui from './modules/ui'
+import sections from './modules/sections'
 import loader from '@/support/loader'
 
 Vue.use(Vuex)
@@ -14,7 +15,8 @@ const storeBuilder = {
   mutations: {
   },
   modules: {
-    ui
+    ui,
+    sections
   }
 }
 

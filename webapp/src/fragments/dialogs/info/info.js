@@ -1,4 +1,5 @@
 import PrettyCodeViewer from '@/fragments/pretty-code-viewer/PrettyCodeViewer'
+import utils from '@/support/utils'
 export default {
   data: () => ({
     infoPromise: null,
@@ -11,7 +12,9 @@ export default {
     textIsMarkdown: false,
     resizable: false,
     code: null, // if an additional json object is provided it will be displayed beyond the infoText
-    zIndex: null
+    zIndex: null,
+    isMaximized: false,
+    guid: null
   }),
   methods: {
     showDialog (info) {
@@ -29,10 +32,12 @@ export default {
     },
     onOk () {
       this.show = false
-      this.eventBus.$emit('infoOk', true)
+      this.eventBus.$emit('infoOk', {event: 'ok', guid: this.guid})
     }
   },
   created () {
+    this.guid = utils.guid('info')
+    this.$emit('infoCreated', this.guid)
     this.eventBus.$on('triggerShowInfo', (info) => {
       this.showDialog(info)
     })

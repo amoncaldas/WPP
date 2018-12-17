@@ -1,5 +1,6 @@
 import PrettyCodeViewer from '@/fragments/pretty-code-viewer/PrettyCodeViewer'
 import JsonTree from 'ors-vue-json-tree'
+import utils from '@/support/utils'
 export default {
   data: () => ({
     confirmPromise: null,
@@ -15,7 +16,8 @@ export default {
     maximized: false,
     code: null, // if an additional json object is provided it will be displayed beyond the infoText
     resizable: false,
-    zIndex: null
+    zIndex: null,
+    guid: null
   }),
   methods: {
     showDialog (confirm) {
@@ -34,14 +36,16 @@ export default {
     },
     onYes () {
       this.show = false
-      this.eventBus.$emit('confirmAnswered', true)
+      this.eventBus.$emit('confirmAnswered', {event: 'yes', guid: this.guid})
     },
     onNo () {
       this.show = false
-      this.eventBus.$emit('confirmAnswered', false)
+      this.eventBus.$emit('confirmAnswered', {event: 'no', guid: this.guid})
     }
   },
   created () {
+    this.guid = utils.guid('confirm')
+    this.$emit('confirmCreated', this.guid)
     this.eventBus.$on('triggerConfirm', (confirm) => {
       this.showDialog(confirm)
     })

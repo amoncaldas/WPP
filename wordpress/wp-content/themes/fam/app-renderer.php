@@ -53,8 +53,13 @@
      * @return string
      */
     public function getWebAppHtml () {
-        $skeleton = $this->getHTMLSkeleton();
-        return $skeleton;
+        $html = $this->getHTMLSkeleton();
+        $uri = $_SERVER["REQUEST_URI"];
+        if ($uri !== "/") {
+            $redirect_append = "<script> window.location = '/#$uri' </script></head>";
+            $html = str_replace('</head>', $redirect_append, $html);
+        }
+        return $html;
     }
 
     /**
@@ -95,18 +100,20 @@
      * @return Integer
      */
     public function getPostId() {
-        $uri_parts = explode("/", $_SERVER["REQUEST_URI"]);
-        $last_url_segment = $uri_parts[count($uri_parts) -1];
-        if(is_integer($last_url_segment)) {
-            return $last_url_segment;
-        } else {
-            $sections = get_posts( array( 'post_type' => 'section', 'post_name'  => $uri_parts[0]));		
-            if (count($sections) > 0) {
-                return $sections[0]->ID;
+        if ($_SERVER["REQUEST_URI"] !== "/") {
+            $uri_parts = explode("/", $_SERVER["REQUEST_URI"]);
+            $last_url_segment = $uri_parts[count($uri_parts) -1];
+            if(is_integer($last_url_segment)) {
+                return $last_url_segment;
             } else {
-                $page = get_page_by_path( $uri_parts[0]);		
-                if ($page !== null) {
-                    return $page->ID;
+                $sections = get_posts( array( 'post_type' => 'section', 'post_name'  => $uri_parts[0]));		
+                if (count($sections) > 0) {
+                    return $sections[0]->ID;
+                } else {
+                    $page = get_page_by_path( $uri_parts[0]);		
+                    if ($page !== null) {
+                        return $page->ID;
+                    }
                 }
             }
         }

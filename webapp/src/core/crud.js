@@ -73,6 +73,8 @@
  * Form validation:
  * if the current vue instance has a $ref named `form` and does not have the option `skipFormValidation` defined as true, the auto form validation will be ran before save and update
  */
+
+import Form from './form'
 class CRUD {
   constructor (vm, modelService, options) {
     this.vm = vm
@@ -514,57 +516,21 @@ class CRUD {
    */
   formIsValid (reject) {
     let validForm = true // init as valid
-
-    if (this.options.skipFormValidation) {
-      return validForm
-    }
-
     let formRef = this.options.formRef || 'form' // get the form ref (custom or default one)
     let form = this.vm.$refs[formRef] || null // get the form object using the formRef
 
-    if (form) {
-      validForm = form.validate()
-
-      // Validate the native `required` input attribute
-      // that is not validated by the form.validate()
-      if (!this.validateRequiredFields(form)) {
-        validForm = false
-      }
-
-      if (!validForm) {
-        let errorMsg = this.options.invalidForm || this.vm.$t('crud.invalidForm')
-        // as we are not sure about the error message size, use multi-line model for the toaster
-        this.vm.showError(this.capitalize(errorMsg), {mode: 'multi-line'})
-
-        // In the default CRUD usage, it is not necessary to
-        // listen to the promise result
-        // if the promise is not being listened
-        // it can raise an error when rejected/resolved.
-        // This is not a problem!
-        reject(errorMsg)
-      }
+    let crudForm = new Form(form, this.vm, this.options)
+    validForm = crudForm.validate()
+    if (!validForm) {
+      let errorMsg = this.options.invalidForm || this.vm.$t('crud.invalidForm')
+      // In the default CRUD usage, it is not necessary to
+      // listen to the promise result
+      // if the promise is not being listened
+      // it can raise an error when rejected/resolved.
+      // This is not a problem!
+      reject(errorMsg)
     }
     // Validate the form
-    return validForm
-  }
-
-  /**
-   * Validate the required input attribute
-   *
-   * @param {Object} form
-   * @returns {Boolean}
-   * @memberof CRUD
-   */
-  validateRequiredFields (form) {
-    let validForm = true
-    form.getInputs().forEach(input => {
-      // We only validate the  required attribute if the input is not yet invalid
-      if (input.valid && input.required && (input.inputValue === undefined || input.inputValue === null || input.inputValue === '')) {
-        input.valid = validForm = false
-        let errorMsg = `${input.label} ${this.vm.$t('crud.required')}` || this.vm.$t('crud.inputRequired')
-        input.errorBucket.push(errorMsg)
-      }
-    })
     return validForm
   }
 

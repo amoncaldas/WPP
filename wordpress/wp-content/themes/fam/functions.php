@@ -20,25 +20,25 @@
    * @return void
    */
   public function set_output () {
-	$uri = $_SERVER["REQUEST_URI"];
+		$uri = $_SERVER["REQUEST_URI"];
     if (!is_admin() && strrpos($uri, "wp-json/") === false && strrpos($uri, "wp-login.php") === false ) {
-		$crawlers_user_agents = ["googlebot","bingbot","msnbot","yahoo","Baidu","aolbuild","facebookexternalhit","iaskspider","DuckDuckBot","Applebot","Almaden","iarchive","archive.org_bot"];
+			$crawlers_user_agents = ["googlebot","bingbot","msnbot","yahoo","Baidu","aolbuild","facebookexternalhit","iaskspider","DuckDuckBot","Applebot","Almaden","iarchive","archive.org_bot"];
 
-		$is_crawler_request = false;
-		foreach ($crawlers_user_agents as $crawler) {
-			if (strpos($_SERVER['HTTP_USER_AGENT'], $crawler) !== false) {
-				$is_crawler_request = true;
-				break;
+			$is_crawler_request = false;
+			foreach ($crawlers_user_agents as $crawler) {
+				if (strpos($_SERVER['HTTP_USER_AGENT'], $crawler) !== false) {
+					$is_crawler_request = true;
+					break;
+				}
 			}
-		}
 
-		if (isset($_GET["_escaped_fragment_"]) || $is_crawler_request) {
-			define('RENDER_AUDIENCE', 'CRAWLER_BROWSER');
-		} else {
-			define('RENDER_AUDIENCE', 'USER_BROWSER');
+			if (isset($_GET["_escaped_fragment_"]) || $is_crawler_request) {
+				define('RENDER_AUDIENCE', 'CRAWLER_BROWSER');
+			} else {
+				define('RENDER_AUDIENCE', 'USER_BROWSER');
+			}
+			require_once("app-renderer.php");
 		}
-		require_once("app-renderer.php");
-	}
   }
 	/**
 	 * Register plugin hooks

@@ -4,9 +4,9 @@ Contributors: tmeister
 Donate link: https://enriquechavez.co
 Tags: wp-json, jwt, json web authentication, wp-api
 Requires at least: 4.2
-Tested up to: 4.8.1
+Tested up to: 5.0
 Requires PHP: 5.3.0
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,7 +62,7 @@ The JWT needs a **secret key** to sign the token this **secret key** must be uni
 To add the **secret key** edit your wp-config.php file and add a new constant called **JWT_AUTH_SECRET_KEY**
 
 `
-define('JWT_AUTH_SECRET_KEY', 'your-top-secrect-key');
+define('JWT_AUTH_SECRET_KEY', 'your-top-secret-key');
 `
 
 You can use a string from here https://api.wordpress.org/secret-key/1.1/salt/
