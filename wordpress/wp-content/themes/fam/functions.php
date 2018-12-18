@@ -21,7 +21,7 @@
    */
   public function set_output () {
 		$uri = $_SERVER["REQUEST_URI"];
-    if (!is_admin() && strrpos($uri, "wp-json/") === false && strrpos($uri, "wp-login.php") === false ) {
+    if (!is_admin() && strrpos($uri, "wp-json") === false && strrpos($uri, "wp-login.php") === false && $uri !== "") {
 			$crawlers_user_agents = ["googlebot","bingbot","msnbot","yahoo","Baidu","aolbuild","facebookexternalhit","iaskspider","DuckDuckBot","Applebot","Almaden","iarchive","archive.org_bot"];
 
 			$is_crawler_request = false;

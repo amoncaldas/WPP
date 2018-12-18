@@ -32,13 +32,15 @@ wordpress/wp-content/plugins/*
 # wordpress/wp-content/fam/static_maps/
 
 ## ...except the pre-instaled plugins
-
 !wordpress/wp-content/plugins/add-youtube-video-to-media-library
 !wordpress/wp-content/plugins/db-cache-reloaded-fix
 !wordpress/wp-content/plugins/disable-comments
 !wordpress/wp-content/plugins/ps-disable-auto-formatting
 !wordpress/wp-content/plugins/reorder-posts
 !wordpress/wp-content/plugins/wp-super-cache
+!wordpress/wp-content/plugins/remote-medias-lite
+!wordpress/wp-content/plugins/quick-and-easy-post-creation-for-acf-relationship-fields
+
 
 !wordpress/wp-content/plugins/wordpress-importer
 !wordpress/wp-content/plugins/wp-mail-smtp
