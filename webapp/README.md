@@ -89,9 +89,10 @@ What is ready for use and included in the base Vue SPA:
 
 ### Core/CRUD ###
 
-The generic crud solution allows communicate with the back-end api with minimum code. You just need to define the endpoint of a resource and inject the crud.js exports to a vue.js component. You can also use direct a model instance or the model service to retrieve/send data not implementing the crud behaviors direct in your VueJS component/page. The composed of three main classes/files:
+The generic crud solution allows the communication with a back-end api with minimum code. You just need to define the endpoint of a resource and add the curd to a component by instantiating it to a vue.js component. You can also use directly a model instance or the model service to retrieve/send data not implementing the crud behaviors in your VueJS component/page. The solution is composed of four main classes/files:
 
 - [core/crud.js](#src/core/crud.js)
+- [core/form.js](#src/core/form.js)
 - [core/model-service.js](#src/core/model-service.js)
 - [core/model.js](#src/core/model.js)
 
@@ -165,6 +166,19 @@ export default {
 }
 ```
 
+#### Form validation ####
+
+The crud solution uses the form.js to validate a form before submitting the form. But, it is possible to disable this by passing the `skipFormValidation:true` in the options object passed to the crud constructor. Is the default behavior is on, the slution will look for a form reference, in your component context, named `form` *(like vm.$refs.form, where vm is the component context passed to the crud)*. Iy is also possible to specify a alternative form ref name, by setting the `formRef:<my-form-ref-name>(string)` in the options object passed to the constructor of crud.
+
+
+It is also possible to use the form validation apart from the crud component. You just have to import it, create a new instance passing:
+
+- the `formRef` object,
+- the `context` object (the component **this**)
+- the optional `options` object.
+
+ Then, just run the `validate` method. It will run the default form object passed in the formRef validation and also check for the `required` attribute in each input and validate it. If any field is invalid, it will highlight it, set the `valid` status as false and also add a string to the inputs the error bucket using input label and crud translations for `required`.
+
 #### Adding CRUD functionalities to a component ####
 
 The CRUD class allows to add common extended CRUD actions (get, index, save, update, destroy)
@@ -175,7 +189,7 @@ refresh listed data after save, destroy and update and success and confirmation 
 
 EXPORTS: this javascript module exports two objects: CRUDData and CRUD.
 
-The crud setter expects the following parameters::
+The crud setter expects the following parameters:
 
 1. @param {} `vm` - the component instance, that can be passed using `this`
 1. @param {} `modelService`  - an instance of the ModelService class representing the service that provides the data service to a resource. @see @/core/model-service
@@ -200,8 +214,9 @@ The options object may contain the following attributes:
 - `skipAutoIndexAfterUpdate` (boolean) : skips the auto resources reload after update
 - `skipAutoIndexAfterDestroy` (boolean) : skips the auto resources reload after destroy
 - `skipServerMessages` (boolean) : skip using server returned message and use only front end messages do display toasters
-- `formRef` (string, optional) : the name of the form ref you are using in the template. Necessary to auto validate the form. If not provided, assumed is 'form'
-- `[http-error-status-code-number]` : defines the message to be used when this http error status code is returned by a request (from 300 to 505)
+- `skipShowValidationMsg` (boolean) : skit showing the validation error message via toaster when a form is invalid
+- `formRef` (string, optional) : the alternative name of the form ref you are using in the template. Used to auto validate the form. If not provided, it is assumed that the form ref name is `form`
+- `[http-error-status-code-number]` : defines the message to be used when an http error status code is returned by a request (only available fot status code from `300` to `505`)
 
 Example of adding CRUD to a component:
 
@@ -363,7 +378,12 @@ The app scaffold has the following structure:
 - `core` - where the model, crud and crud service solution are.
 - `directives` - where custom directives should be put.
 - `filters` - where custom filters should be put.
-- `fragments` - where all the partial components, like menu component, footer etc should be put. Inside the fragments folder there is a sub-folder called `forms` where form components must be stored. the `User.vue` form component (used in user registration and user profile update) is stored here.
+- `fragments` - where all the partial components, like menu component, footer etc should be put.
+  - Inside the fragments folder there is a sub-folder called `forms` where form components must be stored.
+  - **highlighted components**:
+    - `user` is a form component that is used in user registration and user profile update.
+    - `ors-map` - a map component using vue-leaflet that renders a map based on a `ORS API response data`. Each API endpoint supported must have a corresponding data extractor in *fragments/ors-map/services/map-data-extractor/`{version}`/extractor-file-name.js* and must be referred in *fragments/ors-map/services/map-builder.js*. There is an dictionary in *fragments/ors-map/services/map-builder.js:getMapDataExtractor* that is responsible for mapping the API version to ors map extractor version. Currently the ors map extractor `V1` supports API versions `4.5` and `4.7`.
+    - `ors-table` - a table component using vuetify v-data-table that renders a table based on a `ORS API response data`. Each API endpoint supported must have a corresponding data extractor in *fragments/ors-table/services/table-data-extractor/`{version}`/extractor-file-name.js* and must be referred in *fragments/ors-map/services/table-builder.js*. There is an dictionary in *fragments/ors-map/services/map-builder.js:getTableDataExtractor* that is responsible for mapping the API version to ors map extractor version. Currently the ors map extractor `V1` supports API versions `4.5` and `4.7`.
 - `i18n` - where the lang/culture resources and the lang loader resides (each page or fragment can have its own  i18n files)
 - `pages` - where the app pages that are rendered based in a route should be put. The structure and files of a page inside the pages folder is:
   - my-page-name (folder)
@@ -388,7 +408,7 @@ The app load cycle follow these steps:
 1. The `main.js` also includes the main router script, the main vuex store and the main i18n file, that will internally, each one, load all the additional `.router.js` files, `.store.js` files and `.i18n..js` files.
 1. `Main.js` file will create a VueJS app instance and load the `App.vue`.
 1. `App.vue` includes all basic navigation components, like menu, sidebar, footer and etc.
-1. As all the routes were loaded, including the ones in the `pages` sub folder, the page with the `/` or `/home` route will also be rendered in the `<router-view></router-view>` in `App.vue`, considering authentication state.
+1. As soon as all the routes are loaded, including the ones in the `pages` sub folder, the page with the `/` or `/home` route will also be rendered in the `<router-view></router-view>` in `App.vue` component, considering authentication state.
 
 ### Reserved methods and accessor ###
 
@@ -418,17 +438,21 @@ All the VueJS components created (including the fragments) will have, by default
 
 ### Pages ###
 
+- `activate` - the page land when the user clicks in the activation link sent to the email. It gets the data from the url and and run a request to the back-end to activate the user account. If the user id is wrong or the activation code is not valid any more, it will show a corresponding error.
+- `api-docs` - the API documentation parser and interface builder that creates the interactive documentation playground, allowing a user to explore all the API endpoints, resources and responses on the fly, live. This page is composed of several sub-components, specialized services and adapters (responsible for adapting a provided API doc for the interface builder). Among others, this page uses the `@/fragments/ors-map` and `@/fragments/ors-table` components
 - `Auth` - page where the authentication component resides
 - `Home` - page where the user is redirected to after login. This page contains a tab component, with two tabs:
   - `tokens` - where the user token a listed and where s/he can remove/create tokens and also see the token usage and quota
-  - `profile` - where the user can see and edit his/her own profile, including password. It uses the `@fragments/forms/User.vue` form component.
-- `Reset` - page where the user can request a password reset link. As in the back-end we are using wordpress and a specific plugin for triggering user password reset link, in this page we are not using te wp-api, but instead we instantiate a javascript FormData object, fill it with the expected data by the plugin and send it. In the future a custom rest end-point should be created to trigger the same action so we only use rest requests.
-- `Signup` - where the user can create an account filling the form or via single-click using a github account. It uses the `@fragments/forms/User.vue` form component.
+  - `profile` - where the user can see and edit his/her own profile, including password. It uses the `@/fragments/forms/User.vue` form component.
+- `password` a folder that contains the password request and reset components
+  - `request` - allow the user to request a password reset link
+  - `reset` - allow the user to redefine the password after clicking the email link sent after requesting a password reset.
+- `signup` - where the user can create an account filling the form or via single-click using a github account. It uses the `@/fragments/forms/User.vue` form component.
 
 ### Menu ###
 
 The menu displayed in the header and in the sidebar (low resolution and mobile devices) is loaded from the back-end server and adjusted to be show according the app status (user authenticated or not).
-The menu items retrieval is fetched by the on the `created` event of the `@fragments/Header` component. So, it dispatch the store `fetchMainMenu` and the menu is retrieved by the `@common/main-menu.js` that internally uses the `@support/menu-manager.js` and the `@support/model-service.js`. Once the items form the back-end are loaded, they are treated to add/remove custom items and define sidebar items icons in the `@common/main-menu.js`.
+The menu items retrieval is fetched by the on the `created` event of the `@/fragments/Header` component. So, it dispatch the store `fetchMainMenu` and the menu is retrieved by the `@/common/main-menu.js` that internally uses the `@/support/menu-manager.js` and the `@/support/model-service.js`. Once the items form the back-end are loaded, they are treated to add/remove custom items and define sidebar items icons in the `@/common/main-menu.js`.
 
 ## Debug ##
 

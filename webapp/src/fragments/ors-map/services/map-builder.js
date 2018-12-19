@@ -3,6 +3,7 @@ import DirectionsJSONDataBuilderV1 from './map-data-extractors/v1/directions-jso
 import GeocodeSearchBuilderV1 from './map-data-extractors/v1/geocode-search'
 import GeocodeReverseBuilderV1 from './map-data-extractors/v1/geocode-reverse'
 import IsochronesBuilderV1 from './map-data-extractors/v1/isochrones'
+import PoisBuilderV1 from './map-data-extractors/v1/pois'
 
 /**
  * Map data Builder class
@@ -41,6 +42,8 @@ class MapDataBuilder {
         return MapDataBuilder.getMapDataExtractor('GeocodeReverseBuilder', data)
       case '/isochrones':
         return MapDataBuilder.getMapDataExtractor('IsochronesBuilder', data)
+      case '/pois':
+        return MapDataBuilder.getMapDataExtractor('PoisBuilder', data)
     }
   }
 
@@ -66,15 +69,15 @@ class MapDataBuilder {
       DirectionsJSONDataBuilderV1,
       GeocodeSearchBuilderV1,
       GeocodeReverseBuilderV1,
-      IsochronesBuilderV1
+      IsochronesBuilderV1,
+      PoisBuilderV1
       // we can add more versions here in the future
     }
 
     // Get the right extractor based on the extractor name
     // and on the api version from the extractors list
     let extractorNameWithVersion = extractorName + apiVersionToExtractorVersionDictionary[data.apiVersion]
-    let extractor = new extractors[extractorNameWithVersion](data)
-    return extractor
+    return new extractors[extractorNameWithVersion](data)
   }
 
   /**

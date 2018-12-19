@@ -49,8 +49,9 @@
  *  - skipAutoIndexAfterUpdate (boolean) : skips the auto resources reload after update
  *  - skipAutoIndexAfterDestroy (boolean) : skips the auto resources reload after destroy
  *  - skipServerMessages (boolean) : skip using server returned message and use only front end messages do display toasters
- *  - formRef (string, optional) : the name of the form ref you are using in the template. Necessary to auto validate the form. If not provided, assumed is 'form'
- *  - [http-error-status-code-number] : defines the message to be used when this http error status code is returned by a request (from 300 to 505)
+ *  - skipShowValidationMsg (boolean) : skit showing the validation error message via toaster when a form is invalid
+ *  - formRef (string, optional) : the alternative name of the form ref you are using in the template. Used to auto validate the form. If not provided, it is assumed that the form ref name is `form`
+ *  - [http-error-status-code-number] : defines the message to be used when an http error status code is returned by a request (only available fot status code from `300` to `505`)
  *
  * Crud events optional functions:
  * if the vue instance has one of the following defined methods, it is gonna be ran. If it returns false, the execution will be rejected and stopped

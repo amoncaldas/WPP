@@ -14,7 +14,8 @@ export default {
     code: null, // if an additional json object is provided it will be displayed beyond the infoText
     zIndex: null,
     isMaximized: false,
-    guid: null
+    guid: null,
+    persistent: false
   }),
   methods: {
     showDialog (info) {
@@ -29,6 +30,7 @@ export default {
       this.textIsMarkdown = info.markdown
       this.code = info.code // if an additional json object is provided it will be displayed beyond the infoText
       this.zIndex = info.zIndex || 3
+      this.persistent = info.persistent || this.persistent
     },
     onOk () {
       this.show = false

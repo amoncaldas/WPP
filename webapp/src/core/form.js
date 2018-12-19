@@ -6,10 +6,13 @@ class CrudForm {
   }
 
   /**
-   * The initial function is executed when the class is built
-   * if the option queryOnStartup is true, it will also load the resources automatically.
+   * Validate a form by running the default form validate and addition check for required field
+   * If any field is invalid, sets the field as invalid, set it error message and shows a toaster with the error
    */
   validate () {
+    if (this.options.skipFormValidation) {
+      return true
+    }
     let validForm = this.formRef.validate()
 
     // Validate the native `required` input attribute
@@ -18,7 +21,7 @@ class CrudForm {
       validForm = false
     }
 
-    if (!validForm) {
+    if (!validForm && !this.options.skipShowValidationMsg) {
       let errorMsg = this.options.invalidForm || this.vm.$t('crud.invalidForm')
       // as we are not sure about the error message size, use multi-line model for the toaster
       this.vm.showError(this.capitalize(errorMsg), {mode: 'multi-line'})

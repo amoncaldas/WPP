@@ -326,7 +326,7 @@
 	}
 
 	/**
-	 * Add menu support to thetheme
+	 * Add menu support to the theme
 	 *
 	 * @return void
 	 */
