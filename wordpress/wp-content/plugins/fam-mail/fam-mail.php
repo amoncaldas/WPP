@@ -6,13 +6,13 @@
  */
  
 /*
-Plugin Name: FAM Mail From
+Plugin Name: FAM Mail
 Plugin URI: http://fazendoasmalas.com/
-Description: Change the default address that WordPress sends it’s email from.
-Version: 0.9.3
+Description: Change the default address that WordPress sends it’s email from and process mass mails
+Version: 0.9.4
 Author: Amon Caldas
 Author URI: http://fazendoasmalas.com/
-Last Change: 19.09.2013 08:41:06
+Last Change: 20.12.2018 08:41:06
 */
 
 if ( !function_exists('add_action') ) {
@@ -21,32 +21,25 @@ if ( !function_exists('add_action') ) {
 	exit();
 }
 
-if ( !class_exists('wp_mail_from') ) {
-	class wp_mail_from {
-		
-		function wp_mail_from() {
-			add_filter( 'wp_mail_from', array(&$this, 'fb_mail_from') );
-			add_filter( 'wp_mail_from_name', array(&$this, 'fb_mail_from_name') );
-		}
-		
-		// new name
-		function fb_mail_from_name($name) {
-			if( strpos($name, "Fazendo as Malas") === false){
-				$name = 'Fazendo as Malas';		
-				$name = esc_attr($name);
-			}
-			return $name;
-		}
-		
-		// new email-adress
-		function fb_mail_from($email) {
-			if( strpos($email, "@fazendoasmalas.com") === false){
-				$email = 'contato@fazendoasmalas.com';
-			}
-			return $email;
-		}
-	}
-	
-	$wp_mail_from = new wp_mail_from();
-}
+define('FAM_MAIL_PLUGIN_PATH', dirname( __FILE__ ));
+
+// Imports
+require_once(FAM_MAIL_PLUGIN_PATH . '/fam-mass-mailer.php');
+require_once(FAM_MAIL_PLUGIN_PATH . '/mail-from.php');
+
+
+// change from
+$wp_mail_from = new wp_mail_from();
+
+// process mass mails
+$massMailer = new FamMassMailer();
+
+register_rest_route("fam-mailer", '/send', array(
+	array(
+		'methods'  => "GET",
+		'callback' => array(&$massMailer, 'run' ),
+	)
+));
+
+
 ?>

@@ -82,8 +82,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			// Base api namespace that represents also the url
 			$baseNamespace = 'fam-api/v1';
 
-			$orsUserData = new FamUserData($baseNamespace);
-			add_action('rest_api_init', array(&$orsUserData, 'register_routes'));
+			$famUserAPI = new FamUserAPI($baseNamespace);
+			add_action('rest_api_init', array(&$famUserAPI, 'register_routes'));
 		} 
 	}
  }

@@ -6,16 +6,18 @@
 wp plugin install jwt-authentication-for-wp-rest-api --allow-root --activate
 wp plugin install reorder-posts --allow-root --activate
 wp plugin install wp-api-menus --allow-root --activate
-wp plugin install wp-super-cache --allow-root --activate
 wp plugin install db-cache-reloaded-fix --allow-root --activate
 wp plugin install remote-medias-lite --allow-root --activate
 wp plugin install quick-and-easy-post-creation-for-acf-relationship-fields --allow-root --activate
+wp plugin install custom-post-type-ui --allow-root --activate
+wp plugin install acf-to-rest-api --allow-root --activate
+
+
 
 
 # Install fam plugins
 wp plugin install fam --allow-root --activate
 wp plugin install fam-oauth --allow-root --activate
-wp plugin install fam-mu-related-post --allow-root --activate
 wp plugin install fam-multi-site --allow-root --activate
 
 

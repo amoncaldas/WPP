@@ -7,7 +7,7 @@
  */
 
 
-class FamUserData {
+class FamUserAPI {
 
     private $baseNamespace;
 
