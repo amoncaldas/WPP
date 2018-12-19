@@ -32,35 +32,24 @@ wordpress/wp-content/plugins/*
 # wordpress/wp-content/fam/static_maps/
 
 ## ...except the pre-instaled plugins
-!wordpress/wp-content/plugins/add-youtube-video-to-media-library
-!wordpress/wp-content/plugins/db-cache-reloaded-fix
 !wordpress/wp-content/plugins/disable-comments
-!wordpress/wp-content/plugins/ps-disable-auto-formatting
-!wordpress/wp-content/plugins/reorder-posts
-!wordpress/wp-content/plugins/wp-super-cache
 !wordpress/wp-content/plugins/remote-medias-lite
-!wordpress/wp-content/plugins/quick-and-easy-post-creation-for-acf-relationship-fields
-
-
-!wordpress/wp-content/plugins/wordpress-importer
 !wordpress/wp-content/plugins/wp-mail-smtp
 !wordpress/wp-content/plugins/extra-user-details
 !wordpress/wp-content/plugins/jwt-authentication-for-wp-rest-api
 !wordpress/wp-content/plugins/wp-api-menus
 !wordpress/wp-content/plugins/admin-columns-pro
 !wordpress/wp-content/plugins/advanced-custom-fields-pro
-!wordpress/wp-content/plugins/custom-post-type-permalinks
 !wordpress/wp-content/plugins/custom-post-type-ui
 !wordpress/wp-content/plugins/acf-to-rest-api
-
+!wordpress/wp-content/plugins/wp-options-editor
+!wordpress/wp-content/plugins/classic-editor
 
 
 ## Do not ignore FAM plugins
 !wordpress/wp-content/plugins/fam
 !wordpress/wp-content/plugins/fam-oauth
-!wordpress/wp-content/plugins/fam-multi-site
 !wordpress/wp-content/plugins/fam-mail
-!wordpress/wp-content/plugins/fam-mu-related-post
 
 # Ignore files that contains custom enviroment config/data
 wordpress/wp-config.php

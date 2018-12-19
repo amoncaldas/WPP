@@ -15,12 +15,11 @@ Author URI: http://fazendoasmalas.com/
 Last Change: 20.12.2018 08:41:06
 */
 
-if ( !function_exists('add_action') ) {
-	header('Status: 403 Forbidden');
-	header('HTTP/1.1 403 Forbidden');
-	exit();
+// Make sure we don't expose any info if called directly
+if ( ! function_exists( 'add_action' ) ) {
+	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
+	exit;
 }
-
 define('FAM_MAIL_PLUGIN_PATH', dirname( __FILE__ ));
 
 // Imports
@@ -33,13 +32,5 @@ $wp_mail_from = new wp_mail_from();
 
 // process mass mails
 $massMailer = new FamMassMailer();
-
-register_rest_route("fam-mailer", '/send', array(
-	array(
-		'methods'  => "GET",
-		'callback' => array(&$massMailer, 'run' ),
-	)
-));
-
 
 ?>

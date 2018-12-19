@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // WP API v1.
-include_once 'includes/ors-oauth-wp-api.php';
+include_once 'includes/fam-oauth-wp-api.php';
 
 if ( ! function_exists ( 'ors_auth_init' ) ) :
 

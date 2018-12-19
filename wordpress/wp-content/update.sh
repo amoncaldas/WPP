@@ -11,8 +11,7 @@ wp plugin install remote-medias-lite --allow-root --activate
 wp plugin install quick-and-easy-post-creation-for-acf-relationship-fields --allow-root --activate
 wp plugin install custom-post-type-ui --allow-root --activate
 wp plugin install acf-to-rest-api --allow-root --activate
-
-
+wp plugin install wp-options-editor --allow-root --activate
 
 
 # Install fam plugins

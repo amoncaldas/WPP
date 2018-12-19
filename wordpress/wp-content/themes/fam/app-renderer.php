@@ -20,7 +20,7 @@
         }	
     }
     /**
-     * Het the html web apge skeleton
+     * Het the html web page skeleton
      *
      * @return string
      */

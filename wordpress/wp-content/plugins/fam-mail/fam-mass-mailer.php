@@ -1,308 +1,415 @@
 <?php
 
 /**
- * class FamMail
+ * Class FamMail
  *
  * Description for class FamMail
+ * WordPress options used: email_sender_name, email_sender_email, skip_email_sending_notification, deactivate_news_sending
  *
- * @author:
+ * @author: Amon Caldas
 */
 
 
 class FamMassMailer  {
 
-	public $base_insert_sent_sql = "insert into wp_fam_mail_sent (email, id_pending_mail,mail_list_type, mail_title) values ";
-	public $Debug_output = "";
+	public $base_insert_sent_sql = "insert into wp_mail_sent (email, id_pending_mail,mail_list_type, mail_title) values ";
+	public $debug_output = "";
 	public $Times = 0;
 	public $MaxNotificationsPerTime = 50;
-	public $Sent_mails = array();
+	public $sent_mails = array();
+
+	function __construct () {
+		add_action( 'save_post', array($this, 'store_email_based_in_created_content'), 100, 2);
+		add_filter( 'rest_api_init', array( $this, 'register_routes' ) );		
+	}
 
 	/**
-	 * FamMail constructor
+     * Register ORS oauth routes for WP API v2.
+     *
+     * @since  1.2.0
+     */
+    public function register_routes() {
+		register_rest_route("fam-mail", '/send', array(
+			array(
+				'methods'  => "GET",
+				'callback' => array($this, 'send_emails' ),
+			)
+		));
+	}
+
+	/**
+	 * Run mass mail sender
 	 *
 	 * @param 
 	 */
-	function run () {
-		$this->ProcessPendingMails();
-		$this->Debug();
+	public function send_emails () {
+		$deactivated = get_option("deactivate_news_sending");
+		if ($deactivated !== "yes") {
+			$this->process_pending_mails();
+			$this->debug();
+		}		
+	}
+
+	/**
+	 * Get the news mail template
+	 *
+	 * @return String
+	 */
+	function get_news_template() {
+		$template = file_get_contents(FAM_MAIL_PLUGIN_PATH.'/templates/mail/news.html');
+		return $template;
+	}
+
+	/**
+	 * Get the other items news sub template
+	 *
+	 * @return String
+	 */
+	function getRelatedTemplate() {
+		$template = file_get_contents(FAM_MAIL_PLUGIN_PATH.'/templates/mail/news_other_items.html');
+		return $template;
+	}
+
+	/**
+	 * Store email post based in a email created content
+	 *
+	 * @param Integer $post_ID
+	 * @param WP_Post $post
+	 * @return void
+	 */
+	function store_email_based_in_created_content($post_ID, $post) {		
+		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) 
+			return;
+		// AJAX? Not used here
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) 
+			return;	
+		// Return if it's a post revision
+		if ( false !== wp_is_post_revision( $post_ID ) )
+			return;
+		
+		// Get the pos types that supports `send_news`
+		$support_send_news_types = get_post_types_by_support("send_news");	
+		
+		$notified = get_post_meta($post->ID, "notified", true);
+		
+		// This covers the post types with no post type in permalink
+		if (in_array($post->post_type, $support_send_news_types) && $post->post_status === "publish" && $notified !== "yes") {
+			update_post_meta($post->ID, 'notified', "yes");
+
+			$content_image = get_the_post_thumbnail_url($post_ID);			
+			$url_parts = explode("//", network_home_url());
+			$logo_url = network_home_url(get_option("site_relative_logo_url"));
+
+			$template = $this->get_news_template();
+			
+			$template = str_replace("{site-url}", network_home_url(), $template);
+			$template = str_replace("{news-type}", "newsletter", $template);
+			
+			$template = str_replace("{site-name}", get_bloginfo("name"), $template);
+			$template = str_replace("{site-domain}", $url_parts[1], $template);
+			$template = str_replace("{site-logo-url}", $logo_url, $template);			
+			$template = str_replace("{content-url}", get_permalink($post_ID), $template);
+			$template = str_replace("{content-image-src}", $content_image ? $content_image : "", $template);
+			$template = str_replace("{site-url}", network_home_url(), $template);
+			
+			
+			if($content_image = ""){ $template = str_replace("{main-img-height}", "0", $template); } else {$template = str_replace("{main-img-height}", "290", $template);}
+
+			$content = $post->post_excerpt !== "" ? $post->post_excerpt : getSubContent($post->post_content, 500);
+			$template = str_replace("{content-excerpt}", $content, $template);
+			$template = str_replace("{content-title}", $post->post_title, $template);
+			$template = str_replace("{current-year}", date('Y'), $template);
+
+			$template = $this->ReplaceRelatedTemplate($template, $post_ID);
+			$message = str_replace("'","''", $template);
+
+			$email_created = wp_insert_post(
+				array(
+					"post_type"=> "email", 
+					"post_status"=> "publish",
+					"post_author"=> get_current_user_id(),
+					"post_title"=> $post->post_title, 
+					"post_content"=> $message, 
+					"meta_input"=> array(
+						"content_type"=> "html", 
+						"mail_list_type"=> "news"
+					)
+				)
+			);
+
+			update_post_meta($post_ID, 'notified','no');	
+		}
+	}
+
+	/**
+	 * Replace related template in news mail template
+	 *
+	 * @param String $template
+	 * @param Integer $post_ID
+	 * @return String
+	 */
+	function ReplaceRelatedTemplate($template, $post_ID) {
+		$related_post_ids = get_field('related', $post_ID);
+		$related = get_posts(array( 'post__in' => $related_post_ids));
+
+		if(is_array($related) && count($related) > 2) {
+			$template_other_items = $this->getRelatedTemplate();
+			$counter = 1;
+			foreach($related as $related_post)
+			{
+				$template_other_items = str_replace("{related-content-url-".$counter."}", get_permalink($related_post->ID), $template_other_items);
+				$template_other_items = str_replace("{related-content-image-src-".$counter."}", get_the_post_thumbnail_url($related_post->ID), $template_other_items);
+				$template_other_items = str_replace("{related-content-title-".$counter."}", $related_post->post_title, $template_other_items);
+				
+				if($counter == 3) {
+					break;
+				}
+				$counter++;
+			}				
+			
+			$template = str_replace("{other-items}", $template_other_items, $template);
+		} else {
+			$template = str_replace("{other-items}", "", $template);	
+		}
+		return $template;
 	}
 	
-	function ProcessPendingMails() {		
-		global $wpdb;
-		$sql = "SELECT * FROM  wp_fam_pending_mail LIMIT 0 , 2";		
-		$pending_mails = $wpdb->get_results($sql);
+	/**
+	 * Process pending email
+	 *
+	 * @return void
+	 */
+	function process_pending_mails() {			
+		$pending_mails = get_posts( array( 'post_type' => 'email', 'orderby'  => 'id', 'order' => 'ASC', 'post_status' => 'publish'));
 		$to = array();	
 				
 		if (is_array($pending_mails) && count($pending_mails) > 0 ) { 
 			
-			$this->Debug_output .= "<br/>Loging mails sent to email as html | ".$pending_mail->subject." on - ".date('m/d/Y h:i:s', time());
 			$pending_mail = $pending_mails[0];
-			$this->Debug_output .=" <br/> Returned pendging mail ID ".$pending_mail->ID." <br/>";
+			$this->debug_output .= "<br/>Logging mails sent to email as html | ".$pending_mail->post_title." on - ".date('m/d/Y h:i:s', time());
+			$this->debug_output .=" <br/> Returned pending mail ID ".$pending_mail->ID." <br/>";
 					
-			$to = $this->GetMailsTo($pending_mail);	
-			$this->Debug_output .=" <br/> Returned mail subscribers to send amount: ".count($to)." <br/>";	
+			$to = $this->get_mails_to($pending_mail);	
+			$this->debug_output .=" <br/> Returned mail subscribers to send amount: ".count($to)." <br/>";	
 			if(!is_array($to) || count($to) == 0)	
 			{
-				//delete pending mail
-				$this->Debug_output .= "<br/>No more mail to send, deleting pending mail sedind mail ".$pending_mail->ID."...";
-				$delete_pending_sql = " delete from wp_fam_pending_mail where ID = ".$pending_mail->ID;						
-				$wpdb->query($delete_pending_sql);	//desabilitado temporariamente			
+				// Delete pending mail
+				$this->debug_output .= "<br/>No more mail to send, deleting pending mail sending mail ".$pending_mail->ID."...";
+				wp_delete_post($pending_mail->ID)					;		
 			}
 			elseif(is_array($to) && count($to) > 0)
 			{				
-				$this->Debug_output .= "<br/>start sedind mail... ";					
-				$this->SendPendingMails($to,$pending_mail);		
-				$this->NotifiMailSent();		
-			}
-						
+				$this->debug_output .= "<br/>start sending mail... ";					
+				$this->send_pending_mails($to,$pending_mail);		
+				$this->notify_mail_sent();		
+			}						
 		}	
 		else
 		{		
-			$this->Debug_output .= 'No pending mail to send';
+			$this->debug_output .= 'No pending mail to send';
 		}		
 	}
 	
-	function SendPendingMails($to, $pending_mail) {	
+	/**
+	 * Send pending email
+	 *
+	 * @param String $to
+	 * @param WP_Post $pending_mail
+	 * @return void
+	 */
+	function send_pending_mails($to, $pending_mail) {	
 		$insert_sent_sql = $this->base_insert_sent_sql;	
 		if(is_array($to) && count($to) > 0)
 		{		
-			$headers[] = 'From: Fazendo as Malas <contato@fazendoasmalas.com>';	
-			$headers[] = 'Return-Path: <contato@fazendoasmalas.com>';
-			$headers[] = "Sender: <contato@fazendoasmalas.com>";
-												
-			//$this->Debug_output .= "<br/>Header:".var_export($headers,true)."<br/>";
-							
-			if($pending_mail->content_type == "html")
-			{
+			$senderName = get_option("email_sender_name");
+			$senderEmail = get_option("email_sender_email");
+			$headers[] = "From: $senderEmail <$senderName>";	
+			$headers[] = "Return-Path: <$senderName>";
+			$headers[] = "Sender: <$senderName>";
+					
+			$content_type = get_post_meta($pending_mail->ID, "content_type", true);
+			$mail_list_type = get_post_meta($pending_mail->ID, "mail_list_type", true);
+			
+			if($content_type == "html") {
 				add_filter('wp_mail_content_type', 'set_html_content_type' );	
 				$counter = 1;	
 				foreach($to as $mail)
 				{
-					$success = wp_mail($mail,$pending_mail->subject,$pending_mail->content,$headers);
+					$success = wp_mail($mail,$pending_mail->post_title, $pending_mail->post_content, $headers);
 					if($success)
 					{
-						$this->Debug_output .= "<br/>sent as html->".$mail." | ".$pending_mail->subject." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>sent as html->".$mail." | ".$pending_mail->post_title." on - ".date('m/d/Y h:i:s', time());
 						if($counter > 1)
 						{
 							$insert_sent_sql.= ", ";
 						}
-						$insert_sent_sql .= " ('".$mail."', ".$pending_mail->ID. ", '".$pending_mail->mail_list_type."', '".$pending_mail->subject."') ";						
+						$insert_sent_sql .= " ('".$mail."', ".$pending_mail->ID. ", '".$mail_list_type."', '".$pending_mail->post_title."') ";						
 						$sent_mail = new stdClass();
 						$sent_mail->mail = $mail;
-						$sent_mail->mail_title = $pending_mail->subject;						
-						$this->Sent_mails[] = $sent_mail;
+						$sent_mail->mail_title = $pending_mail->post_title;						
+						$this->sent_mails[] = $sent_mail;
 						$counter++;
 					}
 					else
 					{
-						$this->Debug_output .= "<br/>fail to send as html-> noreply@fazendoasmalas.com,".$mail." | ".$pending_mail->subject." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>Failed to send as html-> $senderEmail,".$mail." | ".$pending_mail->post_title." on - ".date('m/d/Y h:i:s', time());
 					}
 				}
 				remove_filter('wp_mail_content_type', 'set_html_content_type');
 				global $wpdb;
 				$wpdb->query($insert_sent_sql);
-				//$this->Debug_output .= "<br/><br/>Html insert sent sql->".$insert_sent_sql." </br>";
 			}
-			else
+			else// Get the pos types that supports `no_post_type_in_permalink`
+			$no_post_type_in_permalink_types = get_post_types_by_support("no_post_type_in_permalink");
+	
+			// Get the post types that supports `parent_section` and `section_in_permalink`
+			$section_in_permalink_types = get_post_types_by_support(array("parent_section","section_in_permalink"));				
+			
+			// This covers the post types with no post type in permalink
+			if (in_array($post->post_type, $no_post_type_in_permalink_types)) {
+				$permalink = $this->get_permalink_with_no_post_type_in_it($post, $permalink);
+			} 
 			{
 				$counter = 1;	
 				foreach($to as $mail)
 				{
-					$success = wp_mail($mail,$pending_mail->subject,$pending_mail->content,$headers);
+					$success = wp_mail($mail, $pending_mail->post_title, $pending_mail->post_content, $headers);
 					if($success)
 					{
-						$this->Debug_output .= "<br/>sent -> ".$to." | ".$pending_mail->subject." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>sent -> ".$to." | ".$pending_mail->post_title." on - ".date('m/d/Y h:i:s', time());
 						if($counter > 1)
 						{
 							$insert_sent_sql.= ", ";
 						}
-						$insert_sent_sql .= " ('".$mail."', ".$pending_mail->ID. ", '".$pending_mail->mail_list_type."', '".$pending_mail->subject."') ";
+						$insert_sent_sql .= " ('".$mail."', ".$pending_mail->ID. ", '".$mail_list_type."', '".$pending_mail->post_title."') ";
 						
 						$counter++;
 					}
 					else
 					{
-						$this->Debug_output .= "<br/>fail to send-> noreply@fazendoasmalas.com,".$to." | ".$pending_mail->subject." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>fail to send-> $senderEmail,".$to." | ".$pending_mail->post_title." on - ".date('m/d/Y h:i:s', time());
 					}
 				}
 				global $wpdb;
 				$wpdb->query($insert_sent_sql);
-				//$this->Debug_output .= "<br/><br/>No html insert sent sql->".$insert_sent_sql." </br>";
 			}	
 									
 		}				
 	}
 	
-	function GetMailsTo($pending_mail) {
-		if($pending_mail->mail_list_type == "news")
-		{			
-			$to = $this->GetNewsMailList($pending_mail->ID, $pending_mail->subject);
-			$this->Debug_output .="<br/> working on news mail...<br/>";
-		}
-		elseif($pending_mail->mail_list_type == "temp")
-		{				
-			$to = $this->GetTempMailList($pending_mail->ID);
-			$this->Debug_output .=" <br/> working on temp mail...<br/>";
-		}
-		elseif( strpos($pending_mail->mail_list_type,"comment_post_")> -1)
-		{
-			$post_ID_parts = explode("comment_post_",$pending_mail->mail_list_type);
-			$post_ID = $post_ID_parts[1];
-			$to = $this->GetCommentersMailList($post_ID, $pending_mail->ID, $pending_mail->site_id, $pending_mail->subject);
-			$this->Debug_output .="<br/> working on comment_post with ID ".$post_ID."...<br/>";
-			$this->Debug_output .="<br/> sending to mail list: ".$to."...<br/>";
-		}
-		
+	/**
+	 * Get the email where sent the email message to
+	 *
+	 * @param WP_Post $pending_mail
+	 * @return String (comma separated emails)
+	 */
+	function get_mails_to($pending_mail) {
+		$mail_list_type = get_post_meta($pending_mail->ID, "mail_list_type", true);					
+		$to = $this->get_mail_list($pending_mail->ID, $pending_mail->post_title, $mail_list_type);
+		$this->debug_output .="<br/> working on news mail...<br/>";
 		return $to;
 	}
 	
-	function GetNewsMailList($id_pending_mail, $mail_title) {
+	/**
+	 * Get email list where send the email to
+	 *
+	 * @param Integer $id_pending_mail
+	 * @param String $mail_title
+	 * @param String $mail_list_type
+	 * @return void
+	 */
+	function get_mail_list($id_pending_mail, $mail_title, $mail_list_type) {
 		global $wpdb;
-		//$sql = "select news_mail from wp_fam_news_subscribers LEFT JOIN wp_fam_mail_sent ON news_mail = email AND mail_list_type = 'news' and id_pending_mail = ".$id_pending_mail." WHERE email IS NULL limit 0, ".$this->MaxNotificationsPerTime;
-		$sql = "select news_mail from wp_fam_news_subscribers where news_mail not in (select email from wp_fam_mail_sent where mail_title = '".$mail_title."') limit 0,".$this->MaxNotificationsPerTime;
-		
-		//$this->Debug_output .=" <br/> SQL for get mails to:".$sql."<br/>";
-				
-		$mail_list = $wpdb->get_results($sql);
+		$prefix = $wpdb->prefix;
+		$sql = "select ID, (select meta_value from $prefix"."postmeta where meta_key = 'email' and post_id = ID limit 1) as email from"." wp_posts where post_type = 'follower' and (select meta_value from $prefix"."postmeta where meta_key = 'email' and post_id = ID limit 1) not in (select wp_mail_sent.email from wp_mail_sent where mail_title = '".$mail_title."') limit 0,".$this->MaxNotificationsPerTime;
+		$followers = $wpdb->get_results($sql);
+					
+		// $followers = get_posts( array( 'post_type' => 'follower', 'orderby'  => 'id', 'order' => 'ASC', 'post_status' => 'publish', 'meta_key' => 'mail_list', 'meta_value' => $mail_list_type));
 		$insert_sql = $this->base_insert_sent_sql;
 		$to_list = '';
-		if(count($mail_list) > $this->MaxNotificationsPerTime)
+		if(count($followers) > $this->MaxNotificationsPerTime)
 		{
-			$mail_list	= array_slice($mail_list, 0, count($mail_list) -1);
+			$followers	= array_slice($followers, 0, count($followers) -1);
 		}
 		$to_array = array();
-		foreach($mail_list as $to)
+		foreach($followers as $to)
 		{
-			$to_array[] =$to->news_mail;
+			$to_array[] = $to->email;
 			
 			if($to_list == "")
 			{				
-				$insert_sql .= " ( '".$to->news_mail."', ".$id_pending_mail.", 'news','".$mail_title."')";
+				$insert_sql .= " ( '".$to->email."', ".$id_pending_mail.", 'news','".$mail_title."')";
 			}
 			else
 			{				
-				$insert_sql .= ", ( '".$to->news_mail."', ".$id_pending_mail.", 'news','".$mail_title."' )";
+				$insert_sql .= ", ( '".$to->email."', ".$id_pending_mail.", 'news','".$mail_title."' )";
 			}	
 		}
-		$wpdb->query($wpdb->prepare($insert_sql));		
+		$wpdb->query($insert_sql);		
 		return $to_array;
 	}
 	
-	function GetTempMailList($id_pending_mail) {
-		global $wpdb;
-		//$sql = "select temp_email from wp_fam_temp_mail_list  where id_pending_mail = ".$id_pending_mail." limit 0, ".$this->MaxNotificationsPerTime;
-		
-		$mail_list = $wpdb->get_results($sql);
-		if(count($mail_list) > $this->MaxNotificationsPerTime)
-		{
-			$mail_list	= array_slice($mail_list, 0, count($mail_list) -1);
-		}
-		$insert_sql = $this->base_insert_sent_sql;
-		$to_list = '';
-		$delete_temp_sent = "DELETE FROM wp_fam_mail_temp where temp_email =  ";
-		$to_array = array();
-		foreach($mail_list as $to)
-		{
-			$to_array[] = $to->email;
-			if($to_list == "")
-			{				
-				$delete_temp_sent .= "'".$to->temp_email."'";
-			}
-			else
-			{				
-				$delete_temp_sent .= " or temp_email = '".$to->temp_email."'";
-			}	
-		}
-		$wpdb->query($wpdb->prepare($delete_temp_sent));		
-		return $to_array;
-	}
 	
-	function NotifiMailSent() {
-		if(count($this->Sent_mails) > 0)
+	/**
+	 * Notify the site admin about the email sent
+	 *
+	 * @return void
+	 */
+	function notify_mail_sent() {
+		$skip_email_sending_notification = get_option("skip_email_sending_notification");
+		if(count($this->sent_mails) > 0 && $skip_email_sending_notification !== "yes")
 		{
-			$notify_send_mail_html = "Log de ".count($this->Sent_mails)." emails enviados para assinantes FAM em ".date("m/d/Y h:i:s", time()).":<br/><br/>";
-			$notify_send_mail_html .= "Título:".$this->Sent_mails[0]->mail_title."<br/><br/>";
-			foreach($this->Sent_mails as $sent_mail)
+			$notify_send_mail_html = "Log of ".count($this->sent_mails)." sent emails at ".date("m/d/Y h:i:s", time()).":<br/><br/>";
+			$notify_send_mail_html .= "Titles:".$this->sent_mails[0]->mail_title."<br/><br/>";
+			foreach($this->sent_mails as $sent_mail)
 			{
 				$notify_send_mail_html .=  "Para: ".$sent_mail->mail."<br/>";
 			}
-					
-			$headers[] = 'From: Fazendo as Malas <contato@fazendoasmalas.com>';	
-			$headers[] = 'Return-Path: <contato@fazendoasmalas.com>';
-			$headers[] = "Sender: <contato@fazendoasmalas.com>";
-			add_filter('wp_mail_content_type', 'set_html_content_type' );			
-			$success = wp_mail("amoncaldas@gmail.com","FAM - Log de emails enviados",$notify_send_mail_html,$headers);
-			remove_filter('wp_mail_content_type', 'set_html_content_type');
+				
+			$senderName = get_option("email_sender_name");
+			$senderEmail = get_option("email_sender_email");
+			$adminEmail = get_option("admin_email");
+			$blogname = get_option("blogname");
 			
-			//$this->Debug_output .="<br/> notifi list: ".var_export($this->Sent_mails,true)."<br/>";
+			
+			$headers[] = "From: $senderName <$senderEmail>";	
+			$headers[] = 'Return-Path: <$senderEmail>';
+			$headers[] = "Sender: <$senderEmail>";
+			add_filter('wp_mail_content_type', 'set_html_content_type' );			
+			$success = wp_mail($adminEmail,"Mailing log - $blogname",$notify_send_mail_html,$headers);
+			remove_filter('wp_mail_content_type', 'set_html_content_type');
 		}
 	}
 	
-	function GetCommentersMailList($post_ID, $id_pending_mail, $site_id, $email_title) {
-		$this->Debug_output .="<br/> working on pending mail with ID ".$id_pending_mail."...<br/>";
-		global $wpdb;
-		if($site_id == 1)
+	/**
+	 * Output debug about email sending
+	 *
+	 * @return void
+	 */
+	function debug() {		
+		if(isset($_GET["debug"]) && $_GET["debug"] === "yes")
 		{
-			$site_id = "";
-		}
-		else
-		{
-			$site_id = "_".$site_id;
-		}
-		$sql = "SELECT distinct comment_author_email FROM wp_fam".$site_id."_comments LEFT JOIN wp_fam_mail_sent ON comment_author_email = email AND mail_list_type = 'comment_post_".$post_ID."' and id_pending_mail = ".$id_pending_mail." WHERE email IS NULL AND comment_post_ID = ".$post_ID ;
-		$sql .= " union SELECT user_email as comment_author_email FROM wp_fam_posts inner join wp_fam_users on wp_fam_users.ID = wp_fam_posts.post_author  where wp_fam_posts.ID = ".$post_ID."  limit 0, ".$this->MaxNotificationsPerTime;
-		$mail_list = $wpdb->get_results($sql);	
-		
-		$this->Debug_output .= " <br/> SQL executed to get users: ".$sql."<br/><br/>";	
-		
-		$this->Debug_output .= " <br/> Returned objet from database: ".var_export($mail_list,true)."<br/>";	
-		
-		if(count($mail_list) > $this->MaxNotificationsPerTime)
-		{
-			$mail_list	= array_slice($mail_list, 0, count($mail_list) -1);
-		}
-		$insert_sql = $this->base_insert_sent_sql;	
-		$to_array = array();
-		foreach($mail_list as $to)
-		{	
-			$to_array[] = $to->comment_author_email;
-			if($to_list == "")
-			{				
-				$insert_sql .= " ( '".$to->comment_author_email."', ".$id_pending_mail.", 'comment_post_".$post_ID."','".$email_title."' )";
-			}
-			else
-			{				
-				$insert_sql .= ", ( '".$to->comment_author_email."', ".$id_pending_mail.", 'comment_post_".$post_ID."','".$email_title."' )";
-			}		
-		}
-		$wpdb->query($wpdb->prepare($insert_sql));	
-		$this->Debug_output .= " <br/> Returned TO list: ".implode(",",$to_array);
-		return $to_array;
-	}
-	
-	function Debug() {		
-		if((is_user_logged_in() && in_array(get_user_role(),array('adm_fam_root','administrator')) || Is_test_enviroment()) && $_GET["debug"] == "yes")
-		{
-			$content = "<html lang='pt-BR'><head><meta charset='UTF-8'></head><body><h2>debug is on</h2>".$this->Debug_output."</body></html>";
+			$content = "<html lang='pt-BR'><head><meta charset='UTF-8'></head><body><h2>debug is on</h2>".$this->debug_output."</body></html>";
 			echo $content;
 		}
 		else
 		{			
-			wp_redirect( network_home_url()."", 301);exit;
+			wp_redirect( network_home_url()."", 301);
+			exit;
 		}
-  }
+  	}
   
-  function insertFakeTest() {
-    if( is_user_logged_in() && in_array(get_user_role(),array('adm_fam_root','administrator')));
-    {			
-      $current_date = date("m/d/Y h:i:s", time());
-      $sql_test_pending = "INSERT INTO wp_fam_pending_mail( subject, content, content_type, mail_list_type, site_id ) VALUES ('auto generated teste',  'auto generated teste -".$current_date."',  'html',  'news', 1)";	
-      $wpdb->query($wpdb->prepare($sql_test_pending));
-    
-      $sql_test_pending = "INSERT INTO wp_fam_pending_mail( subject, content, content_type, mail_list_type, site_id ) VALUES ('auto generated teste 2',  'auto generated teste -".$current_date."',  'html',  'news', 1)";	
-      $wpdb->query($wpdb->prepare($sql_test_pending));
-    }
-  }
+	function insertFakeTest() {
+		if( is_user_logged_in() && in_array(get_user_role(),array('adm_fam_root','administrator')));
+		{			
+		$current_date = date("m/d/Y h:i:s", time());
+		$sql_test_pending = "INSERT INTO wp_fam_pending_mail( subject, content, content_type, mail_list_type, site_id ) VALUES ('auto generated teste',  'auto generated teste -".$current_date."',  'html',  'news', 1)";	
+		$wpdb->query($wpdb->prepare($sql_test_pending));
+		
+		$sql_test_pending = "INSERT INTO wp_fam_pending_mail( subject, content, content_type, mail_list_type, site_id ) VALUES ('auto generated teste 2',  'auto generated teste -".$current_date."',  'html',  'news', 1)";	
+		$wpdb->query($wpdb->prepare($sql_test_pending));
+		}
+	}
 }
 
 ?>

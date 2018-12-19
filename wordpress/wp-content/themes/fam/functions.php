@@ -9,7 +9,7 @@
  class FamWebApp {
 
 	function __construct () {
-		$this->add_menu_support();
+		$this->add_supports();
 		$this->set_output();
 		$this->register_hooks();		
   	}
@@ -20,9 +20,11 @@
    * @return void
    */
   public function set_output () {
-		$uri = $_SERVER["REQUEST_URI"];
+	$uri = $_SERVER["REQUEST_URI"];
     if (!is_admin() && strrpos($uri, "wp-json") === false && strrpos($uri, "wp-login.php") === false && $uri !== "") {
-			$crawlers_user_agents = ["googlebot","bingbot","msnbot","yahoo","Baidu","aolbuild","facebookexternalhit","iaskspider","DuckDuckBot","Applebot","Almaden","iarchive","archive.org_bot"];
+			$crawlers_user_agents = ["googlebot","bingbot","msnbot","yahoo",
+				"Baidu","aolbuild","facebookexternalhit","iaskspider","DuckDuckBot",
+				"Applebot","Almaden","iarchive","archive.org_bot"];
 
 			$is_crawler_request = false;
 			foreach ($crawlers_user_agents as $crawler) {
@@ -328,7 +330,7 @@
 	 *
 	 * @return void
 	 */
-	public function add_menu_support() {
+	public function add_supports() {
 		add_theme_support( 'menus' );
 		add_action( 'init', 'register_my_menus' );
 		function register_my_menus() {
@@ -339,6 +341,8 @@
 					)
 				);
 		}
+
+		add_theme_support( 'post-thumbnails');
 	}
  }
 

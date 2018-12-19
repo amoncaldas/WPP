@@ -17,8 +17,11 @@
  * This plugin assumes that the jwt-authentication-for-wp-rest-api plugin is already installed ac active
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+
+// Make sure we don't expose any info if called directly
+if ( ! function_exists( 'add_action' ) ) {
+	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
+	exit;
 }
 
  class Fam {

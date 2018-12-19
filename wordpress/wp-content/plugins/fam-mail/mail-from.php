@@ -9,17 +9,18 @@
 		
 		// new name
 		function fb_mail_from_name($name) {
-			if( strpos($name, "Fazendo as Malas") === false){
-				$name = 'Fazendo as Malas';		
-				$name = esc_attr($name);
+			$fromName = get_option("email_sender_name");
+			if($fromName && strpos($name, $fromName) === false){
+				$name = esc_attr($fromName);
 			}
 			return $name;
 		}
 		
 		// new email-adress
 		function fb_mail_from($email) {
-			if( strpos($email, "@fazendoasmalas.com") === false){
-				$email = 'contato@fazendoasmalas.com';
+			$senderEmail = get_option("email_sender_email");
+			if($senderEmail && strpos($email, $senderEmail) === false){
+				$email = $senderEmail;
 			}
 			return $email;
 		}
