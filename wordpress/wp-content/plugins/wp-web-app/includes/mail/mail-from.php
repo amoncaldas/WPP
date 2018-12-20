@@ -1,6 +1,6 @@
 <?php
 
-	class wp_mail_from {
+	class WppMailFrom {
 		
 		function __construct() {
 			add_filter( 'wp_mail_from', array(&$this, 'fb_mail_from') );

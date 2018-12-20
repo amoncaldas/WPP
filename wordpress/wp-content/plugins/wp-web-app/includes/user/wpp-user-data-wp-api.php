@@ -7,13 +7,19 @@
  */
 
 
-class FamUserAPI {
+class WppUserAPI {
 
     private $baseNamespace;
 
-    public function __construct($baseNamespace)
+    public function __construct()
     {
-        $this->baseNamespace = $baseNamespace;
+        $this->baseNamespace = WPP_API_NAMESPACE;
+
+        // Load ors api routes/endpoints
+		if ( ! defined( 'JSON_API_VERSION' ) && ! in_array( 'json-rest-api/plugin.php', get_option( 'active_plugins' ) ) ) {
+
+			add_action('rest_api_init', array($this, 'register_routes'));
+		} 
     }
 
 

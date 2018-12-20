@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: FAM
+ * Plugin Name: Wp Web App
  * Description: Add custom behaviors and functions to change WordPress and third party plugins regarding JWT authentication and wp rest api returning data. It assumes that the jwt-authentication-for-wp-rest-api, 
  * profilepress and pp-mailchimp plugins are installed adn active.
  * Version:     0.0.1
@@ -8,9 +8,9 @@
  * Author:      Amon Caldas
  * Author URI:  https://github.com/amoncaldas
  *
- * Text Domain: fam
+ * Text Domain: wpp
  *
- * @package FAM
+ * @package wpp
  */
 
 /**
@@ -24,13 +24,13 @@ if ( ! function_exists( 'add_action' ) ) {
 	exit;
 }
 
- class Fam {
+ class WpWebApp {
 
 	function __construct () {
 		$this->defineConstants();
 		$this->requiredDependencies();
 		$this->runClasses();
-		$this->registerEndpoints();	
+		// add_action( 'init', array($this, 'runClasses'));
 	}	
 
 	/**
@@ -39,11 +39,14 @@ if ( ! function_exists( 'add_action' ) ) {
 	 * @return void
 	 */
 	public function defineConstants () {
-		define('FAM_PLUGIN_PATH', dirname( __FILE__ ));
+		define('WPP_PLUGIN_PATH', dirname( __FILE__ ));
 
-		//Define the environment
+		// Define the environment
 		$serverName = $_SERVER["SERVER_NAME"];
-		define('FAM_ENV_PRODUCTION', strpos($serverName,"teste.") === false && strpos($serverName,"staging.") === false && strpos($serverName,"dev.") === false);
+		define('WPP_ENV_PRODUCTION', strpos($serverName,"teste.") === false && strpos($serverName,"staging.") === false && strpos($serverName,"dev.") === false);
+
+		// Base api namespace that represents also the url
+		define('WPP_API_NAMESPACE', "wpp/v1");
 	}
 
 	/**
@@ -52,13 +55,11 @@ if ( ! function_exists( 'add_action' ) ) {
 	 * @return void
 	 */
 	public function requiredDependencies () {		
-		require_once(FAM_PLUGIN_PATH . '/includes/user/fam-user-data-wp-api.php');
-		require_once(FAM_PLUGIN_PATH . '/includes/global/update-url.php');
-		require_once(FAM_PLUGIN_PATH . '/includes/global/getters.php');
-		require_once(FAM_PLUGIN_PATH . '/includes/feed/feed-loader.php');
-
-		// Import custom listeners starters
-		require_once(FAM_PLUGIN_PATH . '/includes/user/user-events-listener.php');
+		require_once(WPP_PLUGIN_PATH . '/includes/user/wpp-user-data-wp-api.php');
+		require_once(WPP_PLUGIN_PATH . '/includes/user/user-events-listener.php');
+		require_once(WPP_PLUGIN_PATH . '/includes/mail/mass-mailer.php');
+		require_once(WPP_PLUGIN_PATH . '/includes/mail/mail-from.php');
+		require_once(WPP_PLUGIN_PATH . '/includes/oauth/wpp-oauth-wp-api.php');
 	}
 
 	/**
@@ -69,30 +70,17 @@ if ( ! function_exists( 'add_action' ) ) {
 	public function runClasses () {
 		// Start the user hooks listeners
 		new UserEventsListener();
-	}
-
-	
-
-	/**
-	 * Register custom wp api plugin endpoints
-	 *
-	 * @return void
-	 */
-	public function registerEndpoints () {
-		// Load ors api routes/endpoints
-		if ( ! defined( 'JSON_API_VERSION' ) && ! in_array( 'json-rest-api/plugin.php', get_option( 'active_plugins' ) ) ) {
-
-			// Base api namespace that represents also the url
-			$baseNamespace = 'fam-api/v1';
-
-			$famUserAPI = new FamUserAPI($baseNamespace);
-			add_action('rest_api_init', array(&$famUserAPI, 'register_routes'));
-		} 
+		new WppUserAPI();
+		new WppMailFrom();
+		new WppMassMailer();
+		new WppOauthApi();
 	}
  }
 
  // Start the plugin
- new Fam();
+ new WpWebApp();
+
+
 
 
 

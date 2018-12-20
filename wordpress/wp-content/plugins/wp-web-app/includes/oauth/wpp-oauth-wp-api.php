@@ -9,7 +9,11 @@ use \Firebase\JWT\JWT;
  * @package ORS_OAUTH
  */
 
-class OrsOauthWPApi {
+class WppOauthApi {
+
+	function __construct () {
+		add_filter( 'rest_api_init', array( $this, 'register_routes' ) );		
+	}
 
 	/**
 	 * Github client ids
@@ -65,7 +69,7 @@ class OrsOauthWPApi {
      * @return string
      */
     public static function get_plugin_namespace() {
-        return 'ors-oauth';
+        return WPP_API_NAMESPACE.'/oauth';
 	}
 	
 	 /**

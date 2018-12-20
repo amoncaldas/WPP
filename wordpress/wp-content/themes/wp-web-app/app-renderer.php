@@ -53,13 +53,11 @@
      * @return string
      */
     public function getWebAppHtml () {
-        $html = $this->getHTMLSkeleton();
         $uri = $_SERVER["REQUEST_URI"];
         if ($uri !== "/") {
-            $redirect_append = "<script> window.location = '/#$uri' </script></head>";
-            $html = str_replace('</head>', $redirect_append, $html);
+            return "<html><title>".get_bloginfo("name")."</title><script> window.location = '/#$uri' </script></html>";
         }
-        return $html;
+        return $this->getHTMLSkeleton();
     }
 
     /**

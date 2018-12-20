@@ -6,22 +6,48 @@
  *
  */
 
- class FamWebApp {
+ class WpWebAppTheme {
 
 	function __construct () {
+		$this->update_site_url();
 		$this->add_supports();
 		$this->set_output();
-		$this->register_hooks();		
-  	}
+		$this->register_hooks();
+	}
+	
+	/**
+	 * WordPress store in db absolute urls and this is the way to update this 
+	 * and other post metas that also stores absolute urls to images
+	 * @see https://codex.wordpress.org/Changing_The_Site_URL
+	 * WP_HOME is defined in wp-config.php
+	 */
+	public function update_site_url() {
+		global $wpdb;
+		$current_url = $wpdb->get_col( "SELECT option_value from ".$wpdb->prefix."options where option_name = 'siteurl'" )[0];
+		if(WP_HOME != null && $current_url != WP_HOME){
+			// for some reason update_option function is not working in this case, so we direct update the db
+			$wpdb->update($wpdb->prefix."options", array('option_value'=>WP_HOME), array('option_name' => 'siteurl'));
+			$wpdb->update($wpdb->prefix."options", array('option_value'=>WP_HOME), array('option_name' => 'home'));
+		}
+	}
+
+	/**
+	 * Check if the request is to a front-end page
+	 *
+	 * @return boolean
+	 */
+	public function is_front_end() {
+		$uri = $_SERVER["REQUEST_URI"];
+		return $uri !== "" && !is_admin() && strrpos($uri, "wp-json") === false && strrpos($uri, "/feed") === false && strrpos($uri, "wp-login.php") === false;
+	}
   
-  /**
-   * Set the output of the theme
-   *
-   * @return void
-   */
-  public function set_output () {
-	$uri = $_SERVER["REQUEST_URI"];
-    if (!is_admin() && strrpos($uri, "wp-json") === false && strrpos($uri, "wp-login.php") === false && $uri !== "") {
+	/**
+	 * Set the output of the theme
+	 *
+	 * @return void
+	 */
+	public function set_output () {
+		if ($this->is_front_end()) {
 			$crawlers_user_agents = ["googlebot","bingbot","msnbot","yahoo",
 				"Baidu","aolbuild","facebookexternalhit","iaskspider","DuckDuckBot",
 				"Applebot","Almaden","iarchive","archive.org_bot"];
@@ -41,7 +67,8 @@
 			}
 			require_once("app-renderer.php");
 		}
-  }
+	}
+
 	/**
 	 * Register plugin hooks
 	 *
@@ -51,8 +78,27 @@
 		add_action('wp_insert_post', array($this,'after_insert_content'), 10, 2 );
 		add_filter('post_type_link', array($this, 'set_permalink'), 10, 2);
 		add_filter('preview_post_link', array($this, 'set_preview_permalink'), 10, 2);
+		add_filter('request', array($this, 'set_feed_types'));		
 	}
 
+	public function set_feed_types($qv) {
+		if (isset($qv['feed'])) {			
+			$builtin_post_types = get_post_types(array("public"=>true, "_builtin"=>true));
+			unset($builtin_post_types["attachment"]);
+			$custom_post_types = get_post_types_by_support("feed");			
+			$post_types = array_merge_recursive($builtin_post_types, $custom_post_types);
+			$qv['post_type'] = $post_types;
+		}
+		return $qv;
+	}
+
+	/**
+	 * Run custom action after a content is inserted
+	 *
+	 * @param Integer $content_id
+	 * @param String $content
+	 * @return WP_Post
+	 */
 	public function after_insert_content( $content_id, $content) {
 		if ($content->post_type === "page") {
 			return $this->after_insert_page($content_id, $content);
@@ -66,7 +112,7 @@
 	 *
 	 * @param Integer $post_id
 	 * @param WP_Post $post
-	 * @return void
+	 * @return WP_Post
 	 */
 	public function after_insert_post( $post_id, $post ) {
 		$this->set_default_taxonomy($post, "lang");
@@ -159,9 +205,9 @@
 	/**
 	 * Mke sure that the page has a valid post url/slug that does not conflicts with other custom post types having similar permalink structure 
 	 *
-	 * @param WP_Post $post
+	 * @param WP_Post $page
 	 * @param string $permalink
-	 * @return string
+	 * @return WP_Post
 	 */
 	public function after_insert_page( $page_id, $page) {		
 		$get_valid_name = function($name, $post_types) use (&$get_valid_name)  {
@@ -347,7 +393,7 @@
  }
 
  // Start the plugin
- new FamWebApp();
+ new WpWebAppTheme();
 
 
 

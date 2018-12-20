@@ -1,4 +1,14 @@
-# Login via oauth providers ###
+# wP Web App plugin #
+
+This plugin adds custom behaviors based on the Wp Web App needs. It relies on the existence of other plugins, like JWTAuthentication (they must be installed and active)
+
+This plugins is responsible for:
+
+- wordpress, jwt-authentication-for-wp-rest-api and profilepress and pp-mailchimp plugins behavior customization
+- adding filters and actions regarding authentication and wp rest api returning data
+- adding custom wp api endpoints for api doc, ors business data and user registration and password recovery
+
+## Login via oauth providers ####
 
 This plugins is responsible for processing the back-end stuff related to oauth authentication. Currently only github is supported.
 

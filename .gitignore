@@ -23,7 +23,7 @@ wordpress/wp-content/debug.log
 wordpress/wp-content/themes/*
 
 # do not ignore FAM theme
-!wordpress/wp-content/themes/fam
+!wordpress/wp-content/themes/wp-web-app
 
 
 # Ignore all plugins ...
@@ -47,9 +47,7 @@ wordpress/wp-content/plugins/*
 
 
 ## Do not ignore FAM plugins
-!wordpress/wp-content/plugins/fam
-!wordpress/wp-content/plugins/fam-oauth
-!wordpress/wp-content/plugins/fam-mail
+!wordpress/wp-content/plugins/wp-web-app
 
 # Ignore files that contains custom enviroment config/data
 wordpress/wp-config.php

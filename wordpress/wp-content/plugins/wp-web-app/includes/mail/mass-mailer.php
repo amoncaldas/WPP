@@ -10,7 +10,7 @@
 */
 
 
-class FamMassMailer  {
+class WppMassMailer  {
 
 	public $base_insert_sent_sql = "insert into wp_mail_sent (email, id_pending_mail,mail_list_type, mail_title) values ";
 	public $debug_output = "";
@@ -29,7 +29,7 @@ class FamMassMailer  {
      * @since  1.2.0
      */
     public function register_routes() {
-		register_rest_route("fam-mail", '/send', array(
+		register_rest_route(WPP_API_NAMESPACE."/mass-mail", '/send', array(
 			array(
 				'methods'  => "GET",
 				'callback' => array($this, 'send_emails' ),
@@ -55,8 +55,8 @@ class FamMassMailer  {
 	 *
 	 * @return String
 	 */
-	function get_news_template() {
-		$template = file_get_contents(FAM_MAIL_PLUGIN_PATH.'/templates/mail/news.html');
+	function get_news_template($lang = "pt-br") {
+		$template = file_get_contents(WPP_PLUGIN_PATH."/includes/mail/templates/$lang/news.html");
 		return $template;
 	}
 
@@ -65,8 +65,8 @@ class FamMassMailer  {
 	 *
 	 * @return String
 	 */
-	function getRelatedTemplate() {
-		$template = file_get_contents(FAM_MAIL_PLUGIN_PATH.'/templates/mail/news_other_items.html');
+	function get_related_template($lang = "pt-br") {
+		$template = file_get_contents(FAM_MAIL_PLUGIN_PATH."/includes/mail/templates/$lang/news_other_items.html");
 		return $template;
 	}
 
@@ -115,18 +115,18 @@ class FamMassMailer  {
 			
 			if($content_image = ""){ $template = str_replace("{main-img-height}", "0", $template); } else {$template = str_replace("{main-img-height}", "290", $template);}
 
-			$content = $post->post_excerpt !== "" ? $post->post_excerpt : getSubContent($post->post_content, 500);
+			$content = $post->post_excerpt !== "" ? $post->post_excerpt : $this->get_sub_content($post->post_content, 500);
 			$template = str_replace("{content-excerpt}", $content, $template);
 			$template = str_replace("{content-title}", $post->post_title, $template);
 			$template = str_replace("{current-year}", date('Y'), $template);
 
-			$template = $this->ReplaceRelatedTemplate($template, $post_ID);
+			$template = $this->replace_related_template($template, $post_ID);
 			$message = str_replace("'","''", $template);
 
 			$email_created = wp_insert_post(
 				array(
 					"post_type"=> "email", 
-					"post_status"=> "publish",
+					"post_status"=> "pending",
 					"post_author"=> get_current_user_id(),
 					"post_title"=> $post->post_title, 
 					"post_content"=> $message, 
@@ -141,6 +141,75 @@ class FamMassMailer  {
 		}
 	}
 
+
+	/**
+	 * Get sub content of a string
+	 *
+	 * @param String $content
+	 * @param Integer $length
+	 * @param boolean $forcePrecision
+	 * @return String
+	 */
+	function get_sub_content($content, $length, $forcePrecision = false) {
+		$length = $length-3;
+		$content = strip_tags($content, '');
+		if(strlen($content) > $length)
+		{		
+			if($forcePrecision == true)	
+			{			
+				$content = trim($content);					
+				if(strpos($content, " ") > 0 )
+				{		
+					$content = substr($content, 0,$length + 200);						
+					$offset = strlen($content);	
+					$spacePosition = 	strlen($content);	
+					while( ($pos = strrpos(($content)," ",$offset)) != false) {
+						$offset = $pos;
+						if($pos < $length)
+						{						
+							$spacePosition = $pos;							
+							break;
+						}
+					}		
+														
+					$content = substr($content, 0, $spacePosition)."...";
+					
+					if(strlen($content) > $length + 3)
+					{
+						$content = substr($content, 0, $length)."...";
+					}				
+				}
+				else
+				{																		
+					$content = substr($content, 0,$length)."...";
+				}
+			}
+			else
+			{
+				if(strlen($content) > $length)
+				{			
+					if(strpos($content, " ", $length) > $length)
+					{
+						$content =  substr($content, 0, strpos($content, " ", $length))."...";
+					}
+					else
+					{
+						$length = ($length > 20)? ($length -20): 0;								
+						$content =  substr($content, 0, strpos($content, " ", $length))."...";
+					}				
+				}
+			}	
+			$content = rtrim($content, ',');
+			$content = rtrim($content, '-');		
+			return $content;
+		}
+		else
+		{
+			return $content;
+		}			
+	}
+
+
 	/**
 	 * Replace related template in news mail template
 	 *
@@ -148,12 +217,12 @@ class FamMassMailer  {
 	 * @param Integer $post_ID
 	 * @return String
 	 */
-	function ReplaceRelatedTemplate($template, $post_ID) {
+	function replace_related_template($template, $post_ID) {
 		$related_post_ids = get_field('related', $post_ID);
 		$related = get_posts(array( 'post__in' => $related_post_ids));
 
 		if(is_array($related) && count($related) > 2) {
-			$template_other_items = $this->getRelatedTemplate();
+			$template_other_items = $this->get_related_template();
 			$counter = 1;
 			foreach($related as $related_post)
 			{
