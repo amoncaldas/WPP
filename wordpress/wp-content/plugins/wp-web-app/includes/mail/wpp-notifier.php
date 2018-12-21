@@ -10,16 +10,24 @@
 */
 
 
-class WppMassMailer  {
+class WppNotifier  {
 
-	public $base_insert_sent_sql = "insert into wp_mail_sent (email, id_pending_mail,mail_list_type, mail_title) values ";
+	public $base_insert_sent_sql = "insert into wp_mail_sent (email, id_pending_notification,mail_list_type, mail_title) values ";
 	public $debug_output = "";
 	public $Times = 0;
 	public $MaxNotificationsPerTime = 50;
 	public $sent_mails = array();
 
+	// Defining values and keys to generate the notification
+	public $notification_post_type = "notification";
+	public $notification_post_status = "pending";
+	public $notification_content_type = "html";
+	public $generated_post_id_meta_key = "generated_from_post_id";
+	public $default_notification_type = "news";
+	public $notification_content_type_desc = "newsletter";
+
 	function __construct () {
-		add_action( 'save_post', array($this, 'store_email_based_in_created_content'), 100, 2);
+		add_action( 'save_post', array($this, 'generate_notification_based_on_created_content'), 100, 2);
 		add_filter( 'rest_api_init', array( $this, 'register_routes' ) );		
 	}
 
@@ -29,10 +37,10 @@ class WppMassMailer  {
      * @since  1.2.0
      */
     public function register_routes() {
-		register_rest_route(WPP_API_NAMESPACE."/mass-mail", '/send', array(
+		register_rest_route(WPP_API_NAMESPACE."/notifications", '/send', array(
 			array(
 				'methods'  => "GET",
-				'callback' => array($this, 'send_emails' ),
+				'callback' => array($this, 'send_notifications' ),
 			)
 		));
 	}
@@ -42,10 +50,10 @@ class WppMassMailer  {
 	 *
 	 * @param 
 	 */
-	public function send_emails () {
+	public function send_notifications () {
 		$deactivated = get_option("deactivate_news_sending");
 		if ($deactivated !== "yes") {
-			$this->process_pending_mails();
+			$this->process_pending_notifications();
 			$this->debug();
 		}		
 	}
@@ -71,39 +79,76 @@ class WppMassMailer  {
 	}
 
 	/**
-	 * Store email post based in a email created content
+	 * checks whenever a notification must be created when a given post is saved
+	 *
+	 * @param Integer $post_ID from which a notification would be created
+	 * @return boolean
+	 */
+	function must_create_notification($post_ID) {
+		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) 
+			return false;
+		// AJAX? Not used here
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) 
+			return false;	
+		// Return if it's a post revision
+		if ( false !== wp_is_post_revision( $post_ID ) ) {
+			return false;		
+		}
+		
+		// check if there is already a generated notification for this post
+		$args = (
+			array(
+				"post_type"=> $this->notification_post_type, 
+				"post_status"=> $this->notification_post_status,
+				'meta_query' => array(
+					array(
+						'key'=> $this->generated_post_id_meta_key,
+						'value'=> $post_ID
+					)
+				)
+			)
+		);
+		$already_generated = get_posts($args);
+
+		// if there is already a notification, skip generating anew one
+		if (count($already_generated) > 0) {
+			return false;
+		}
+
+		// in not aborting condition is detected, return true
+		return true;
+	}
+
+	/**
+	 * Generate/store notification post when a new post is created
 	 *
 	 * @param Integer $post_ID
 	 * @param WP_Post $post
 	 * @return void
 	 */
-	function store_email_based_in_created_content($post_ID, $post) {		
-		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) 
+	function generate_notification_based_on_created_content($post_ID, $post) {			
+		if (!$this->must_create_notification($post_ID)) {
 			return;
-		// AJAX? Not used here
-		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) 
-			return;	
-		// Return if it's a post revision
-		if ( false !== wp_is_post_revision( $post_ID ) )
-			return;
+		}		
 		
 		// Get the pos types that supports `send_news`
-		$support_send_news_types = get_post_types_by_support("send_news");	
+		$support_send_news_types = get_post_types_by_support($this->notification_post_type);	
 		
-		$notified = get_post_meta($post->ID, "notified", true);
+		// Built in `post` also supports notification
+		$support_send_news_types[] = "post";
 		
 		// This covers the post types with no post type in permalink
-		if (in_array($post->post_type, $support_send_news_types) && $post->post_status === "publish" && $notified !== "yes") {
-			update_post_meta($post->ID, 'notified', "yes");
-
+		if (in_array($post->post_type, $support_send_news_types) && $post->post_status === "publish") {
 			$content_image = get_the_post_thumbnail_url($post_ID);			
 			$url_parts = explode("//", network_home_url());
 			$logo_url = network_home_url(get_option("site_relative_logo_url"));
 
-			$template = $this->get_news_template();
+			$content_lang_slug = $this->get_post_language($post_ID, "slug");
+
+			$template = $this->get_news_template($content_lang_slug);
 			
 			$template = str_replace("{site-url}", network_home_url(), $template);
-			$template = str_replace("{news-type}", "newsletter", $template);
+			$template = str_replace("{news-type}", $this->notification_content_type_desc, $template);
 			
 			$template = str_replace("{site-name}", get_bloginfo("name"), $template);
 			$template = str_replace("{site-domain}", $url_parts[1], $template);
@@ -120,24 +165,57 @@ class WppMassMailer  {
 			$template = str_replace("{content-title}", $post->post_title, $template);
 			$template = str_replace("{current-year}", date('Y'), $template);
 
-			$template = $this->replace_related_template($template, $post_ID);
+			$template = $this->replace_related_template($template, $post_ID, $content_lang_slug);
 			$message = str_replace("'","''", $template);
 
-			$email_created = wp_insert_post(
+			$notification_id = wp_insert_post(
 				array(
-					"post_type"=> "email", 
-					"post_status"=> "pending",
+					"post_type"=> $this->notification_post_type, 
+					"post_status"=> $this->notification_post_status,
 					"post_author"=> get_current_user_id(),
 					"post_title"=> $post->post_title, 
 					"post_content"=> $message, 
 					"meta_input"=> array(
-						"content_type"=> "html", 
-						"mail_list_type"=> "news"
+						"content_type"=> $this->notification_content_type, 
+						"mail_list_type"=> $this->default_notification_type,
+						$this->generated_post_id_meta_key=> $post->ID
 					)
 				)
 			);
+		
+			$content_lang_id = $this->get_post_language($post_ID);
+			if ($content_lang_id) {
+				$term_arr = [$content_lang_id];
+				wp_set_post_terms($notification_id, $term_arr, "lang");
+			}
 
-			update_post_meta($post_ID, 'notified','no');	
+			add_action( 'admin_notices', array($this,'show_notification_created_admin_notice'));
+		}
+	}
+
+	function show_notification_created_admin_notice() {		
+		?>
+		<div class="notice notice-info is-dismissible">
+			<p>A notification was created and is pending for revision in the notifications <a href="/wp-admin/edit.php?post_type=<?php echo $this->notification_post_type ?>>">outbox</a></p>
+		</div>
+		<?php		
+	}
+
+	/**
+	 * Get the post language
+	 *
+	 * @param Integer $post_id
+	 * @param string $field
+	 * @return id|slug
+	 */
+	function get_post_language($post_ID, $field = "id") {
+		$taxonomy = "lang";
+		$content_lang_taxonomies = wp_get_post_terms($post_ID, $taxonomy);
+		if( is_array($content_lang_taxonomies) && count($content_lang_taxonomies) > 0) {
+			if ($field === "id") {
+				return $content_lang_taxonomies[0]->term_id;
+			}
+			return $content_lang_taxonomies[0]->slug;
 		}
 	}
 
@@ -153,20 +231,16 @@ class WppMassMailer  {
 	function get_sub_content($content, $length, $forcePrecision = false) {
 		$length = $length-3;
 		$content = strip_tags($content, '');
-		if(strlen($content) > $length)
-		{		
-			if($forcePrecision == true)	
-			{			
+		if(strlen($content) > $length) {		
+			if($forcePrecision == true)	{			
 				$content = trim($content);					
-				if(strpos($content, " ") > 0 )
-				{		
+				if(strpos($content, " ") > 0 ) {		
 					$content = substr($content, 0,$length + 200);						
 					$offset = strlen($content);	
 					$spacePosition = 	strlen($content);	
 					while( ($pos = strrpos(($content)," ",$offset)) != false) {
 						$offset = $pos;
-						if($pos < $length)
-						{						
+						if($pos < $length) {						
 							$spacePosition = $pos;							
 							break;
 						}
@@ -174,26 +248,20 @@ class WppMassMailer  {
 														
 					$content = substr($content, 0, $spacePosition)."...";
 					
-					if(strlen($content) > $length + 3)
-					{
+					if(strlen($content) > $length + 3) {
 						$content = substr($content, 0, $length)."...";
 					}				
 				}
-				else
-				{																		
+				else {																		
 					$content = substr($content, 0,$length)."...";
 				}
 			}
-			else
-			{
-				if(strlen($content) > $length)
-				{			
-					if(strpos($content, " ", $length) > $length)
-					{
+			else {
+				if(strlen($content) > $length) {			
+					if(strpos($content, " ", $length) > $length) {
 						$content =  substr($content, 0, strpos($content, " ", $length))."...";
 					}
-					else
-					{
+					else {
 						$length = ($length > 20)? ($length -20): 0;								
 						$content =  substr($content, 0, strpos($content, " ", $length))."...";
 					}				
@@ -203,8 +271,7 @@ class WppMassMailer  {
 			$content = rtrim($content, '-');		
 			return $content;
 		}
-		else
-		{
+		else {
 			return $content;
 		}			
 	}
@@ -217,12 +284,12 @@ class WppMassMailer  {
 	 * @param Integer $post_ID
 	 * @return String
 	 */
-	function replace_related_template($template, $post_ID) {
+	function replace_related_template($template, $post_ID, $lang_slug) {
 		$related_post_ids = get_field('related', $post_ID);
 		$related = get_posts(array( 'post__in' => $related_post_ids));
 
 		if(is_array($related) && count($related) > 2) {
-			$template_other_items = $this->get_related_template();
+			$template_other_items = $this->get_related_template($lang_slug);
 			$counter = 1;
 			foreach($related as $related_post)
 			{
@@ -244,32 +311,32 @@ class WppMassMailer  {
 	}
 	
 	/**
-	 * Process pending email
+	 * Process pending notification
 	 *
 	 * @return void
 	 */
-	function process_pending_mails() {			
-		$pending_mails = get_posts( array( 'post_type' => 'email', 'orderby'  => 'id', 'order' => 'ASC', 'post_status' => 'publish'));
+	function process_pending_notifications() {			
+		$pending_notifications = get_posts( array( 'post_type' => 'notification', 'orderby'  => 'id', 'order' => 'ASC', 'post_status' => 'publish'));
 		$to = array();	
 				
-		if (is_array($pending_mails) && count($pending_mails) > 0 ) { 
+		if (is_array($pending_notifications) && count($pending_notifications) > 0 ) { 
 			
-			$pending_mail = $pending_mails[0];
-			$this->debug_output .= "<br/>Logging mails sent to email as html | ".$pending_mail->post_title." on - ".date('m/d/Y h:i:s', time());
-			$this->debug_output .=" <br/> Returned pending mail ID ".$pending_mail->ID." <br/>";
+			$pending_notification = $pending_notifications[0];
+			$this->debug_output .= "<br/>Logging mails sent to email as html | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
+			$this->debug_output .=" <br/> Returned pending mail ID ".$pending_notification->ID." <br/>";
 					
-			$to = $this->get_mails_to($pending_mail);	
+			$to = $this->get_mails_to($pending_notification);	
 			$this->debug_output .=" <br/> Returned mail subscribers to send amount: ".count($to)." <br/>";	
 			if(!is_array($to) || count($to) == 0)	
 			{
 				// Delete pending mail
-				$this->debug_output .= "<br/>No more mail to send, deleting pending mail sending mail ".$pending_mail->ID."...";
-				wp_delete_post($pending_mail->ID)					;		
+				$this->debug_output .= "<br/>No more mail to send, deleting pending mail sending mail ".$pending_notification->ID."...";
+				wp_delete_post($pending_notification->ID)					;		
 			}
 			elseif(is_array($to) && count($to) > 0)
 			{				
 				$this->debug_output .= "<br/>start sending mail... ";					
-				$this->send_pending_mails($to,$pending_mail);		
+				$this->send_pending_notifications($to,$pending_notification);		
 				$this->notify_mail_sent();		
 			}						
 		}	
@@ -283,10 +350,10 @@ class WppMassMailer  {
 	 * Send pending email
 	 *
 	 * @param String $to
-	 * @param WP_Post $pending_mail
+	 * @param WP_Post $pending_notification
 	 * @return void
 	 */
-	function send_pending_mails($to, $pending_mail) {	
+	function send_pending_notifications($to, $pending_notification) {	
 		$insert_sent_sql = $this->base_insert_sent_sql;	
 		if(is_array($to) && count($to) > 0)
 		{		
@@ -296,32 +363,32 @@ class WppMassMailer  {
 			$headers[] = "Return-Path: <$senderName>";
 			$headers[] = "Sender: <$senderName>";
 					
-			$content_type = get_post_meta($pending_mail->ID, "content_type", true);
-			$mail_list_type = get_post_meta($pending_mail->ID, "mail_list_type", true);
+			$content_type = get_post_meta($pending_notification->ID, "content_type", true);
+			$mail_list_type = get_post_meta($pending_notification->ID, "mail_list_type", true);
 			
 			if($content_type == "html") {
 				add_filter('wp_mail_content_type', 'set_html_content_type' );	
 				$counter = 1;	
 				foreach($to as $mail)
 				{
-					$success = wp_mail($mail,$pending_mail->post_title, $pending_mail->post_content, $headers);
+					$success = wp_mail($mail,$pending_notification->post_title, $pending_notification->post_content, $headers);
 					if($success)
 					{
-						$this->debug_output .= "<br/>sent as html->".$mail." | ".$pending_mail->post_title." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>sent as html->".$mail." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 						if($counter > 1)
 						{
 							$insert_sent_sql.= ", ";
 						}
-						$insert_sent_sql .= " ('".$mail."', ".$pending_mail->ID. ", '".$mail_list_type."', '".$pending_mail->post_title."') ";						
+						$insert_sent_sql .= " ('".$mail."', ".$pending_notification->ID. ", '".$mail_list_type."', '".$pending_notification->post_title."') ";						
 						$sent_mail = new stdClass();
 						$sent_mail->mail = $mail;
-						$sent_mail->mail_title = $pending_mail->post_title;						
+						$sent_mail->mail_title = $pending_notification->post_title;						
 						$this->sent_mails[] = $sent_mail;
 						$counter++;
 					}
 					else
 					{
-						$this->debug_output .= "<br/>Failed to send as html-> $senderEmail,".$mail." | ".$pending_mail->post_title." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>Failed to send as html-> $senderEmail,".$mail." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 					}
 				}
 				remove_filter('wp_mail_content_type', 'set_html_content_type');
@@ -342,21 +409,21 @@ class WppMassMailer  {
 				$counter = 1;	
 				foreach($to as $mail)
 				{
-					$success = wp_mail($mail, $pending_mail->post_title, $pending_mail->post_content, $headers);
+					$success = wp_mail($mail, $pending_notification->post_title, $pending_notification->post_content, $headers);
 					if($success)
 					{
-						$this->debug_output .= "<br/>sent -> ".$to." | ".$pending_mail->post_title." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>sent -> ".$to." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 						if($counter > 1)
 						{
 							$insert_sent_sql.= ", ";
 						}
-						$insert_sent_sql .= " ('".$mail."', ".$pending_mail->ID. ", '".$mail_list_type."', '".$pending_mail->post_title."') ";
+						$insert_sent_sql .= " ('".$mail."', ".$pending_notification->ID. ", '".$mail_list_type."', '".$pending_notification->post_title."') ";
 						
 						$counter++;
 					}
 					else
 					{
-						$this->debug_output .= "<br/>fail to send-> $senderEmail,".$to." | ".$pending_mail->post_title." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>fail to send-> $senderEmail,".$to." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 					}
 				}
 				global $wpdb;
@@ -369,12 +436,12 @@ class WppMassMailer  {
 	/**
 	 * Get the email where sent the email message to
 	 *
-	 * @param WP_Post $pending_mail
+	 * @param WP_Post $pending_notification
 	 * @return String (comma separated emails)
 	 */
-	function get_mails_to($pending_mail) {
-		$mail_list_type = get_post_meta($pending_mail->ID, "mail_list_type", true);					
-		$to = $this->get_mail_list($pending_mail->ID, $pending_mail->post_title, $mail_list_type);
+	function get_mails_to($pending_notification) {
+		$mail_list_type = get_post_meta($pending_notification->ID, "mail_list_type", true);					
+		$to = $this->get_mail_list($pending_notification->ID, $pending_notification->post_title, $mail_list_type);
 		$this->debug_output .="<br/> working on news mail...<br/>";
 		return $to;
 	}
@@ -382,16 +449,30 @@ class WppMassMailer  {
 	/**
 	 * Get email list where send the email to
 	 *
-	 * @param Integer $id_pending_mail
+	 * @param Integer $id_pending_notification
 	 * @param String $mail_title
 	 * @param String $mail_list_type
 	 * @return void
 	 */
-	function get_mail_list($id_pending_mail, $mail_title, $mail_list_type) {
+	function get_mail_list($id_pending_notification, $mail_title, $mail_list_type) {
+		$notification_term_list = wp_get_post_terms($id_pending_notification, "lang", array("fields" => "all"));	
+		$notification_lang_term_id = $notification_term_list[0]->term_id;
+
 		global $wpdb;
 		$prefix = $wpdb->prefix;
-		$sql = "select ID, (select meta_value from $prefix"."postmeta where meta_key = 'email' and post_id = ID limit 1) as email from"." wp_posts where post_type = 'follower' and (select meta_value from $prefix"."postmeta where meta_key = 'email' and post_id = ID limit 1) not in (select wp_mail_sent.email from wp_mail_sent where mail_title = '".$mail_title."') limit 0,".$this->MaxNotificationsPerTime;
+		$post_table_name = $prefix."posts";
+		$post_meta_table_name = $prefix."postmeta";
+		$term_relationship_table_name = $prefix."term_relationships";
+
+		$sql = "select ID, (select meta_value from $post_meta_table_name where meta_key = 'email' and post_id = ID limit 1) as email from 
+		$post_table_name where post_type = 'follower' and (select meta_value from $post_meta_table_name where meta_key = 'email' and post_id = ID limit 1) 
+		not in (select wp_mail_sent.email from wp_mail_sent where mail_title = '".$mail_title."')		
+		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = 'mail_list' and meta_value = '".$mail_list_type."' )
+		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = 'activated' and meta_value = 1 )
+		and ID in (SELECT object_id FROM $term_relationship_table_name where object_id = ID and term_taxonomy_id = $notification_lang_term_id) limit 0,".$this->MaxNotificationsPerTime;
+		
 		$followers = $wpdb->get_results($sql);
+
 					
 		// $followers = get_posts( array( 'post_type' => 'follower', 'orderby'  => 'id', 'order' => 'ASC', 'post_status' => 'publish', 'meta_key' => 'mail_list', 'meta_value' => $mail_list_type));
 		$insert_sql = $this->base_insert_sent_sql;
@@ -403,15 +484,16 @@ class WppMassMailer  {
 		$to_array = array();
 		foreach($followers as $to)
 		{
+
 			$to_array[] = $to->email;
 			
 			if($to_list == "")
 			{				
-				$insert_sql .= " ( '".$to->email."', ".$id_pending_mail.", 'news','".$mail_title."')";
+				$insert_sql .= " ( '".$to->email."', ".$id_pending_notification.", '".$mail_list_type."','".$mail_title."')";
 			}
 			else
 			{				
-				$insert_sql .= ", ( '".$to->email."', ".$id_pending_mail.", 'news','".$mail_title."' )";
+				$insert_sql .= ", ( '".$to->email."', ".$id_pending_notification.", '".$mail_list_type."','".$mail_title."' )";
 			}	
 		}
 		$wpdb->query($insert_sql);		
@@ -468,14 +550,14 @@ class WppMassMailer  {
 		}
   	}
   
-	function insertFakeTest() {
+	function insert_fake_test() {
 		if( is_user_logged_in() && in_array(get_user_role(),array('adm_fam_root','administrator')));
 		{			
 		$current_date = date("m/d/Y h:i:s", time());
-		$sql_test_pending = "INSERT INTO wp_fam_pending_mail( subject, content, content_type, mail_list_type, site_id ) VALUES ('auto generated teste',  'auto generated teste -".$current_date."',  'html',  'news', 1)";	
+		$sql_test_pending = "INSERT INTO wp_fam_pending_notification( subject, content, content_type, mail_list_type, site_id ) VALUES ('auto generated teste',  'auto generated teste -".$current_date."',  'html',  'news', 1)";	
 		$wpdb->query($wpdb->prepare($sql_test_pending));
 		
-		$sql_test_pending = "INSERT INTO wp_fam_pending_mail( subject, content, content_type, mail_list_type, site_id ) VALUES ('auto generated teste 2',  'auto generated teste -".$current_date."',  'html',  'news', 1)";	
+		$sql_test_pending = "INSERT INTO wp_fam_pending_notification( subject, content, content_type, mail_list_type, site_id ) VALUES ('auto generated teste 2',  'auto generated teste -".$current_date."',  'html',  'news', 1)";	
 		$wpdb->query($wpdb->prepare($sql_test_pending));
 		}
 	}

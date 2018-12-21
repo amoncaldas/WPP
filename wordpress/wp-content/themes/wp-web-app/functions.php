@@ -77,10 +77,17 @@
 	public function register_hooks() {
 		add_action('wp_insert_post', array($this,'after_insert_content'), 10, 2 );
 		add_filter('post_type_link', array($this, 'set_permalink'), 10, 2);
+		add_filter('post_link', array($this, 'set_native_post_permalink'), 10, 2);
 		add_filter('preview_post_link', array($this, 'set_preview_permalink'), 10, 2);
 		add_filter('request', array($this, 'set_feed_types'));		
 	}
 
+	/**
+	 * Set post types added to the feed output
+	 *
+	 * @param Array $qv
+	 * @return Array
+	 */
 	public function set_feed_types($qv) {
 		if (isset($qv['feed'])) {			
 			$builtin_post_types = get_post_types(array("public"=>true, "_builtin"=>true));
@@ -116,7 +123,7 @@
 	 */
 	public function after_insert_post( $post_id, $post ) {
 		$this->set_default_taxonomy($post, "lang");
-		$this->set_default_section($post);	
+		$this->set_section($post);	
 		$this->set_valid_post_name($post);
 		return $post;
 	}
@@ -165,23 +172,25 @@
 		// Get the pos types that supports `no_post_type_in_permalink`
 		$no_post_type_in_permalink_types = get_post_types_by_support("no_post_type_in_permalink");
 
+		// built in `post` also supports `no_post_type_in_permalink`
+		$no_post_type_in_permalink_types[] = "post";	
+
 		// Get the post types that supports `parent_section` and `section_in_permalink`
-		$section_in_permalink_types = get_post_types_by_support(array("parent_section","section_in_permalink"));				
+		$section_in_permalink_types = get_post_types_by_support(array("parent_section","section_in_permalink"));
+
+		// built in `post` also supports `parent_section` and `section_in_permalink`
+		$section_in_permalink_types[] = "post";				
 		
-		// This covers the post types with no post type in permalink
-		if (in_array($post->post_type, $no_post_type_in_permalink_types)) {
-			$permalink = $this->get_permalink_with_no_post_type_in_it($post, $permalink);
-		} 
 		// This covers all custom post types with support for `post_type_after_section_in_permalink`
-		elseif (in_array($post->post_type, $section_in_permalink_types)) {
+		if (in_array($post->post_type, $section_in_permalink_types)) {
 
 			$parent = get_post($post->post_parent);
 
 			// We only set the custom permalink when the the parent is already defined
 			// In the normal wordpress post save flow this hook is fired twice, and in the second time
-			// have the parent already defined, after running the `set_default_section` as a trigger for `wp_insert_post`
+			// have the parent already defined, after running the `set_section` as a trigger for `wp_insert_post`
 			if($parent) {
-				// Some post type may support translations in url: /stories/meu-conteudo/123 => /relatos/meu-conteudo/123
+				// Some post type may support translations in url: /stories/my-conteudo/123 => /relatos/meu-conteudo/123
 				$post_slug_translation = $this->get_post_url_slug($post);
 
 				if (isset($_POST['new_title']) && $_POST['new_title'] !== "") {
@@ -199,7 +208,40 @@
 				}
 			}
 		}
+		// This covers the post types with no post type in permalink
+		if (in_array($post->post_type, $no_post_type_in_permalink_types)) {
+			$permalink = $this->get_permalink_with_no_post_type_in_it($post, $permalink);
+		} 
 		return $permalink;	
+	}
+
+	/**
+	 * Set the permalink for post preview
+	 *
+	 * @param string $preview_link
+	 * @param WP_Post $post
+	 * @return string
+	 */
+	public function set_preview_permalink($preview_link, $post) {
+		$permalink = $this->set_permalink($preview_link, $post);
+		
+		// Add the preview query
+		$preview_link = add_query_arg( array("preview" => 'true'), $preview_link );
+		return $preview_link;
+	}
+
+	/**
+	 * Set the permalink for post preview
+	 *
+	 * @param string $preview_link
+	 * @param WP_Post $post
+	 * @return string
+	 */
+	public function set_native_post_permalink($permalink, $post) {
+		if ($post->post_type === "post") {
+			$permalink = $this->set_permalink($permalink, $post);
+		}
+		return $permalink;
 	}
 
 	/**
@@ -250,7 +292,12 @@
 	 */
 	public function get_permalink_with_no_post_type_in_it($post, $permalink) {
 		$post_type_obj = get_post_type_object($post->post_type);
-		$post_url_slug = $post_type_obj->rewrite["slug"];
+
+		$post_url_slug = $post->post_type;
+		if ($post_type_obj->rewrite !== false) {
+			$post_url_slug = $post_type_obj->rewrite["slug"];
+		} 
+		
 		$permalink = str_replace("/$post_url_slug/", "/", $permalink);
 		return $permalink;
 	}
@@ -263,7 +310,11 @@
 	 */
 	public function get_post_url_slug($post) {
 		$post_type_obj = get_post_type_object($post->post_type);
-		$post_slug = $post_type_obj->rewrite["slug"];
+
+		$post_slug = $post->post_type;
+		if ($post_type_obj->rewrite !== false) {
+			$post_slug = $post_type_obj->rewrite["slug"];
+		} 
 
 		// Get the post `lang` list
 		$lang_list = wp_get_post_terms($post->ID, "lang", array("fields" => "all"));	
@@ -304,38 +355,35 @@
 	}
 
 	/**
-	 * Set the permalink for post preview
-	 *
-	 * @param string $preview_link
-	 * @param WP_Post $post
-	 * @return string
-	 */
-	public function set_preview_permalink($preview_link, $post) {
-		$permalink = $this->set_permalink($preview_link, $post);
-		
-		// Add the preview query
-		$preview_link = add_query_arg( array("preview" => 'true'), $preview_link );
-		return $preview_link;
-	}
-
-	/**
-	 * Set post default section, if supports section
+	 * Set post section, if it supports section
 	 *
 	 * @param WP_Post $post
 	 * @return void
 	 */
-	public function set_default_section($post) {
+	public function set_section($post) {
 		$post_types_with_section = get_post_types_by_support("parent_section");
+
+		// Built in `post` also supports parent_section
+		$post_types_with_section[] = "post";
 
 		if (in_array($post->post_type, $post_types_with_section)) {
 
-			if ($post->post_parent === 0) {								
-				$sections = get_posts( array( 'post_type' => 'section', 'orderby'  => 'id', 'order' => 'ASC'));
-		
+			$parent_id = get_post_meta($post->ID, "section", true);	
+			$parent_id = is_array($parent_id) && count($parent_id)> 0 ? $parent_id[0] : $parent_id;
+			if (isset($parent_id)) {
+				$parent_id = intval($parent_id);
+			}
+
+			if ($post->post_parent === 0 && !$parent_id) {				
+				$sections = get_posts( array( 'post_type' => 'section', 'orderby'  => 'id', 'order' => 'ASC'));		
 				if (count($sections) > 0) {
-					wp_update_post( array('ID' => $post->ID, 'post_parent' => $sections[0]->ID));
-					$post ->post_parent = $sections[0]->ID;
-				}
+					$parent_id = $sections[0]->ID;
+				}							
+			} 
+
+			if($parent_id && $post->post_parent !== $parent_id) {
+				wp_update_post( array('ID' => $post->ID, 'post_parent' => $parent_id));
+				$post ->post_parent = $parent_id;		
 			}
 		}
 	}
