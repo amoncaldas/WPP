@@ -3,8 +3,8 @@
 ## Dump the latest db to the file system ##
 
 ```sh
-docker exec fam-mysql-local /bin/sh -c "mysqldump -u root -padmin wordpress > fam-dump.sql"
-docker cp fam-mysql-local:/fam-dump.sql $PWD/mysql/db-backup.sql
+docker exec fam-mysql-local /bin/sh -c "mysqldump -u root -padmin wordpress > wpp-dump.sql"
+docker cp fam-mysql-local:/wpp-dump.sql $PWD/mysql/db-backup.sql
 ```
 
 ## Copy remote file to local file system ##

@@ -8,6 +8,8 @@
 
  class WpWebAppTheme {
 
+	public $lang_tax_slug = "lang";
+
 	function __construct () {
 		$this->update_site_url();
 		$this->add_supports();
@@ -76,10 +78,14 @@
 	 */
 	public function register_hooks() {
 		add_action('wp_insert_post', array($this,'after_insert_content'), 10, 2 );
-		add_filter('post_type_link', array($this, 'set_permalink'), 10, 2);
-		add_filter('post_link', array($this, 'set_native_post_permalink'), 10, 2);
-		add_filter('preview_post_link', array($this, 'set_preview_permalink'), 10, 2);
-		add_filter('request', array($this, 'set_feed_types'));		
+		add_filter('request', array($this, 'set_feed_types'));
+
+		// Customize permalink
+		add_filter('post_type_link', array($this, 'set_post_permalink'), 10, 2);
+		add_filter('preview_post_link', array($this, 'set_post_preview_permalink'), 10, 2);
+		add_filter('page_link', array($this, 'set_page_permalink'), 10, 2);
+		add_filter('preview_page_link', array($this, 'set_page_preview_permalink'), 10, 2);
+		add_filter( 'image_send_to_editor', array($this, 'set_image_before_send_to_editor'), 10, 6 );
 	}
 
 	/**
@@ -122,7 +128,7 @@
 	 * @return WP_Post
 	 */
 	public function after_insert_post( $post_id, $post ) {
-		$this->set_default_taxonomy($post, "lang");
+		$this->set_default_taxonomy($post, $this->lang_tax_slug);
 		$this->set_section($post);	
 		$this->set_valid_post_name($post);
 		return $post;
@@ -168,7 +174,7 @@
 	 * @param WP_Post $post
 	 * @return string
 	 */
-	public function set_permalink ($permalink, $post) {
+	public function set_post_permalink ($permalink, $post) {
 		// Get the pos types that supports `no_post_type_in_permalink`
 		$no_post_type_in_permalink_types = get_post_types_by_support("no_post_type_in_permalink");
 
@@ -184,7 +190,9 @@
 		// This covers all custom post types with support for `post_type_after_section_in_permalink`
 		if (in_array($post->post_type, $section_in_permalink_types)) {
 
-			$parent = get_post($post->post_parent);
+			if ($post->post_parent) {
+				$parent = get_post($post->post_parent);
+			}
 
 			// We only set the custom permalink when the the parent is already defined
 			// In the normal wordpress post save flow this hook is fired twice, and in the second time
@@ -222,12 +230,65 @@
 	 * @param WP_Post $post
 	 * @return string
 	 */
-	public function set_preview_permalink($preview_link, $post) {
-		$permalink = $this->set_permalink($preview_link, $post);
+	public function set_post_preview_permalink($preview_link, $post) {
+		$permalink = $this->set_post_permalink($preview_link, $post);
 		
 		// Add the preview query
 		$preview_link = add_query_arg( array("preview" => 'true'), $preview_link );
 		return $preview_link;
+	}
+
+
+	/**
+	 * Set the permalink for post preview
+	 *
+	 * @param string $preview_link
+	 * @param WP_Post $post
+	 * @return string
+	 */
+	public function set_page_permalink($permalink, $page_id ) {
+		$page = get_page($page_id);
+		$parent_section_id = $this->get_parent_section_id($page_id);
+
+		// Get the url segment of the page section
+		$section_url_segment = "";
+		if($parent_section_id) {
+			$parent_section = get_post($parent_section_id);
+			$section_url_segment = "/$parent_section->post_name";
+		} 
+
+		// Get the url segment of the page ancestors
+		$ancestors_url_segment = "";
+		$ancestors = get_post_ancestors($page_id);
+		if ($ancestors) {
+			foreach ($ancestors as $ancestor_id) {
+				$ancestor = get_page($ancestor_id);
+				$ancestors_url_segment .= "/$ancestor->post_name";
+			}
+		}
+
+		// Set the url segment of the page parents/ancestors
+		$parents_url_segment = $section_url_segment.$ancestors_url_segment;
+
+		// We only set the custom permalink when the the parent is already defined
+		// In the normal wordpress post save flow this hook is fired twice, and in the second time
+		// have the parent already defined, after running the `set_section` as a trigger for `wp_insert_post`
+		
+		if (isset($_POST['new_title']) && $_POST['new_title'] !== "") {
+			$page_name = sanitize_title($_POST['new_title']);
+			$permalink = network_site_url("$parents_url_segment/$page_name");
+		}
+		elseif (isset($page->post_title)  && $page->post_title !== "") {
+			$page_name = sanitize_title($page->post_title);
+			$permalink = network_site_url("$parents_url_segment/$page_name");
+		} 
+		elseif (isset($page->post_name) && $page->post_name !== "") {
+			$permalink = network_site_url("$parents_url_segment/$page->post_name");
+		}  else {
+			$permalink = network_site_url("$parents_url_segment/$page->ID");
+		}
+		
+		return $permalink;
 	}
 
 	/**
@@ -237,11 +298,10 @@
 	 * @param WP_Post $post
 	 * @return string
 	 */
-	public function set_native_post_permalink($permalink, $post) {
-		if ($post->post_type === "post") {
-			$permalink = $this->set_permalink($permalink, $post);
-		}
-		return $permalink;
+	public function set_page_preview_permalink($permalink, $page) {		
+		$permalink = $this->set_page_permalink($permalink, $page);
+		$preview_link = add_query_arg( array("preview" => 'true'), $preview_link );		
+		return $preview_link;
 	}
 
 	/**
@@ -317,7 +377,7 @@
 		} 
 
 		// Get the post `lang` list
-		$lang_list = wp_get_post_terms($post->ID, "lang", array("fields" => "all"));	
+		$lang_list = wp_get_post_terms($post->ID, $this->lang_tax_slug, array("fields" => "all"));	
 				
 		// If the post has not such taxonomy assigned
 		if ( !empty( $lang_list ) ) {
@@ -367,12 +427,7 @@
 		$post_types_with_section[] = "post";
 
 		if (in_array($post->post_type, $post_types_with_section)) {
-
-			$parent_id = get_post_meta($post->ID, "section", true);	
-			$parent_id = is_array($parent_id) && count($parent_id)> 0 ? $parent_id[0] : $parent_id;
-			if (isset($parent_id)) {
-				$parent_id = intval($parent_id);
-			}
+			$parent_id = $this->get_parent_section_id($post->ID);
 
 			if ($post->post_parent === 0 && !$parent_id) {				
 				$sections = get_posts( array( 'post_type' => 'section', 'orderby'  => 'id', 'order' => 'ASC'));		
@@ -381,11 +436,28 @@
 				}							
 			} 
 
+			// If we could find an available parent and this is not already the post parent
+			// set this parent as parent of the post
 			if($parent_id && $post->post_parent !== $parent_id) {
 				wp_update_post( array('ID' => $post->ID, 'post_parent' => $parent_id));
-				$post ->post_parent = $parent_id;		
+				$post->post_parent = $parent_id;		
 			}
 		}
+	}
+
+	/**
+	 * Get parent section id
+	 *
+	 * @param Integer $post_id
+	 * @return Integer|null
+	 */
+	public function get_parent_section_id($post_id) {
+		$parent_id = get_post_meta($post_id, "section", true);	
+		$parent_id = is_array($parent_id) && count($parent_id)> 0 ? $parent_id[0] : $parent_id;
+		if (isset($parent_id)) {
+			$parent_id = intval($parent_id);
+		}
+		return $parent_id;
 	}
 
 	/**
@@ -426,17 +498,50 @@
 	 */
 	public function add_supports() {
 		add_theme_support( 'menus' );
-		add_action( 'init', 'register_my_menus' );
-		function register_my_menus() {
-				register_nav_menus(
-					array(
-							'primary-menu' => __( 'Primary Menu' ),
-							'secondary-menu' => __( 'Secondary Menu' )
-					)
-				);
+		add_action( 'init', 'register_wpp_menus' );
+		function register_wpp_menus() {
+			register_nav_menus(
+				array(
+					'primary-menu' => __( 'Primary Menu' ),
+					'secondary-menu' => __( 'Secondary Menu' )
+				)
+			);
 		}
 
 		add_theme_support( 'post-thumbnails');
+	}
+
+	/**
+	 * Convert an image url about to be inserted in post html to a base 64 image representation
+	 *
+	 * @param string $html
+	 * @param integer $id
+	 * @param string $caption
+	 * @param string $title
+	 * @param string $align
+	 * @param string $url
+	 * @return string
+	 */
+	public function set_image_before_send_to_editor ($html, $id, $caption, $title, $align, $url) {
+		$src_data  = wp_get_attachment_image_src( $id, $size, false );
+		if(is_array($src_data)) {
+			$src_url =  $src_data[0];
+			$relative_src = str_replace(network_home_url(), "", $src_url);
+			$local_path = $_SERVER["DOCUMENT_ROOT"].$relative_src;			
+			$data = file_get_contents($local_path);
+			if ($data) {
+				$type = pathinfo($relative_src, PATHINFO_EXTENSION);
+				$base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);	
+				$title = $title === "" ? $caption :  $title;
+
+				// Set the new html out put for the image with base64 src			
+				$html = "<div id='post-$id media-$id' class='align$align'><img src='$base64' alt='$title' width='$src_data[1]' height='$src_data[2]' /></div>";
+				return $html;
+			}
+			return $html;
+		}
+
+		return $html;
 	}
  }
 

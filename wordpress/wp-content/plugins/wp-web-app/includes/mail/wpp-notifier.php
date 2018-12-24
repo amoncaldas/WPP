@@ -14,17 +14,28 @@ class WppNotifier  {
 
 	public $base_insert_sent_sql = "insert into wp_mail_sent (email, id_pending_notification,mail_list_type, mail_title) values ";
 	public $debug_output = "";
-	public $Times = 0;
-	public $MaxNotificationsPerTime = 50;
+	public $max_notifications_per_time = 50;
 	public $sent_mails = array();
+	public $default_language = "pt-br";
 
 	// Defining values and keys to generate the notification
 	public $notification_post_type = "notification";
-	public $notification_post_status = "pending";
+	public $notification_initial_post_status = "pending";
 	public $notification_content_type = "html";
 	public $generated_post_id_meta_key = "generated_from_post_id";
 	public $default_notification_type = "news";
 	public $notification_content_type_desc = "newsletter";
+
+	// Defining follower values and keys
+	public $follower_post_type = "follower";
+	public $follower_initial_post_status = "pending";
+	public $follower_email = "email";
+	public $ip = "ip";
+	public $user_agent = "user_agent";
+	public $activated = "activated";
+	public $mail_list = "mail_list";
+	public $lang_tax_slug = "lang";
+	
 
 	function __construct () {
 		add_action( 'save_post', array($this, 'generate_notification_based_on_created_content'), 100, 2);
@@ -32,7 +43,7 @@ class WppNotifier  {
 	}
 
 	/**
-     * Register ORS oauth routes for WP API v2.
+     * Register routes for WP API v2.
      *
      * @since  1.2.0
      */
@@ -43,7 +54,197 @@ class WppNotifier  {
 				'callback' => array($this, 'send_notifications' ),
 			)
 		));
+		register_rest_route(WPP_API_NAMESPACE."/notifications", '/subscribe', array(
+			array(
+				'methods'  => "POST",
+				'callback' => array($this, 'subscribe_for_notifications' ),
+			)
+		));
+		register_rest_route(WPP_API_NAMESPACE."/notifications", '/unsubscribe/(?P<followerId>[0-9]+)', array(
+			array(
+				'methods'  => "PUT",
+				'callback' => array($this, 'unsubscribe_for_notifications' ),
+			)
+		));
 	}
+
+	/**
+	 * Unsubscribe a follower to the notification
+	 *
+	 * @return void
+	 */
+	public function unsubscribe_for_notifications($request) {
+		$follower_id = $request["followerId"];
+		$follower = get_post($follower_id);
+
+		if ($follower) {
+			$activated = get_post_meta($follower_id, $this->activated, true);
+			if ($activated === "0") {
+				return new WP_REST_Response(null, 400); // INVALID REQUEST
+			}
+			update_post_meta($follower_id, $this->activated, 0);
+			$message = "Name: ". $follower->post_title."<br/><br/>";
+			$message .= "Email: ". get_post_meta($follower_id, $this->follower_email, true);
+			$this->notify_admin("Follower opt out", $message, "Follower opt out");	
+			return new WP_REST_Response(null, 204); // ACCEPTED, NO CONTENT
+		} else {
+			return new WP_REST_Response(null, 404); // NOT FOUND
+		}
+	}
+
+
+	/**
+	 * Subscribe to notification list
+	 *
+	 * @param Object $request
+	 * @return WP_REST_Response
+	 */
+	public function subscribe_for_notifications($request) {
+		$name = $request->get_param('name');
+		$email = $request->get_param($this->follower_email);
+
+		if (isset($name) && isset($email)) {
+			$lang = $request->get_param($this->lang_tax_slug) ? $request->get_param($this->lang_tax_slug) :$this->default_language;
+			$mail_list =  $request->get_param($this->mail_list) ?  $request->get_param($this->mail_list) : $this->default_notification_type;
+
+			// check if there is already a generated notification for this post
+			$args = (
+				array(
+					"post_type"=> $this->follower_post_type, 
+					"post_status"=> array("publish", "pending"),
+					'meta_query' => array(
+						array(
+							'key'=> $this->follower_email,
+							'value'=> $email
+						)
+					)
+				)
+			);
+			$existing_followers = get_posts($args);
+
+			if (count($existing_followers) > 0) {
+				$existing_follower = $existing_followers[0];
+				if ($existing_follower->post_status === "publish") {
+					update_post_meta($existing_follower->ID, $this->activated, 1);
+					return new WP_REST_Response(null, 204); // ACCEPTED/UPDATED, NO CONTENT TO RETURN
+				} else {
+					return new WP_REST_Response(null, 409); // CONFLICT, ALREADY EXISTS
+				}
+			} else {
+				$follower_id = wp_insert_post(
+					array(
+						"post_type"=> $this->follower_post_type, 
+						"post_status"=> $this->follower_initial_post_status,
+						"post_author"=> 1, // 1 is always the admin, the first user created
+						"post_title"=> strip_tags($name), 
+						"meta_input"=> array(
+							$this->ip => $this->get_request_ip(),
+							$this->follower_email => strip_tags($email),
+							$this->user_agent => $_SERVER['HTTP_USER_AGENT'],
+							$this->activated => 0,
+							$this->mail_list => $mail_list
+						)
+					)
+				);
+				$term = get_term_by('slug', $this->default_language, $this->lang_tax_slug);
+				$term_arr = [$term->term_id];
+				wp_set_post_terms($follower_id, $term_arr, $this->lang_tax_slug);
+
+				$message = "Name: ". strip_tags($name)."<br/><br/>";
+				$message .= "Email: ". strip_tags($email);
+				$this->notify_admin("New follower registration", $message, "New follower");							
+
+			}
+	
+			return new WP_REST_Response(["id" => $follower_id ], 201); // CREATED, NO CONTENT TO RETURN
+		} else {
+			return new WP_REST_Response(null, 400); // INVALID REQUEST
+		}
+	}
+
+	/**
+	 * Notify admin via email using basic notification template
+	 *
+	 * @param [type] $title
+	 * @param [type] $message
+	 * @param [type] $type
+	 * @return void
+	 */
+	public function notify_admin($title, $message, $type) {
+		$message .= "<br/><br/>";	
+		$message .= "IP: http://www.ip2location.com/". $this->get_request_ip();
+		$message .= "<br/><br/>";	
+		$message .=	"UserAgent:". $_SERVER['HTTP_USER_AGENT'];	
+
+		$template = $this->get_basic_notification_template();
+		$url_parts = explode("//", network_home_url());
+		$logo_url = network_home_url(get_option("wpp_site_relative_logo_url"));
+		
+		$template = str_replace("{news-type}", $type, $template);
+		$template = str_replace("{site-url}", network_home_url(), $template);
+		$template = str_replace("{site-name}", get_bloginfo("name"), $template);
+		$template = str_replace("{site-domain}", $url_parts[1], $template);
+		$template = str_replace("{site-logo-url}", $logo_url, $template);			
+		$template = str_replace("{site-url}", network_home_url(), $template);
+		$template = str_replace("{content-excerpt}", $message, $template);
+		$template = str_replace("{content-title}", $title, $template);
+		$html_message = str_replace("{current-year}", date('Y'), $template);	
+		
+		$senderName = get_option("wpp_email_sender_name");
+		$senderEmail = get_option("wpp_email_sender_email");
+		$headers[] = "From: $senderEmail <$senderName>";	
+		$headers[] = "Return-Path: <$senderName>";
+		$headers[] = "Sender: <$senderName>";			
+
+		add_filter('wp_mail_content_type', array($this, 'set_html_content_type'));	
+		$adminEmail = get_option("admin_email");
+		wp_mail($adminEmail, $title, $html_message, $headers);			
+		remove_filter('wp_mail_content_type', array($this, 'set_html_content_type'));
+	}
+
+	/**
+	 * Set the email content type to be html
+	 *
+	 * @return string
+	 */
+	public function set_html_content_type() {
+		return "text/html";
+	}
+
+	/**
+	 * Try to get the base64 representation o the image. If not, return the image full url
+	 *
+	 * @param string $relative_image_url
+	 * @return string
+	 */
+	public function try_get_image_in_base6($relative_image_url) {
+		$type = pathinfo($relative_image_url, PATHINFO_EXTENSION);
+		$local_path = $_SERVER["DOCUMENT_ROOT"].$relative_image_url;
+		$data = file_get_contents($local_path);
+		if ($data) {
+			$base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+			return $base64;
+		}
+		return network_home_url($relative_image_url);
+	}
+	 
+
+	/**
+	 * Get the request ip address
+	 *
+	 * @return String
+	 */
+	public function get_request_ip () {
+		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} else {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		return $ip;
+	}
+
 
 	/**
 	 * Run mass mail sender
@@ -51,7 +252,7 @@ class WppNotifier  {
 	 * @param 
 	 */
 	public function send_notifications () {
-		$deactivated = get_option("deactivate_news_sending");
+		$deactivated = get_option("wpp_deactivate_news_sending");
 		if ($deactivated !== "yes") {
 			$this->process_pending_notifications();
 			$this->debug();
@@ -63,8 +264,20 @@ class WppNotifier  {
 	 *
 	 * @return String
 	 */
-	function get_news_template($lang = "pt-br") {
+	public function get_news_template($lang = null) {
+		$lang = $lang ? $lang : $this->default_language;
 		$template = file_get_contents(WPP_PLUGIN_PATH."/includes/mail/templates/$lang/news.html");
+		return $template;
+	}
+
+	/**
+	 * Get the news mail template
+	 *
+	 * @return String
+	 */
+	public function get_basic_notification_template($lang = null) {
+		$lang = $lang ? $lang : $this->default_language;
+		$template = file_get_contents(WPP_PLUGIN_PATH."/includes/mail/templates/$lang/notification.html");
 		return $template;
 	}
 
@@ -73,7 +286,8 @@ class WppNotifier  {
 	 *
 	 * @return String
 	 */
-	function get_related_template($lang = "pt-br") {
+	public function get_related_template($lang = null) {
+		$lang = $lang ? $lang : $this->default_language;
 		$template = file_get_contents(FAM_MAIL_PLUGIN_PATH."/includes/mail/templates/$lang/news_other_items.html");
 		return $template;
 	}
@@ -84,7 +298,7 @@ class WppNotifier  {
 	 * @param Integer $post_ID from which a notification would be created
 	 * @return boolean
 	 */
-	function must_create_notification($post_ID) {
+	public function must_create_notification($post_ID) {
 		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) 
 			return false;
 		// AJAX? Not used here
@@ -99,7 +313,7 @@ class WppNotifier  {
 		$args = (
 			array(
 				"post_type"=> $this->notification_post_type, 
-				"post_status"=> $this->notification_post_status,
+				"post_status"=> $this->notification_initial_post_status,
 				'meta_query' => array(
 					array(
 						'key'=> $this->generated_post_id_meta_key,
@@ -126,7 +340,7 @@ class WppNotifier  {
 	 * @param WP_Post $post
 	 * @return void
 	 */
-	function generate_notification_based_on_created_content($post_ID, $post) {			
+	public function generate_notification_based_on_created_content($post_ID, $post) {			
 		if (!$this->must_create_notification($post_ID)) {
 			return;
 		}		
@@ -141,7 +355,7 @@ class WppNotifier  {
 		if (in_array($post->post_type, $support_send_news_types) && $post->post_status === "publish") {
 			$content_image = get_the_post_thumbnail_url($post_ID);			
 			$url_parts = explode("//", network_home_url());
-			$logo_url = network_home_url(get_option("site_relative_logo_url"));
+			$logo_url = network_home_url(get_option("wpp_site_relative_logo_url"));
 
 			$content_lang_slug = $this->get_post_language($post_ID, "slug");
 
@@ -171,7 +385,7 @@ class WppNotifier  {
 			$notification_id = wp_insert_post(
 				array(
 					"post_type"=> $this->notification_post_type, 
-					"post_status"=> $this->notification_post_status,
+					"post_status"=> $this->notification_initial_post_status,
 					"post_author"=> get_current_user_id(),
 					"post_title"=> $post->post_title, 
 					"post_content"=> $message, 
@@ -186,19 +400,18 @@ class WppNotifier  {
 			$content_lang_id = $this->get_post_language($post_ID);
 			if ($content_lang_id) {
 				$term_arr = [$content_lang_id];
-				wp_set_post_terms($notification_id, $term_arr, "lang");
+				wp_set_post_terms($notification_id, $term_arr, $this->lang_tax_slug);
 			}
 
-			add_action( 'admin_notices', array($this,'show_notification_created_admin_notice'));
+			function notification_created_notice() {
+				$post_type = $this->notification_post_type;
+				printf(
+				"<div class='notice notice-info is-dismissible'>
+					<p>A notification was created and is pending for revision in the notifications <a href='/wp-admin/edit.php?post_type=$post_type>'>outbox</a></p>
+				</div>");
+			}
+			add_action( 'admin_notices', 'notification_created_notice');
 		}
-	}
-
-	function show_notification_created_admin_notice() {		
-		?>
-		<div class="notice notice-info is-dismissible">
-			<p>A notification was created and is pending for revision in the notifications <a href="/wp-admin/edit.php?post_type=<?php echo $this->notification_post_type ?>>">outbox</a></p>
-		</div>
-		<?php		
 	}
 
 	/**
@@ -208,9 +421,8 @@ class WppNotifier  {
 	 * @param string $field
 	 * @return id|slug
 	 */
-	function get_post_language($post_ID, $field = "id") {
-		$taxonomy = "lang";
-		$content_lang_taxonomies = wp_get_post_terms($post_ID, $taxonomy);
+	public function get_post_language($post_ID, $field = "id") {
+		$content_lang_taxonomies = wp_get_post_terms($post_ID, $this->lang_tax_slug);
 		if( is_array($content_lang_taxonomies) && count($content_lang_taxonomies) > 0) {
 			if ($field === "id") {
 				return $content_lang_taxonomies[0]->term_id;
@@ -228,7 +440,7 @@ class WppNotifier  {
 	 * @param boolean $forcePrecision
 	 * @return String
 	 */
-	function get_sub_content($content, $length, $forcePrecision = false) {
+	public function get_sub_content($content, $length, $forcePrecision = false) {
 		$length = $length-3;
 		$content = strip_tags($content, '');
 		if(strlen($content) > $length) {		
@@ -284,7 +496,7 @@ class WppNotifier  {
 	 * @param Integer $post_ID
 	 * @return String
 	 */
-	function replace_related_template($template, $post_ID, $lang_slug) {
+	public function replace_related_template($template, $post_ID, $lang_slug) {
 		$related_post_ids = get_field('related', $post_ID);
 		$related = get_posts(array( 'post__in' => $related_post_ids));
 
@@ -315,7 +527,7 @@ class WppNotifier  {
 	 *
 	 * @return void
 	 */
-	function process_pending_notifications() {			
+	public function process_pending_notifications() {			
 		$pending_notifications = get_posts( array( 'post_type' => 'notification', 'orderby'  => 'id', 'order' => 'ASC', 'post_status' => 'publish'));
 		$to = array();	
 				
@@ -353,12 +565,12 @@ class WppNotifier  {
 	 * @param WP_Post $pending_notification
 	 * @return void
 	 */
-	function send_pending_notifications($to, $pending_notification) {	
+	public function send_pending_notifications($to, $pending_notification) {	
 		$insert_sent_sql = $this->base_insert_sent_sql;	
 		if(is_array($to) && count($to) > 0)
 		{		
-			$senderName = get_option("email_sender_name");
-			$senderEmail = get_option("email_sender_email");
+			$senderName = get_option("wpp_email_sender_name");
+			$senderEmail = get_option("wpp_email_sender_email");
 			$headers[] = "From: $senderEmail <$senderName>";	
 			$headers[] = "Return-Path: <$senderName>";
 			$headers[] = "Sender: <$senderName>";
@@ -367,7 +579,7 @@ class WppNotifier  {
 			$mail_list_type = get_post_meta($pending_notification->ID, "mail_list_type", true);
 			
 			if($content_type == "html") {
-				add_filter('wp_mail_content_type', 'set_html_content_type' );	
+				add_filter('wp_mail_content_type', array($this, 'set_html_content_type'));	
 				$counter = 1;	
 				foreach($to as $mail)
 				{
@@ -391,7 +603,7 @@ class WppNotifier  {
 						$this->debug_output .= "<br/>Failed to send as html-> $senderEmail,".$mail." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 					}
 				}
-				remove_filter('wp_mail_content_type', 'set_html_content_type');
+				remove_filter('wp_mail_content_type', array($this, 'set_html_content_type'));
 				global $wpdb;
 				$wpdb->query($insert_sent_sql);
 			}
@@ -439,7 +651,7 @@ class WppNotifier  {
 	 * @param WP_Post $pending_notification
 	 * @return String (comma separated emails)
 	 */
-	function get_mails_to($pending_notification) {
+	public function get_mails_to($pending_notification) {
 		$mail_list_type = get_post_meta($pending_notification->ID, "mail_list_type", true);					
 		$to = $this->get_mail_list($pending_notification->ID, $pending_notification->post_title, $mail_list_type);
 		$this->debug_output .="<br/> working on news mail...<br/>";
@@ -454,8 +666,8 @@ class WppNotifier  {
 	 * @param String $mail_list_type
 	 * @return void
 	 */
-	function get_mail_list($id_pending_notification, $mail_title, $mail_list_type) {
-		$notification_term_list = wp_get_post_terms($id_pending_notification, "lang", array("fields" => "all"));	
+	public function get_mail_list($id_pending_notification, $mail_title, $mail_list_type) {
+		$notification_term_list = wp_get_post_terms($id_pending_notification, $this->lang_tax_slug, array("fields" => "all"));	
 		$notification_lang_term_id = $notification_term_list[0]->term_id;
 
 		global $wpdb;
@@ -464,35 +676,28 @@ class WppNotifier  {
 		$post_meta_table_name = $prefix."postmeta";
 		$term_relationship_table_name = $prefix."term_relationships";
 
-		$sql = "select ID, (select meta_value from $post_meta_table_name where meta_key = 'email' and post_id = ID limit 1) as email from 
-		$post_table_name where post_type = 'follower' and (select meta_value from $post_meta_table_name where meta_key = 'email' and post_id = ID limit 1) 
+		$sql = "select ID, (select meta_value from $post_meta_table_name where meta_key = '".$this->follower_email."' and post_id = ID limit 1) as email from 
+		$post_table_name where post_type = '".$this->follower_post_type."' and (select meta_value from $post_meta_table_name where meta_key = '".$this->follower_email."' and post_id = ID limit 1) 
 		not in (select wp_mail_sent.email from wp_mail_sent where mail_title = '".$mail_title."')		
-		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = 'mail_list' and meta_value = '".$mail_list_type."' )
-		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = 'activated' and meta_value = 1 )
-		and ID in (SELECT object_id FROM $term_relationship_table_name where object_id = ID and term_taxonomy_id = $notification_lang_term_id) limit 0,".$this->MaxNotificationsPerTime;
+		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = '".$this->mail_list."' and meta_value = '".$mail_list_type."' )
+		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = '".$this->activated."' and meta_value = 1 )
+		and ID in (SELECT object_id FROM $term_relationship_table_name where object_id = ID and term_taxonomy_id = $notification_lang_term_id) limit 0,".$this->max_notifications_per_time;
 		
 		$followers = $wpdb->get_results($sql);
 
-					
-		// $followers = get_posts( array( 'post_type' => 'follower', 'orderby'  => 'id', 'order' => 'ASC', 'post_status' => 'publish', 'meta_key' => 'mail_list', 'meta_value' => $mail_list_type));
 		$insert_sql = $this->base_insert_sent_sql;
 		$to_list = '';
-		if(count($followers) > $this->MaxNotificationsPerTime)
-		{
+		if(count($followers) > $this->max_notifications_per_time) {
 			$followers	= array_slice($followers, 0, count($followers) -1);
 		}
 		$to_array = array();
-		foreach($followers as $to)
-		{
-
+		foreach($followers as $to) {
 			$to_array[] = $to->email;
 			
-			if($to_list == "")
-			{				
+			if($to_list == "") {				
 				$insert_sql .= " ( '".$to->email."', ".$id_pending_notification.", '".$mail_list_type."','".$mail_title."')";
 			}
-			else
-			{				
+			else {				
 				$insert_sql .= ", ( '".$to->email."', ".$id_pending_notification.", '".$mail_list_type."','".$mail_title."' )";
 			}	
 		}
@@ -506,8 +711,8 @@ class WppNotifier  {
 	 *
 	 * @return void
 	 */
-	function notify_mail_sent() {
-		$skip_email_sending_notification = get_option("skip_email_sending_notification");
+	public function notify_mail_sent() {
+		$skip_email_sending_notification = get_option("wpp_skip_email_sending_notification");
 		if(count($this->sent_mails) > 0 && $skip_email_sending_notification !== "yes")
 		{
 			$notify_send_mail_html = "Log of ".count($this->sent_mails)." sent emails at ".date("m/d/Y h:i:s", time()).":<br/><br/>";
@@ -517,8 +722,8 @@ class WppNotifier  {
 				$notify_send_mail_html .=  "Para: ".$sent_mail->mail."<br/>";
 			}
 				
-			$senderName = get_option("email_sender_name");
-			$senderEmail = get_option("email_sender_email");
+			$senderName = get_option("wpp_email_sender_name");
+			$senderEmail = get_option("wpp_email_sender_email");
 			$adminEmail = get_option("admin_email");
 			$blogname = get_option("blogname");
 			
@@ -526,9 +731,9 @@ class WppNotifier  {
 			$headers[] = "From: $senderName <$senderEmail>";	
 			$headers[] = 'Return-Path: <$senderEmail>';
 			$headers[] = "Sender: <$senderEmail>";
-			add_filter('wp_mail_content_type', 'set_html_content_type' );			
+			add_filter('wp_mail_content_type', array($this, 'set_html_content_type') );					
 			$success = wp_mail($adminEmail,"Mailing log - $blogname",$notify_send_mail_html,$headers);
-			remove_filter('wp_mail_content_type', 'set_html_content_type');
+			remove_filter('wp_mail_content_type', array($this, 'set_html_content_type'));
 		}
 	}
 	
@@ -537,7 +742,7 @@ class WppNotifier  {
 	 *
 	 * @return void
 	 */
-	function debug() {		
+	public function debug() {		
 		if(isset($_GET["debug"]) && $_GET["debug"] === "yes")
 		{
 			$content = "<html lang='pt-BR'><head><meta charset='UTF-8'></head><body><h2>debug is on</h2>".$this->debug_output."</body></html>";
@@ -550,7 +755,7 @@ class WppNotifier  {
 		}
   	}
   
-	function insert_fake_test() {
+	public function insert_fake_test() {
 		if( is_user_logged_in() && in_array(get_user_role(),array('adm_fam_root','administrator')));
 		{			
 		$current_date = date("m/d/Y h:i:s", time());

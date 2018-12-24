@@ -185,7 +185,7 @@ class WppOauthApi {
 					]
 				);
 
-				return new WP_REST_Response($data, 201); // OK
+				return new WP_REST_Response($data, 201); // CREATED, NO CONTENT
 			}
 
 			return new WP_REST_Response(null, 404 ); // Local wordpress user linked to github email address not found
