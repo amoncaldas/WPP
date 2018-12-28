@@ -47,8 +47,9 @@ const router = new Router({
  */
 router.beforeEach((to, from, next) => {
   let promise1 = store.dispatch('tryAutoLogin')
+  let promise2 = store.dispatch('fetchSections')
 
-  Promise.all([promise1]).then(() => {
+  Promise.all([promise1, promise2]).then(() => {
     next()
   })
 })

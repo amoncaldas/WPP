@@ -44,6 +44,7 @@ wordpress/wp-content/plugins/*
 !wordpress/wp-content/plugins/acf-to-rest-api
 !wordpress/wp-content/plugins/wp-options-editor
 !wordpress/wp-content/plugins/classic-editor
+!wordpress/wp-content/plugins/acf-field-openstreetmap
 
 
 ## Do not ignore FAM plugins

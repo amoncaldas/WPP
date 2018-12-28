@@ -16,16 +16,15 @@ const httpApi = axios.create({
  * @param {} config
  */
 const requestInterceptors = (config) => {
+  // if yes, show the loading and add the authorization header
+  VueInstance.eventBus.$emit('showLoading', true)
+
+  // Set/increase the pending request counter
+  VueInstance.$pendingRequest = VueInstance.$pendingRequest ? VueInstance.$pendingRequest + 1 : 1
+
   // Before each request, we check if the user is authenticated
   // This store isAuthenticated getter relies on the @/common/auth/auth.store.js module
-  if (!VueInstance.$store.getters.isAuthenticated) {
-    // if not, redirect to login page
-    VueInstance.$router.replace('/')
-  } else {
-    // if yes, show the loading and add the authorization header
-    VueInstance.eventBus.$emit('showLoading', true)
-    // Set/increase the pending request counter
-    VueInstance.$pendingRequest = VueInstance.$pendingRequest ? VueInstance.$pendingRequest + 1 : 1
+  if (VueInstance.$store.getters.isAuthenticated) {
     config.headers.common['Authorization'] = 'Bearer ' + VueInstance.$store.getters.user.token
   }
   return config // you have to return the config, otherwise the request wil be blocked

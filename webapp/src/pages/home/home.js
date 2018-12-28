@@ -1,5 +1,4 @@
-import Tokens from './tabs/tokens/Tokens'
-import Profile from './tabs/profile/Profile'
+import SectionsMap from '@/fragments/sections-map/SectionsMap'
 
 export default {
   data: () => ({
@@ -7,8 +6,7 @@ export default {
     activeTab: '0'
   }),
   components: {
-    appTokens: Tokens,
-    userProfile: Profile
+    SectionsMap
   },
   created () {
     if (this.$route.query.tab) {
