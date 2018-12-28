@@ -47,7 +47,7 @@ wordpress/wp-content/plugins/*
 !wordpress/wp-content/plugins/acf-field-openstreetmap
 
 
-## Do not ignore FAM plugins
+## Do not ignore wpp plugin
 !wordpress/wp-content/plugins/wp-web-app
 
 # Ignore files that contains custom enviroment config/data
