@@ -27,12 +27,18 @@
     public function getHTMLSkeleton () {
         $skeleton = file_get_contents("/var/www/webapp/index.html");
         $skeleton = str_replace("=static/", "=/static/", $skeleton);
-        
-        $skeleton = str_replace("{{keywords}}", "key words", $skeleton);
-        $skeleton = str_replace("{{description}}", "page description", $skeleton);
-        $skeleton = str_replace("{{fb_app_id}}", "fb_app_id", $skeleton);
-        $skeleton = str_replace("{{fb_admin}}", "fb_admin", $skeleton);
-        $skeleton = str_replace("{{author}}", "author", $skeleton);
+        $all_options = wp_load_alloptions();
+
+        $head_inject = "";
+        foreach ($all_options as $key => $value) {
+            if ( strpos($key, "wpp_meta_") === 0) {
+                $meta_property_name = str_replace("wpp_meta_", "", $key);
+                $head_inject .= "<meta property='$meta_property_name' content='$value'>";
+            }
+        }
+        $head_inject .= "</head>";
+
+        $skeleton = str_replace("</head>", $head_inject, $skeleton);
 
         $title = get_bloginfo("name");
         $og_image_url = "image_path";
@@ -53,8 +59,7 @@
      * @return string
      */
     public function getWebAppHtml () {
-        $uri = $_SERVER["REQUEST_URI"];
-        if ($uri !== "/") {
+        if ($_SERVER["REQUEST_URI"] !== "/") {
             return "<html><title>".get_bloginfo("name")."</title><script> window.location = '/#$uri' </script></html>";
         }
         return $this->getHTMLSkeleton();
@@ -75,9 +80,11 @@
         if(is_integer($last_url_segment)) {
             $post_id = $last_url_segment;
         }
+        $skeleton = $this->getHTMLSkeleton();
         $html = str_replace('<div id="app"></div>', "", $skeleton);
         $html = str_replace('</body>', "", $html);
         $html = str_replace('</html>', "", $html);
+        
         // add content there
         $html .= "</body>";
         $html .= "</html>";

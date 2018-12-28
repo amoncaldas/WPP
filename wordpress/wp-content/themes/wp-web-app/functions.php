@@ -9,6 +9,7 @@
  class WpWebAppTheme {
 
 	public $lang_tax_slug = "lang";
+	public $section_custom_post_type_slug = "section";
 
 	function __construct () {
 		$this->update_site_url();
@@ -77,15 +78,138 @@
 	 * @return void
 	 */
 	public function register_hooks() {
-		add_action('wp_insert_post', array($this,'after_insert_content'), 10, 2 );
+		add_action('wp_insert_post', array($this,'after_save_content'), 10, 2 );
 		add_filter('request', array($this, 'set_feed_types'));
+		add_action('init', array($this, 'register_custom_types'));
+		add_action('admin_menu', array($this, 'add_language_admin_menu'));
+		add_action( 'rest_api_init', array($this, 'register_wp_api_custom_fields'));
+		add_filter('acf/fields/google_map/api', array($this,'acf_google_map_api'));
 
 		// Customize permalink
 		add_filter('post_type_link', array($this, 'set_post_permalink'), 10, 2);
 		add_filter('preview_post_link', array($this, 'set_post_preview_permalink'), 10, 2);
 		add_filter('page_link', array($this, 'set_page_permalink'), 10, 2);
 		add_filter('preview_page_link', array($this, 'set_page_preview_permalink'), 10, 2);
-		add_filter( 'image_send_to_editor', array($this, 'set_image_before_send_to_editor'), 10, 6 );
+		add_filter('image_send_to_editor', array($this, 'set_image_before_send_to_editor'), 10, 6 );		
+	}
+
+		/**
+	 * Register user meta data to get and update callbacks user wp rest api
+	 *
+	 * @return void
+	 */
+	public function register_wp_api_custom_fields() {
+		register_rest_field( $this->section_custom_post_type_slug, 'places',
+			array(
+				'get_callback'  => function ($post, $field_name, $request) {
+					return $this->resolve_places($post, $field_name, $request);
+				},
+				'schema' => null,
+			)
+		);
+	}
+
+	/**
+	 * Add custom data to the wp/v2/users/<user-id> endpoint
+	 *
+	 * @param Wp_User $user
+	 * @param string $field_name
+	 * @param Object $request
+	 * @return array of metas to be added in the response
+	 */
+	public function resolve_places($post_arr, $field_name, $request) {	
+		$place_ids = get_post_meta($post_arr["id"], "places", true);
+		$places = [];
+		if (is_array($place_ids) && count($place_ids) > 0) {			
+			foreach ($place_ids as $place_id) {				
+				$location = get_post_meta($place_id, "location", true);	
+				if($location) {
+					$places[$place_id] = $location;
+					$places[$place_id]["title"] = get_the_title($place_id);
+					$langs = wp_get_post_terms($place_id, $this->lang_tax_slug);
+					$places[$place_id]["lang"] = count($langs) > 0 ? $langs[0]->slug : null;
+				}
+			}
+		}
+		return $places;
+	}	
+
+	/**
+	 * Set the ACF custom fields google map api key from `wpp_google_maps_api_key` option value
+	 *
+	 * @param Array $api
+	 * @return Array
+	 */
+	public function acf_google_map_api( $api ){	
+		$api['key'] = get_option("wpp_google_maps_api_key");
+		return $api;		
+	}
+	
+
+	/**
+	 * Register custom types section and lang
+	 *
+	 * @return void
+	 */
+	public function register_custom_types () {
+		$section_args = array (
+			'name' => $this->section_custom_post_type_slug,
+			'label' => 'Sections',
+			'singular_label' => 'Section',
+			'public' => true,
+			'publicly_queryable' => true,
+			'show_ui' => true,
+			'show_in_nav_menus' => true,
+			'show_in_rest' => true,
+			'rest_base' => 'sections',
+			'map_meta_cap' => true,
+			'has_archive' => false,
+			'exclude_from_search' => false,
+			'capability_type' => array($this->section_custom_post_type_slug, $this->section_custom_post_type_slug."s"),
+			'hierarchical' => false,
+			'rewrite' => true,
+			'rewrite_withfront' => true,	
+			'show_in_menu' => true,
+			'supports' => 
+			array (
+				0 => 'title',
+				1 => 'editor',
+				2 => 'thumbnail',
+				3 => 'revisions',
+			),
+		);
+
+		register_post_type( $this->section_custom_post_type_slug , $section_args );
+
+		$lang_tax_args = array (
+			'name' => 'languages',
+			'label' => 'Language',
+			'singular_label' => 'Language',
+			'public' => true,
+			'publicly_queryable' => true,
+			'hierarchical' => false,
+			'show_ui' => true,
+			'show_in_menu' => true,
+			'show_in_nav_menus' => true,
+			'query_var' => true,
+			'rewrite' => true,
+			'rewrite_withfront' => '1',
+			'rewrite_hierarchical' => '0',
+			'show_admin_column' => true,
+			'show_in_rest' => true,
+			'rest_base' => 'langs',
+		);
+		register_taxonomy( $this->lang_tax_slug, null, $lang_tax_args );
+	}
+
+	/**
+	 * Add a admin menu entry to manage the languages
+	 *
+	 * @return void
+	 */
+	public function add_language_admin_menu(){
+		global $submenu;
+		$submenu['options-general.php'][] = array( 'Language', 'manage_options', "/wp-admin/edit-tags.php?taxonomy=".$this->lang_tax_slug);
 	}
 
 	/**
@@ -98,7 +222,8 @@
 		if (isset($qv['feed'])) {			
 			$builtin_post_types = get_post_types(array("public"=>true, "_builtin"=>true));
 			unset($builtin_post_types["attachment"]);
-			$custom_post_types = get_post_types_by_support("feed");			
+			$custom_post_types = get_post_types_by_support("feed");		
+			$custom_post_types[] = $this->section_custom_post_type_slug;	
 			$post_types = array_merge_recursive($builtin_post_types, $custom_post_types);
 			$qv['post_type'] = $post_types;
 		}
@@ -112,11 +237,11 @@
 	 * @param String $content
 	 * @return WP_Post
 	 */
-	public function after_insert_content( $content_id, $content) {
+	public function after_save_content( $content_id, $content) {
 		if ($content->post_type === "page") {
-			return $this->after_insert_page($content_id, $content);
+			return $this->after_save_page($content_id, $content);
 		} else {
-			return $this->after_insert_post($content_id, $content);
+			return $this->after_save_post($content_id, $content);
 		}
 	}
 
@@ -127,7 +252,7 @@
 	 * @param WP_Post $post
 	 * @return WP_Post
 	 */
-	public function after_insert_post( $post_id, $post ) {
+	public function after_save_post( $post_id, $post ) {
 		$this->set_default_taxonomy($post, $this->lang_tax_slug);
 		$this->set_section($post);	
 		$this->set_valid_post_name($post);
@@ -179,7 +304,8 @@
 		$no_post_type_in_permalink_types = get_post_types_by_support("no_post_type_in_permalink");
 
 		// built in `post` also supports `no_post_type_in_permalink`
-		$no_post_type_in_permalink_types[] = "post";	
+		$no_post_type_in_permalink_types[] = "post";
+		$no_post_type_in_permalink_types[] = $this->section_custom_post_type_slug;	
 
 		// Get the post types that supports `parent_section` and `section_in_permalink`
 		$section_in_permalink_types = get_post_types_by_support(array("parent_section","section_in_permalink"));
@@ -311,8 +437,11 @@
 	 * @param string $permalink
 	 * @return WP_Post
 	 */
-	public function after_insert_page( $page_id, $page) {		
+	public function after_save_page( $page_id, $page) {		
 		$get_valid_name = function($name, $post_types) use (&$get_valid_name)  {
+			if (!$post_types || count($post_types) === 0) {
+				return $name;
+			}
 			foreach ($post_types as $key => $post_type) {
 				$post = get_page_by_path($name, OBJECT, $post_type);
 				if ($post) {
@@ -332,6 +461,7 @@
 
 		if(isset($page->post_name) && $page->post_name !== "") {
 			$no_post_type_in_permalink_types = get_post_types_by_support("no_post_type_in_permalink");
+			$no_post_type_in_permalink_types[] = $this->section_custom_post_type_slug;
 			$valid_page_name = $get_valid_name($page->post_name, $no_post_type_in_permalink_types);
 			if($valid_page_name !== $page->post_name) {
 				$page->post_name = $valid_page_name;
@@ -430,7 +560,7 @@
 			$parent_id = $this->get_parent_section_id($post->ID);
 
 			if ($post->post_parent === 0 && !$parent_id) {				
-				$sections = get_posts( array( 'post_type' => 'section', 'orderby'  => 'id', 'order' => 'ASC'));		
+				$sections = get_posts( array( 'post_type' => $this->section_custom_post_type_slug, 'orderby'  => 'id', 'order' => 'ASC'));		
 				if (count($sections) > 0) {
 					$parent_id = $sections[0]->ID;
 				}							
@@ -452,7 +582,7 @@
 	 * @return Integer|null
 	 */
 	public function get_parent_section_id($post_id) {
-		$parent_id = get_post_meta($post_id, "section", true);	
+		$parent_id = get_post_meta($post_id, $this->section_custom_post_type_slug, true);	
 		$parent_id = is_array($parent_id) && count($parent_id)> 0 ? $parent_id[0] : $parent_id;
 		if (isset($parent_id)) {
 			$parent_id = intval($parent_id);
