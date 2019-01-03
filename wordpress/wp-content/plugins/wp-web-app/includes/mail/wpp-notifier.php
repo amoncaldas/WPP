@@ -43,15 +43,21 @@ class WppNotifier  {
 	}
 
 	/**
-     * Register routes for WP API v2.
-     *
-     * @since  1.2.0
-     */
-    public function register_routes() {
+	 * Register routes for WP API v2.
+	 *
+	 * @since  1.2.0
+	 */
+  public function register_routes() {
 		register_rest_route(WPP_API_NAMESPACE."/notifications", '/send', array(
 			array(
 				'methods'  => "GET",
 				'callback' => array($this, 'send_notifications' ),
+			)
+		));
+		register_rest_route(WPP_API_NAMESPACE."/message", '/send', array(
+			array(
+				'methods'  => "POST",
+				'callback' => array($this, 'send_message' ),
 			)
 		));
 		register_rest_route(WPP_API_NAMESPACE."/notifications", '/subscribe', array(
@@ -160,6 +166,27 @@ class WppNotifier  {
 		} else {
 			return new WP_REST_Response(null, 400); // INVALID REQUEST
 		}
+	}
+
+	/**
+	 * Subscribe to notification list
+	 *
+	 * @param Object $request
+	 * @return WP_REST_Response
+	 */
+	public function send_message($request) {
+		$actual_url= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+		if ($_SERVER['HTTP_REFERER'] === $actual_url) {
+			$subject = $request->get_param('subject');
+			$message = $request->get_param('message');
+			if (isset($subject) && isset($message)) {
+				$title = $subject . " | ". get_bloginfo("name");
+				$this->notify_admin($title, $message, "contact form");
+				return new WP_REST_Response(null, 204); // ACCEPTED/UPDATED, NO CONTENT TO RETURN
+			}
+			return new WP_REST_Response(null, 409); // CONFLICT, MISSING DATA
+		}
+		return new WP_REST_Response(null, 403); // FORBIDDEN
 	}
 
 	/**
@@ -753,8 +780,9 @@ class WppNotifier  {
 			wp_redirect( network_home_url()."", 301);
 			exit;
 		}
-  	}
-  
+  }
+  	
+	
 	public function insert_fake_test() {
 		if( is_user_logged_in() && in_array(get_user_role(),array('adm_fam_root','administrator')));
 		{			

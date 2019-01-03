@@ -1,5 +1,5 @@
 <template>
-  <box resizable background="white" @resized="adjustMap">
+  <box resizable background="white" @boxCreated="boxCreated" @resized="adjustMap">
     <div slot="header">
           <h3>{{$t('sectionsMap.title')}}</h3>
         </div>
@@ -9,7 +9,7 @@
         <l-popup v-if="marker.label">
             <div >
               {{marker.label}}
-              <v-icon v-if="marker.json" @click="markerInfoClick(marker)" color="info" class="right-btn-icon pointer" :title="$t('sectionsMap.locationDetails')">launch</v-icon>
+              <v-icon v-if="marker.json" @click="markerInfoClick(marker)" color="info" class="right-btn-icon pointer" :title="$t('sectionsMap.section')">launch</v-icon>
             </div>
           </l-popup>
       </l-marker>

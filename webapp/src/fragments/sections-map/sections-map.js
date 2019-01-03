@@ -32,7 +32,8 @@ export default {
       routeColor: theme.primary,
       guid: null,
       mapData: null,
-      info: null
+      info: null,
+      boxGuid:null
     }
   },
   computed: {
@@ -55,9 +56,12 @@ export default {
   },
 
   methods: {
+    boxCreated(guid) {
+      this.boxGuid = guid
+    },
     loadMapData () {
       this.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
-      this.mapData = { markers: GeoUtils.buildMarkers(this.getMarkersData(), false) }
+      this.mapData = { markers: GeoUtils.buildMarkers(this.getMarkersData(), false, {mapIconUrl: this.$store.getters.options.map_icon_url}) }
       this.dataBounds = GeoUtils.getBBoxAndMarkersBounds(this.dataBounds, this.mapData.markers)
       this.fitFeaturesBounds()
       this.redrawMap()
@@ -75,7 +79,7 @@ export default {
             let place = section.places[placeKey]
             if (place.markers.length > 0) {
               let location = place.markers[0]
-              markersData.push([location.lng, location.lat, place.title, place])
+              markersData.push([location.lng, location.lat, section.title.rendered, section])
             }
           }
         })
@@ -115,32 +119,35 @@ export default {
         }
       })
     },
-    markerInfoClick (marker) {
-      this.infoDialog(marker.label, null, {code: marker.json, resizable: true, zIndex: 1001})
+    markerInfoClick (section) {
+      this.$router.push(`/${section.json.slug}`)
+      //this.infoDialog(section.label, null, {code: section.json, resizable: true, zIndex: 1001})
     },
-    adjustMap (isMaximized) {
-      window.dispatchEvent(new Event('resize'))
-      // if the map is maximized, then the height
-      // will be the window height less an offset
-      if (isMaximized) {
-        this.mapHeight = window.innerHeight - 300
-      } else { // if not, the height is fixed
-        this.mapHeight = 300
+    adjustMap (data) {
+      if (data.guid === this.boxGuid) {
+        window.dispatchEvent(new Event('resize'))
+        // if the map is maximized, then the height
+        // will be the window height less an offset
+        if (data.maximized) {
+          this.mapHeight = window.innerHeight - 300
+        } else { // if not, the height is fixed
+          this.mapHeight = 300
+        }
+        // After map container box is resized
+        // we need to wait a little bit
+        // to redraw the map and then
+        // wait a little bit more to fit the bounds
+        setTimeout(() => {
+          // Redraw the map and then wait
+          this.redrawMap().then(() => {
+            setTimeout(() => {
+              // After redrawing and waiting
+              // fit the bounds
+              this.fitFeaturesBounds()
+            }, 500)
+          })
+        }, 500)
       }
-      // After map container box is resized
-      // we need to wait a little bit
-      // to redraw the map and then
-      // wait a little bit more to fit the bounds
-      setTimeout(() => {
-        // Redraw the map and then wait
-        this.redrawMap().then(() => {
-          setTimeout(() => {
-            // After redrawing and waiting
-            // fit the bounds
-            this.fitFeaturesBounds()
-          }, 500)
-        })
-      }, 500)
     }
   },
   mounted () {

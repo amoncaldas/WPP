@@ -51,7 +51,7 @@ const geoUtils = {
    * @param {Boolean} isRoute - default true
    * @returns {Array} of markers
    */
-  buildMarkers: (markersData, isRoute = true) => {
+  buildMarkers: (markersData, isRoute = true, options = {}) => {
     let markers = []
     VueInstance.lodash.each(markersData, (wayPoint, key) => {
       // Define the marker color
@@ -59,7 +59,7 @@ const geoUtils = {
       let coloredMarkerName = geoUtils.getMarkerColor(key, lastIndexKey, isRoute)
 
       // Build the marker
-      let markerIcon = geoUtils.buildMarkerIcon(coloredMarkerName)
+      let markerIcon = geoUtils.buildMarkerIcon(coloredMarkerName, options)
       let marker = { position: { lng: wayPoint[0], lat: wayPoint[1] }, icon: markerIcon }
 
       // if the way point array has the third parameter, it is its label
@@ -83,13 +83,22 @@ const geoUtils = {
    * @param {String} color
    * @returns {Object} markerIcon
    */
-  buildMarkerIcon: (color) => {
+  buildMarkerIcon: (color, options) => {
+    let iconFile = require(`./static/${color}-marker.png`)
+    let shadowUrl = require('leaflet/dist/images/marker-shadow.png')
+    let iconSize = [28, 36]
+
+    if (options.mapIconUrl) {
+      iconFile = options.mapIconUrl
+      shadowUrl = null
+      iconSize = [36, 36]
+    }
     let markerIcon = Leaflet.icon({
-      iconUrl: require(`./static/${color}-marker.png`),
-      shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+      iconUrl: iconFile,
+      shadowUrl: shadowUrl,
       iconAnchor: [14, 35],
       shadowAnchor: [12, 41],
-      iconSize: [28, 36],
+      iconSize: iconSize,
       popupAnchor: [0, -32]
     })
     return markerIcon

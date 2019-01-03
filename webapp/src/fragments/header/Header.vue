@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar class="ors-toolbar app-toolbar" height="93" app :clipped-left="clipped">
+  <v-toolbar class="ors-toolbar app-toolbar" app :clipped-left="clipped">
     <v-btn icon @click.stop="toggleSidebar" class="hidden-md-and-up">
       <v-icon>menu</v-icon>
     </v-btn>

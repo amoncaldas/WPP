@@ -1,4 +1,5 @@
 import SectionsMap from '@/fragments/sections-map/SectionsMap'
+import Posts from '@/fragments/posts/Posts'
 
 export default {
   data: () => ({
@@ -6,7 +7,8 @@ export default {
     activeTab: '0'
   }),
   components: {
-    SectionsMap
+    SectionsMap,
+    Posts
   },
   created () {
     if (this.$route.query.tab) {

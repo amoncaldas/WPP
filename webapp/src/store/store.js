@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import ui from './modules/ui'
 import section from './modules/section'
+import options from './modules/options'
 import loader from '@/support/loader'
 
 Vue.use(Vuex)
@@ -16,7 +17,8 @@ const storeBuilder = {
   },
   modules: {
     ui,
-    section
+    section,
+    options
   }
 }
 

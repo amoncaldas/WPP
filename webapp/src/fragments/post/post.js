@@ -1,12 +1,11 @@
-import postService from '@/shared-services/user-service'
+import postService from '@/shared-services/post-service'
+import Media from '@/fragments/media/Media'
+
 
 export default {
   created () {
-    // extend this component, adding CRUD functionalities and load the tokens
     if (this.postId) {
       let context = this
-
-      // get the data related to the userId defined
       postService.get(this.postId).then((post) => {
         context.post = post
       }).catch(error => {
@@ -23,6 +22,9 @@ export default {
     },
     postData: {
       required: false
+    },
+    noTopBorder: {
+      default: false
     }
   },
   data () {
@@ -34,6 +36,11 @@ export default {
 
   },
   methods: {
-
-  }
+    excerpt() {
+      return this.post.content.rendered.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
+    }
+  },
+  components: {
+    Media
+  },
 }

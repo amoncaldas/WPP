@@ -55,9 +55,9 @@ function ModelService (endPoint, resourceName, options) {
    * Queries the model service endpoint, retrieve the resources and (by default) transform them in active record Models
    * @param {*} filters  filters to be applied to retrieve the resources
    */
-  this.query = (filters) => {
+  this.query = (filters, endpointAppend = '') => {
     return new Promise((resolve, reject) => {
-      let endPoint = this.endPoint
+      let endPoint = this.endPoint + endpointAppend
       endPoint += this.buildParams(filters)
       let request = { endPoint: endPoint, filters: filters, running: 'query' }
 

@@ -11,6 +11,7 @@ export default {
     locationDetails: 'Location details',
     viewBasedOnEquivalentGeoJsonResponse: 'Visualization based on an equivalent GeoJSON response',
     polygonDetails: 'Polygon details',
-    polygon: 'Polygon'
+    polygon: 'Polygon',
+    section: 'Section details'
   }
 }
