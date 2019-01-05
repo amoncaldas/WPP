@@ -60,8 +60,7 @@ if ( ! function_exists( 'add_action' ) ) {
 		require_once(WPP_PLUGIN_PATH . '/includes/mail/wpp-notifier.php');
 		require_once(WPP_PLUGIN_PATH . '/includes/mail/mail-from.php');
 		require_once(WPP_PLUGIN_PATH . '/includes/oauth/wpp-oauth-wp-api.php');
-		require_once(WPP_PLUGIN_PATH . '/includes/global/wp-web-app-services-api.php');
-		
+		require_once(WPP_PLUGIN_PATH . '/includes/global/wp-web-app-services-api.php');		
 	}
 
 	/**

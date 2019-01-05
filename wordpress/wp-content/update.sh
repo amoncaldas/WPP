@@ -12,6 +12,7 @@ wp plugin install quick-and-easy-post-creation-for-acf-relationship-fields --all
 wp plugin install custom-post-type-ui --allow-root --activate
 wp plugin install acf-to-rest-api --allow-root --activate
 wp plugin install wp-options-editor --allow-root --activate
+wp plugin install user-role-editor --allow-root --activate
 
 
 # Install fam plugins

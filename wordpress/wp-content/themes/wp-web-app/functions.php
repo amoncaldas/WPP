@@ -10,6 +10,11 @@
 
 	public $lang_tax_slug = "lang";
 	public $section_custom_post_type_slug = "section";
+	public $notification_custom_post_type_slug = "notification";
+	public $follower_custom_post_type_slug = "follower";
+	public $section_type_field_slug = "section_type";
+	public $section_type_home_field_value = "home";
+	
 
 	function __construct () {
 		$this->update_site_url();
@@ -17,6 +22,8 @@
 		$this->set_output();
 		$this->register_hooks();
 	}
+
+	
 	
 	/**
 	 * WordPress store in db absolute urls and this is the way to update this 
@@ -80,10 +87,10 @@
 	public function register_hooks() {
 		add_action('wp_insert_post', array($this,'after_save_content'), 10, 2 );
 		add_filter('request', array($this, 'set_feed_types'));
-		add_action('init', array($this, 'register_custom_types'));
+		add_action('init', array($this, 'register_custom_types'), 10);
+		add_action('init', array($this, 'make_sure_home_section_exists'), 11);
 		add_action('admin_menu', array($this, 'add_language_admin_menu'));
-		add_action( 'rest_api_init', array($this, 'register_wp_api_custom_fields'));
-		add_filter('acf/fields/google_map/api', array($this,'acf_google_map_api'));
+		add_action('rest_api_init', array($this, 'register_wp_api_custom_fields'));
 
 		// Customize permalink
 		add_filter('post_type_link', array($this, 'set_post_permalink'), 10, 2);
@@ -91,6 +98,37 @@
 		add_filter('page_link', array($this, 'set_page_permalink'), 10, 2);
 		add_filter('preview_page_link', array($this, 'set_page_preview_permalink'), 10, 2);
 		add_filter('image_send_to_editor', array($this, 'set_image_before_send_to_editor'), 10, 6 );		
+	}
+
+	/**
+	 * Check if home section exists. If does not exist, create it
+	 *
+	 * @return void
+	 */
+	public function make_sure_home_section_exists() {
+		$home_section_args = array("post_type"=> $this->section_custom_post_type_slug, "post_status"=> "publish", 'meta_query' => array(array('key'=> $this->section_type_field_slug,'value'=> $this->section_type_home_field_value)));
+		$home_sections = get_posts($home_section_args);		
+		if (count($home_sections) === 0) {
+			$home_section_id = wp_insert_post(
+				array(
+					"post_type"=> $this->section_custom_post_type_slug, 
+					"post_status"=> "publish",
+					"post_author"=> 1, // 1 is always the admin, the first user created
+					"post_title"=> "Home",
+					"meta_input"=> array(
+						$this->section_type_field_slug => $this->section_type_home_field_value
+					)
+				)
+			);
+			// Get all available terms, and select the first one as default
+			$available_lang_terms = get_terms( array('taxonomy' => $this->lang_tax_slug, 'hide_empty' => false, 'orderby' => 'id', 'order' => 'ASC'));
+
+			if (is_array($available_lang_terms) && isset($available_lang_terms[0])) {
+				// Assign the default (the first one available)
+				$term_arr = [$available_lang_terms[0]->term_id];
+				wp_set_post_terms($home_section_id, $term_arr, $this->lang_tax_slug);
+			}	
+		}
 	}
 
 		/**
@@ -117,7 +155,7 @@
 	 * @param Object $request
 	 * @return array of metas to be added in the response
 	 */
-	public function resolve_places($post_arr, $field_name, $request) {	
+	public function resolve_places($post_arr, $field_name, $request) {
 		$place_ids = get_post_meta($post_arr["id"], "places", true);
 		$places = [];
 		if (is_array($place_ids) && count($place_ids) > 0) {			
@@ -134,17 +172,6 @@
 		return $places;
 	}	
 
-	/**
-	 * Set the ACF custom fields google map api key from `wpp_google_maps_api_key` option value
-	 *
-	 * @param Array $api
-	 * @return Array
-	 */
-	public function acf_google_map_api( $api ){	
-		$api['key'] = get_option("wpp_google_maps_api_key");
-		return $api;		
-	}
-	
 
 	/**
 	 * Register custom types section and lang
@@ -173,13 +200,68 @@
 			'supports' => 
 			array (
 				0 => 'title',
-				1 => 'editor',
 				2 => 'thumbnail',
 				3 => 'revisions',
 			),
 		);
 
 		register_post_type( $this->section_custom_post_type_slug , $section_args );
+
+		$notification_args = array (
+			'name' => $this->notification_custom_post_type_slug,
+			'label' => 'Notifications',
+			'singular_label' => 'Notification',
+			"description"=> "Emails about to be sent to newsletter subscribers",
+			'public' => false,
+			'publicly_queryable' => false,
+			'show_ui' => true,
+			'show_in_nav_menus' => true,
+			'show_in_rest' => false,
+			'map_meta_cap' => true,
+			'has_archive' => false,
+			'exclude_from_search' => true,
+			'capability_type' => array($this->notification_custom_post_type_slug, $this->notification_custom_post_type_slug."s"),
+			'hierarchical' => false,
+			'rewrite' => true,
+			'rewrite_withfront' => false,	
+			'show_in_menu' => true,
+			'supports' => 
+			array (
+				0 => 'title',
+				2 => 'editor',
+				3 => 'revisions',
+			),
+		);
+
+		register_post_type( $this->notification_custom_post_type_slug , $notification_args );
+
+
+		$follower_args = array (
+			'name' => $this->follower_custom_post_type_slug,
+			'label' => 'Followers',
+			'singular_label' => 'Follower',
+			"description"=> "Emails about to be sent to newsletter subscribers",
+			'public' => false,
+			'publicly_queryable' => false,
+			'show_ui' => true,
+			'show_in_nav_menus' => true,
+			'show_in_rest' => false,
+			'map_meta_cap' => true,
+			'has_archive' => false,
+			'exclude_from_search' => true,
+			'capability_type' => array($this->follower_custom_post_type_slug, $this->follower_custom_post_type_slug."s"),
+			'hierarchical' => false,
+			'rewrite' => true,
+			'rewrite_withfront' => false,	
+			'show_in_menu' => true,
+			'supports' => 
+			array (
+				0 => 'title',
+				3 => 'revisions',
+			),
+		);
+
+		register_post_type($this->follower_custom_post_type_slug , $follower_args );
 
 		$lang_tax_args = array (
 			'name' => 'languages',
@@ -256,7 +338,29 @@
 		$this->set_default_taxonomy($post, $this->lang_tax_slug);
 		$this->set_section($post);	
 		$this->set_valid_post_name($post);
+		$this->set_unique_section_home($post);
 		return $post;
+	}
+
+	/**
+	 * Guarantee that only one section is defined as home
+	 *
+	 * @param object $post
+	 * @return void
+	 */
+	public function set_unique_section_home ($post) {
+		if ($this->section_custom_post_type_slug === $post->post_type) {
+			$section_type = get_post_meta($post->ID, $this->section_type_field_slug, true);	
+			$home_section_args = array("post_type"=> $this->section_custom_post_type_slug, "post_status"=> "publish", 'meta_query' => array(array('key'=> $this->section_type_field_slug,'value'=> $this->section_type_home_field_value)));
+			$home_sections = get_posts($home_section_args);		
+			if ($section_type === $this->section_type_home_field_value && count($home_sections) > 1) {
+
+				foreach ($home_sections as $home_section) {
+					wp_update_post(array('ID' => $home_section->ID, 'meta_query' => array(array('key'=> $this->section_type_field_slug,'value'=> $this->section_type_home_field_value))));
+				}
+				wp_update_post( array('ID' => $post->ID, 'meta_query' => array(array('key'=> $this->section_type_field_slug,'value'=> $this->section_type_home_field_value))));
+			}
+		}
 	}
 
 	/**
@@ -311,7 +415,15 @@
 		$section_in_permalink_types = get_post_types_by_support(array("parent_section","section_in_permalink"));
 
 		// built in `post` also supports `parent_section` and `section_in_permalink`
-		$section_in_permalink_types[] = "post";				
+		$section_in_permalink_types[] = "post";		
+		
+		// This covers the section  that is home
+		if ($this->section_custom_post_type_slug === $post->post_type) {
+			$section_type = get_post_meta($post->ID, "section_type", true);	
+			if ($section_type === $this->section_type_home_field_value ) {
+				return "/";
+			} 
+		} 
 		
 		// This covers all custom post types with support for `post_type_after_section_in_permalink`
 		if (in_array($post->post_type, $section_in_permalink_types)) {
@@ -327,18 +439,22 @@
 				// Some post type may support translations in url: /stories/my-conteudo/123 => /relatos/meu-conteudo/123
 				$post_slug_translation = $this->get_post_url_slug($post);
 
+				$section_type = get_post_meta($parent->ID, "section_type", true);	
+
+				$parent_post_url_segment = $section_type === $this->section_type_home_field_value ? "/" : $parent->post_name;
+
 				if (isset($_POST['new_title']) && $_POST['new_title'] !== "") {
 					$post_name = sanitize_title($_POST['new_title']);
-					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post_name/$post->ID");
+					$permalink = network_site_url("/$parent_post_url_segment/$post_slug_translation/$post_name/$post->ID");
 				}
 				elseif (isset($post->post_title)  && $post->post_title !== "") {
 					$post_name = sanitize_title($post->post_title);
-					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post_name/$post->ID");
+					$permalink = network_site_url("/$parent_post_url_segment/$post_slug_translation/$post_name/$post->ID");
 				} 
 				elseif (isset($post->post_name) && $post->post_name !== "") {
-					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post->post_name/$post->ID");
+					$permalink = network_site_url("/$parent_post_url_segment/$post_slug_translation/$post->post_name/$post->ID");
 				}  else {
-					$permalink = network_site_url("/$parent->post_name/$post_slug_translation/$post->ID");
+					$permalink = network_site_url("/$parent_post_url_segment/$post_slug_translation/$post->ID");
 				}
 			}
 		}
@@ -593,23 +709,25 @@
 	/**
 	 * Set default taxonomy for a fresh created post
 	 *
-	 * @param WP_Post $post
+	 * @param WP_Post|Integer $post_or_id
 	 * @param string $taxonomy_slug
 	 * @return void
 	 */
-	public function set_default_taxonomy($post, $taxonomy_slug) {
-		$post_id = $post->ID;
+	public function set_default_taxonomy($post_or_id, $taxonomy_slug) {
+		$post_id = is_integer($post_or_id) ? $post_or_id : $post_or_id->ID;
+
+		$post = get_post($post_id);
 
 		// Get the possible taxonomies to this kind of post
 		$taxonomies = get_object_taxonomies($post);
 		
 		// If the post supports the passed taxonomy slug
 		// we will make sure it has one assigned
-		if (in_array($taxonomy_slug, $taxonomies)) {
+		if (!in_array($taxonomy_slug, $taxonomies)) {
 			$term_list = wp_get_post_terms($post_id, $taxonomy_slug, array("fields" => "all"));	
 			
 			// If the post has not such taxonomy assigned
-			if ( empty( $term_list ) ) {				
+			if ( empty( $term_list)) {				
 				// Get all available terms, and select the first one as default
 				$available_tax_terms = get_terms( array('taxonomy' => $taxonomy_slug, 'hide_empty' => false, 'orderby' => 'id', 'order' => 'ASC'));
 				if (isset($available_tax_terms[0])) {
