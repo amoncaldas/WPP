@@ -39,7 +39,8 @@ class WppNotifier  {
 
 	function __construct () {
 		add_action( 'save_post', array($this, 'generate_notification_based_on_created_content'), 100, 2);
-		add_filter( 'rest_api_init', array( $this, 'register_routes' ) );		
+		add_filter( 'rest_api_init', array( $this, 'register_routes' ) );
+		add_action('init', array($this, 'register_custom_types'), 10);
 	}
 
 	/**
@@ -72,6 +73,69 @@ class WppNotifier  {
 				'callback' => array($this, 'unsubscribe_for_notifications' ),
 			)
 		));
+	}
+
+	/**
+	 * Register custom types section and lang
+	 *
+	 * @return void
+	 */
+	public function register_custom_types () {
+		$notification_args = array (
+			'name' => $this->notification_post_type,
+			'label' => 'Notifications',
+			'singular_label' => 'Notification',
+			"description"=> "Emails about to be sent to newsletter subscribers",
+			'public' => false,
+			'publicly_queryable' => false,
+			'show_ui' => true,
+			'show_in_nav_menus' => true,
+			'show_in_rest' => false,
+			'map_meta_cap' => true,
+			'has_archive' => false,
+			'exclude_from_search' => true,
+			'capability_type' => array($this->notification_post_type, $this->notification_post_type."s"),
+			'hierarchical' => false,
+			'rewrite' => true,
+			'rewrite_withfront' => false,	
+			'show_in_menu' => true,
+			'supports' => 
+			array (
+				0 => 'title',
+				2 => 'editor',
+				3 => 'revisions',
+			),
+		);
+
+		register_post_type( $this->notification_post_type , $notification_args );
+
+
+		$follower_args = array (
+			'name' => $this->follower_post_type,
+			'label' => 'Followers',
+			'singular_label' => 'Follower',
+			"description"=> "Emails about to be sent to newsletter subscribers",
+			'public' => false,
+			'publicly_queryable' => false,
+			'show_ui' => true,
+			'show_in_nav_menus' => true,
+			'show_in_rest' => false,
+			'map_meta_cap' => true,
+			'has_archive' => false,
+			'exclude_from_search' => true,
+			'capability_type' => array($this->follower_post_type, $this->follower_post_type."s"),
+			'hierarchical' => false,
+			'rewrite' => true,
+			'rewrite_withfront' => false,	
+			'show_in_menu' => true,
+			'supports' => 
+			array (
+				0 => 'title',
+				3 => 'revisions',
+			),
+		);
+
+		register_post_type($this->follower_post_type , $follower_args );
 	}
 
 	/**

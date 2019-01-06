@@ -10,10 +10,9 @@
 
 	public $lang_tax_slug = "lang";
 	public $section_custom_post_type_slug = "section";
-	public $notification_custom_post_type_slug = "notification";
-	public $follower_custom_post_type_slug = "follower";
 	public $section_type_field_slug = "section_type";
 	public $section_type_home_field_value = "home";
+	public $WPP_SKIP_AFTER_SAVE = false;
 	
 
 	function __construct () {
@@ -21,9 +20,7 @@
 		$this->add_supports();
 		$this->set_output();
 		$this->register_hooks();
-	}
-
-	
+	}	
 	
 	/**
 	 * WordPress store in db absolute urls and this is the way to update this 
@@ -106,32 +103,39 @@
 	 * @return void
 	 */
 	public function make_sure_home_section_exists() {
-		$home_section_args = array("post_type"=> $this->section_custom_post_type_slug, "post_status"=> "publish", 'meta_query' => array(array('key'=> $this->section_type_field_slug,'value'=> $this->section_type_home_field_value)));
-		$home_sections = get_posts($home_section_args);		
-		if (count($home_sections) === 0) {
-			$home_section_id = wp_insert_post(
-				array(
-					"post_type"=> $this->section_custom_post_type_slug, 
-					"post_status"=> "publish",
-					"post_author"=> 1, // 1 is always the admin, the first user created
-					"post_title"=> "Home",
-					"meta_input"=> array(
-						$this->section_type_field_slug => $this->section_type_home_field_value
-					)
-				)
-			);
-			// Get all available terms, and select the first one as default
-			$available_lang_terms = get_terms( array('taxonomy' => $this->lang_tax_slug, 'hide_empty' => false, 'orderby' => 'id', 'order' => 'ASC'));
+		// Get all available terms, and select the first one as default
+		$available_lang_terms = get_terms( array('taxonomy' => $this->lang_tax_slug, 'hide_empty' => false, 'orderby' => 'id', 'order' => 'ASC'));
 
-			if (is_array($available_lang_terms) && isset($available_lang_terms[0])) {
-				// Assign the default (the first one available)
-				$term_arr = [$available_lang_terms[0]->term_id];
-				wp_set_post_terms($home_section_id, $term_arr, $this->lang_tax_slug);
-			}	
+		if (is_array($available_lang_terms)) {
+			foreach ($available_lang_terms as $lang_term) {
+				if ($lang_term->slug === "neutral") {
+					continue;
+				}
+
+				// Get the home for a given language. If does not exist, create it
+				$home_sections = $this->get_home_section($lang_term->term_id);
+
+				if (count($home_sections) === 0) {
+					$section_title = "Home | ". $lang_term->name;
+					$home_section_id = wp_insert_post(
+						array(
+							"post_type"=> $this->section_custom_post_type_slug, 
+							"post_status"=> "publish",
+							"post_author"=> 1, // 1 is always the admin, the first user created
+							"post_title"=> $section_title,
+							"meta_input"=> array(
+								$this->section_type_field_slug => $this->section_type_home_field_value
+							)
+						)
+					);
+					// Assign the default (the first one available)
+					wp_set_post_terms($home_section_id, [$lang_term->term_id], $this->lang_tax_slug);
+				}
+			}				
 		}
 	}
 
-		/**
+	/**
 	 * Register user meta data to get and update callbacks user wp rest api
 	 *
 	 * @return void
@@ -207,62 +211,6 @@
 
 		register_post_type( $this->section_custom_post_type_slug , $section_args );
 
-		$notification_args = array (
-			'name' => $this->notification_custom_post_type_slug,
-			'label' => 'Notifications',
-			'singular_label' => 'Notification',
-			"description"=> "Emails about to be sent to newsletter subscribers",
-			'public' => false,
-			'publicly_queryable' => false,
-			'show_ui' => true,
-			'show_in_nav_menus' => true,
-			'show_in_rest' => false,
-			'map_meta_cap' => true,
-			'has_archive' => false,
-			'exclude_from_search' => true,
-			'capability_type' => array($this->notification_custom_post_type_slug, $this->notification_custom_post_type_slug."s"),
-			'hierarchical' => false,
-			'rewrite' => true,
-			'rewrite_withfront' => false,	
-			'show_in_menu' => true,
-			'supports' => 
-			array (
-				0 => 'title',
-				2 => 'editor',
-				3 => 'revisions',
-			),
-		);
-
-		register_post_type( $this->notification_custom_post_type_slug , $notification_args );
-
-
-		$follower_args = array (
-			'name' => $this->follower_custom_post_type_slug,
-			'label' => 'Followers',
-			'singular_label' => 'Follower',
-			"description"=> "Emails about to be sent to newsletter subscribers",
-			'public' => false,
-			'publicly_queryable' => false,
-			'show_ui' => true,
-			'show_in_nav_menus' => true,
-			'show_in_rest' => false,
-			'map_meta_cap' => true,
-			'has_archive' => false,
-			'exclude_from_search' => true,
-			'capability_type' => array($this->follower_custom_post_type_slug, $this->follower_custom_post_type_slug."s"),
-			'hierarchical' => false,
-			'rewrite' => true,
-			'rewrite_withfront' => false,	
-			'show_in_menu' => true,
-			'supports' => 
-			array (
-				0 => 'title',
-				3 => 'revisions',
-			),
-		);
-
-		register_post_type($this->follower_custom_post_type_slug , $follower_args );
-
 		$lang_tax_args = array (
 			'name' => 'languages',
 			'label' => 'Language',
@@ -335,11 +283,42 @@
 	 * @return WP_Post
 	 */
 	public function after_save_post( $post_id, $post ) {
-		$this->set_default_taxonomy($post, $this->lang_tax_slug);
-		$this->set_section($post);	
-		$this->set_valid_post_name($post);
-		$this->set_unique_section_home($post);
-		return $post;
+		if ($this->WPP_SKIP_AFTER_SAVE === false) {
+			$this->set_default_taxonomy($post, $this->lang_tax_slug);
+			$this->set_section($post);	
+			$this->set_valid_post_name($post);
+			$this->set_unique_section_home($post);
+			return $post;
+		}
+	}
+
+	/**
+	 * Get home sections with a given language term id
+	 *
+	 * @param Integer $lang_term_id
+	 * @return Array
+	 */
+	public function get_home_section($lang_term_id) {
+		// Set the get posts args to retrive the home section
+		$home_section_args = array(
+			"post_type"=> $this->section_custom_post_type_slug, 
+			"post_status"=> "publish", 
+			'meta_query' => array(
+				array(
+					'key'=> $this->section_type_field_slug,
+					'value'=> $this->section_type_home_field_value
+				)
+			),
+			'tax_query' => array (
+				array(
+					'taxonomy' => $this->lang_tax_slug,
+					'field' => 'term_id',
+					'terms' => $lang_term_id
+				)
+			)
+		);
+		$home_sections = get_posts($home_section_args);	
+		return $home_sections;
 	}
 
 	/**
@@ -351,14 +330,20 @@
 	public function set_unique_section_home ($post) {
 		if ($this->section_custom_post_type_slug === $post->post_type) {
 			$section_type = get_post_meta($post->ID, $this->section_type_field_slug, true);	
-			$home_section_args = array("post_type"=> $this->section_custom_post_type_slug, "post_status"=> "publish", 'meta_query' => array(array('key'=> $this->section_type_field_slug,'value'=> $this->section_type_home_field_value)));
-			$home_sections = get_posts($home_section_args);		
-			if ($section_type === $this->section_type_home_field_value && count($home_sections) > 1) {
 
-				foreach ($home_sections as $home_section) {
-					wp_update_post(array('ID' => $home_section->ID, 'meta_query' => array(array('key'=> $this->section_type_field_slug,'value'=> $this->section_type_home_field_value))));
+			$post_langs_terms = wp_get_post_terms($post->ID, $this->lang_tax_slug);
+
+			if (is_array($post_langs_terms)) {
+				$home_sections = $this->get_home_section($post_langs_terms[0]->term_id);
+				
+				if ($section_type === $this->section_type_home_field_value && count($home_sections) > 1) {
+					$this->WPP_SKIP_AFTER_SAVE = true;
+					foreach ($home_sections as $home_section) {
+						wp_update_post(array('ID' => $home_section->ID, 'meta_query' => array(array('key'=> $this->section_type_field_slug,'value'=> $this->section_type_home_field_value))));
+					}
+					wp_update_post( array('ID' => $post->ID, 'meta_query' => array(array('key'=> $this->section_type_field_slug,'value'=> $this->section_type_home_field_value))));
+					$this->WPP_SKIP_AFTER_SAVE = false;
 				}
-				wp_update_post( array('ID' => $post->ID, 'meta_query' => array(array('key'=> $this->section_type_field_slug,'value'=> $this->section_type_home_field_value))));
 			}
 		}
 	}
