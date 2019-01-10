@@ -8,10 +8,11 @@
 
  class WpWebAppTheme {
 
-	public $lang_tax_slug = "lang";
+	public $locale_taxonomy_slug = "locale";
 	public $section_custom_post_type_slug = "section";
 	public $section_type_field_slug = "section_type";
 	public $section_type_home_field_value = "home";
+	public $default_locale = "en-us";
 	public $WPP_SKIP_AFTER_SAVE = false;
 	
 
@@ -85,9 +86,10 @@
 		add_action('wp_insert_post', array($this,'after_save_content'), 10, 2 );
 		add_filter('request', array($this, 'set_feed_types'));
 		add_action('init', array($this, 'register_custom_types'), 10);
-		add_action('init', array($this, 'make_sure_home_section_exists'), 11);
+		add_action('init', array($this, 'make_sure_locale_exists'), 11);
+		add_action('init', array($this, 'make_sure_home_section_exists'), 12);
 		add_action('admin_menu', array($this, 'add_language_admin_menu'));
-		add_action('rest_api_init', array($this, 'register_wp_api_custom_fields'));
+		add_action('rest_api_init', array($this, 'on_rest_api_init'));
 
 		// Customize permalink
 		add_filter('post_type_link', array($this, 'set_post_permalink'), 10, 2);
@@ -102,36 +104,56 @@
 	 *
 	 * @return void
 	 */
+	public function make_sure_locale_exists() {
+		if (is_admin()) {
+			$en_us_locale = get_term_by('slug', 'en-us', $this->locale_taxonomy_slug);	
+			if (!$en_us_locale) {
+				wp_insert_term("en-us", $this->locale_taxonomy_slug, array("description"=> "English", "slug"=> "en-us"));
+			}
+			$neutral_locale = get_term_by('slug', 'neutral', $this->locale_taxonomy_slug);	
+			if (!$neutral_locale) {
+				wp_insert_term("neutral", $this->locale_taxonomy_slug, array("description"=> "Neutral", "slug"=> "neutral"));
+			}
+		}
+	}
+
+	/**
+	 * Check if home section exists. If does not exist, create it
+	 *
+	 * @return void
+	 */
 	public function make_sure_home_section_exists() {
-		// Get all available terms, and select the first one as default
-		$available_lang_terms = get_terms( array('taxonomy' => $this->lang_tax_slug, 'hide_empty' => false, 'orderby' => 'id', 'order' => 'ASC'));
-
-		if (is_array($available_lang_terms)) {
-			foreach ($available_lang_terms as $lang_term) {
-				if ($lang_term->slug === "neutral") {
-					continue;
-				}
-
-				// Get the home for a given language. If does not exist, create it
-				$home_sections = $this->get_home_section($lang_term->term_id);
-
-				if (count($home_sections) === 0) {
-					$section_title = "Home | ". $lang_term->name;
-					$home_section_id = wp_insert_post(
-						array(
-							"post_type"=> $this->section_custom_post_type_slug, 
-							"post_status"=> "publish",
-							"post_author"=> 1, // 1 is always the admin, the first user created
-							"post_title"=> $section_title,
-							"meta_input"=> array(
-								$this->section_type_field_slug => $this->section_type_home_field_value
+		if (is_admin()) {
+			// Get all available terms, and select the first one as default
+			$available_locale_terms = get_terms( array('taxonomy' => $this->locale_taxonomy_slug, 'hide_empty' => false, 'orderby' => 'id', 'order' => 'ASC'));
+	
+			if (is_array($available_locale_terms)) {
+				foreach ($available_locale_terms as $lang_term) {
+					if ($lang_term->slug === "neutral") {
+						continue;
+					}
+	
+					// Get the home for a given language. If does not exist, create it
+					$home_sections = $this->get_home_section($lang_term->term_id);
+	
+					if (count($home_sections) === 0) {
+						$section_title = "Home | ". $lang_term->name;
+						$home_section_id = wp_insert_post(
+							array(
+								"post_type"=> $this->section_custom_post_type_slug, 
+								"post_status"=> "publish",
+								"post_author"=> 1, // 1 is always the admin, the first user created
+								"post_title"=> $section_title,
+								"meta_input"=> array(
+									$this->section_type_field_slug => $this->section_type_home_field_value
+								)
 							)
-						)
-					);
-					// Assign the default (the first one available)
-					wp_set_post_terms($home_section_id, [$lang_term->term_id], $this->lang_tax_slug);
-				}
-			}				
+						);
+						// Assign the default (the first one available)
+						wp_set_post_terms($home_section_id, [$lang_term->term_id], $this->locale_taxonomy_slug);
+					}
+				}				
+			}
 		}
 	}
 
@@ -140,7 +162,11 @@
 	 *
 	 * @return void
 	 */
-	public function register_wp_api_custom_fields() {
+	public function on_rest_api_init() {
+		// Apply the locale taxonomy filter to when running rest api requests
+		add_action( 'pre_get_posts', array($this, 'apply_locale_filter_get_posts') );
+
+		// Add a custom field for section
 		register_rest_field( $this->section_custom_post_type_slug, 'places',
 			array(
 				'get_callback'  => function ($post, $field_name, $request) {
@@ -149,7 +175,100 @@
 				'schema' => null,
 			)
 		);
+
+		$public_post_types = get_post_types(array("public"=>true));
+		unset($public_post_types["attachment"]);
+
+		foreach ($public_post_types as $post_type) {
+			// Add a custom field for section
+			register_rest_field($post_type, 'locale',
+				array(
+					'get_callback'  => function ($post, $field_name, $request) {
+						return $this->attach_post_locale( $post);
+					},
+					'schema' => null,
+				)
+			);
+		}
+	
 	}
+
+	public function attach_post_locale ($post) {
+		$terms = get_the_terms( $post->ID, $this->locale_taxonomy_slug );
+		if ( !empty( $terms ) ){
+			// get the first term
+			$term = array_shift( $terms );
+			return $term->slug;
+		}
+	}
+
+	/**
+	 * Apply the locale taxonomy filter to when running rest api requests
+	 *
+	 * @param [type] $query
+	 * @return void
+	 */
+	public function apply_locale_filter_get_posts($query) {		
+		$request_locale = $this->get_request_locale();
+		$tax_query = array (
+			array(
+				'taxonomy' => $this->locale_taxonomy_slug,
+				'field' => 'slug',
+				'terms' => [$request_locale, "neutral"]
+			)
+		);
+		$query->set( 'tax_query', $tax_query );		
+	}
+
+	/**
+	 * Get request locale, considering query string, header, browser locale or default
+	 * If the locale in the request is not valid, it will return the default one
+	 *
+	 * @return string|null
+	 */
+	public function get_request_locale() {
+		$locale = $this->default_locale;
+		if (isset($_GET["locale"])) {
+			$locale = $_GET["locale"];
+		} elseif (isset($_SERVER["locale"])) {
+			$locale = $_SERVER["locale"];
+		} else {
+			$browser_locale = $this->get_browser_locale();
+			if (isset($browser_locale)) {
+				$locale = $browser_locale;
+			}
+		}
+		$locale_options = get_option("wpp_locales", $this->default_locale);
+		$locale_options = strpos($locale_options, ",") > -1 ? explode(",", $locale_options) : [$locale_options];
+		$locale_options = array_map('trim', $locale_options);
+
+		if (!in_array($locale, $locale_options)){
+			$locale = $this->default_locale;
+		}
+		return $locale;
+	}
+
+	/**
+     * Get request locale sent by the browser
+     *
+     * @return string|null
+     */
+    protected function get_browser_locale () {
+        if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+        {
+			$locale_strings = explode(",",$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+			
+			foreach ($locale_strings as $locale_string) {
+				$locale_string = strtolower($locale_string);
+				if(strpos($locale_string, ";") > -1)
+				{
+					$locale_string = explode(";", $locale_string)[0];
+				}
+				return $locale_string;
+			}            
+        }
+    }
+
 
 	/**
 	 * Add custom data to the wp/v2/users/<user-id> endpoint
@@ -168,8 +287,8 @@
 				if($location) {
 					$places[$place_id] = $location;
 					$places[$place_id]["title"] = get_the_title($place_id);
-					$langs = wp_get_post_terms($place_id, $this->lang_tax_slug);
-					$places[$place_id]["lang"] = count($langs) > 0 ? $langs[0]->slug : null;
+					$locales = wp_get_post_terms($place_id, $this->locale_taxonomy_slug);
+					$places[$place_id][$this->locale_taxonomy_slug] = count($locales) > 0 ? $locales[0]->slug : null;
 				}
 			}
 		}
@@ -212,9 +331,9 @@
 		register_post_type( $this->section_custom_post_type_slug , $section_args );
 
 		$lang_tax_args = array (
-			'name' => 'languages',
-			'label' => 'Language',
-			'singular_label' => 'Language',
+			'name' => $this->locale_taxonomy_slug."s",
+			'label' => ucfirst($this->locale_taxonomy_slug),
+			'singular_label' => ucfirst($this->locale_taxonomy_slug),
 			'public' => true,
 			'publicly_queryable' => true,
 			'hierarchical' => false,
@@ -229,7 +348,7 @@
 			'show_in_rest' => true,
 			'rest_base' => 'langs',
 		);
-		register_taxonomy( $this->lang_tax_slug, null, $lang_tax_args );
+		register_taxonomy( $this->locale_taxonomy_slug, null, $lang_tax_args );
 	}
 
 	/**
@@ -239,7 +358,7 @@
 	 */
 	public function add_language_admin_menu(){
 		global $submenu;
-		$submenu['options-general.php'][] = array( 'Language', 'manage_options', "/wp-admin/edit-tags.php?taxonomy=".$this->lang_tax_slug);
+		$submenu['options-general.php'][] = array( 'Locales', 'manage_options', "/wp-admin/edit-tags.php?taxonomy=".$this->locale_taxonomy_slug);
 	}
 
 	/**
@@ -284,7 +403,7 @@
 	 */
 	public function after_save_post( $post_id, $post ) {
 		if ($this->WPP_SKIP_AFTER_SAVE === false) {
-			$this->set_default_taxonomy($post, $this->lang_tax_slug);
+			$this->set_default_taxonomy($post, $this->locale_taxonomy_slug);
 			$this->set_section($post);	
 			$this->set_valid_post_name($post);
 			$this->set_unique_section_home($post);
@@ -299,7 +418,7 @@
 	 * @return Array
 	 */
 	public function get_home_section($lang_term_id) {
-		// Set the get posts args to retrive the home section
+		// Set the get posts args to retrieve the home section
 		$home_section_args = array(
 			"post_type"=> $this->section_custom_post_type_slug, 
 			"post_status"=> "publish", 
@@ -311,7 +430,7 @@
 			),
 			'tax_query' => array (
 				array(
-					'taxonomy' => $this->lang_tax_slug,
+					'taxonomy' => $this->locale_taxonomy_slug,
 					'field' => 'term_id',
 					'terms' => $lang_term_id
 				)
@@ -331,7 +450,7 @@
 		if ($this->section_custom_post_type_slug === $post->post_type) {
 			$section_type = get_post_meta($post->ID, $this->section_type_field_slug, true);	
 
-			$post_langs_terms = wp_get_post_terms($post->ID, $this->lang_tax_slug);
+			$post_langs_terms = wp_get_post_terms($post->ID, $this->locale_taxonomy_slug);
 
 			if (is_array($post_langs_terms)) {
 				$home_sections = $this->get_home_section($post_langs_terms[0]->term_id);
@@ -608,7 +727,7 @@
 		} 
 
 		// Get the post `lang` list
-		$lang_list = wp_get_post_terms($post->ID, $this->lang_tax_slug, array("fields" => "all"));	
+		$lang_list = wp_get_post_terms($post->ID, $this->locale_taxonomy_slug, array("fields" => "all"));	
 				
 		// If the post has not such taxonomy assigned
 		if ( !empty( $lang_list ) ) {
@@ -629,12 +748,9 @@
 	 * @return void
 	 */
 	public function get_post_slug_url_translation($post_url_slug, $lang) {
-		$dictionary = [
-			"story" => [ 
-				"pt-br" => "relatos",
-				"en-us" => "stories"
-			]			
-		];
+		$dictionary = get_option("wpp_post_url_translations", "{}");
+		$dictionary = str_replace("\\", "", $dictionary);
+		$dictionary = json_decode($dictionary, true);
 
 		if (!isset($dictionary[$post_url_slug])) {
 			return $post_url_slug;

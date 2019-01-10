@@ -3,9 +3,17 @@
 ## Dump the latest db to the file system ##
 
 ```sh
-docker exec fam-mysql-local /bin/sh -c "mysqldump -u root -padmin wordpress > wpp-dump.sql"
-docker cp fam-mysql-local:/wpp-dump.sql $PWD/mysql/db-backup.sql
+docker exec wpp-mysql-local /bin/sh -c "mysqldump -u root -padmin wordpress > wpp-dump.sql"
+docker cp wpp-mysql-local:/wpp-dump.sql $PWD/mysql/db-backup.sql
 ```
+
+## Update database in container from dump ##
+
+```sh
+docker cp $PWD/mysql/db-backup.sql wpp-mysql-local:/wpp-dump.sql
+docker exec wpp-mysql-local /bin/sh -c "mysql -uroot -padmin wordpress < wpp-dump.sql"
+```
+
 
 ## Copy remote file to local file system ##
 
@@ -27,41 +35,41 @@ docker-compose -f docker-compose.yml start
 
 ```sh
 # import from file `db-backup.sql` in `mysql` folder
-docker exec -i fam-mysql-local  mysql -uroot -padmin wordpress < mysql/db-backup.sql
+docker exec -i wpp-mysql-local  mysql -uroot -padmin wordpress < mysql/db-backup.sql
 ```
 
 ## create and import database file in staging ##
 
 ```sh
 # dump database
-docker exec fam-mysql-staging /bin/sh -c "mysqldump -u root -padmin wordpress > fam-dump.sql"
-docker cp fam-mysql-staging:/fam-dump.sql $PWD/fam-dump.sql
+docker exec wpp-mysql-staging /bin/sh -c "mysqldump -u root -padmin wordpress > wpp-dump.sql"
+docker cp wpp-mysql-staging:/wpp-dump.sql $PWD/wpp-dump.sql
 
 # connect and show databases
-docker exec fam-mysql-staging /bin/sh -c "echo 'show databases' | mysql -uroot -padmin"
+docker exec wpp-mysql-staging /bin/sh -c "echo 'show databases' | mysql -uroot -padmin"
 # create database
-docker exec fam-mysql-staging /bin/sh -c "echo 'create database wordpress' | mysql -uroot -padmin"
+docker exec wpp-mysql-staging /bin/sh -c "echo 'create database wordpress' | mysql -uroot -padmin"
 # import database
-docker exec -i fam-mysql-staging mysql -uroot -padmin wordpress < mysql/db-backup.sql
+docker exec -i wpp-mysql-staging mysql -uroot -padmin wordpress < mysql/db-backup.sql
 ```
 
 ## create and import database file in production ##
 
 ```sh
 # connect and show databases
-docker exec fam-mysql-production /bin/sh -c "echo 'show databases' | mysql -uroot -padmin"
+docker exec wpp-mysql-production /bin/sh -c "echo 'show databases' | mysql -uroot -padmin"
 # create database
-docker exec fam-mysql-production /bin/sh -c "echo 'create database wordpress' | mysql -uroot -padmin"
+docker exec wpp-mysql-production /bin/sh -c "echo 'create database wordpress' | mysql -uroot -padmin"
 # import database
-docker exec -i fam-mysql-staging mysql -uroot -padmin wordpress < mysql/db-backup.sql
+docker exec -i wpp-mysql-staging mysql -uroot -padmin wordpress < mysql/db-backup.sql
 ```
 
 ## backup old and rebuild with restored db in production ##
 
 ```sh
 # dump database
-docker exec fam-mysql-production /bin/sh -c "mysqldump -u root -padmin wordpress > fam-dump.sql"
-docker cp fam-mysql-production:/fam-dump.sql $PWD/fam-dump.sql
+docker exec wpp-mysql-production /bin/sh -c "mysqldump -u root -padmin wordpress > wpp-dump.sql"
+docker cp wpp-mysql-production:/wpp-dump.sql $PWD/wpp-dump.sql
 
 # stop docker compose
 docker-compose -f master.docker-compose.yml down
@@ -70,7 +78,7 @@ docker-compose -f master.docker-compose.yml down
 sudo rm -rf ~/ors_web/wordpress/db/*
 
 # move to auto restore location
-sudo mv fam-dump.sql ~/ors_web/mysql/db-backup.sql
+sudo mv wpp-dump.sql ~/ors_web/mysql/db-backup.sql
 docker-compose -f master.docker-compose.yml up -d
 ```
 
@@ -78,11 +86,11 @@ docker-compose -f master.docker-compose.yml up -d
 
 ```sh
 # dump database
-docker exec fam-mysql-production /bin/sh -c "mysqldump -u root -padmin wordpress > fam-dump.sql"
-docker cp fam-mysql-production:/fam-dump.sql $PWD/fam-dump.sql
+docker exec wpp-mysql-production /bin/sh -c "mysqldump -u root -padmin wordpress > wpp-dump.sql"
+docker cp wpp-mysql-production:/wpp-dump.sql $PWD/wpp-dump.sql
 
 # copy from remote to local
-scp -i keys/ssh_access.pem ubuntu@129.206.7.180:~/fam-dump.sql ~/apps/fam-dump.sql
+scp -i keys/ssh_access.pem ubuntu@129.206.7.180:~/wpp-dump.sql ~/apps/wpp-dump.sql
 ```
 
 ## Copy wp-config from container ##
@@ -95,23 +103,23 @@ docker cp 0a0:/var/www/html/wp-config.php $PWD/wp-config.php
 
 ```sh
 # create a user as admin
-docker exec --user root fam-website-staging /bin/sh -c "wp user create <user-login> user@domain.tld --role=administrator --allow-root"
+docker exec --user root wpp-website-staging /bin/sh -c "wp user create <user-login> user@domain.tld --role=administrator --allow-root"
 # get the password printed out!
 
 # update existing user password:
-docker exec --user root fam-website-staging /bin/sh -c 'wp user update 1005 --user_pass="123456" --allow-root'
+docker exec --user root wpp-website-staging /bin/sh -c 'wp user update 1005 --user_pass="123456" --allow-root'
 
 # activate user:
-docker exec --user root fam-website-staging /bin/sh -c 'wp user meta update <username-or-id> pending 0 --allow-root'
+docker exec --user root wpp-website-staging /bin/sh -c 'wp user meta update <username-or-id> pending 0 --allow-root'
 
 # list user metas #
-docker exec --user root fam-website-staging /bin/sh -c 'wp user meta list <username-or-id> --allow-root'
+docker exec --user root wpp-website-staging /bin/sh -c 'wp user meta list <username-or-id> --allow-root'
 ```
 
 ## Install a plugin via wp-cli ##
 
 ```sh
-docker exec --user root fam-website-local /bin/sh -c 'wp plugin install <plugin-sanitized-name> --allow-root'
+docker exec --user root wpp-website-local /bin/sh -c 'wp plugin install <plugin-sanitized-name> --allow-root'
 ```
 
 ## Write permission on upload/download folder ##
