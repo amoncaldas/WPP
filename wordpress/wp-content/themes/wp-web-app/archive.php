@@ -1,7 +1,7 @@
-<?php 
+<?php require_once("header.php");
 
 // the query
-$the_query = new WP_Query( array( "post_type"=> "",  "post_status"=> "publish" )) ?>
+$the_query = new WP_Query( array( "post_type"=> RENDER_ARCHIVE_POST_TYPE,  "post_status"=> "publish" )) ?>
 
 <?php if ( $the_query->have_posts() ) : ?>
 
@@ -18,8 +18,7 @@ $the_query = new WP_Query( array( "post_type"=> "",  "post_status"=> "publish" )
     ?>
 	<!-- pagination here -->
 
-	<?php wp_reset_postdata(); ?>
+	<?php wp_reset_postdata(); 
+	endif;
 
-<?php else : ?>
-	<p><?php esc_html_e( 'Sorry, no posts matched your criteria.' ); ?></p>
-<?php endif; ?>
+require_once("footer.php");

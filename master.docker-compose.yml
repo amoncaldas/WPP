@@ -1,15 +1,15 @@
 version: '3.1'
 
 networks:
-  fam:
+  wpp:
     driver: bridge
 
 services:
     wordpress-c:
-        container_name: fam-website-production
-        image: fam-custom-wordpress-prod
+        container_name: wpp-website-production
+        image: wpp-custom-wordpress-prod
         networks:
-          - fam
+          - wpp
         restart: always
         build:
           context: wordpress/build
@@ -31,10 +31,10 @@ services:
             max-file: "3"
         
     mysql:
-        container_name: fam-mysql-production
-        image: fam-custom-mysql-prod
+        container_name: wpp-mysql-production
+        image: wpp-custom-mysql-prod
         networks:
-          - fam
+          - wpp
         restart: always
         build:
           context: mysql/

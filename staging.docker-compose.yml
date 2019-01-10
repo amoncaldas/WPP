@@ -1,15 +1,15 @@
 version: '3.1'
 
 networks:
-  fam:
+  wpp:
     driver: bridge
 
 services:
     wordpress:
-        container_name: fam-website-staging
-        image: fam-custom-wordpress-staging
+        container_name: wpp-website-staging
+        image: wpp-custom-wordpress-staging
         networks:
-          - fam
+          - wpp
         restart: always
         build:
           context: wordpress/build
@@ -25,10 +25,10 @@ services:
           - ./wordpress/wp-content:/var/www/html/wp-content
           - ./webapp:/var/www/webapp
     mysql:
-        container_name: fam-mysql-staging
-        image: fam-custom-mysql-staging
+        container_name: wpp-mysql-staging
+        image: wpp-custom-mysql-staging
         networks:
-          - fam
+          - wpp
         restart: always
         build:
           context: mysql/

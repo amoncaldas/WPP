@@ -10,12 +10,12 @@
                 $webapp = $this->getWebAppHtml();
                 // Output the basic html app here
                 // the content will be rendered via javascript
-                echo $webapp;                    
+                echo $webapp;
+                exit;                 
             }
             elseif (RENDER_AUDIENCE === 'CRAWLER_BROWSER') {
                 $this->renderNoJSHtml();
-            }
-            exit;
+            }            
         }	
     }
     /**
@@ -69,15 +69,13 @@
      *
      * @return void
      */
-    public function renderNoJSHtml () {       
-        $is_single  = true;
-
+    public function renderNoJSHtml () {
         // render the section that is the some page for the request locale
         if ($_SERVER["REQUEST_URI"] === "/") {
             $home_section = $this->get_home_section_post();
             if($home_section) {
                 $post_or_page_object = $home_section;
-                $is_single = false;                
+                define('IS_HOME_SECTION', TRUE);          
             } 
         } else { // Define the single page or post
             $uri = ltrim($_SERVER["REQUEST_URI"], '/');
@@ -97,13 +95,13 @@
 
         // If a page or post is defined, set it as global object
         if($post_or_page_object) {
-            global $post;
-            $post = $post_object;
-            setup_postdata( $post);
-            if($is_single) {
-                require_once("single.php");
-            } else {
+            global $section;
+            $section = $post_or_page_object;
+            //setup_postdata( $post);
+            if(defined("IS_HOME_SECTION")) {
                 require_once("index.php");
+            } else {                
+                require_once("single.php");
             }
         } else { // if not, or we are in an archive or it is 404
             if (defined('RENDER_ARCHIVE_POST_TYPE')){
@@ -111,7 +109,7 @@
             } else {
                 require_once("404.php");
             }
-        }       
+        }   
     }
 
     /**
@@ -121,21 +119,26 @@
      */
     public function get_home_section_post() {
         // Get section home for the request locale
-        //TODO: COULD NOT ACECSS CLASS $wpWebAppTheme
-        $locale = $wpWebAppTheme->get_request_locale();
+        $locale = get_request_locale();
     
-        $home_section_args = array(
-            "post_type"=> $wpWebAppTheme->section_custom_post_type_slug, 
+        $args = array(
+            "post_type"=> SECTION_POST_TYPE, 
             "post_status"=> "publish", 
             'tax_query' => array (
                 array(
-                    'taxonomy' => $wpWebAppTheme->locale_taxonomy_slug,
+                    'taxonomy' => LOCALE_TAXONOMY_SLUG,
                     'field' => 'slug',
-                    'terms' => $locale
-                )
-            )
+                    'terms' => array($locale)
+                ),
+            ),
+            'meta_query' => array(
+				array(
+					'key'=> SECTION_TYPE_FIELD_SLUG,
+					'value'=> SECTION_POST_HOME_FIELD_VALUE
+				)
+			),
         );
-        $home_sections = get_posts($home_section_args);
+        $home_sections = get_posts($args);
         if(is_array($home_sections) && count($home_sections) > 0) {
             $home_section = $home_sections[0];
             return $home_section;             
@@ -166,6 +169,11 @@
         return $post_object;
     }
 
+    /**
+     * Get the section for the current request
+     *
+     * @return void
+     */
     public function getSection() {
         $uri_parts = explode("/", $_SERVER["REQUEST_URI"]);
         $sections = get_posts( array( 'post_type' => 'section', 'post_name'  => $uri_parts[0]));		

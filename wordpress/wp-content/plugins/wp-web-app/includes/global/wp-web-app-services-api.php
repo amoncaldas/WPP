@@ -32,8 +32,9 @@
       foreach ($all_options as $key => $value) {
           if ( strpos($key, "wpp_") === 0) {
 						$clean_key =  $meta_property_name = str_replace("wpp_meta_", "", $key);
-						$clean_key =  $meta_property_name = str_replace("wpp_", "", $clean_key);
-						$wpp_options[$clean_key] = $value;
+            $clean_key =  $meta_property_name = str_replace("wpp_", "", $clean_key);
+            $json_as_array_value = json_decode($value, true);
+						$wpp_options[$clean_key] = $json_as_array_value ? $json_as_array_value : $value;
           }
       }
       $wpp_options["site_ttle"] = get_bloginfo("name");
