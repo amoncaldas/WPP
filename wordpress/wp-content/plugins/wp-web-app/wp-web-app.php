@@ -80,7 +80,7 @@ if ( ! function_exists( 'add_action' ) ) {
  }
 
  // Start the plugin
- new WpWebApp();
+ $wpWebApp = new WpWebApp();
 
 
 

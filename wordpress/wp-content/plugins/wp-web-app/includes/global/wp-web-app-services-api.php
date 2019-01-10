@@ -36,6 +36,7 @@
 						$wpp_options[$clean_key] = $value;
           }
       }
+      $wpp_options["site_ttle"] = get_bloginfo("name");
       return new WP_REST_Response($wpp_options, 200); // OK
     }
   }

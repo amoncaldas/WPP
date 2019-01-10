@@ -56,19 +56,19 @@
 	 */
 	public function set_output () {
 		if ($this->is_front_end()) {
-			$crawlers_user_agents = ["googlebot","bingbot","msnbot","yahoo",
-				"Baidu","aolbuild","facebookexternalhit","iaskspider","DuckDuckBot",
-				"Applebot","Almaden","iarchive","archive.org_bot"];
+			$crawlers_user_agents = get_option("wpp_crawlers_user_agents", "fake-crawler-agent");
+			$crawlers_user_agents = strpos($crawlers_user_agents, ",") > -1 ? explode(",", $crawlers_user_agents) : [$crawlers_user_agents];
+			$crawlers_user_agents = array_map('trim', $crawlers_user_agents);
 
 			$is_crawler_request = false;
 			foreach ($crawlers_user_agents as $crawler) {
-				if (strpos($_SERVER['HTTP_USER_AGENT'], $crawler) !== false) {
+				if (strtolower(strpos($_SERVER['HTTP_USER_AGENT']), strtolower($crawler)) !== false) {
 					$is_crawler_request = true;
 					break;
 				}
 			}
 
-			if (isset($_GET["_escaped_fragment_"]) || $is_crawler_request) {
+			if (isset($_GET["_escaped_fragment_"]) && get_option("wpp_treat_escaped_fragment_as_crawler") === "yes" || $is_crawler_request) {
 				define('RENDER_AUDIENCE', 'CRAWLER_BROWSER');
 			} else {
 				define('RENDER_AUDIENCE', 'USER_BROWSER');
@@ -748,7 +748,7 @@
 	 * @return void
 	 */
 	public function get_post_slug_url_translation($post_url_slug, $lang) {
-		$dictionary = get_option("wpp_post_url_translations", "{}");
+		$dictionary = get_option("wpp_post_type_translations", "{}");
 		$dictionary = str_replace("\\", "", $dictionary);
 		$dictionary = json_decode($dictionary, true);
 
@@ -756,8 +756,11 @@
 			return $post_url_slug;
 		} elseif (!isset($dictionary[$post_url_slug][$lang])) {
 			return $post_url_slug;
-		} else {
-			return $dictionary[$post_url_slug][$lang];
+		} elseif (!isset($dictionary[$post_url_slug][$lang]["url"])) {
+			return $post_url_slug;
+		}
+		else {
+			return $dictionary[$post_url_slug][$lang]["url"];
 		}
 	}
 
@@ -894,8 +897,12 @@
 	}
  }
 
- // Start the plugin
- new WpWebAppTheme();
+// Start theme functions class
+ $wpWebAppTheme = new WpWebAppTheme();
+ 
+
+
+
 
 
 

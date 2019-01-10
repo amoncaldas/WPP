@@ -13,8 +13,7 @@
                 echo $webapp;                    
             }
             elseif (RENDER_AUDIENCE === 'CRAWLER_BROWSER') {
-                $html = $this->getNoJSHtml();
-                echo $html;
+                $this->renderNoJSHtml();
             }
             exit;
         }	
@@ -66,29 +65,105 @@
     }
 
     /**
-     * Get crawler html
+     * Render crawler html
      *
-     * @return string
+     * @return void
      */
-    public function getNoJSHtml () {        
-        $section = $this->getSection();
-        if ($section) {
-            $section_id = $section->ID;
-        }            
-        
-        $last_url_segment = $uri_parts[count($uri_parts) -1];
-        if(is_integer($last_url_segment)) {
-            $post_id = $last_url_segment;
+    public function renderNoJSHtml () {       
+        $is_single  = true;
+
+        // render the section that is the some page for the request locale
+        if ($_SERVER["REQUEST_URI"] === "/") {
+            $home_section = $this->get_home_section_post();
+            if($home_section) {
+                $post_or_page_object = $home_section;
+                $is_single = false;                
+            } 
+        } else { // Define the single page or post
+            $uri = ltrim($_SERVER["REQUEST_URI"], '/');
+            $uri_segments = explode("/", $uri);
+            $uri_segments = array_map('trim', $uri_segments);
+            $last_segment = $uri_segments[count($uri_segments) - 1 ];
+
+            $public_post_types = get_post_types(array("public"=>true));
+            unset($public_post_types["attachment"]);
+
+            if(in_array($last_segment, $public_post_types)){
+                define('RENDER_ARCHIVE_POST_TYPE', $last_segment);
+            } else {
+                $post_or_page_object = $this->get_single($last_segment);
+            }
         }
-        $skeleton = $this->getHTMLSkeleton();
-        $html = str_replace('<div id="app"></div>', "", $skeleton);
-        $html = str_replace('</body>', "", $html);
-        $html = str_replace('</html>', "", $html);
-        
-        // add content there
-        $html .= "</body>";
-        $html .= "</html>";
-        return $html;
+
+        // If a page or post is defined, set it as global object
+        if($post_or_page_object) {
+            global $post;
+            $post = $post_object;
+            setup_postdata( $post);
+            if($is_single) {
+                require_once("single.php");
+            } else {
+                require_once("index.php");
+            }
+        } else { // if not, or we are in an archive or it is 404
+            if (defined('RENDER_ARCHIVE_POST_TYPE')){
+                require_once("archive.php");
+            } else {
+                require_once("404.php");
+            }
+        }       
+    }
+
+    /**
+     * Get home section post based on the request locale
+     *
+     * @return void
+     */
+    public function get_home_section_post() {
+        // Get section home for the request locale
+        //TODO: COULD NOT ACECSS CLASS $wpWebAppTheme
+        $locale = $wpWebAppTheme->get_request_locale();
+    
+        $home_section_args = array(
+            "post_type"=> $wpWebAppTheme->section_custom_post_type_slug, 
+            "post_status"=> "publish", 
+            'tax_query' => array (
+                array(
+                    'taxonomy' => $wpWebAppTheme->locale_taxonomy_slug,
+                    'field' => 'slug',
+                    'terms' => $locale
+                )
+            )
+        );
+        $home_sections = get_posts($home_section_args);
+        if(is_array($home_sections) && count($home_sections) > 0) {
+            $home_section = $home_sections[0];
+            return $home_section;             
+        } 
+    }
+
+
+    /**
+     * Get the single post based on the last url segment (id or page name)
+     *
+     * @param string $last_uri_segment
+     * @return void
+     */
+    public function get_single($last_uri_segment) {
+        $post_object = null;
+        if (is_integer($last_uri_segment)) {
+            $post_object = get_post($last_uri_segment);
+            
+        } else {
+            $post_object = get_page_by_path($last_uri_segment);
+            if(!$post_object) {
+                $posts = get_posts(array("name"=>$last_uri_segment));
+                if(is_array($posts) && count($posts) > 0) {
+                    $post_object = $posts[0];
+                }
+            }
+        }
+        return $post_object;
     }
 
     public function getSection() {
