@@ -4,6 +4,7 @@ import store from '@/store/store'
 import loader from '@/support/loader'
 import socialAuth from '@/common/social-auth'
 import VueInstance from '@/main'
+import Section from '@/pages/section/Section'
 
 Vue.use(Router)
 
@@ -42,6 +43,28 @@ const router = new Router({
   }]
 })
 
+const addSectionsRoutes = () => {
+  let sectionRoutes = []
+  let sectionsUnique = VueInstance.lodash.uniqBy(store.getters.sections, 'link')
+
+  var parser = document.createElement('a')
+
+  sectionsUnique.forEach(section => {
+    parser.href = section.link
+
+    if (parser.pathname !== '' && parser.pathname !== '/') {
+      let sectionRoute = {
+        path: parser.pathname,
+        name: section.slug,
+        component: Section
+      }
+
+      sectionRoutes.push(sectionRoute)
+    }
+  })
+  router.addRoutes(sectionRoutes)
+}
+
 /**
  * We have to load the menu before entering in each route
  */
@@ -51,6 +74,7 @@ router.beforeEach((to, from, next) => {
   let promise3 = store.dispatch('fetchOptions')
 
   Promise.all([promise1, promise2, promise3]).then(() => {
+    addSectionsRoutes()
     next()
   })
 })
