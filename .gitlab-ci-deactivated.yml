@@ -12,9 +12,9 @@ deploy_staging:
     - ssh-add <(echo "$STAGING_PRIVATE_KEY")
     - ssh-keyscan -H '129.206.7.40' >> ~/.ssh/known_hosts
   script:
-    - ssh -p22 ubuntu@129.206.7.40 "sudo chmod -R 777 ors-website-staging/*"
-    - ssh -p22 ubuntu@129.206.7.40 "cd ors-website-staging && git checkout . && git stash && git pull"
-    - ssh -p22 ubuntu@129.206.7.40 "docker exec ors-website-staging /bin/sh -c 'cd wp-content && sh update.sh'"
+    - ssh -p22 ubuntu@129.206.7.40 "sudo chmod -R 777 wpp-website-staging/*"
+    - ssh -p22 ubuntu@129.206.7.40 "cd wpp-website-staging && git checkout . && git stash && git pull"
+    - ssh -p22 ubuntu@129.206.7.40 "docker exec wpp-website-staging /bin/sh -c 'cd wp-content && sh update.sh'"
   only:
     - staging
 
@@ -29,9 +29,9 @@ deploy_master:
     - ssh-add <(echo "$MASTER_PRIVATE_KEY")
     - ssh-keyscan -H '129.206.7.180' >> ~/.ssh/known_hosts
   script:
-    - ssh -p22 ubuntu@129.206.7.180 "sudo chmod -R 777 ors_web/*"
-    - ssh -p22 ubuntu@129.206.7.180 "cd ors_web && git checkout . && git stash && git pull"
-    - ssh -p22 ubuntu@129.206.7.180 "docker exec ors-website-production-c /bin/sh -c 'cd wp-content && sh update.sh'"
+    - ssh -p22 ubuntu@129.206.7.180 "sudo chmod -R 777 wpp_web/*"
+    - ssh -p22 ubuntu@129.206.7.180 "cd wpp_web && git checkout . && git stash && git pull"
+    - ssh -p22 ubuntu@129.206.7.180 "docker exec wpp-website-production-c /bin/sh -c 'cd wp-content && sh update.sh'"
   only:
     - master
 

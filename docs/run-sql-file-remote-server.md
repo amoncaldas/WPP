@@ -7,7 +7,7 @@
 scp ~/local-folder/sql-file-name.sql user@server:~/sql-file-name.sql
 
 # production example:
-# sudo scp -i keys/ssh_access.pem ~/apps/ors/mysql/tyk-user-update.sql ubuntu@129.206.7.180:~/tyk-user-update.sql
+# sudo scp -i keys/ssh_access.pem ~/apps/wpp/mysql/tyk-user-update.sql ubuntu@129.206.7.180:~/tyk-user-update.sql
 ```
 
 1. Access the remove server via ssh
@@ -28,7 +28,7 @@ docker cp sql-file-name.sql fam-mysql-staging:sql-file-name.sql
 
 ```sh
 # example how to to connect to mysql container on staging
-docker exec -it ors-mysql-staging bash
+docker exec -it wpp-mysql-staging bash
 ```
 
 1. Backup the database

@@ -24,7 +24,7 @@ scp  user@server:~/folder/file.ext ~/local-folder
 ## Run docker compose ##
 
 ```sh
-cd ~/apps/ors
+cd ~/apps/wpp
 docker-compose -f docker-compose.yml up
 
 # Starting already created:
@@ -75,10 +75,10 @@ docker cp wpp-mysql-production:/wpp-dump.sql $PWD/wpp-dump.sql
 docker-compose -f master.docker-compose.yml down
 
 # empty database files (to be able to restore backup)
-sudo rm -rf ~/ors_web/wordpress/db/*
+sudo rm -rf ~/wpp_mapped_folder/wordpress/db/*
 
 # move to auto restore location
-sudo mv wpp-dump.sql ~/ors_web/mysql/db-backup.sql
+sudo mv wpp-dump.sql ~/wpp/mysql/db-backup.sql
 docker-compose -f master.docker-compose.yml up -d
 ```
 

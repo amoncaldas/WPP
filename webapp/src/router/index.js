@@ -15,7 +15,7 @@ const router = new Router({
   // because it is an abstract route, so every route contains the base `/` route
   routes: [ {
     path: '/',
-    name: 'Root',
+    name: 'Home',
     beforeEnter: (to, from, next) => {
       // Get current route
       // this only works in we are using the `hash` mode
@@ -31,7 +31,7 @@ const router = new Router({
         // a boolean if the flow most continue or not.
         let proceed = socialAuth.runOauthCallBackCheck()
         if (proceed) {
-          next('/home')
+          next()
         }
       } else {
         // if the target is not the root `/` page
@@ -47,28 +47,45 @@ const router = new Router({
  */
 router.beforeEach((to, from, next) => {
   let promise1 = store.dispatch('tryAutoLogin')
-  let promise2 = store.dispatch('fetchSections')
-  let promise3 = store.dispatch('fetchOptions')
 
-  Promise.all([promise1, promise2, promise3]).then(() => {
+  Promise.all([promise1]).then(() => {
     next()
   })
 })
 
-router.afterEach((to, from) => {
-  VueInstance.eventBus.$emit('routeChanged', {to: to, from: from})
-})
+const fetchRouteData = async function () {
+  let routeDataGetter = new Promise((resolve) => {
+    store.dispatch('autoSetLocale').then(() => {
+      let promise1 = store.dispatch('fetchSections')
+      let promise2 = store.dispatch('fetchOptions')
+
+      Promise.all([promise1, promise2]).then((result) => {
+        resolve(result)
+      })
+    })
+  })
+  let result = await routeDataGetter
+  return result
+}
+
+fetchRouteData()
 
 // load and get all routes from components with name following the pattern *.route.js
 let routes = loader.load(require.context('@/pages/', true, /\.route\.js$/))
 
 // Once we have all additional routes, we add them to the router
 routes.forEach(componentRoute => {
-  if (Array.isArray(componentRoute)) {
-    router.addRoutes(componentRoute)
-  } else {
-    router.addRoute(componentRoute)
+  if (componentRoute) {
+    if (Array.isArray(componentRoute)) {
+      router.addRoutes(componentRoute)
+    } else {
+      router.addRoutes([componentRoute])
+    }
   }
+})
+
+router.afterEach((to, from) => {
+  VueInstance.eventBus.$emit('routeChanged', {to: to, from: from})
 })
 
 export default router

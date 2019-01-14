@@ -2,7 +2,9 @@ const config = {
   devBaseAPIUrl: 'http://localhost:5002/wp-json/',
   prodBaseAPIUrl: '/wp-json/',
   mainMenuSlug: 'primary_menu',
-  setCustomMenuIcons: true
+  setCustomMenuIcons: true,
+  defaultLocale: 'pt-br',
+  validLocales: ['en-us', 'pt-br']
 }
 
 config.getBaseUrl = () => {

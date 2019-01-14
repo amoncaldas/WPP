@@ -3,5 +3,5 @@
 # from https://materialdesignicons.com/.
 # Use:
 # convert marker-256x256.png -crop 180x230+38+18 marker-180x230.png
-# to crop marker PNGs to the right size for adding to ors-map
+# to crop marker PNGs to the right size for adding to wpp-map
 
