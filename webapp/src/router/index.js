@@ -53,20 +53,24 @@ router.beforeEach((to, from, next) => {
   })
 })
 
-const fetchRouteData = async function () {
+const fetchRouteData = async () => {
   let routeDataGetter = new Promise((resolve) => {
     store.dispatch('autoSetLocale').then(() => {
       let promise1 = store.dispatch('fetchSections')
       let promise2 = store.dispatch('fetchOptions')
 
-      Promise.all([promise1, promise2]).then((result) => {
-        resolve(result)
+      Promise.all([promise1, promise2]).then(() => {
+        resolve()
       })
     })
   })
   let result = await routeDataGetter
   return result
 }
+
+router.afterEach((to, from) => {
+  VueInstance.eventBus.$emit('routeChanged', {to: to, from: from})
+})
 
 fetchRouteData()
 
