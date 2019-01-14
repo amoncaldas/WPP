@@ -17,8 +17,8 @@ This plugins is responsible for processing the back-end stuff related to oauth a
 The flow works as following:
 
 1. the user clicks on github button on the login page.
-1. it is made a request a request to the back-end to retrieve the oauth provider `clientId` and set it to the corresponding provider `clientId` property. This and all others oauth authenticate requests are taken on the back-end by the custom `ors-oauth` plugin that we have created.
+1. it is made a request a request to the back-end to retrieve the oauth provider `clientId` and set it to the corresponding provider `clientId` property. This and all others oauth authenticate requests are taken on the back-end by the custom `wpp-web-app` plugin that we have created.
 1. We call the custom `social-auth` authenticate function. It opens the corresponding social provider login pop-up using the `vue-authenticate` component and the `clientId` defined in the previous step and allows the user to authenticate on the service.
-1. When it is finished, the component will resolves the promise and brings back a temporary `code`. We send this `code` to the back-end and there, the `ors-oauth` plugin, using this code we will get a token and then we use this token to get the user data, including the user email registered on the provider.
+1. When it is finished, the component will resolves the promise and brings back a temporary `code`. We send this `code` to the back-end and there, the `wpp-web-app` plugin, using this code we will get a token and then we use this token to get the user data, including the user email registered on the provider.
 1. Still on the back-end, having the user's email, we locate the user account on wordpress and generate a standard `JWT token`.
 1. In the response, we give back the oauth provider token  and an additional property named `user`, where we put the `JWT token` and other user's data. These data are used by the the clients to continue the authentication process.

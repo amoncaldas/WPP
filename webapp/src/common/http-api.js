@@ -27,6 +27,9 @@ const requestInterceptors = (config) => {
   if (VueInstance.$store.getters.isAuthenticated) {
     config.headers.common['Authorization'] = 'Bearer ' + VueInstance.$store.getters.user.token
   }
+
+  config.headers.common['locale'] = VueInstance.$store.getters.locale
+
   return config // you have to return the config, otherwise the request wil be blocked
 }
 

@@ -36,7 +36,7 @@ const actions = {
         var parser = document.createElement('a')
         sections.forEach(section => {
           parser.href = section.link
-          if (parser.pathname !== '/' && parser.pathname !== '' && !sectionsRoutes.indexOf(parser.pathname) === -1) {
+          if (parser.pathname !== '/' && parser.pathname !== '' && sectionsRoutes.indexOf(parser.pathname) === -1) {
             sectionsRoutes.push(parser.pathname)
           }
         })

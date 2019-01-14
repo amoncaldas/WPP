@@ -49,8 +49,8 @@ function get_request_locale() {
 	$locale = DEFAULT_LOCALE;
 	if (isset($_GET["locale"])) {
 		$locale = $_GET["locale"];
-	} elseif (isset($_SERVER["locale"])) {
-		$locale = $_SERVER["locale"];
+	} elseif (isset($_SERVER["HTTP_LOCALE"])) {
+		$locale = $_SERVER["HTTP_LOCALE"];
 	} else {
 		$browser_locale = get_browser_locale();
 		if (isset($browser_locale)) {
@@ -227,12 +227,30 @@ function get_wpp_metas() {
 }
 
 /**
- * Affter init run custom functions
+ * Allow cors for content type, authorization and locale
+ *
+ * @return WP_REST_Response
+ */
+function allow_cors() {
+	$allow_cors = get_option("wpp_allow_cors", false);
+	if ($allow_cors === "yes") {
+		add_filter('rest_post_dispatch', function (\WP_REST_Response $result) {
+			if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+				$result->header('Access-Control-Allow-Headers', 'Authorization, Content-Type, locale', true);
+			}
+			return $result;
+		});
+	}
+}
+
+/**
+ * After init run custom functions
  *
  * @return void
  */
 function after_init() {
 	update_site_url();
+	allow_cors();
 	register_custom_types();
 	set_output();
 	register_wpp_menus();

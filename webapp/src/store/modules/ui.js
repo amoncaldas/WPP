@@ -1,8 +1,10 @@
 import MainMenu from '@/common/main-menu'
+import appConfig from '@/config'
 
 const state = {
   leftSideBarOpen: false,
-  mainMenu: []
+  mainMenu: [],
+  locale: null
 }
 
 const getters = {
@@ -11,6 +13,9 @@ const getters = {
   },
   mainMenu: state => {
     return state.mainMenu
+  },
+  locale: state => {
+    return state.locale
   }
 }
 
@@ -20,6 +25,9 @@ const mutations = {
   },
   mainMenu: (state, items) => {
     state.mainMenu = items
+  },
+  locale: (state, locale) => {
+    state.locale = locale
   }
 }
 
@@ -33,6 +41,18 @@ const actions = {
         commit('mainMenu', items)
         resolve(items)
       })
+    })
+  },
+  autoSetLocale ({commit}) {
+    return new Promise((resolve) => {
+      let locale = localStorage.getItem('locale') || window.navigator.language || window.navigator.userLanguage
+      let validLocale = locale && appConfig.validLocales.includes(locale)
+      if (!validLocale) {
+        locale = appConfig.defaultLocale
+      }
+      localStorage.setItem('locale', locale)
+      commit('locale', locale)
+      resolve(locale)
     })
   }
 }

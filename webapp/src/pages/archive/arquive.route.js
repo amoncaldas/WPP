@@ -1,57 +1,32 @@
 import Archive from './Archive'
-import store from '@/store/store'
+import wppRouter from '@/support/wpp-router'
 
 const routes = {
   get: () => {
-    let archiveRutes = []
-    store.getters.sectionRoutes.forEach(sectionRoute => {
-      archiveRutes = archiveRutes.concat(getSectionRoutes(sectionRoute))
-    })
-  },
-  getEndpoints: () => {
-    let endpoints = []
-    if(store.getters.options.wpp_post_type_endpoints) {
-      endpoints = store.getters.options.wpp_post_type_endpoints
-      endpoints = Array.isArray(endpoints) ? endpoints : endpoints.split(',')
-
-      for(key in endpoints) {
-        let endpoint = endpoints[key]
-
-        if (store.getters.options.wpp_post_type_translations[endpoint]) {
-          let translations = store.getters.options.wpp_post_type_translations[endpoint]
-          for(key in translations) {
-            let translation = translations[key]
-            endpoints.push(translation.url)
-          }
-        }
-      }
-    }
-    return endpoints
-  },
-  getSectionRoutes: (section) =>  {
-    let endpoints = getEndpoints()
-
     let routes = []
-    endpoints.forEach(endpoint => {
+
+    let postTypeEndpoints = wppRouter.getPostTypeEndpoints()
+    postTypeEndpoints.forEach(postTypeEndpoint => {
       routes.push(
         {
-          path: `/${endpoint}`,
+          path: `/${postTypeEndpoint}`,
           name: 'Archive',
           component: Archive
         }
       )
-      routes.push(
-        {
-          path: `${section}/${endpoint}`,
-          name: 'Archive',
-          component: Archive
-        }
-      )
-    });
-    return routes
+      wppRouter.getSectionEndpoints().forEach(sectionEndPoint => {
+        routes.push(
+          {
+            path: `/${sectionEndPoint}/${postTypeEndpoint}`,
+            name: 'Archive',
+            component: Archive
+          }
+        )
+      })
+    })
   }
 }
 
-const archiveRutes = routes.get()
+const archiveRoutes = routes.get()
 
-export default archiveRutes
+export default archiveRoutes
