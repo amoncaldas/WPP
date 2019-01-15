@@ -1,4 +1,5 @@
-import sectionService from '@/shared-services/section-service'
+import httpApi from '@/common/http-api'
+import appConfig from '@/config'
 
 const state = {
   sections: [],
@@ -29,7 +30,8 @@ const actions = {
       if (getters.sections.length > 0) {
         resolve(getters.sections)
       }
-      sectionService.query().then((sections) => {
+      httpApi.get(appConfig.baseWpApiPath + 'sections?_embed').then((response) => {
+        let sections = response.data
         commit('sections', sections)
 
         let sectionsRoutes = []

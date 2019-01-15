@@ -21,7 +21,7 @@
     }
 
     /**
-     * Unsubscribe a follower to the notification
+     * Get all wpp options, format them and return
      *
      * @return void
      */
@@ -30,15 +30,26 @@
 
       $wpp_options = [];
       foreach ($all_options as $key => $value) {
-          if ( strpos($key, "wpp_") === 0) {
-						$clean_key =  $meta_property_name = str_replace("wpp_meta_", "", $key);
-            $clean_key =  $meta_property_name = str_replace("wpp_", "", $clean_key);
-            $json_as_array_value = json_decode($value, true);
-            $value = $json_as_array_value ? $json_as_array_value : $value;
-            $wpp_options[$clean_key] = $value;          
-          }
+        if ( strpos($key, "wpp_meta_") === 0) {
+          $clean_key =  $meta_property_name = str_replace("wpp_meta_", "", $key);
+          $wpp_options[$clean_key] = $value;
+        } 
+        elseif ( strpos($key, "wpp_") === 0) {          
+          $clean_key =  $meta_property_name = str_replace("wpp_", "", $key);
+          
+          $value = str_replace("\\", "", $value);
+          $json_as_array_value = json_decode($value, true);
+
+          if ($json_as_array_value) {
+            $value = $json_as_array_value;
+          } elseif (strpos($value, ",") > -1) {              
+            $value = explode(",", $value);              
+          }          
+         
+          $wpp_options[$clean_key] = $value;
+        }
       }
-      $wpp_options["site_ttle"] = get_bloginfo("name");
+      $wpp_options["site_title"] = get_bloginfo("name");
       return new WP_REST_Response($wpp_options, 200); // OK
     }
   }

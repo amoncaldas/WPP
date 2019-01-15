@@ -74,14 +74,26 @@ Vue.component('date-picker', DatePicker)
 Vue.filter('uppercase', uppercase)
 Vue.filter('capitalize', capitalize)
 
-/* eslint-disable no-new */
-const VueInstance = new Vue({
-  el: '#app',
-  i18n,
-  router,
-  components: { App },
-  store: store,
-  template: '<App/>'
+let VueInstance = {}
+
+router.resolveDependencies().then(() => {
+  router.loadRoutes()
+
+  /* eslint-disable no-new */
+  VueInstance = new Vue({
+    el: '#app',
+    i18n,
+    router,
+    components: { App },
+    store: store,
+    template: '<App/>'
+  })
 })
 
-export default VueInstance
+const main = {
+  getInstance: () => {
+    return VueInstance
+  }
+}
+
+export default main

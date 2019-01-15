@@ -9,11 +9,11 @@ Vue.use(Vuex)
 
 const storeBuilder = {
   state: {
-    value: 0
   },
   getters: {
   },
   mutations: {
+
   },
   modules: {
     ui,

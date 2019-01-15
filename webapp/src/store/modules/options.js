@@ -1,4 +1,4 @@
-import optionService from '@/shared-services/option-service'
+import httpApi from '@/common/http-api'
 
 const state = {
   options: []
@@ -22,7 +22,8 @@ const actions = {
       if (getters.options.length > 0) {
         resolve(getters.options)
       }
-      optionService.query().then((options) => {
+      httpApi.get('wpp/v1/services/options').then((response) => {
+        let options = response.data
         commit('options', options)
         resolve(options)
       })

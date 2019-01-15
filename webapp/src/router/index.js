@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import store from '@/store/store'
 import loader from '@/support/loader'
 import socialAuth from '@/common/social-auth'
-import VueInstance from '@/main'
+import Home from '@/pages/home/Home'
 
 Vue.use(Router)
 
@@ -16,6 +16,7 @@ const router = new Router({
   routes: [ {
     path: '/',
     name: 'Home',
+    component: Home,
     beforeEnter: (to, from, next) => {
       // Get current route
       // this only works in we are using the `hash` mode
@@ -53,39 +54,33 @@ router.beforeEach((to, from, next) => {
   })
 })
 
-const fetchRouteData = async () => {
-  let routeDataGetter = new Promise((resolve) => {
+router.resolveDependencies = () => {
+  return new Promise((resolve) => {
     store.dispatch('autoSetLocale').then(() => {
       let promise1 = store.dispatch('fetchSections')
       let promise2 = store.dispatch('fetchOptions')
 
-      Promise.all([promise1, promise2]).then(() => {
-        resolve()
+      Promise.all([promise1, promise2]).then((data) => {
+        resolve(data)
       })
     })
   })
-  let result = await routeDataGetter
-  return result
 }
 
-router.afterEach((to, from) => {
-  VueInstance.eventBus.$emit('routeChanged', {to: to, from: from})
-})
+router.loadRoutes = () => {
+  // load and get all routes from components with name following the pattern *.route.js
+  let routes = loader.load(require.context('@/pages/', true, /\.route\.js$/))
 
-fetchRouteData()
-
-// load and get all routes from components with name following the pattern *.route.js
-let routes = loader.load(require.context('@/pages/', true, /\.route\.js$/))
-
-// Once we have all additional routes, we add them to the router
-routes.forEach(componentRoute => {
-  if (componentRoute) {
-    if (Array.isArray(componentRoute)) {
-      router.addRoutes(componentRoute)
-    } else {
-      router.addRoutes([componentRoute])
+  // Once we have all additional routes, we add them to the router
+  routes.forEach(componentRoute => {
+    if (componentRoute) {
+      if (Array.isArray(componentRoute)) {
+        router.addRoutes(componentRoute)
+      } else {
+        router.addRoutes([componentRoute])
+      }
     }
-  }
-})
+  })
+}
 
 export default router

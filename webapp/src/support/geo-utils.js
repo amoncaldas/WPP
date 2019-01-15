@@ -1,4 +1,4 @@
-import VueInstance from '@/main'
+import Main from '@/main'
 import Leaflet from 'leaflet'
 
 const geoUtils = {
@@ -53,6 +53,7 @@ const geoUtils = {
    */
   buildMarkers: (markersData, isRoute = true, options = {}) => {
     let markers = []
+    let VueInstance = Main.getInstance()
     VueInstance.lodash.each(markersData, (wayPoint, key) => {
       // Define the marker color
       let lastIndexKey = markersData.length - 1
@@ -211,6 +212,7 @@ const geoUtils = {
    * @returns {String} formatted tool tip
    */
   getDurationInSegments: (seconds, translations) => {
+    let VueInstance = Main.getInstance()
     let durationObj = VueInstance.$moment.duration(seconds, 'seconds') // the duration value is expected to be always in seconds
     return {
       days: durationObj._data.days > 0 ? durationObj._data.days + ' ' + translations.days : '',

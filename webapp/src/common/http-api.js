@@ -1,6 +1,7 @@
 import axios from 'axios'
 import appConfig from '@/config'
 import VueInstance from '@/main'
+import store from '@/store/store'
 
 let baseURL = appConfig.getBaseUrl()
 
@@ -16,20 +17,21 @@ const httpApi = axios.create({
  * @param {} config
  */
 const requestInterceptors = (config) => {
-  // if yes, show the loading and add the authorization header
-  VueInstance.eventBus.$emit('showLoading', true)
+  if (VueInstance.eventBus) {
+    // if yes, show the loading and add the authorization header
+    VueInstance.eventBus.$emit('showLoading', true)
 
-  // Set/increase the pending request counter
-  VueInstance.$pendingRequest = VueInstance.$pendingRequest ? VueInstance.$pendingRequest + 1 : 1
+    // Set/increase the pending request counter
+    VueInstance.$pendingRequest = VueInstance.$pendingRequest ? VueInstance.$pendingRequest + 1 : 1
+  }
 
   // Before each request, we check if the user is authenticated
   // This store isAuthenticated getter relies on the @/common/auth/auth.store.js module
-  if (VueInstance.$store.getters.isAuthenticated) {
-    config.headers.common['Authorization'] = 'Bearer ' + VueInstance.$store.getters.user.token
+  if (store.getters.isAuthenticated) {
+    config.headers.common['Authorization'] = 'Bearer ' + store.getters.user.token
   }
 
-  config.headers.common['locale'] = VueInstance.$store.getters.locale
-
+  config.headers.common['locale'] = store.getters.locale
   return config // you have to return the config, otherwise the request wil be blocked
 }
 
@@ -38,13 +40,15 @@ const requestInterceptors = (config) => {
  * @param {*} response
  */
 const responseInterceptors = (response) => {
-  // Decrease the pending request counter
-  VueInstance.$pendingRequest--
+  if (VueInstance.eventBus) {
+    // Decrease the pending request counter
+    VueInstance.$pendingRequest--
 
-  // If the the pending request counter is zero, so
-  // we can hide the progress bar
-  if (VueInstance.$pendingRequest === 0) {
-    VueInstance.eventBus.$emit('showLoading', false)
+    // If the the pending request counter is zero, so
+    // we can hide the progress bar
+    if (VueInstance.$pendingRequest === 0) {
+      VueInstance.eventBus.$emit('showLoading', false)
+    }
   }
   response = response.response || response
   response.data = response.data || {}
@@ -57,13 +61,15 @@ const responseInterceptors = (response) => {
  */
 const responseErrorInterceptors = (response) => {
   return new Promise((resolve, reject) => {
-    // Decrease the pending request counter
-    VueInstance.$pendingRequest--
+    if (VueInstance.eventBus) {
+      // Decrease the pending request counter
+      VueInstance.$pendingRequest--
 
-    // If the the pending request counter is zero, so
-    // we can hide the progress bar
-    if (VueInstance.$pendingRequest === 0) {
-      VueInstance.eventBus.$emit('showLoading', false)
+      // If the the pending request counter is zero, so
+      // we can hide the progress bar
+      if (VueInstance.$pendingRequest === 0) {
+        VueInstance.eventBus.$emit('showLoading', false)
+      }
     }
     response = response.response || response
     response.data = response.data || {}
