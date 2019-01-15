@@ -83,4 +83,8 @@ router.loadRoutes = () => {
   })
 }
 
+router.afterEach((to, from) => {
+  VueInstance.eventBus.$emit('routeChanged', {to: to, from: from})
+})
+
 export default router
