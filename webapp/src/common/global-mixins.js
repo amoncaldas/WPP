@@ -1,5 +1,5 @@
 import * as showToaster from './show-toaster-mixin'
-import VueInstance from '@/main'
+import main from '@/main'
 
 const globalMixins = {
   methods: {
@@ -9,6 +9,7 @@ const globalMixins = {
       let confirm = options || {}
       confirm.text = text
       confirm.title = title
+      let VueInstance = main.getInstance()
       VueInstance.eventBus.$emit('triggerConfirm', confirm)
 
       return new Promise((resolve, reject) => {
@@ -25,6 +26,7 @@ const globalMixins = {
       let info = options || {}
       info.text = text
       info.title = title
+      let VueInstance = main.getInstance()
       VueInstance.eventBus.$emit('triggerShowInfo', info)
 
       return new Promise((resolve, reject) => {

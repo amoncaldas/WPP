@@ -6,10 +6,10 @@ export default {
     // extend this component, adding CRUD functionalities and load the tokens
 
     let context = this
-    this.boxTitle = this.title ||  this.$t('posts.title')
+    this.boxTitle = this.title || this.$t('posts.title')
 
     // get the data related to the userId defined
-    let endpointAppend = `/${this.type}`
+    let endpointAppend = `/${this.endpoint}`
     postService.query({}, endpointAppend).then((posts) => {
       context.posts = posts
     }).catch(error => {
@@ -18,7 +18,7 @@ export default {
     })
   },
   props: {
-    type: {
+    endpoint: {
       default: 'post'
     },
     title: {
@@ -32,11 +32,11 @@ export default {
     }
   },
   methods: {
-    excerpt() {
+    excerpt () {
       return this.post.content.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
     }
   },
   components: {
     Post
-  },
+  }
 }

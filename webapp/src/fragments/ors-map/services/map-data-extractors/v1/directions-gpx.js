@@ -1,5 +1,5 @@
 import HttpOrsApi from '@/pages/api-docs/services/http-ors-api'
-import VueInstance from '@/main'
+import main from '@/main'
 import GeoUtils from '@/support/geo-utils'
 
 /**
@@ -41,7 +41,7 @@ class DirectionsGPXBuilder {
    */
   buildMarkers = () => {
     let markersData = []
-    if (VueInstance.lodash.get(this, 'gpxSecondRequestResponseData.info.query.coordinates')) {
+    if (main.getInstance().lodash.get(this, 'gpxSecondRequestResponseData.info.query.coordinates')) {
       markersData = this.gpxSecondRequestResponseData.info.query.coordinates
     }
     return GeoUtils.buildMarkers(markersData)
@@ -54,6 +54,7 @@ class DirectionsGPXBuilder {
   getRouteSummaryData = () => {
     if (this.gpxSecondRequestResponseData) {
       let summary = {}
+      let VueInstance = main.getInstance()
       if (VueInstance.lodash.get(this, 'gpxSecondRequestResponseData.routeSummary')) {
         summary = this.gpxSecondRequestResponseData.routeSummary.summary
       } else if (VueInstance.lodash.get(this, 'gpxSecondRequestResponseData.features[0].properties.summary[0]')) {
@@ -92,7 +93,7 @@ class DirectionsGPXBuilder {
    */
   redoRequestToGetResponseAsGeoJson = () => {
     let url = this.requestData.url.replace('format=gpx', 'format=geojson')
-    if (VueInstance.lodash.get(this, 'requestData.body.format')) {
+    if (main.getInstance().lodash.get(this, 'requestData.body.format')) {
       this.requestData.body.format = 'geojson'
     }
     if (this.requestData.method === 'get') {

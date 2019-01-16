@@ -1,6 +1,6 @@
 import axios from 'axios'
 import appConfig from '@/config'
-import VueInstance from '@/main'
+import main from '@/main'
 import store from '@/store/store'
 
 let baseURL = appConfig.getBaseUrl()
@@ -17,7 +17,8 @@ const httpApi = axios.create({
  * @param {} config
  */
 const requestInterceptors = (config) => {
-  if (VueInstance.eventBus) {
+  let VueInstance = main.getInstance()
+  if (VueInstance) {
     // if yes, show the loading and add the authorization header
     VueInstance.eventBus.$emit('showLoading', true)
 
@@ -40,7 +41,9 @@ const requestInterceptors = (config) => {
  * @param {*} response
  */
 const responseInterceptors = (response) => {
-  if (VueInstance.eventBus) {
+  let VueInstance = main.getInstance()
+
+  if (VueInstance) {
     // Decrease the pending request counter
     VueInstance.$pendingRequest--
 
@@ -60,15 +63,17 @@ const responseInterceptors = (response) => {
  * @param {*} response
  */
 const responseErrorInterceptors = (response) => {
+  let VueInstance = main.getInstance()
+
   return new Promise((resolve, reject) => {
-    if (VueInstance.eventBus) {
+    if (VueInstance) {
       // Decrease the pending request counter
       VueInstance.$pendingRequest--
 
       // If the the pending request counter is zero, so
       // we can hide the progress bar
       if (VueInstance.$pendingRequest === 0) {
-        VueInstance.eventBus.$emit('showLoading', false)
+        VueInstance.$emit('showLoading', false)
       }
     }
     response = response.response || response

@@ -74,7 +74,7 @@ Vue.component('date-picker', DatePicker)
 Vue.filter('uppercase', uppercase)
 Vue.filter('capitalize', capitalize)
 
-let VueInstance = {}
+let VueInstance = null
 
 router.resolveDependencies().then(() => {
   router.loadRoutes()

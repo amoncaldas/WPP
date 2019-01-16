@@ -1,5 +1,5 @@
 import GeoUtils from '@/support/geo-utils'
-import VueInstance from '@/main'
+import main from '@/main'
 import htmlColors from 'html-colors'
 /**
  * IsochronesBuilder Map data Builder class
@@ -32,7 +32,7 @@ class IsochronesBuilder {
    */
   getMarkersData = () => {
     let markersData = []
-    if (VueInstance.lodash.get(this, 'responseData.info.query.locations')) {
+    if (main.getInstance().lodash.get(this, 'responseData.info.query.locations')) {
       this.responseData.info.query.locations.forEach(location => {
         let locationCoordsStr = `${location[0]}, ${location[1]}`
         markersData.push([location[0], location[1], locationCoordsStr, this.responseData.info.query])

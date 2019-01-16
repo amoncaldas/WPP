@@ -3,7 +3,7 @@
     <v-slide-y-transition mode="out-in">
       <v-layout child-flex>
         <v-flex xs6>
-          <posts type="stories" title="Stories"></posts>
+          <posts :key="postType.endpoint" v-for="postType in listPostEndpoints" :endpoint="postType.endpoint" :title="postType.title"></posts>
         </v-flex>
         <v-flex xs6>
           <sections-map></sections-map>

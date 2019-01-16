@@ -1,4 +1,4 @@
-import VueInstance from '@/main'
+import main from '@/main'
 import GeoUtils from '@/support/geo-utils'
 
 /**
@@ -21,6 +21,7 @@ class DirectionsJSONBuilder {
       mapData.markers = this.buildMarkers()
       mapData.polyLineData = this.getPolyLineData()
       mapData.routeSummaryData = this.getRouteSummaryData()
+      let VueInstance = main.getInstance()
       if (VueInstance.lodash.get(context, 'responseData.features[0].properties.summary[0]')) {
         mapData.geoJson = context.responseData
         mapData.bbox = GeoUtils.getBBoxAndMarkersBounds(context.responseData.bbox, mapData.markers)
@@ -37,6 +38,7 @@ class DirectionsJSONBuilder {
    */
   buildMarkers = () => {
     let markersData = []
+    let VueInstance = main.getInstance()
     if (VueInstance.lodash.get(this, 'geoJson.info.query.coordinates')) {
       markersData = this.geoJson.info.query.coordinates
     } else if (VueInstance.lodash.get(this, 'responseData.info.query.coordinates')) {
@@ -51,6 +53,7 @@ class DirectionsJSONBuilder {
    */
   getRouteSummaryData = () => {
     let summary = {}
+    let VueInstance = main.getInstance()
     if (VueInstance.lodash.get(this, 'responseData.routeSummary')) {
       summary = this.responseData.routeSummary.summary
     } else if (VueInstance.lodash.get(this, 'responseData.features[0].properties.summary[0]')) {

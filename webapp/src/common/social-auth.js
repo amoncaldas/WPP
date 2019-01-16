@@ -5,8 +5,8 @@ import appConfig from '@/config'
 import socialOauthData from '@/shared-services/social-oauth-data-service'
 import store from '@/store/store'
 import utils from '@/support/utils'
-import VueInstance from '@/main'
 import socialOauthService from '@/shared-services/social-oauth-service'
+import main from '@/main'
 
 Vue.use(VueAxios, axios)
 let baseUrl = appConfig.getBaseUrl()
@@ -115,7 +115,7 @@ const runOauthCallBackCheck = () => {
     return false
   } else {
     if (params.error_description) {
-      VueInstance.showError(params.error_description)
+      main.getInstance().showError(params.error_description)
     }
     return true
   }
@@ -132,6 +132,7 @@ const runOauthCallBackCheck = () => {
  * @param context the VueJS this
  */
 function checkAndProceedOAuth (callback) {
+  let VueInstance = main.getInstance()
   authenticateUser().then((userData) => {
     if (userData) {
       localStorage.clear()
@@ -157,6 +158,7 @@ function authenticateUser () {
   return new Promise((resolve, reject) => {
     store.dispatch('getSocialOauthCode').then((socialOauthCode) => {
       if (socialOauthCode) {
+        let VueInstance = main.getInstance()
         VueInstance.showInfo(VueInstance.$t('auth.processingOAuth'), {timeout: 6000})
         store.commit('socialOauthCode', null) // remove the temp code from local storage
         buildEndPointAndProceedOauth(socialOauthCode, resolve, reject)

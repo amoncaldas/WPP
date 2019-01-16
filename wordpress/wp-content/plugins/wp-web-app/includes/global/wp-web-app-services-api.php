@@ -36,6 +36,9 @@
         } 
         elseif ( strpos($key, "wpp_") === 0) {          
           $clean_key =  $meta_property_name = str_replace("wpp_", "", $key);
+
+          $value =  $value === "yes" ? true : $value;
+          $value =  $value === "no" ? false : $value;
           
           $value = str_replace("\\", "", $value);
           $json_as_array_value = json_decode($value, true);

@@ -133,7 +133,7 @@
 	}
 
 	public function attach_post_locale ($post) {
-		$terms = get_the_terms( $post->ID, LOCALE_TAXONOMY_SLUG );
+		$terms = get_the_terms( $post["id"], LOCALE_TAXONOMY_SLUG );
 		if ( !empty( $terms ) ){
 			// get the first term
 			$term = array_shift( $terms );

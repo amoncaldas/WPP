@@ -1,8 +1,8 @@
-import VueInstance from '@/main'
+import main from '@/main'
 
 const showMessage = (msg, theme, options) => {
   options = options || {}
-  VueInstance.eventBus.$emit('showSnack', {message: msg, theme: theme, options: options})
+  main.getInstance().eventBus.$emit('showSnack', {message: msg, theme: theme, options: options})
 }
 
 const showError = (msg, options) => {
