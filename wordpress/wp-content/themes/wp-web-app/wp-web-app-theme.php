@@ -15,8 +15,6 @@
 	public function __construct () {
 		$this->register_hooks();
 	}
-  
-	
 
 	/**
 	 * Register plugin hooks
@@ -148,15 +146,20 @@
 	 * @return void
 	 */
 	public function apply_locale_filter_get_posts($query) {		
-		$request_locale = get_request_locale();
-		$tax_query = array (
-			array(
-				'taxonomy' => LOCALE_TAXONOMY_SLUG,
-				'field' => 'slug',
-				'terms' => [$request_locale, "neutral"]
-			)
-		);
-		$query->set( 'tax_query', $tax_query );		
+		$public_post_types = get_post_types(array("public"=>true));
+		unset($public_post_types["attachments"]);
+		$post_type = $query->query["post_type"];
+		if ($post_type !== SECTION_POST_TYPE && in_array($post_type, $public_post_types)) {
+			$request_locale = get_request_locale();
+			$tax_query = array (
+				array(
+					'taxonomy' => LOCALE_TAXONOMY_SLUG,
+					'field' => 'slug',
+					'terms' => [$request_locale, "neutral"]
+				)
+			);
+			$query->set( 'tax_query', $tax_query );
+		}
 	}
 
 	/**

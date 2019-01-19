@@ -24,7 +24,7 @@ export default {
     this.setListingPosts()
     // emit the an event catch by root App component
     // telling it to update the page title
-    this.eventBus.$emit('titleChanged', this.$t('home.pageTitle'))
+    this.eventBus.$emit('titleChanged', this.$store.getters.options.site_title)
   },
   methods: {
     setListingPosts () {
