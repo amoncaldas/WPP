@@ -6,7 +6,9 @@ export default {
   created () {
     if (this.postId) {
       let context = this
-      postService.get(this.postId).then((post) => {
+      let endpoint = this.$store.getters.postTypeEndpoint
+      let endpointAppend = `${endpoint}/${this.postId}`
+      postService.get(endpointAppend).then((post) => {
         context.post = post
       }).catch(error => {
         console.log(error)
@@ -25,6 +27,10 @@ export default {
     },
     noTopBorder: {
       default: false
+    },
+    mode: {
+      type: String,
+      default: 'list'
     }
   },
   data () {
@@ -33,11 +39,19 @@ export default {
     }
   },
   computed: {
-
+    featuredMedia () {
+      if (this.post._embedded && this.post._embedded['wp:featuredmedia']) {
+        let media = this.post._embedded['wp:featuredmedia'][0]
+        return media
+      }
+    }
   },
   methods: {
     excerpt() {
       return this.post.content.rendered.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
+    },
+    goToSingle() {
+      this.$router.push(this.postData.link)
     }
   },
   components: {

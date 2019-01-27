@@ -2,26 +2,25 @@ import mediaService from './media-service'
 
 export default {
   created () {
-    // extend this component, adding CRUD functionalities and load the tokens
     if (this.mediaId) {
       let context = this
 
       // get the data related to the userId defined
       mediaService.get(this.mediaId).then((media) => {
-        context.media = media
+        context.mediaPost = media
       }).catch(error => {
         console.log(error)
         context.showError(this.$t('post.thePostCouldNotBeLoaded'))
       })
     } else {
-      this.post = this.mediaData
+      this.mediaPost = this.media
     }
   },
   props: {
     mediaId: {
       required: false
     },
-    mediaData: {
+    media: {
       required: false
     },
     size: {
@@ -30,19 +29,19 @@ export default {
   },
   data () {
     return {
-      media: null
+      mediaPost: null
     }
   },
   computed: {
     url () {
-      if(this.media) {
-        return this.media.media_details.sizes[this.size].source_url
+      if(this.mediaPost) {
+        return this.mediaPost.media_details.sizes[this.size].source_url
       }
       return null
     },
     title () {
-      if (this.media) {
-        return this.media.title.rendered
+      if (this.mediaPost) {
+        return this.mediaPost.title.rendered
       }
     }
   },

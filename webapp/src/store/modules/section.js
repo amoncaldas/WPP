@@ -3,7 +3,8 @@ import appConfig from '@/config'
 
 const state = {
   sections: [],
-  sectionsRoutes: []
+  sectionsRoutes: [],
+  currentSection: null
 }
 
 const getters = {
@@ -12,6 +13,9 @@ const getters = {
   },
   sectionsRoutes: state => {
     return state.sectionsRoutes
+  },
+  currentSection: state => {
+    return state.currentSection
   }
 }
 
@@ -21,6 +25,9 @@ const mutations = {
   },
   sectionsRoutes: (state, items) => {
     state.sectionsRoutes = items
+  },
+  currentSection: (state, currentSection) => {
+    state.currentSection = currentSection
   }
 }
 
@@ -31,14 +38,20 @@ const actions = {
         resolve(getters.sections)
       }
       httpApi.get(appConfig.baseWpApiPath + 'sections?_embed').then((response) => {
+        var parser = document.createElement('a')
         let sections = response.data
+        for (let key in sections) {
+          let section = sections[key]
+          parser.href = section.link
+          sections[key].link = parser.pathname
+        }
+
         commit('sections', sections)
 
         let sectionsRoutes = []
-        var parser = document.createElement('a')
         sections.forEach(section => {
           parser.href = section.link
-          if (parser.pathname !== '/' && parser.pathname !== '' && sectionsRoutes.indexOf(parser.pathname) === -1) {
+          if (section.link !== '/' && section.link !== '' && sectionsRoutes.indexOf(section.link) === -1) {
             sectionsRoutes.push(parser.pathname)
           }
         })

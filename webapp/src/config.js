@@ -2,7 +2,7 @@ const config = {
   devBaseAPIUrl: 'http://localhost:5002/wp-json/',
   prodBaseAPIUrl: '/wp-json/',
   baseWpApiPath: 'wp/v2/',
-  mainMenuSlug: 'primary_menu',
+  mainMenuSlug: 'primary_menu_pt-br',
   setCustomMenuIcons: true,
   defaultLocale: 'pt-br',
   validLocales: ['en-us', 'pt-br']

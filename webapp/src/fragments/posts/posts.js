@@ -9,7 +9,8 @@ export default {
     this.boxTitle = this.title || this.$t('posts.title')
 
     // get the data related to the userId defined
-    let endpointAppend = `/${this.endpoint}`
+    let endpointAppend = `/${this.endpoint}?_embed`
+
     postService.query({}, endpointAppend).then((posts) => {
       context.posts = posts
     }).catch(error => {

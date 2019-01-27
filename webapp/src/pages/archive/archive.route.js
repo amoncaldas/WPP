@@ -1,5 +1,6 @@
 import Archive from './Archive'
 import wppRouter from '@/support/wpp-router'
+import store from '@/store/store'
 
 const routes = {
   get: () => {
@@ -9,23 +10,32 @@ const routes = {
     var regex = new RegExp('/', 'g')
 
     postTypeEndpoints.forEach(postTypeEndpoint => {
-      postTypeEndpoint = postTypeEndpoint.replace(regex, '')
+      let postTypeEndpointUrl = postTypeEndpoint.url.replace(regex, '')
       routes.push(
         {
-          path: `/${postTypeEndpoint}`,
-          name: `${postTypeEndpoint}-Archive`,
-          component: Archive
+          path: `/${postTypeEndpointUrl}`,
+          name: `${postTypeEndpointUrl}-Archive`,
+          component: Archive,
+          beforeEnter: (to, from, next) => {
+            store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+            next()
+          }
         }
       )
-      let sectionEndpoints = wppRouter.getSectionEndpoints()
+      let sections = wppRouter.getSections(false)
 
-      sectionEndpoints.forEach(sectionEndPoint => {
-        sectionEndPoint = sectionEndPoint.replace(regex, '')
+      sections.forEach(section => {
+        let sectionEndPoint = section.link.replace(regex, '')
         routes.push(
           {
-            path: `/${sectionEndPoint}/${postTypeEndpoint}`,
-            name: `${sectionEndPoint}-${postTypeEndpoint}-Archive`,
-            component: Archive
+            path: `/${sectionEndPoint}/${postTypeEndpointUrl}`,
+            name: `${sectionEndPoint}-${postTypeEndpointUrl}-Archive`,
+            component: Archive,
+            beforeEnter: (to, from, next) => {
+              store.commit('currentSection', section)
+              store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+              next()
+            }
           }
         )
       })

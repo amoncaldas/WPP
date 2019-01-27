@@ -1,43 +1,43 @@
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
-import en from './en/all'
-import de from './de/all'
+import enUS from './en-us/all'
+import ptBR from './pt-br/all'
 import loader from '@/support/loader'
 
 Vue.use(VueI18n)
 
 const i18n = {
-  locale: 'en', // set locale
+  locale: 'en-us', // set locale
   messages: {
-    en: en,
-    de: de
+    'en-us': enUS,
+    'pt-br': ptBR
   },
-  fallbackLocale: 'en'
+  fallbackLocale: 'en-us'
 }
 
 // load and get all EN messages from components *i18n.en.js default export using custom loader
 let enComponentMessages = loader.load(require.context('@/pages/', true, /\.i18n\.en\.js$/), true)
-addComponentKeys('en', enComponentMessages)
+addComponentKeys('en-us', enComponentMessages)
 
 // load and get all EN messages from core *i18n.en.js default export using custom loader
 let enCoreMessages = loader.load(require.context('@/core/', true, /\.i18n\.en\.js$/), true)
-addComponentKeys('en', enCoreMessages)
+addComponentKeys('en-us', enCoreMessages)
 
 // load and get all EN messages from shared parts *i18n.en.js default export using custom loader
 let enSharedPartsMessages = loader.load(require.context('@/fragments/', true, /\.i18n\.en\.js$/), true)
-addComponentKeys('en', enSharedPartsMessages)
+addComponentKeys('en-us', enSharedPartsMessages)
 
 // load and get all DE messages from components *i18n.de.js default export using custom loader
-let deComponentMessages = loader.load(require.context('@/pages/', true, /\.i18n\.de\.js$/), true)
-addComponentKeys('de', deComponentMessages)
+let deComponentMessages = loader.load(require.context('@/pages/', true, /\.i18n\.pt-br\.js$/), true)
+addComponentKeys('pt-br', deComponentMessages)
 
 // load and get all EN messages from core *i18n.en.js default export using custom loader
-let deCoreMessages = loader.load(require.context('@/core/', true, /\.i18n\.de\.js$/), true)
-addComponentKeys('en', deCoreMessages)
+let deCoreMessages = loader.load(require.context('@/core/', true, /\.i18n\.pt-br\.js$/), true)
+addComponentKeys('pt-br', deCoreMessages)
 
 // load and get all EN messages from shared parts *i18n.en.js default export using custom loader
-let deSharedPartsMessages = loader.load(require.context('@/fragments/', true, /\.i18n\.de\.js$/), true)
-addComponentKeys('en', deSharedPartsMessages)
+let deSharedPartsMessages = loader.load(require.context('@/fragments/', true, /\.i18n\.pt-br\.js$/), true)
+addComponentKeys('pt-br', deSharedPartsMessages)
 
 export default new VueI18n(i18n)
 

@@ -1,5 +1,7 @@
 import Single from './Single'
 import wppRouter from '@/support/wpp-router'
+import store from '@/store/store'
+import Section from '@/support/section'
 
 const routes = {
   get: () => {
@@ -8,36 +10,58 @@ const routes = {
 
     let postTypeEndpoints = wppRouter.getPostTypeEndpoints()
     postTypeEndpoints.forEach(postTypeEndpoint => {
-      postTypeEndpoint = postTypeEndpoint.replace(regex, '')
+      let postTypeEndpointUrl = postTypeEndpoint.url.replace(regex, '')
       routes.push(
         {
-          path: `/${postTypeEndpoint}/:postName/:postId`,
-          name: `${postTypeEndpoint}-Single`,
-          component: Single
+          path: `/${postTypeEndpointUrl}/:postName/:postId`,
+          name: `${postTypeEndpointUrl}-Single`,
+          component: Single,
+          beforeEnter: (to, from, next) => {
+            let curretHomeSection = Section.getCurrentHomeSection()
+            store.commit('currentSection', curretHomeSection)
+            store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+            next()
+          }
         }
       )
       routes.push(
         {
-          path: `/${postTypeEndpoint}/:postId`,
-          name: `${postTypeEndpoint}-SingleId`,
-          component: Single
+          path: `/${postTypeEndpointUrl}/:postId`,
+          name: `${postTypeEndpointUrl}-SingleId`,
+          component: Single,
+          beforeEnter: (to, from, next) => {
+            let curretHomeSection = Section.getCurrentHomeSection()
+            store.commit('currentSection', curretHomeSection)
+            store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+            next()
+          }
         }
       )
-      let sectionEndPoints = wppRouter.getSectionEndpoints()
-      sectionEndPoints.forEach(sectionEndPoint => {
-        sectionEndPoint = sectionEndPoint.replace(regex, '')
+      let sections = wppRouter.getSections(false)
+      sections.forEach(section => {
+        let sectionEndPoint = section.link.replace(regex, '')
         routes.push(
           {
-            path: `/${sectionEndPoint}/${postTypeEndpoint}/:postName/:postId`,
-            name: `${sectionEndPoint}-${postTypeEndpoint}-Single`,
-            component: Single
+            path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postName/:postId`,
+            name: `${sectionEndPoint}-${postTypeEndpointUrl}-Single`,
+            component: Single,
+            beforeEnter: (to, from, next) => {
+              store.commit('currentSection', section)
+              store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+              next()
+            }
           }
         )
         routes.push(
           {
-            path: `/${sectionEndPoint}/${postTypeEndpoint}/:postId`,
-            name: `${sectionEndPoint}-${postTypeEndpoint}-SingleId`,
-            component: Single
+            path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postId`,
+            name: `${sectionEndPoint}-${postTypeEndpointUrl}-SingleId`,
+            component: Single,
+            beforeEnter: (to, from, next) => {
+              store.commit('currentSection', section)
+              store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+              next()
+            }
           }
         )
       })
