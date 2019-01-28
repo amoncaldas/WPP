@@ -3,12 +3,12 @@ import ModelServ from '@/core/model-service'
 let options = {
   raw: true, // we dont need each menu resource to be converted to a Model (@/core/model), because it is a read-only resource,
   transformResponse: (response) => {
-    if (response.data && response.config.method === 'query') {
+    if (response.data && Array.isArray(response.data)) {
       var parser = document.createElement('a')
       for (let key in response.data) {
         let section = response.data[key]
         parser.href = section.link
-        response.data[key].link = parser.pathname
+        response.data[key].url = `#${parser.pathname}`
       }
     }
   }

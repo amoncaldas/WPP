@@ -14,11 +14,7 @@ export default {
     Posts
   },
   created () {
-    if (this.$route.query.tab) {
-      this.activeTab = this.$route.query.tab
-    }
-
-    this.currentSection = Section.getCurrentSection()
+    this.currentSection = Section.getCurrentHomeSection()
     this.listPostEndpoints = Section.getListingPosts()
 
     // emit the an event catch by root App component

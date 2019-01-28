@@ -3,11 +3,12 @@ import VueI18n from 'vue-i18n'
 import enUS from './en-us/all'
 import ptBR from './pt-br/all'
 import loader from '@/support/loader'
+import appConfig from '@/config'
 
 Vue.use(VueI18n)
 
 const i18n = {
-  locale: 'en-us', // set locale
+  locale: appConfig.defaultLocale.defaultLocale, // set locale
   messages: {
     'en-us': enUS,
     'pt-br': ptBR

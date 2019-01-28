@@ -79,6 +79,10 @@ let VueInstance = null
 router.resolveDependencies().then(() => {
   router.loadRoutes()
 
+  // Set locale from store/local storage
+  i18n.locale = store.getters.locale
+  console.log('Locale:', i18n.locale)
+
   /* eslint-disable no-new */
   VueInstance = new Vue({
     el: '#app',

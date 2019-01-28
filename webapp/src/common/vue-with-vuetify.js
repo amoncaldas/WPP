@@ -31,7 +31,8 @@ import {
   VDatePicker,
   VChip,
   VSwitch,
-  VAlert
+  VAlert,
+  VImg
 } from 'vuetify'
 
 Vue.use(Vuetify, {
@@ -64,7 +65,8 @@ Vue.use(Vuetify, {
     VDatePicker,
     VChip,
     VSwitch,
-    VAlert
+    VAlert,
+    VImg
   }
 })
 

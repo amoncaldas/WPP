@@ -28,6 +28,7 @@ const mutations = {
   },
   locale: (state, locale) => {
     state.locale = locale
+    localStorage.setItem('locale', locale)
   }
 }
 

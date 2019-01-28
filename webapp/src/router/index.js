@@ -56,13 +56,12 @@ router.beforeEach((to, from, next) => {
 
 router.resolveDependencies = () => {
   return new Promise((resolve) => {
-    store.dispatch('autoSetLocale').then(() => {
-      let promise1 = store.dispatch('fetchSections')
-      let promise2 = store.dispatch('fetchOptions')
+    let promise1 = store.dispatch('fetchSections')
+    let promise2 = store.dispatch('fetchOptions')
+    let promise3 = store.dispatch('autoSetLocale')
 
-      Promise.all([promise1, promise2]).then((data) => {
-        resolve(data)
-      })
+    Promise.all([promise1, promise2, promise3]).then((data) => {
+      resolve(data)
     })
   })
 }

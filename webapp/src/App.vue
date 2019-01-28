@@ -3,7 +3,7 @@
     <v-progress-linear :indeterminate="true" :class="{'progress-linear-disabled': !showLoading}"></v-progress-linear>
     <app-toaster></app-toaster>
     <app-header></app-header>
-    <v-content>
+    <v-content class="main-container">
       <app-welcome></app-welcome>
       <app-confirm></app-confirm>
       <app-info></app-info>

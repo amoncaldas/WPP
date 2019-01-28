@@ -12,6 +12,30 @@ import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
 import theme from '@/common/theme'
 
+const tileProviders = [
+  {
+    name: 'Open Street Maps',
+    visible: true,
+    attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    token: null
+  },
+  {
+    name: 'Satellite',
+    visible: false,
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    token: null
+  },
+  {
+    name: 'Topography',
+    visible: false,
+    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+    token: null
+  }
+]
+
 export default {
   props: {
     responseData: {
@@ -22,27 +46,26 @@ export default {
     },
     apiVersion: {
       required: true
+    },
+    height: {
+      default: 300
     }
   },
   data () {
     return {
-      baseMap: {
-        name: 'OpenStreetMap',
-        visible: true,
-        attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-      },
-      zoom: 13,
-      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      tileProviders: tileProviders,
+      mapOptions: { zoomControl: true, attributionControl: true },
+      layersPosition: 'topright',
+      zoom: 11,
       map: null,
       mapDataBuilder: null,
-      mapHeight: 300,
+      mapHeight: null,
       initialMaxZoom: 18,
       mapData: null,
       info: null,
       routeColor: theme.primary,
-      guid: null
+      guid: null,
+      center: GeoUtils.buildLatLong(49.510944, 8.76709) // By default, Heidelberg
     }
   },
   computed: {
@@ -97,7 +120,7 @@ export default {
   },
   methods: {
     setMapBuilder () {
-      if (!this.mapDataBuilder) {
+      if (this.requestData) {
         let data = {
           responseData: this.responseData,
           requestData: this.requestData,
@@ -110,6 +133,9 @@ export default {
     supportsEndpoint (endpoint) {
       OrsMapBuilder.supportsEndpoint(endpoint)
     },
+    setMapCenter (lat, long) {
+      this.center = GeoUtils.buildLatLong(lat, long)
+    },
     loadMapData () {
       // To load map data we use the map builder service
       // and then once it is ready, we set the local data from
@@ -118,14 +144,16 @@ export default {
       // If the response data does not contains a geojson
       // then the promise resolver will return an object with the expected
       // props but all of then containing null values. This will not cause a fail
-      this.mapDataBuilder.buildMapData().then(mapData => {
-        mapData.maxZoom = mapData.maxZoom ? mapData.maxZoom : this.initialMaxZoom
-        this.mapData = mapData
-        this.info = mapData.info
-        this.dataBounds = mapData.bbox
-        this.fitFeaturesBounds()
-        this.redrawMap()
-      })
+      if (this.mapDataBuilder) {
+        this.mapDataBuilder.buildMapData().then(mapData => {
+          mapData.maxZoom = mapData.maxZoom ? mapData.maxZoom : this.initialMaxZoom
+          this.mapData = mapData
+          this.info = mapData.info
+          this.dataBounds = mapData.bbox
+          this.fitFeaturesBounds()
+          this.redrawMap()
+        })
+      }
     },
     redrawMap () {
       return new Promise((resolve, reject) => {
@@ -141,17 +169,29 @@ export default {
         }, 10)
       })
     },
+
+    /**
+     * Determines if the given bounds Array is valid
+     * @param {*} dataBounds
+     * @returns Boolean
+     */
+    isValidBounds (dataBounds) {
+      if (!dataBounds || !Array.isArray(dataBounds) || dataBounds.length < 2) {
+        return false
+      }
+      return dataBounds[0].lat && dataBounds[0].lon && dataBounds[1].lat && dataBounds[1].lon
+    },
     fitFeaturesBounds () {
       let context = this
       return new Promise((resolve, reject) => {
         // If te map object is already defined
         // then we can directly access it
-        if (context.map) {
+        if (context.map && context.isValidBounds(this.dataBounds)) {
           context.map.fitBounds(context.dataBounds, {padding: [20, 20]})
         } else {
           // If not, it wil be available only in the next tick
           this.$nextTick(() => {
-            if (context.$refs.map) {
+            if (context.$refs.map && context.isValidBounds(this.dataBounds)) {
               context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
               context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
             }
@@ -204,6 +244,11 @@ export default {
     }
   },
   mounted () {
+    if (this.height === 'full') {
+      this.mapHeight = window.innerHeight
+    } else {
+      this.mapHeight = this.height
+    }
     // Define a unique identifier to the map component instance
     this.guid = utils.guid()
 
@@ -219,6 +264,11 @@ export default {
       if (data.guid && data.guid === context.guid) {
         this.adjustMap(data.isMaximized)
       }
+    })
+
+    this.eventBus.$on('clearMap', () => {
+      this.mapDataBuilder = null
+      this.mapData = null
     })
     // once the map component is mounted, load the map data
     this.setMapBuilder()

@@ -24,6 +24,10 @@ export default {
     },
     title: {
       required: false
+    },
+    columnsPerPost: {
+      type: Number,
+      default: 12
     }
   },
   data () {

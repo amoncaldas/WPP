@@ -8,7 +8,6 @@
 import { LMap, LTileLayer, LMarker, LTooltip, LPopup, LControlZoom, LControlAttribution, LControlScale, LControlLayers, LLayerGroup } from 'vue2-leaflet'
 import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
-
 import theme from '@/common/theme'
 
 const tileProviders = [
@@ -37,6 +36,10 @@ const tileProviders = [
 
 export default {
   props: {
+    post: {
+      type: Object,
+      required: true
+    }
   },
   data () {
     return {
@@ -69,6 +72,11 @@ export default {
         return this.mapData.markers
       }
     },
+    polyline () {
+      if (this.mapData) {
+        return this.mapData.polyline
+      }
+    },
     maxZoom () {
       return this.initialMaxZoom
     }
@@ -81,6 +89,7 @@ export default {
     loadMapData () {
       this.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
       this.mapData = { markers: GeoUtils.buildMarkers(this.getMarkersData(), false, {mapIconUrl: this.$store.getters.options.map_icon_url}) }
+      this.mapData.polyline = this.post.route
       this.dataBounds = GeoUtils.getBBoxAndMarkersBounds(this.dataBounds, this.mapData.markers)
       this.loaded = true
       this.fitFeaturesBounds()
@@ -93,16 +102,14 @@ export default {
      */
     getMarkersData () {
       let markersData = []
-      if (this.$store.getters.sections) {
-        this.$store.getters.sections.forEach(section => {
-          for (let placeKey in section.places) {
-            let place = section.places[placeKey]
-            if (place.markers.length > 0) {
-              let location = place.markers[0]
-              markersData.push([location.lng, location.lat, section.title.rendered, section])
-            }
+      if (this.post) {
+        for (let placeKey in this.post.places) {
+          let place = this.post.places[placeKey]
+          if (place.markers.length > 0) {
+            let location = place.markers[0]
+            markersData.push([location.lng, location.lat, place.title, place])
           }
-        })
+        }
       }
       return markersData
     },
@@ -139,8 +146,8 @@ export default {
         }
       })
     },
-    markerInfoClick (section) {
-      this.$router.push(section.json.url)
+    markerInfoClick (place) {
+      this.infoDialog(place.label, null, {code: place.json, resizable: true, zIndex: 1001})
     },
     adjustMap (data) {
       if (data.guid === this.boxGuid) {

@@ -1,5 +1,5 @@
 import GeoUtils from '@/support/geo-utils'
-import main from '@/main'
+import VueInstance from '@/main'
 
 /**
  * GeocodeReverseBuilder Map data Builder class
@@ -33,7 +33,7 @@ class GeocodeReverseBuilder {
   buildMarkers = () => {
     let markersData = this.getMarkersData()
     let markers = []
-    main.getInstance().lodash.each(markersData, (wayPoint, key) => {
+    VueInstance.lodash.each(markersData, (wayPoint, key) => {
       // define the color: all are red, except for the last one (the reference point) that is blue
       let coloredMarkerName = 'red'
       if (key === markersData.length - 1) {

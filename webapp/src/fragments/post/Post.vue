@@ -9,7 +9,7 @@
       <p>
         {{excerpt()}}
       </p>
-      <v-btn v-if="mode === 'list'" flat @click="goToSingle()">{{ $t('post.readMore')}}</v-btn>
+      <v-btn v-if="mode === 'list'" style="margin-left:0px" :href="post.url" flat>{{ $t('post.readMore')}}</v-btn>
     </div>
   </box>
 </template>

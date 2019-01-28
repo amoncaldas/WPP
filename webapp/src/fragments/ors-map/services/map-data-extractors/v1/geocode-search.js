@@ -29,7 +29,7 @@ class GeocodeSearchBuilder {
    */
   getMarkersData = () => {
     let markersData = []
-    if (this.responseData.features) {
+    if (this.responseData && this.responseData.features) {
       this.responseData.features.forEach(feature => {
         markersData.push([feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.label, feature])
       })

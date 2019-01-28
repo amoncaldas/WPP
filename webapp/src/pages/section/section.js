@@ -1,4 +1,4 @@
-import SectionsMap from '@/fragments/sections-map/SectionsMap'
+import PostMap from '@/fragments/post-map/PostMap'
 import Posts from '@/fragments/posts/Posts'
 import Section from '@/support/section'
 
@@ -10,14 +10,10 @@ export default {
     currentSection: null
   }),
   components: {
-    SectionsMap,
+    PostMap,
     Posts
   },
   created () {
-    if (this.$route.query.tab) {
-      this.activeTab = this.$route.query.tab
-    }
-
     this.currentSection = Section.getCurrentSection()
     this.listPostEndpoints = Section.getListingPosts()
 
