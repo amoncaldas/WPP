@@ -73,6 +73,12 @@ class WppNotifier  {
 				'callback' => array($this, 'unsubscribe_for_notifications' ),
 			)
 		));
+		register_rest_route(WPP_API_NAMESPACE."/message", '/error', array(
+			array(
+				'methods'  => "POST",
+				'callback' => array($this, 'report_error' ),
+			)
+		));
 	}
 
 	/**
@@ -160,6 +166,28 @@ class WppNotifier  {
 		} else {
 			return new WP_REST_Response(null, 404); // NOT FOUND
 		}
+	}
+
+	/**
+	 * Unsubscribe a follower to the notification
+	 *
+	 * @return void
+	 */
+	public function report_error($request) {
+		$actual_url= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+		if ($_SERVER['HTTP_REFERER'] === $actual_url) {
+			$site_title = get_bloginfo("name");
+			$subject = "Error report | $site_title";
+			$message = $request->get_param('message');
+			if (isset($subject) && isset($message)) {
+				$title = $subject;
+				$this->notify_admin($title, $message, "report error");
+				return new WP_REST_Response(null, 204); // ACCEPTED/UPDATED, NO CONTENT TO RETURN
+			}
+			return new WP_REST_Response(null, 409); // CONFLICT, MISSING DATA
+		}
+		return new WP_REST_Response(null, 403); // FORBIDDEN
 	}
 
 

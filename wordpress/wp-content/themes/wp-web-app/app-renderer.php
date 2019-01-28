@@ -40,20 +40,23 @@
         $skeleton = str_replace("</head>", $head_inject, $skeleton);
 
         $title = get_bloginfo("name");
-        $og_image_url = "image_path";
+        $og_image_url = network_site_url(trim(get_option("wpp_site_relative_logo_url")));
         
         $post_id = $this->getPostId();
         if ($post_id) {
-            $title = get_the_title($post_id);
+            $title = get_the_title($post_id). " | ". $title;
             $og_image_url = get_the_post_thumbnail_url($post_id);
         }
-        $skeleton = preg_replace("/<title[^>]*>.*?<\/title>/i", "<title>$title</title>", $skeleton);
-        // <link rel='image_src'  type="image/jpeg" href="http://fazendoasmalas.com/wp-content/uploads/2014/09/casal-viajou-de-carro-pelo-mundo-por-23-anos-10.jpg" />
-        // <link rel="canonical" id="page_canonical" href="http://fazendoasmalas.com/albuns/casal-viaja-ha-29-anos-pelo-mundo-no-mesmo-veiculo/924/" />
-        // <meta property="og:title" content="Casal viaja há 29 anos pelo mundo no mesmo veículo | Por Amon Caldas | Album de viagem Fazendo as Malas | Fazendo as Malas" />
-	    // <meta property='og:image' content='http://fazendoasmalas.com/wp-content/uploads/2014/09/casal-viajou-de-carro-pelo-mundo-por-23-anos-10.jpg' />	
+        $header_injection = "<title>$title</title>";
+        $ext = pathinfo($og_image_url, PATHINFO_EXTENSION);
+        $header_injection .= "<link rel='image_src' type='image/$ext' href='$og_image_url' />";
+        $header_injection .= "<meta property='og:title' content='$title' />";
+        $header_injection .= "<meta property='og:image' content='$og_image_url' />";
 
-        $skeleton = str_replace("{{og_image}}", $og_image_url, $skeleton);
+        $url = network_site_url($_SERVER["REQUEST_URI"]);
+        $header_injection .= "<link rel='canonical' id='page_canonical' href='$url' />";
+
+        $skeleton = preg_replace("/<title[^>]*>.*?<\/title>/i", $header_injection, $skeleton);
         return $skeleton;
     }
 
