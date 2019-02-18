@@ -1,8 +1,8 @@
 {
-  "name": "dashboard",
+  "name": "WPP",
   "version": "1.0.0",
-  "description": "Developers dashboard",
-  "author": "amon@openrouteservice.org",
+  "description": "Wodpress web app",
+  "author": "amon@gmail.com",
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",

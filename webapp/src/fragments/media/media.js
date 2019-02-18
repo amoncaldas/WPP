@@ -29,7 +29,7 @@ export default {
     maxHeight: {
       default: null
     },
-    maxHWith: {
+    maxWidth: {
       default: null
     },
     contains: {

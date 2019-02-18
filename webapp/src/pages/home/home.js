@@ -18,7 +18,6 @@ export default {
     // telling it to update the page title
     this.eventBus.$emit('titleChanged', this.$store.getters.options.site_title)
     this.loadData()
-
     this.eventBus.$on('localeChanged', () => {
       this.loadData()
     })
@@ -26,7 +25,9 @@ export default {
   methods: {
     loadData () {
       this.currentSection = Section.getCurrentHomeSection()
+      this.$store.commit('currentSection', this.currentSection)
       this.listPostEndpoints = Section.getListingPosts()
     }
-  }
+  },
+
 }

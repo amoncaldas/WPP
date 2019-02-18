@@ -24,7 +24,7 @@ export default {
     },
     exclude: {
       type: Array,
-      default: []
+      default: function () { return [] }
     }
   },
   data () {
@@ -38,9 +38,11 @@ export default {
       return this.post.content.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
     },
     loadPosts () {
-      // get the data related to the userId defined
-      let exclude = this.exclude.join(',')
-      let endpointAppend = `/${this.endpoint}?_embed=1&exclude=${exclude}`
+      let endpointAppend = `/${this.endpoint}?_embed=1`
+      if (this.exclude.length > 0) {
+        let exclude = this.exclude.join(',')
+        endpointAppend += `&exclude=${exclude}`
+      }
 
       postService.query({}, endpointAppend).then((posts) => {
         this.posts = posts

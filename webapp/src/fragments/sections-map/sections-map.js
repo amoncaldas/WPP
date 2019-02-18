@@ -133,6 +133,7 @@ export default {
             if (context.$refs.map) {
               context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
               context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
+              context.map.scrollWheelZoom.disable()
             }
             resolve()
           })
