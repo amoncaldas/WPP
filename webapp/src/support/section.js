@@ -13,7 +13,7 @@ const section = {
       currentSection.acf.list_post_endpoints.forEach(endpoint => {
         let localesTranslation = VueInstance.lodash.find(translations, (locales) => {
           return VueInstance.lodash.find(locales, locale => {
-            return locale.url === endpoint
+            return locale.path === endpoint
           })
         })
         if (localesTranslation) {

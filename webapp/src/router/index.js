@@ -37,7 +37,7 @@ const router = new Router({
       } else {
         // if the target is not the root `/` page
         // send the user to the target page
-        next(route)
+        next()
       }
     }
   }]

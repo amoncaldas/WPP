@@ -10,15 +10,15 @@ const routes = {
 
     let postTypeEndpoints = wppRouter.getPostTypeEndpoints()
     postTypeEndpoints.forEach(postTypeEndpoint => {
-      let postTypeEndpointUrl = postTypeEndpoint.url.replace(regex, '')
+      let postTypeEndpointUrl = postTypeEndpoint.path.replace(regex, '')
       routes.push(
         {
           path: `/${postTypeEndpointUrl}/:postName/:postId`,
           name: `${postTypeEndpointUrl}-Single`,
           component: Single,
           beforeEnter: (to, from, next) => {
-            let curretHomeSection = Section.getCurrentHomeSection()
-            store.commit('currentSection', curretHomeSection)
+            let currentHomeSection = Section.getCurrentHomeSection()
+            store.commit('currentSection', currentHomeSection)
             store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
             next()
           }
@@ -30,8 +30,8 @@ const routes = {
           name: `${postTypeEndpointUrl}-SingleId`,
           component: Single,
           beforeEnter: (to, from, next) => {
-            let curretHomeSection = Section.getCurrentHomeSection()
-            store.commit('currentSection', curretHomeSection)
+            let currentHomeSection = Section.getCurrentHomeSection()
+            store.commit('currentSection', currentHomeSection)
             store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
             next()
           }
@@ -39,7 +39,7 @@ const routes = {
       )
       let sections = wppRouter.getSections(false)
       sections.forEach(section => {
-        let sectionEndPoint = section.link.replace(regex, '')
+        let sectionEndPoint = section.path.replace(regex, '')
         routes.push(
           {
             path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postName/:postId`,

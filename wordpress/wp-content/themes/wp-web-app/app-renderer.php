@@ -64,6 +64,7 @@
      */
     public function getWebAppHtml () {
         if ($_SERVER["REQUEST_URI"] !== "/") {
+            $uri = $_SERVER["REQUEST_URI"];
             return "<html><title>".get_bloginfo("name")."</title><script> window.location = '/#$uri' </script></html>";
         }
         return $this->getHTMLSkeleton();

@@ -43,7 +43,7 @@ const actions = {
         for (let key in sections) {
           let section = sections[key]
           parser.href = section.link
-          sections[key].url = parser.pathname
+          sections[key].path = parser.pathname
         }
 
         commit('sections', sections)

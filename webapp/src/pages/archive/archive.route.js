@@ -10,7 +10,7 @@ const routes = {
     var regex = new RegExp('/', 'g')
 
     postTypeEndpoints.forEach(postTypeEndpoint => {
-      let postTypeEndpointUrl = postTypeEndpoint.url.replace(regex, '')
+      let postTypeEndpointUrl = postTypeEndpoint.path.replace(regex, '')
       routes.push(
         {
           path: `/${postTypeEndpointUrl}`,
@@ -25,7 +25,7 @@ const routes = {
       let sections = wppRouter.getSections(false)
 
       sections.forEach(section => {
-        let sectionEndPoint = section.link.replace(regex, '')
+        let sectionEndPoint = section.path.replace(regex, '')
         routes.push(
           {
             path: `/${sectionEndPoint}/${postTypeEndpointUrl}`,

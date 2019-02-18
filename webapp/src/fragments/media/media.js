@@ -25,6 +25,15 @@ export default {
     },
     size: {
       default: 'medium_large'
+    },
+    maxHeight: {
+      default: null
+    },
+    maxHWith: {
+      default: null
+    },
+    contains: {
+      default: false
     }
   },
   data () {

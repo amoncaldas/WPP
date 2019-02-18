@@ -3,9 +3,9 @@
     <v-slide-y-transition mode="out-in">
       <div>
         <div v-if="currentSection.acf.has_content" v-html="currentSection.content"></div>
-        <br><br>
+        <br>
         <post-map v-if="currentSection && currentSection.acf.has_places" :post="currentSection"></post-map>
-        <br><br>
+        <br>
         <div v-if="currentSection.acf.list_posts">
           <posts  :columns-per-post="6" :key="postType.endpoint" v-for="postType in listPostEndpoints" :endpoint="postType.endpoint" :title="postType.title"></posts>
         </div>

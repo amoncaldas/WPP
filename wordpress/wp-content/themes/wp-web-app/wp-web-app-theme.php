@@ -583,11 +583,11 @@
 			return $post_url_slug;
 		} elseif (!isset($dictionary[$post_url_slug][$lang])) {
 			return $post_url_slug;
-		} elseif (!isset($dictionary[$post_url_slug][$lang]["url"])) {
+		} elseif (!isset($dictionary[$post_url_slug][$lang]["path"])) {
 			return $post_url_slug;
 		}
 		else {
-			return $dictionary[$post_url_slug][$lang]["url"];
+			return $dictionary[$post_url_slug][$lang]["path"];
 		}
 	}
 

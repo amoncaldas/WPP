@@ -1,25 +1,32 @@
 import postService from '@/shared-services/post-service'
 import Media from '@/fragments/media/Media'
 
-
 export default {
   created () {
-    if (this.postId) {
+    if (this.postData) {
+      this.post = this.postData
+    } else {
       let context = this
       let endpoint = this.$store.getters.postTypeEndpoint
-      let endpointAppend = `${endpoint}/${this.postId}`
+      let endpointAppend = null
+      if (this.postId) {
+        endpointAppend = `${endpoint}/${this.postId}`
+      } else if (this.postName) {
+        endpointAppend = `${endpoint}?name=${this.postName}`
+      }
       postService.get(endpointAppend).then((post) => {
         context.post = post
       }).catch(error => {
         console.log(error)
         context.showError(this.$t('post.thePostCouldNotBeLoaded'))
       })
-    } else {
-      this.post = this.postData
     }
   },
   props: {
     postId: {
+      required: false
+    },
+    postName: {
       required: false
     },
     postData: {
@@ -47,14 +54,14 @@ export default {
     }
   },
   methods: {
-    excerpt() {
+    excerpt () {
       return this.post.content.rendered.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
     },
-    goToSingle() {
+    goToSingle () {
       this.$router.push(this.postData.link)
     }
   },
   components: {
     Media
-  },
+  }
 }

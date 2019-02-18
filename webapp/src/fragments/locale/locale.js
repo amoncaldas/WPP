@@ -27,9 +27,9 @@ export default {
       this.$i18n.locale = this.currentLocale
       this.$store.commit('locale', this.currentLocale)
 
-      // When the language is changed, we redirect to home because
-      // the current content may not exist in the selected language
-      this.$router.push('/')
+      // if not, go to home after change the locale
+      // Once the home is reloaded, the content in the new language wil be listed
+      this.$router.push({ name: 'Home' })
       this.eventBus.$emit('localeChanged', this.currentLocale)
     }
   }

@@ -8,7 +8,7 @@ let options = {
       for (let key in response.data) {
         let post = response.data[key]
         parser.href = post.link
-        response.data[key].url = `#${parser.pathname}`
+        response.data[key].path = `#${parser.pathname}`
       }
     }
   }

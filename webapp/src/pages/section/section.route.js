@@ -9,7 +9,7 @@ const routes = {
     let sections = wppRouter.getSections(false)
 
     sections.forEach(section => {
-      let sectionEndPoint = section.link.replace(regex, '')
+      let sectionEndPoint = section.path.replace(regex, '')
       routes.push(
         {
           path: `/${sectionEndPoint}`,

@@ -21,6 +21,7 @@ import VueLodash from 'vue-lodash'
 import VueAuthenticate from 'vue-authenticate'
 import socialAuth from '@/common/social-auth'
 import VueMoment from 'vue-moment'
+import theme from '@/common/theme'
 /**
  * Fix Vue leaflet issues:
  * - import leaflet styles for proper map rendering
@@ -39,6 +40,8 @@ L.Icon.Default.mergeOptions({
 
 const options = { name: 'lodash' } // customize the way you want to call it
 Vue.use(VueLodash, options) // options is optional
+
+Vue.prototype.theme = theme
 
 // Use vee validate to easily validate forms
 Vue.use(VeeValidate)

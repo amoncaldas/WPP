@@ -28,7 +28,7 @@ const wppRouter = {
         if (typeof endpoints[key] === 'string') {
           let declaredEndpoint = endpoints[key]
           wppRouter.addEndpointTranslations(declaredEndpoint, endpoints)
-          endpoints[key] = {endpoint: declaredEndpoint, url: declaredEndpoint}
+          endpoints[key] = {endpoint: declaredEndpoint, path: declaredEndpoint}
         }
       }
     }
@@ -39,26 +39,31 @@ const wppRouter = {
     if (translations) {
       for (let tKey in translations) {
         let translation = translations[tKey]
-        let match = false
-        for (let key in translation) {
-          let locale = translation[key]
-          if (locale.url === endpoint) {
-            match = true
-          }
-        }
 
-        if (match) {
+        let hasTranslation = wppRouter.endPointHasTranslations(endpoint, translation)
+        if (hasTranslation) {
           for (let key in translation) {
             let locale = translation[key]
-            let includes = endpoints.includes(locale.url)
+            let includes = endpoints.includes(locale.path)
             if (!includes) {
-              endpoints.push({endpoint: endpoint, url: locale.url})
+              endpoints.push({endpoint: endpoint, path: locale.path})
             }
           }
         }
       }
     }
     return endpoints
+  },
+
+  endPointHasTranslations: (endpoint, translation) => {
+    let match = false
+    for (let key in translation) {
+      let locale = translation[key]
+      if (locale.path === endpoint) {
+        match = true
+      }
+    }
+    return match
   }
 }
 

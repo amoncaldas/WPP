@@ -14,13 +14,19 @@ export default {
     Posts
   },
   created () {
-    this.currentSection = Section.getCurrentHomeSection()
-    this.listPostEndpoints = Section.getListingPosts()
-
     // emit the an event catch by root App component
     // telling it to update the page title
     this.eventBus.$emit('titleChanged', this.$store.getters.options.site_title)
+    this.loadData()
+
+    this.eventBus.$on('localeChanged', () => {
+      this.loadData()
+    })
   },
   methods: {
+    loadData () {
+      this.currentSection = Section.getCurrentHomeSection()
+      this.listPostEndpoints = Section.getListingPosts()
+    }
   }
 }
