@@ -36,26 +36,20 @@
 					<?php else : ?>
 						<p class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></p>
 					<?php endif;
-
-					$description = get_bloginfo( 'description', 'display' );
-					?>
-						<p class="site-description"><?php echo $description; ?></p>
-				</div><!-- .site-branding -->
-
-				<?php 
-					$locale = get_request_locale();
-					if ( has_nav_menu( "primary-menu-$locale")) : ?>
+					?><p class="site-description"><?php bloginfo( 'description', 'display' ); ?></p>
+				</div><!-- .site-branding -->			
 					<div id="site-header-menu" class="site-header-menu">						
 						<nav id="site-navigation" class="main-navigation" role="navigation">
 							<?php
+								$locale = get_request_locale();
 								wp_nav_menu( array(
-									'theme_location' => "primary-menu",
-									'menu_class'     => "primary-menu",
+									'theme_location' => "primary-menu-$locale",
+									'menu_class'     => "primary-menu-$locale",
 									) );
 							?>
 						</nav><!-- .main-navigation -->					
 					</div><!-- .site-header-menu -->
-				<?php endif; ?>
+				
 			</div><!-- .site-header-main -->
 		</header><!-- .site-header -->
 

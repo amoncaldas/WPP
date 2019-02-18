@@ -30,6 +30,9 @@
 
       $wpp_options = [];
       foreach ($all_options as $key => $value) {
+        if($key === "wpp_site_relative_logo_url")  {
+          $value = network_site_url(trim($value));
+        }
         if ( strpos($key, "wpp_meta_") === 0) {
           $clean_key =  $meta_property_name = str_replace("wpp_meta_", "", $key);
           $wpp_options[$clean_key] = $value;
