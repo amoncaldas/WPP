@@ -6,12 +6,18 @@ export default {
     return {
       drawer: true,
       clipped: false,
-      menuItems: []
+      menuData: []
     }
   },
   methods: {
     toggleSidebar () {
       this.$store.commit('setLeftSideBarIsOpen', !this.$store.getters.leftSideBarOpen)
+    },
+    loadData () {
+      let context = this
+      this.$store.dispatch('fetchMainMenu').then(() => {
+        context.menuData = context.$store.getters.mainMenu
+      })
     }
   },
   computed : {
@@ -22,16 +28,21 @@ export default {
     appTitle ()  {
       let title = this.$store.getters.options.site_title.trim()
       return title
+    },
+    menuItems () {
+      return this.menuData
     }
   },
   components: {
     LocaleChanger
   },
   created () {
-    this.$store.dispatch('fetchMainMenu').then(() => {
-      this.menuItems = this.$store.getters.mainMenu
-    })
 
+    this.loadData()
+
+    this.eventBus.$on('localeChanged', () => {
+      this.loadData()
+    })
     this.eventBus.$on('routeChanged', (routeParams) => {
       if (this.menuItems.length > 0) {
         menuManager.setMenuActiveStatus(this.menuItems, routeParams.to)

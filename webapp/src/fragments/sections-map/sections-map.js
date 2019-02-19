@@ -141,7 +141,7 @@ export default {
       })
     },
     markerInfoClick (section) {
-      this.$router.push(section.json.url)
+      this.$router.push(section.json.path)
     },
     adjustMap (data) {
       if (data.guid === this.boxGuid) {

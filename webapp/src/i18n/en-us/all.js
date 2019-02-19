@@ -9,8 +9,8 @@ export default {
     yes: 'Yes',
     no: 'No',
     ok: 'OK',
-    developedByIntro: 'Services developed by',
-    developedBy: 'The Heidelberg Institute for Geoinformation Technology',
+    developedByIntro: 'Developed by',
+    developedBy: 'CodigoCriativo',
     months: {
       january: 'January',
       february: 'February',

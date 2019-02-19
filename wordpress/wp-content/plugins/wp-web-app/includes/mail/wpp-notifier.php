@@ -73,7 +73,7 @@ class WppNotifier  {
 				'callback' => array($this, 'unsubscribe_for_notifications' ),
 			)
 		));
-		register_rest_route(WPP_API_NAMESPACE."/message", '/error', array(
+		register_rest_route(WPP_API_NAMESPACE."/message", '/report-error', array(
 			array(
 				'methods'  => "POST",
 				'callback' => array($this, 'report_error' ),

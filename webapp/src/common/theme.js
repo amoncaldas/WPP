@@ -1,6 +1,6 @@
 const theme = {
-  primary: '#C62828',
-  secondary: '#8e0000',
+  primary: '#678713',
+  secondary: '#276BB1',
   accent: '#ff5f52',
   error: '#f44336',
   warning: '#FFD54F',

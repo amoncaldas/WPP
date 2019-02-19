@@ -5,8 +5,16 @@ export default {
       drawer: true,
       right: false,
       fixed: false,
-      menuItems: [],
+      menuData: [],
       subMenuOpen: []
+    }
+  },
+  methods: {
+    loadData () {
+      let context = this
+      this.$store.dispatch('fetchMainMenu').then(() => {
+        context.menuData = context.$store.getters.mainMenu
+      })
     }
   },
   computed: {
@@ -17,11 +25,16 @@ export default {
       set (newValue) {
         this.$store.commit('setLeftSideBarIsOpen', newValue)
       }
+    },
+    menuItems () {
+      return this.menuData
     }
   },
   created () {
-    this.$store.dispatch('fetchMainMenu').then(() => {
-      this.menuItems = this.$store.getters.mainMenu
+    this.loadData()
+
+    this.eventBus.$on('localeChanged', () => {
+      this.loadData()
     })
   }
 }

@@ -1,9 +1,10 @@
-import MainMenu from '@/common/main-menu'
+import SiteMenu from '@/common/site-menu'
 import appConfig from '@/config'
 
 const state = {
   leftSideBarOpen: false,
   mainMenu: [],
+  secondaryMenu: [],
   locale: null
 }
 
@@ -13,6 +14,9 @@ const getters = {
   },
   mainMenu: state => {
     return state.mainMenu
+  },
+  secondaryMenu: state => {
+    return state.secondaryMenu
   },
   locale: state => {
     return state.locale
@@ -26,6 +30,9 @@ const mutations = {
   mainMenu: (state, items) => {
     state.mainMenu = items
   },
+  secondaryMenu: (state, items) => {
+    state.secondaryMenu = items
+  },
   locale: (state, locale) => {
     state.locale = locale
     localStorage.setItem('locale', locale)
@@ -35,11 +42,16 @@ const mutations = {
 const actions = {
   fetchMainMenu ({getters, commit}) {
     return new Promise((resolve) => {
-      if (getters.mainMenu.length > 0) {
-        resolve(getters.mainMenu)
-      }
-      MainMenu.loadItems().then((items) => {
+      SiteMenu.loadItems(appConfig.mainMenuSlug).then((items) => {
         commit('mainMenu', items)
+        resolve(items)
+      })
+    })
+  },
+  fetchSecondaryMenu ({getters, commit}) {
+    return new Promise((resolve) => {
+      SiteMenu.loadItems(appConfig.secondaryMenu).then((items) => {
+        commit('secondaryMenu', items)
         resolve(items)
       })
     })

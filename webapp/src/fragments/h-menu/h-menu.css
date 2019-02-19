@@ -1,32 +1,29 @@
 /* Customize the ORS header menu */
 
 .app-btn-mh {
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  text-transform: capitalize;
-  content: unset;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  text-transform: capitalize !important;
+  content: unset !important;
 }
 
-.app-btn-mh > .btn__content {
-  color: #828282;
-  font-size: 14px;
+.app-btn-mh > .v-btn__content {
   font-weight: 600;
+  font-size: 16px !important;
 }
 
 
-.app-hm-list .app-btn-mh .btn__content {
+.app-hm-list .app-btn-mh .v-btn__content {
   padding-left: 0px;
   text-align: left;
   display: block;
+  font-size: 16px !important;
 }
 
-.app-btn-mh > .btn__content:hover {
-  background-color: #fff !important
-}
-.app-btn-mh > .btn__content:before {
+.app-btn-mh > .v-btn__content:before {
  opacity: 0;
 }
 
-.ors-toolbar .app-btn-mh:hover > .btn__content:after, .ors-toolbar .app-btn-mh > .btn__content:hover:after, .ors-toolbar .app-btn-mh.active > .btn__content:after {
+.wpp-toolbar .app-btn-mh:hover > .v-btn__content:after, .wpp-toolbar .app-btn-mh > .v-btn__content:hover:after, .wpp-toolbar .app-btn-mh.active > .v-btn__content:after {
   position: absolute;
   bottom: 30px;
   left: 50%;
@@ -34,14 +31,13 @@
   width: 20px;
   height: 2px;
   margin-left: -10px;
-  background-color: #b5152b;
 }
 
-.ors-toolbar .app-btn-mh.has-icon:hover > .btn__content:after {
+.wpp-toolbar .app-btn-mh.has-icon:hover > .v-btn__content:after {
   background-color: transparent
 }
 
-.list__tile .app-btn-mh > .btn__content:hover:after {
+.list__tile .app-btn-mh > .v-btn__content:hover:after {
   position: absolute;
   bottom: 1px;
   left: 0;
@@ -49,7 +45,7 @@
   width: 20px;
   height: 2px;
   margin-left: 0px;
-  background-color: #b5152b;
+  background-color: #678713;
 }
 
 .hm-content {

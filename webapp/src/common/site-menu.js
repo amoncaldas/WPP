@@ -1,13 +1,15 @@
 import menuManager from '@/support/menu-manager'
 import appConfig from '@/config'
+import store from '@/store/store'
 
 /**
  * Load the primary menu by its slug defined app config
  * from remote server and then run the local customization over it
  */
-const loadItems = () => {
+const loadItems = (menuSlugPrefix) => {
   return new Promise((resolve, reject) => {
-    menuManager.getMenu(appConfig.mainMenuSlug).then((menu) => {
+    let menuSlug = menuSlugPrefix + store.getters.locale
+    menuManager.getMenu(menuSlug).then((menu) => {
       runCustomization(menu)
       resolve(menu)
     })
@@ -107,8 +109,8 @@ const setIcons = (items) => {
 /**
  * Return Main menu
  */
-const MainMenu = {
+const SiteMenu = {
   loadItems
 }
 
-export default MainMenu
+export default SiteMenu
