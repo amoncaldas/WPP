@@ -6,7 +6,7 @@
       <post :post-id="$route.params.postId" mode="single"></post>
     </v-flex>
     <v-flex md3>
-      <posts :key="postType.endpoint" v-for="postType in listPostEndpoints" :endpoint="postType.endpoint" :exclude="[$route.params.postId]" :title="postType.title"></posts>
+      <sections></sections>
     </v-flex>
   </v-layout>
 </v-container>

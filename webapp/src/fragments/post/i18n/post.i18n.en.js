@@ -1,5 +1,6 @@
 export default {
   post: {
-    readMore: 'Read more'
+    readMore: 'Read more',
+    related: 'Related content'
   }
 }

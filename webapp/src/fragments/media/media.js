@@ -44,7 +44,11 @@ export default {
   computed: {
     url () {
       if(this.mediaPost) {
-        return this.mediaPost.media_details.sizes[this.size].source_url
+        if (this.mediaPost.media_details.sizes[this.size]) {
+          return this.mediaPost.media_details.sizes[this.size].source_url
+        } else {
+          return this.mediaPost.media_details.sizes.full.source_url
+        }
       }
       return null
     },

@@ -1,18 +1,18 @@
 import Post from '@/fragments/post/Post'
 import Posts from '@/fragments/posts/Posts'
+import Sections from '@/fragments/sections/Sections'
 import Section from '@/support/section'
 
 export default {
   components: {
     Post,
-    Posts
+    Posts,
+    Sections
   },
   data: () => ({
-    listPostEndpoints: [],
     currentSection: null
   }),
   created () {
-    this.listPostEndpoints = Section.getListingPosts()
     this.currentSection = Section.getCurrentHomeSection()
   }
 }

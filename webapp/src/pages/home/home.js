@@ -6,7 +6,7 @@ export default {
   data: () => ({
     valid: false,
     activeTab: '0',
-    listPostEndpoints: [],
+    homePostYpes: [],
     currentSection: null
   }),
   components: {
@@ -22,11 +22,16 @@ export default {
       this.loadData()
     })
   },
+  computed: {
+    listingPosts () {
+      return this.homePostYpes
+    }
+  },
   methods: {
     loadData () {
       this.currentSection = Section.getCurrentHomeSection()
       this.$store.commit('currentSection', this.currentSection)
-      this.listPostEndpoints = Section.getListingPosts()
+      this.homePostYpes = Section.getListingPosts()
     }
   },
 

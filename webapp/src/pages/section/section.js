@@ -6,16 +6,23 @@ export default {
   data: () => ({
     valid: false,
     activeTab: '0',
-    listPostEndpoints: [],
+    homePostYpes: [],
     currentSection: null
   }),
   components: {
     PostMap,
     Posts
   },
+  computed: {
+    computed: {
+      listingPosts () {
+        return this.homePostYpes
+      }
+    },
+  },
   created () {
     this.currentSection = Section.getCurrentSection()
-    this.listPostEndpoints = Section.getListingPosts()
+    this.homePostYpes = Section.getListingPosts()
 
     // Emit the an event catch by root App component
     // telling it to update the page title

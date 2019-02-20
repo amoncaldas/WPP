@@ -2,6 +2,7 @@ import postService from '@/shared-services/post-service'
 import Media from '@/fragments/media/Media'
 
 export default {
+  name: 'post',
   created () {
     if (this.postData) {
       this.post = this.postData
@@ -51,11 +52,24 @@ export default {
         let media = this.post._embedded['wp:featuredmedia'][0]
         return media
       }
+    },
+    related () {
+      if (this.post && this.post.data && this.post.data.related && Array.isArray(this.post.data.related)) {
+        return this.post.data.related
+      }
+      return []
     }
   },
   methods: {
     excerpt () {
-      return this.post.content.rendered.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
+      let content = ''
+      if (this.post.content) {
+        content =  this.post.content.rendered
+      }
+      if (this.post.data && this.post.data.content) {
+        content =  this.post.data.content
+      }
+      return content.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
     },
     goToSingle () {
       this.$router.push(this.postData.link)
@@ -63,5 +77,8 @@ export default {
   },
   components: {
     Media
+  },
+  beforeCreate: function () {
+    this.$options.components.Posts = require('@/fragments/posts/Posts.vue').default
   }
 }

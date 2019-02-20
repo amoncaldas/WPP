@@ -44,6 +44,7 @@ const actions = {
           let section = sections[key]
           parser.href = section.link
           sections[key].path = parser.pathname
+          sections[key].data = sections[key].acf
         }
 
         commit('sections', sections)
