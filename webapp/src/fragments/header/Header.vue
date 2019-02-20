@@ -3,7 +3,7 @@
     <v-btn icon @click.stop="toggleSidebar" class="hidden-md-and-up">
       <v-icon>menu</v-icon>
     </v-btn>
-    <a href="/">
+    <a href="/#/">
       <img height="52.5" :src="logoUrl" :alt="appTitle" class="ml-3">
     </a>
     <v-spacer></v-spacer>

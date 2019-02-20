@@ -5,11 +5,10 @@
     </div>
     <div slot="content" v-if="posts">
       <template  >
-        <v-container grid-list-lg fluid >
+        <v-container style="padding:5px" grid-list-lg fluid >
           <v-layout row wrap>
             <v-flex  v-for="post in posts" v-bind="{['xs'+columnsPerPost]: true}"  :key="post.id">
               <post :key="post.id" :no-top-border="true" :post-data="post"></post>
-              <br :key="post.id + '_'"/>
             </v-flex>
           </v-layout>
         </v-container>

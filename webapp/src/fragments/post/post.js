@@ -1,5 +1,6 @@
 import postService from '@/shared-services/post-service'
 import Media from '@/fragments/media/Media'
+import PostMap from '@/fragments/post-map/PostMap'
 
 export default {
   name: 'post',
@@ -58,10 +59,12 @@ export default {
         return this.post.data.related
       }
       return []
-    }
-  },
-  methods: {
+    },
     excerpt () {
+      let content = this.content || ''
+      return content.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
+    },
+    content () {
       let content = ''
       if (this.post.content) {
         content =  this.post.content.rendered
@@ -69,14 +72,17 @@ export default {
       if (this.post.data && this.post.data.content) {
         content =  this.post.data.content
       }
-      return content.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
+      return content
     },
+  },
+  methods: {
     goToSingle () {
       this.$router.push(this.postData.link)
     }
   },
   components: {
-    Media
+    Media,
+    PostMap
   },
   beforeCreate: function () {
     this.$options.components.Posts = require('@/fragments/posts/Posts.vue').default
