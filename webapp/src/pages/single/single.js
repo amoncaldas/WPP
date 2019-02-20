@@ -9,10 +9,7 @@ export default {
     Posts,
     Sections
   },
-  data: () => ({
-    currentSection: null
-  }),
   created () {
-    this.currentSection = Section.getCurrentHomeSection()
+    this.currentSection = Section.getCurrentSection()
   }
 }

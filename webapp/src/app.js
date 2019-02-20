@@ -15,7 +15,7 @@ export default {
       }],
       miniVariant: false,
       fixed: false,
-      title: 'OSM dev dashboard',
+      title: 'WPP',
       showLoading: false
     }
   },

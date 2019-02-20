@@ -40,10 +40,11 @@ const actions = {
       httpApi.get(appConfig.baseWpApiPath + 'sections?_embed').then((response) => {
         var parser = document.createElement('a')
         let sections = response.data
+        var regex = new RegExp('/', 'g')
         for (let key in sections) {
           let section = sections[key]
           parser.href = section.link
-          sections[key].path = parser.pathname
+          sections[key].path = `/${parser.pathname.replace(regex, '')}`
           sections[key].data = sections[key].acf
         }
 

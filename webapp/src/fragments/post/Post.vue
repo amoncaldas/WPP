@@ -6,16 +6,17 @@
       <h3 v-else>{{post.title.rendered}}</h3>
     </div>
     <div slot="content">
-      <media v-if="post._embedded" :media="featuredMedia" :max-height="500" :contains="true"></media>
-      <media v-else-if="post.featured_media" :media-id="post.featured_media" :max-height="500" :contains="true"></media>
+      <media v-if="post._embedded" :media="featuredMedia" :max-height="mode === 'single'? 500 : 200"></media>
+      <media v-else-if="post.featured_media" :media-id="post.featured_media" :max-height="mode === 'single'? 500 : 200"></media>
       <br>
       <template v-if="mode === 'single'">
         <div v-html="content"></div>
         <post-map v-if="post.data && post.data.has_places" :post="post"></post-map>
       </template>
       <template v-else>
-         <p>{{excerpt}}</p>
-         <v-btn style="margin-left:0px" :href="post.path" flat>{{ $t('post.readMore')}}</v-btn>
+        <div v-if="explicitLocale"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>
+        <p>{{excerpt}}</p>
+        <v-btn style="margin-left:0px" :href="'/#'+post.path" :title="$t('post.readMore')" flat>{{ $t('post.readMore')}}</v-btn>
       </template>
     </div>
   </box>

@@ -17,8 +17,8 @@ const routes = {
           name: `${postTypeEndpointUrl}-Single`,
           component: Single,
           beforeEnter: (to, from, next) => {
-            let currentHomeSection = Section.getCurrentHomeSection()
-            store.commit('currentSection', currentHomeSection)
+            let currentSection = Section.getCurrentSection()
+            store.commit('currentSection', currentSection)
             store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
             next()
           }
@@ -30,8 +30,8 @@ const routes = {
           name: `${postTypeEndpointUrl}-SingleId`,
           component: Single,
           beforeEnter: (to, from, next) => {
-            let currentHomeSection = Section.getCurrentHomeSection()
-            store.commit('currentSection', currentHomeSection)
+            let currentSection = Section.getCurrentSection()
+            store.commit('currentSection', currentSection)
             store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
             next()
           }

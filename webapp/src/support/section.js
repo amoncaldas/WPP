@@ -25,12 +25,12 @@ const section = {
     return listPostEndpoints
   },
   getCurrentSection () {
-    if (store.getters.currentSection) {
+    let VueInstance = Main.getInstance()
+    if (!VueInstance) {
       return store.getters.currentSection
     } else {
-      let VueInstance = Main.getInstance()
       let currentSection = VueInstance.lodash.find(store.getters.sections, (section) => {
-        return section.link === VueInstance.$route.path && section.locale === store.getters.locale
+        return section.path === VueInstance.$route.path && (section.path !== '/' || section.locale === store.getters.locale)
       })
       return currentSection
     }
@@ -38,7 +38,7 @@ const section = {
   getCurrentHomeSection () {
     let VueInstance = Main.getInstance()
     let currentHomeSection = VueInstance.lodash.find(store.getters.sections, (section) => {
-      return section.link === '/' && section.locale === store.getters.locale
+      return section.path === '/' && section.locale === store.getters.locale
     })
     return currentHomeSection
   }

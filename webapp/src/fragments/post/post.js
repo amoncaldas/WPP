@@ -5,23 +5,14 @@ import PostMap from '@/fragments/post-map/PostMap'
 export default {
   name: 'post',
   created () {
-    if (this.postData) {
-      this.post = this.postData
-    } else {
-      let context = this
-      let endpoint = this.$store.getters.postTypeEndpoint
-      let endpointAppend = null
-      if (this.postId) {
-        endpointAppend = `${endpoint}/${this.postId}`
-      } else if (this.postName) {
-        endpointAppend = `${endpoint}?name=${this.postName}`
-      }
-      postService.get(endpointAppend).then((post) => {
-        context.post = post
-      }).catch(error => {
-        console.log(error)
-        context.showError(this.$t('post.thePostCouldNotBeLoaded'))
-      })
+    this.loadData()
+  },
+  watch: {
+    $route: function () {
+      this.post = null
+      setTimeout(() => {
+        this.loadData()
+      },100)
     }
   },
   props: {
@@ -40,7 +31,12 @@ export default {
     mode: {
       type: String,
       default: 'list'
-    }
+    },
+    explicitLocale: {
+      type: Boolean,
+      default: false
+    },
+
   },
   data () {
     return {
@@ -76,9 +72,26 @@ export default {
     },
   },
   methods: {
-    goToSingle () {
-      this.$router.push(this.postData.link)
-    }
+    loadData () {
+      if (this.postData) {
+        this.post = this.postData
+      } else {
+        let context = this
+        let endpoint = this.$store.getters.postTypeEndpoint
+        let endpointAppend = null
+        if (this.postId) {
+          endpointAppend = `${endpoint}/${this.postId}`
+        } else if (this.postName) {
+          endpointAppend = `${endpoint}?name=${this.postName}`
+        }
+        postService.get(endpointAppend).then((post) => {
+          context.post = post
+        }).catch(error => {
+          console.log(error)
+          context.showError(this.$t('post.thePostCouldNotBeLoaded'))
+        })
+      }
+    },
   },
   components: {
     Media,
