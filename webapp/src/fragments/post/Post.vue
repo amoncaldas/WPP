@@ -25,7 +25,7 @@
   <posts v-if="post && mode === 'single'"
     :columns-per-post="4" :exclude="[post.id]"
     :endpoint="$store.getters.postTypeEndpoint"
-    :include="related"
+    :include="related" :max="6"
     :title="$t('post.related')">
   </posts>
 </div>

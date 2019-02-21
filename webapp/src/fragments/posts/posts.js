@@ -27,6 +27,22 @@ export default {
     include: {
       type: Array,
       default: function () { return [] }
+    },
+    max: {
+      type: Number,
+      default: 10
+    },
+    page: {
+      type: Number,
+      default: 1
+    },
+    offset: {
+      type: Number,
+      default: 0
+    },
+    embed: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -41,17 +57,24 @@ export default {
   },
   methods: {
     loadPosts () {
-      let endpointAppend = `/${this.endpoint}?_embed=1`
-      if (this.exclude.length > 0) {
-        let exclude = this.exclude.join(',')
-        endpointAppend += `&exclude=${exclude}`
-      }
-      if (this.include.length > 0) {
-        let include = this.include.join(',')
-        endpointAppend += `&include=${include}`
+      let filters = {
+        page: this.page,
+        per_page: this.max,
+        offset: this.offset
       }
 
-      postService.query({}, endpointAppend).then((posts) => {
+      if (this.embed) {
+        filters._embed = 1
+      }
+
+      if (this.exclude.length > 0) {
+        filters.exclude = this.exclude.join(',')
+      }
+      if (this.include.length > 0) {
+        filters.include = this.include.join(',')
+      }
+
+      postService.query(filters, `/${this.endpoint}`).then((posts) => {
         this.posts = posts
       }).catch(error => {
         console.log(error)

@@ -103,16 +103,6 @@
 		// Apply the locale taxonomy filter to when running rest api requests
 		add_action( 'pre_get_posts', array($this, 'apply_locale_filter_get_posts') );
 
-		// Add a custom field for section
-		register_rest_field( SECTION_POST_TYPE, 'places',
-			array(
-				'get_callback'  => function ($post, $field_name, $request) {
-					return $this->resolve_places($post, $field_name, $request);
-				},
-				'schema' => null,
-			)
-		);
-
 		$public_post_types = get_post_types(array("public"=>true));
 		unset($public_post_types["attachment"]);
 
@@ -155,7 +145,7 @@
 	 */
 	public function apply_locale_filter_get_posts($query) {		
 		$public_post_types = get_post_types(array("public"=>true));
-		unset($public_post_types["attachments"]);
+		unset($public_post_types["attachment"]);
 		$post_type = $query->query["post_type"];
 		if ($post_type !== SECTION_POST_TYPE && in_array($post_type, $public_post_types)) {
 			$request_locale = get_request_locale();
@@ -171,12 +161,12 @@
 	}
 
 	/**
-	 * Add custom data to the wp/v2/users/<user-id> endpoint
+	 * Resolve the slide images gallery data based on the ids postmeta
 	 *
-	 * @param Wp_User $user
+	 * @param Array $post_arr
 	 * @param string $field_name
 	 * @param Object $request
-	 * @return array of metas to be added in the response
+	 * @return array of data
 	 */
 	public function resolve_places($post_arr, $field_name, $request) {
 		$place_ids = get_post_meta($post_arr["id"], "places", true);
@@ -703,8 +693,16 @@
 				$base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);	
 				$title = $title === "" ? $caption :  $title;
 
+				preg_match_all( '@src="([^"]+)"@' , $html, $match );
+				if (isset($match[0]) && isset($match[0][0])) {
+					$src = $match[0][0];
+					$src = str_replace("src=", "", $src);
+					$src = trim($src, '"');
+					$html = str_replace($src, $base64, $html);
+				}
+
 				// Set the new html out put for the image with base64 src			
-				$html = "<div id='post-$id media-$id' class='align$align'><img src='$base64' alt='$title' width='$src_data[1]' height='$src_data[2]' /></div>";
+				// $html = "<div id='post-$id media-$id' class='align$align'><img src='$base64' alt='$title' width='$src_data[1]' height='$src_data[2]' /></div>";
 				return $html;
 			}
 			return $html;

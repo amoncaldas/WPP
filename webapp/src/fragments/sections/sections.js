@@ -14,6 +14,14 @@ export default {
     columnsPerSection: {
       type: Number,
       default: 12
+    },
+    max: {
+      type: Number,
+      default: 10
+    },
+    random: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -30,8 +38,14 @@ export default {
     loadSections () {
       let context = this
        let sections = this.lodash.filter(this.$store.getters.sections, (s)=> {
-        return s.path !== '/' && context.$store.getters.currentSection.id !== s.id && s.locale === context.$store.getters.locale
+        return s.path !== '/'
        })
+       if (this.max !== -1) {
+        sections = sections.slice(0, this.max)
+       }
+       if (this.random) {
+        sections = this.lodash.shuffle(sections)
+       }
        this.sections = sections
     }
   },

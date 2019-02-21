@@ -6,7 +6,7 @@
       <post :post-id="$route.params.postId" mode="single"></post>
     </v-flex>
     <v-flex md3>
-      <sections></sections>
+      <sections :random="true"></sections>
     </v-flex>
   </v-layout>
 </v-container>

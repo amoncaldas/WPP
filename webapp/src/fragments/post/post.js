@@ -58,7 +58,8 @@ export default {
     },
     excerpt () {
       let content = this.content || ''
-      return content.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
+      let subContent = content.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
+      return subContent.length > 0 ? `${subContent} [...]` : subContent
     },
     content () {
       let content = ''

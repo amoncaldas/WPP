@@ -1,5 +1,6 @@
 import SectionsMap from '@/fragments/sections-map/SectionsMap'
 import Posts from '@/fragments/posts/Posts'
+import Slider from '@/fragments/slider/Slider'
 import Section from '@/support/section'
 
 export default {
@@ -11,7 +12,8 @@ export default {
   }),
   components: {
     SectionsMap,
-    Posts
+    Posts,
+    Slider
   },
   created () {
     // emit the an event catch by root App component
