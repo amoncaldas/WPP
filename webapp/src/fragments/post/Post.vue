@@ -12,6 +12,11 @@
       <template v-if="mode === 'single'">
         <div v-html="content"></div>
         <post-map v-if="post.data && post.data.has_places" :post="post"></post-map>
+        <br>
+        <box v-if="post.data.medias" background="white" :no-top-border="noTopBorder">
+          <div slot="header">Gallery</div>
+          <gallery :medias="post.data.medias" ></gallery>
+        </box>
       </template>
       <template v-else>
         <div v-if="explicitLocale"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>
@@ -31,3 +36,4 @@
 </div>
 </template>
 <script src="./post.js"></script>
+<style scoped src="./post.css"></style>

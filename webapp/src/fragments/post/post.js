@@ -1,6 +1,7 @@
 import postService from '@/shared-services/post-service'
 import Media from '@/fragments/media/Media'
 import PostMap from '@/fragments/post-map/PostMap'
+import Gallery from '@/fragments/gallery/Gallery'
 
 export default {
   name: 'post',
@@ -12,7 +13,7 @@ export default {
       this.post = null
       setTimeout(() => {
         this.loadData()
-      },100)
+      }, 100)
     }
   },
   props: {
@@ -35,12 +36,12 @@ export default {
     explicitLocale: {
       type: Boolean,
       default: false
-    },
-
+    }
   },
   data () {
     return {
-      post: null
+      post: null,
+      galleryImageIndex: null
     }
   },
   computed: {
@@ -64,13 +65,13 @@ export default {
     content () {
       let content = ''
       if (this.post.content) {
-        content =  this.post.content.rendered
+        content = this.post.content.rendered
       }
       if (this.post.data && this.post.data.content) {
-        content =  this.post.data.content
+        content = this.post.data.content
       }
       return content
-    },
+    }
   },
   methods: {
     loadData () {
@@ -92,11 +93,12 @@ export default {
           context.showError(this.$t('post.thePostCouldNotBeLoaded'))
         })
       }
-    },
+    }
   },
   components: {
     Media,
-    PostMap
+    PostMap,
+    Gallery
   },
   beforeCreate: function () {
     this.$options.components.Posts = require('@/fragments/posts/Posts.vue').default

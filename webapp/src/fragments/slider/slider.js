@@ -28,17 +28,14 @@ export default {
   },
 
   data: () => ({
-      fluxOptions: {
-        autoplay: true,
-        indKeys: true,
-				fullscreen: true
-      },
-      fluxTransitions: {
-        transitionBook: Transitions.transitionKenburn
-        // see: https://deulos.github.io/vue-flux/
-      }
-  }),
-  created () {
-    console.log('created flux')
-  }
+    fluxOptions: {
+      autoplay: true,
+      indKeys: true,
+      fullscreen: false
+    },
+    fluxTransitions: {
+      transitionBook: Transitions.transitionKenburn
+      // see: https://deulos.github.io/vue-flux/
+    }
+  })
 }
