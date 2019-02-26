@@ -1,6 +1,8 @@
 export default {
   post: {
-    readMore: 'Leia mais',
-    related: 'Conteúdo relacionado'
+    readMore: 'Veja mais',
+    related: 'Conteúdo relacionado',
+    thePostCouldNotBeLoaded: 'O conteúdo não pode ser carregado',
+    contentLanguage: 'Idioma'
   }
 }

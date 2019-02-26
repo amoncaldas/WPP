@@ -20,6 +20,9 @@ export default {
 
     sectorService.query().then((sectors) => {
       this.sectors = sectors
+      if(sectors.raw && sectors.data) {
+        this.sectors = sectors.data
+      }
     })
     if (this.userId) {
       this.mode = 'edit'

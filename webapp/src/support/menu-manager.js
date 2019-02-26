@@ -16,6 +16,9 @@ const getMenu = (slug) => {
   return new Promise((resolve, reject) => {
     menuService.query()
     .then(resources => {
+      if (resources.raw && resources.data) {
+        resources = resources.data
+      }
       let menuBySlug = Vue.lodash.find(resources, (menu) => {
         return menu.slug === slug
       })

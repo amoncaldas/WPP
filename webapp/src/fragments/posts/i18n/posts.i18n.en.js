@@ -1,5 +1,6 @@
 export default {
   posts: {
-    title: 'Posts'
+    title: 'Posts',
+    thePostListCouldNotBeLoaded: 'The list of contents could not be loaded'
   }
 }

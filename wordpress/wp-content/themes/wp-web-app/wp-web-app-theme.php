@@ -29,7 +29,7 @@
 		add_action('rest_api_init', array($this, 'on_rest_api_init'));
 		add_filter('image_send_to_editor', array($this, 'set_image_before_send_to_editor'), 10, 6 );		
 
-		// Customize permalink
+		// Customize permalinks
 		add_filter('post_type_link', array($this, 'set_post_permalink'), 10, 2);
 		add_filter('preview_post_link', array($this, 'set_post_preview_permalink'), 10, 2);
 		add_filter('page_link', array($this, 'set_page_permalink'), 10, 2);
@@ -95,7 +95,7 @@
 	}
 
 	/**
-	 * Register user meta data to get and update callbacks user wp rest api
+	 * Register rest api hooks to treat locale and resolve custom data
 	 *
 	 * @return void
 	 */
@@ -124,10 +124,15 @@
 					'schema' => null,
 				)
 			);
-		}
-	
+		}	
 	}
 
+	/**
+	 * Attach post locale slug to post object
+	 *
+	 * @param Array $post
+	 * @return String - locale slug
+	 */
 	public function attach_post_locale ($post) {
 		$terms = get_the_terms( $post["id"], LOCALE_TAXONOMY_SLUG );
 		if ( !empty( $terms ) ){

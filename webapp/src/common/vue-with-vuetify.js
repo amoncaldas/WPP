@@ -32,7 +32,8 @@ import {
   VChip,
   VSwitch,
   VAlert,
-  VImg
+  VImg,
+  VPagination
 } from 'vuetify'
 
 Vue.use(Vuetify, {
@@ -66,7 +67,8 @@ Vue.use(Vuetify, {
     VChip,
     VSwitch,
     VAlert,
-    VImg
+    VImg,
+    VPagination
   }
 })
 

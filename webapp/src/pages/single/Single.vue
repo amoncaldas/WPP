@@ -1,6 +1,6 @@
 <template>
 <v-container grid-list-lg fluid >
-  <br>
+  <br><br>
   <v-layout row wrap>
     <v-flex md9 >
       <post :post-id="$route.params.postId" mode="single"></post>

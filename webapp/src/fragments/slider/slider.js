@@ -19,10 +19,16 @@ export default {
   computed: {
     fluxCaptions () {
       let titles = this.lodash.map(this.contents, 'title')
+      titles = titles.concat(titles)
+      titles = titles.concat(titles)
+      titles = titles.concat(titles)
       return titles
     },
     fluxImages () {
       let urls = this.lodash.map(this.contents, 'url')
+      urls = urls.concat(urls)
+      urls = urls.concat(urls)
+      urls = urls.concat(urls)
       return urls
     }
   },
@@ -38,7 +44,12 @@ export default {
         // see: https://deulos.github.io/vue-flux/
       }
   }),
-  created () {
-    console.log('created flux')
+  mounted () {
+    let context = this
+    setTimeout(() => {
+      let clickEvent = new Event('click');
+      clickEvent.index = null
+      context.$refs.fluxIndex.click(clickEvent, {index:null})
+    },200)
   }
 }

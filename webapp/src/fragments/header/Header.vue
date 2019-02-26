@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar dark color="primary" height="65" class="wpp-toolbar app-toolbar" app :clipped-left="clipped">
+  <v-toolbar dark color="dark" height="65" class="wpp-toolbar app-toolbar" app :clipped-left="clipped">
     <v-btn icon @click.stop="toggleSidebar" class="hidden-md-and-up">
       <v-icon>menu</v-icon>
     </v-btn>

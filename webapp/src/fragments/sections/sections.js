@@ -26,7 +26,9 @@ export default {
   },
   data () {
     return {
-      sections: []
+      sections: [],
+      total: null,
+      totalPages: null
     }
   },
   computed: {
@@ -36,17 +38,15 @@ export default {
   },
   methods: {
     loadSections () {
-      let context = this
        let sections = this.lodash.filter(this.$store.getters.sections, (s)=> {
         return s.path !== '/'
        })
        if (this.max !== -1) {
-        sections = sections.slice(0, this.max)
+        this.sections = sections.slice(0, this.max)
        }
        if (this.random) {
-        sections = this.lodash.shuffle(sections)
+        this.sections = this.lodash.shuffle(sections)
        }
-       this.sections = sections
     }
   },
   components: {

@@ -1,6 +1,8 @@
 export default {
   post: {
-    readMore: 'Read more',
-    related: 'Related content'
+    readMore: 'See more',
+    related: 'Related content',
+    thePostCouldNotBeLoaded: 'The content couldnot be loaded',
+    contentLanguage: 'Language'
   }
 }

@@ -139,6 +139,9 @@ class CRUD {
         // you can skip this by defining the `raw` attribute equal true in the model service
         // @see @/core/model-service and @/core/model to read more
         context.modelService.query(filters).then((resources) => {
+          if (resources.raw && resources.data) {
+            resources = resources.data
+          }
           // Each returned resource, will be, by default an Model (@core/model) instance, that supports instance methods, like $save, $destroy etc
           context.vm.resources = resources
 

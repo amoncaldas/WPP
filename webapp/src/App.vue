@@ -1,6 +1,6 @@
 <template>
   <v-app >
-    <v-progress-linear :indeterminate="true" :class="{'progress-linear-disabled': !showLoading}"></v-progress-linear>
+    <v-progress-linear color="neutral" class="progress-linear" :indeterminate="true" :class="{'progress-linear-disabled': !showLoading}"></v-progress-linear>
     <app-toaster></app-toaster>
     <app-header></app-header>
     <v-content class="main-container">

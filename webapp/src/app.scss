@@ -12,8 +12,13 @@
   padding-top: 0px !important;
 }
 
+.progress-linear {
+  z-index:5;
+  padding-top: 0px;
+}
+
 /* Hide the app default global progress when it is disabled */
-.progress-linear-disabled div.primary {
+.progress-linear-disabled {
   display: none;
 }
 

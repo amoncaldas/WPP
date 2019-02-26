@@ -59,9 +59,12 @@ const oAuthConfig = {
 const oauthViaPopUp = (context, provider) => {
   return new Promise((resolve, reject) => {
     // get the social oauth config data from back-end, provided by the `ors-oauth` plugin
-    socialOauthData.query().then((data) => {
+    socialOauthData.query().then((response) => {
+      if (response.raw && response.data) {
+        response = response.data
+      }
       // set the provider client id retrieved from the back-end
-      oAuthConfig.providers[provider].clientId = data[provider].clientId
+      oAuthConfig.providers[provider].clientId = response[provider].clientId
 
       // runs the VueAuthenticate authenticate method
       context.$auth.authenticate(provider).then((response) => {
@@ -85,11 +88,14 @@ const oauthViaRedirect = (provider, action) => {
   localStorage.clear()
 
   // get the social oauth config data from back-end, provided by the `ors-oauth` plugin
-  socialOauthData.query().then((data) => {
+  socialOauthData.query().then((response) => {
+    if (response.raw) {
+      response = response.data
+    }
     store.commit('socialOauthAction', action)
     // set the provider client id retrieved from the back-end
     store.commit('socialOauthProvider', provider)
-    oAuthConfig.providers[provider].clientId = data[provider].clientId
+    oAuthConfig.providers[provider].clientId = response[provider].clientId
     let provConf = oAuthConfig.providers[provider]
     let oauthLocation = provConf.getOauthUrl()
 

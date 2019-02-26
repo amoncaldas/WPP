@@ -1,6 +1,7 @@
 import postService from '@/shared-services/post-service'
 import Media from '@/fragments/media/Media'
 import PostMap from '@/fragments/post-map/PostMap'
+import Slider from '@/fragments/slider/Slider'
 
 export default {
   name: 'post',
@@ -32,11 +33,6 @@ export default {
       type: String,
       default: 'list'
     },
-    explicitLocale: {
-      type: Boolean,
-      default: false
-    },
-
   },
   data () {
     return {
@@ -96,7 +92,8 @@ export default {
   },
   components: {
     Media,
-    PostMap
+    PostMap,
+    Slider
   },
   beforeCreate: function () {
     this.$options.components.Posts = require('@/fragments/posts/Posts.vue').default

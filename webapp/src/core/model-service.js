@@ -76,7 +76,8 @@ function ModelService (endPoint, resourceName, options) {
         }
         // if the raw option is defined, skip the transformation to Model and resolve the promise
         if (options.raw === true) {
-          resolve(response.data)
+          response.raw = true
+          resolve(response)
         } else {
           // transform each resource returned in a active record Model
           // @see @/core/model to read more
@@ -135,6 +136,7 @@ function ModelService (endPoint, resourceName, options) {
           if (typeof response.data === 'object') {
             response.data.httpStatusCode = response.status
           }
+          response.raw = true
           resolve(response.data)
         } else {
           // transform each resource returned in a active record Model
@@ -177,6 +179,7 @@ function ModelService (endPoint, resourceName, options) {
         }
 
         if (options.raw === true) {
+          response.raw = true
           resolve(response.data)
         } else {
           // transform the resource returned in a active record Model

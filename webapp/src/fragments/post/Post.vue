@@ -1,6 +1,6 @@
 <template>
 <div>
-  <box background="white" :no-top-border="noTopBorder" v-if="post">
+  <box class="post" background="white" :no-top-border="noTopBorder" v-if="post">
     <div slot="header">
       <a v-bind:href="post.path" :style="{color:theme.dark}" v-if="mode === 'list'" style="margin-left:0px; text-decoration:none" ><h3>{{post.title.rendered}}</h3></a>
       <h3 v-else>{{post.title.rendered}}</h3>
@@ -12,22 +12,25 @@
       <template v-if="mode === 'single'">
         <div v-html="content"></div>
         <post-map v-if="post.data && post.data.has_places" :post="post"></post-map>
+        <br>
+        <slider v-if="post.data.gallery" :contents="post.data.gallery"></slider>
       </template>
       <template v-else>
-        <div v-if="explicitLocale"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>
+        <div class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': theme.accent}"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>
         <p>{{excerpt}}</p>
         <v-btn style="margin-left:0px" :href="'/#'+post.path" :title="$t('post.readMore')" flat>{{ $t('post.readMore')}}</v-btn>
       </template>
     </div>
   </box>
-  <br>
-  <br>
-  <posts v-if="post && mode === 'single'"
-    :columns-per-post="4" :exclude="[post.id]"
-    :endpoint="$store.getters.postTypeEndpoint"
-    :include="related" :max="6"
-    :title="$t('post.related')">
-  </posts>
+  <template v-if="post && mode === 'single'">
+    <br><br>
+    <posts :columns-per-post="4" :exclude="[post.id]"
+      :endpoint="$store.getters.postTypeEndpoint"
+      :include="related" :max="6"
+      :title="$t('post.related')">
+    </posts>
+  </template>
 </div>
 </template>
+<style scoped src="./post.css"></style>
 <script src="./post.js"></script>
