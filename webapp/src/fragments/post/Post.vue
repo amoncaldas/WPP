@@ -13,7 +13,10 @@
         <div v-html="content"></div>
         <post-map v-if="post.data && post.data.has_places" :post="post"></post-map>
         <br>
-        <slider v-if="post.data.gallery" :contents="post.data.gallery"></slider>
+        <box v-if="post.data.medias" background="white" :no-top-border="noTopBorder">
+          <div slot="header">Gallery</div>
+          <gallery :medias="post.data.medias" ></gallery>
+        </box>
       </template>
       <template v-else>
         <div class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': theme.accent}"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>
@@ -34,3 +37,4 @@
 </template>
 <style scoped src="./post.css"></style>
 <script src="./post.js"></script>
+<style scoped src="./post.css"></style>

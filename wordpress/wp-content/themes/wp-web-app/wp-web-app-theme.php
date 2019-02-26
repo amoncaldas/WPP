@@ -13,6 +13,9 @@
 	
 
 	public function __construct () {
+		if (!defined('WPP_API_NAMESPACE')) {
+			define('WPP_API_NAMESPACE', "wpp/v1");
+		}
 		$this->register_hooks();
 	}
 
@@ -34,6 +37,7 @@
 		add_filter('preview_post_link', array($this, 'set_post_preview_permalink'), 10, 2);
 		add_filter('page_link', array($this, 'set_page_permalink'), 10, 2);
 		add_filter('preview_page_link', array($this, 'set_page_preview_permalink'), 10, 2);
+		
 	}
 
 	/**
@@ -124,8 +128,81 @@
 					'schema' => null,
 				)
 			);
-		}	
+		}
+		
+		register_rest_route(WPP_API_NAMESPACE."/content", '/all-types', array(
+			array(
+				'methods'  => "GET",
+				'callback' => array($this, 'get_from_all_post_types' ),
+			)
+		));
 	}
+
+	/**
+	 * Get the posts from all post ypes
+	 *
+	 * @param [type] $request
+	 * @return WP_REST_Response
+	 */
+	function get_from_all_post_types( $request ) {
+    // Initialize the array that will receive the posts' data. 
+    $posts_data = array();
+    // Receive and set the page parameter from the $request for pagination purposes
+    $paged = $request->get_param( 'page' );
+		$paged = (isset($paged) && !empty($paged)) ? $paged : 1;
+		
+		// Receive and set the per_page parameter from the $request for pagination purposes
+		$per_page = $request->get_param( 'per_page' );
+		$per_page = (isset($per_page) && !empty($per_page)) ? $per_page : 10; 
+
+		$public_post_types = get_post_types(array("public"=>true));
+		unset($public_post_types["attachment"]);
+
+		$args = array(
+			'paged' => $paged,
+			'posts_per_page' => $per_page,            
+			'post_type' => array($public_post_types)
+		);
+
+		// Receive and set the exclude parameter from the $request
+		$exclude = $request->get_param( 'exclude' );
+		$exclude = (isset($exclude) && !empty($exclude)) ? $exclude : null;
+		if (!is_array($exclude) && isset($include)) {
+			$exclude = explode(",", $exclude);
+		}
+
+		// Receive and set the exclude parameter from the $request
+		$include = $request->get_param( 'include' );
+		$include = (isset($include) && !empty($include)) ? $include : null;
+		if (!is_array($include) && isset($include)) {
+			$include = explode(",", $include);
+		}
+
+		if (isset($include)) {
+			$args["post__in"] = $include;
+		}
+
+		if (isset($exclude)) {
+			$args["post__not_in"] = $exclude;
+		}
+
+    // Get the posts using the public post types
+		$posts = get_posts($args); 
+
+    // Loop through the posts and push the desired data to the array we've initialized earlier in the form of an object
+    foreach( $posts as $post ) {
+        $id = $post->ID; 
+        $post_thumbnail = ( has_post_thumbnail( $id ) ) ? get_the_post_thumbnail_url( $id ) : null;
+				$post["featured_img_src"] = $post_thumbnail;
+    }                  
+		$response =  new WP_REST_Response($posts_data, 200); // OK
+		
+		// TODO: resolve total
+		$response->header("X-WP-Total", 10);
+		// TODO: resolve total pages
+		$response->header("X-WP-TotalPages", 10);
+		return $response;
+} 
 
 	/**
 	 * Attach post locale slug to post object

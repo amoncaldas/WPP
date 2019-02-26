@@ -244,6 +244,28 @@ function allow_cors() {
 }
 
 /**
+ * Set custom logo in login screen from wpp sitel logo option
+ *
+ * @return void
+ */
+function wpp_login_logo() { 
+	$og_image_url = network_site_url(trim(get_option("wpp_site_relative_logo_url")));
+	$login_style =  "
+		<style type='text/css'>
+			#login h1 a, .login h1 a {
+				background-image: url($og_image_url);
+				width: 220px;
+				background-size: 250px;
+				background-repeat: no-repeat;
+				padding-bottom: 30px;
+				min-height: 220px;
+			}
+		</style>";
+		echo $login_style;
+}
+
+
+/**
  * After init run custom functions
  *
  * @return void
@@ -257,6 +279,7 @@ function after_init() {
 	add_language_admin_menu();
 	add_theme_support( 'menus' );
 	add_theme_support( 'post-thumbnails');
+	add_action( 'login_head', 'wpp_login_logo' );	
 }
 
 add_action('init', 'after_init', 10);
