@@ -2,8 +2,8 @@
 <div>
   <box class="post" background="white" :no-top-border="noTopBorder" v-if="post">
     <div slot="header">
-      <a v-bind:href="post.path" :style="{color:theme.dark}" v-if="mode === 'list'" style="margin-left:0px; text-decoration:none" ><h3>{{post.title.rendered}}</h3></a>
-      <h3 v-else>{{post.title.rendered}}</h3>
+      <a v-bind:href="post.path" :style="{color:theme.dark}" v-if="mode === 'list'" style="margin-left:0px; text-decoration:none" ><h3>{{title}}</h3></a>
+      <h3 v-else>{{title}}</h3>
     </div>
     <div slot="content">
       <media v-if="post._embedded" :media="featuredMedia" :max-height="mode === 'single'? 500 : 200"></media>
@@ -27,11 +27,7 @@
   </box>
   <template v-if="post && mode === 'single'">
     <br><br>
-    <posts :columns-per-post="4" :exclude="[post.id]"
-      :endpoint="$store.getters.postTypeEndpoint"
-      :include="related" :max="6"
-      :title="$t('post.related')">
-    </posts>
+    <related :columns-per-post="4" :content-id="post.id" :max="6"> </related>
   </template>
 </div>
 </template>

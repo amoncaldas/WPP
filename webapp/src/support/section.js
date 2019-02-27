@@ -29,8 +29,10 @@ const section = {
     if (!VueInstance) {
       return store.getters.currentSection
     } else {
+      var regex = new RegExp('/', 'g')
       let currentSection = VueInstance.lodash.find(store.getters.sections, (section) => {
-        return section.path === VueInstance.$route.path && (section.path !== '/' || section.locale === store.getters.locale)
+        let currentPath = `/${VueInstance.$route.path.replace(regex, '')}`
+        return section.path === currentPath && (section.path !== '/' || section.locale === store.getters.locale)
       })
       return currentSection
     }

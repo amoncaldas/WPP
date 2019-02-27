@@ -16,39 +16,6 @@ class WppOauthApi {
 	}
 
 	/**
-	 * Github client ids
-	 *
-	 * @var string
-	 */
-	protected $ghClientIds = [
-		"dev" => 'bac0172a938adda77c3e',
-		"staging" => '55a0a8aa4caceab8faf8',
-		"prod"=> 'fcfe0d9a52baf824cdcd'
-	];
-
-	/**
-	 * Github client secrets
-	 *
-	 * @var string
-	 */
-	protected $ghClientSecrets = [
-		"dev" => '555d422ce0b177eceed2a4c242109bcddb5d874b',
-		"staging" => '46c159393e6da57e75fd23f0f1c199055546b299',
-		"prod"=> '17926513767b9ba42e37c50ec508bef599a2d654'
-	];
-
-	/**
-	 * Env hosts
-	 *
-	 * @var string
-	 */
-	protected $envHosts = [
-		"dev"=> 'localhost',
-		"staging" => '129.206.7.40',
-		"prod"=> 'openrouteservice.org'
-	];
-
-	/**
 	 * Github api base url
 	 *
 	 * @var string
@@ -72,40 +39,30 @@ class WppOauthApi {
         return WPP_API_NAMESPACE.'/oauth';
 	}
 	
-	 /**
-     * the ProfilePress form id used
-     *
-     * @return void
-     */
-    private static function getSignFormId() {
-        return 15;
-    }
-
-
-    /**
-     * Register ORS oauth routes for WP API v2.
-     *
-     * @since  1.2.0
-     */
-    public function register_routes() {
-        register_rest_route( self::get_plugin_namespace(), '/github/login', array(
-            array(
-                'methods'  => 'POST',
-                'callback' => array( $this, 'processGitHubOauthLogIn' ),
-            )
-		) );
-		register_rest_route( self::get_plugin_namespace(), '/github/signup', array(
-            array(
-                'methods'  => 'POST',
-                'callback' => array( $this, 'processGitHubOauthSignUp' ),
-            )
-		) );
-		register_rest_route( self::get_plugin_namespace(), '/social-client-data', array(
-            array(
-                'methods'  => 'GET',
-                'callback' => array( $this, 'socialClientData' ),
-            )
-        ) );
+	/**
+	 * Register ORS oauth routes for WP API v2.
+	 *
+	 * @since  1.2.0
+	 */
+	public function register_routes() {
+			register_rest_route( self::get_plugin_namespace(), '/github/login', array(
+					array(
+							'methods'  => 'POST',
+							'callback' => array( $this, 'processGitHubOauthLogIn' ),
+					)
+	) );
+	register_rest_route( self::get_plugin_namespace(), '/github/signup', array(
+					array(
+							'methods'  => 'POST',
+							'callback' => array( $this, 'processGitHubOauthSignUp' ),
+					)
+	) );
+	register_rest_route( self::get_plugin_namespace(), '/social-client-data', array(
+					array(
+							'methods'  => 'GET',
+							'callback' => array( $this, 'socialClientData' ),
+					)
+			) );
 	}
 
 	/**
@@ -322,65 +279,27 @@ class WppOauthApi {
 	 * @return WP_User|string user object or the error message
 	 */
 	private function createWPUser($gh_user) {
-        try {
+		try {
 			$email = $this->getGhUserEmail($gh_user);
 			$pass = uniqid();
-            $userData = array(
-                'reg_username' => $email,
-                'reg_password' => $pass,
-                "reg_password2" => $pass,
-                "reg_password_present" => "true",            
-                'reg_email' => $email,
-                'reg_email2' => $email,
-                'reg_website' => null,
-                'reg_nickname' => "",
-                'reg_display_name' => $gh_user->login,
-                'reg_first_name' => $gh_user->login,
-                'reg_last_name' => null,
-                'reg_bio' => "",
-                'reg_select_role' => null
-			);
-
-			// Disable new User Notification for registration via github
-			add_filter( 'pp_new_user_notification', '__return_false' );
-
-			$sigUpFormId = self::getSignFormId();
-
-            // It is assumed that the ProfilePress plugin is installed and loaded
-            $response = ProfilePress_Registration_Auth::register_new_user($userData, $sigUpFormId, [], null, false);
-
-            $wp_user = get_user_by('email', $userData['reg_email']);
+			wp_create_user( $email, $pass, $email );
+			$wp_user = get_user_by('email', $email);
 
 			if ($wp_user) { // USER WAS CREATED
-				
-				// Add custom ProfilePress expected meta key to define that the user was created via github
-				update_user_meta($wp_user->ID, '_pp_signup_via', 'github');
-					
-
-				// Set user as verified, because we don't need to wait e-mail confirmation
-				// update_user_meta($wp_user->ID, 'pp_email_verified', "true" );
-				PP_User_Email_Confirmation_Addon::confirm_user_email($wp_user->ID);
-				$wp_user->data->emailVerified = true;
-				
-                // Add the user to the news letter list, if s/he has selected this option on the form
-				// It is assumed that the PP_Mailchimp plugin is installed and loaded
-				if (isset($userData['reg_email'])) {
-					$mailChimp = new PP_Mailchimp_Addon();
-					$mailChimp->add_to_list($userData['reg_email'], $userData['reg_first_name'], $userData['reg_last_name']);
-				}
-                
-                return $wp_user;
-            }
-            // In the case that the expected registered user was not found
-            // we return the reason why it was not registered
-            // Unfortunately the ProfilePress_Registration_Auth returns and html with the reason, so we strip it
-            $reason = strip_tags($response);
-            return $reason;
-        }
-        catch (Exception $e) {                
-            $reason = $e->getMessage();
-            return $reason;            
-        }
+				update_user_meta($wp_user->ID, '_signedup_via', 'github');
+				wp_new_user_notification($wp_user->ID);
+				$wp_user->data->emailVerified = true;								
+				return $wp_user;
+			}
+			// In the case that the expected registered user was not found
+			// we return the reason why it was not registered
+			$reason = strip_tags($response);
+			return $reason;
+		}
+		catch (Exception $e) {                
+			$reason = $e->getMessage();
+			return $reason;            
+		}
 	}
 	
 	/**
@@ -425,16 +344,10 @@ class WppOauthApi {
 	 * @return string client Id
 	 */
 	protected function getGitHubClientId() {
-		$socialOptions = get_option("pp_social_login");
+		$git_hub_client_id = get_option("wpp_git_hub_client_id");
 
-		if (isset($socialOptions["github_client_id"])) {
-			return $socialOptions["github_client_id"];
-		} else {
-			foreach ($this->envHosts as $key => $value) {
-				if ($value === $_SERVER["SERVER_NAME"]) {
-					return $this->ghClientIds[$key];
-				}
-			}
+		if (isset($git_hub_client_id)) {
+			return $git_hub_client_id;
 		}
 	}
 
@@ -444,18 +357,10 @@ class WppOauthApi {
 	 * @return string client secret
 	 */
 	protected function getGitHubClientSecret() {
-		// We stopped using the github credentials as ProfilePress social login
-		// because they use different callback urls
-		$socialOptions = get_option("pp_social_login");
+		$git_hub_client_secret = get_option("wpp_git_hub_client_secret");
 
-		if (isset($socialOptions["github_client_secret"])) {
-			return $socialOptions["github_client_secret"];
-		} else {
-			foreach ($this->envHosts as $key => $value) {
-				if ($value === $_SERVER["SERVER_NAME"]) {
-					return $this->ghClientSecrets[$key];
-				}
-			}
+		if (isset($git_hub_client_secret)) {
+			return $git_hub_client_secret;
 		}
 	}
 }

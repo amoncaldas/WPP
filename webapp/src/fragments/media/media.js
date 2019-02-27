@@ -53,9 +53,10 @@ export default {
       return null
     },
     title () {
-      if (this.mediaPost) {
+      if (this.mediaPost && this.mediaPost.title && this.mediaPost.title.rendered) {
         return this.mediaPost.title.rendered
       }
-    }
+      return this.mediaPost.post_title
+    },
   },
 }

@@ -57,6 +57,12 @@ export default {
       }
       return []
     },
+    title () {
+      if (this.post.title && this.post.title.rendered) {
+        return this.post.title.rendered
+      }
+      return this.post.post_title
+    },
     excerpt () {
       let content = this.content || ''
       let subContent = content.replace(/<(?:.|\n)*?>/gm, '').substring(0, 300)
@@ -101,6 +107,6 @@ export default {
     Gallery
   },
   beforeCreate: function () {
-    this.$options.components.Posts = require('@/fragments/posts/Posts.vue').default
+    this.$options.components.Related = require('@/fragments/related/Related.vue').default
   }
 }

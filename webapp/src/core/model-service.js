@@ -52,6 +52,14 @@ function ModelService (endPoint, resourceName, options) {
   }
 
   /**
+   * Provides an accessor to set the endpoint
+   * @param String endPoint
+   */
+  this.setEndPoint = (endPoint) => {
+    this.endPoint = endPoint
+  }
+
+  /**
    * Queries the model service endpoint, retrieve the resources and (by default) transform them in active record Models
    * @param {*} filters  filters to be applied to retrieve the resources
    */
