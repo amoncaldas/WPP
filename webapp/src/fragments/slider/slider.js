@@ -19,16 +19,10 @@ export default {
   computed: {
     fluxCaptions () {
       let titles = this.lodash.map(this.contents, 'title')
-      titles = titles.concat(titles)
-      titles = titles.concat(titles)
-      titles = titles.concat(titles)
       return titles
     },
     fluxImages () {
       let urls = this.lodash.map(this.contents, 'url')
-      urls = urls.concat(urls)
-      urls = urls.concat(urls)
-      urls = urls.concat(urls)
       return urls
     }
   },
@@ -41,7 +35,7 @@ export default {
     },
     fluxTransitions: {
       transitionBook: Transitions.transitionKenburn
-      // see: https://deulos.github.io/vue-flux/
+      // Transition options: @see: https://deulos.github.io/vue-flux/
     }
   })
 }

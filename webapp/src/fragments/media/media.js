@@ -58,5 +58,8 @@ export default {
       }
       return this.mediaPost.post_title
     },
+    placeHolder () {
+      return 'https://via.placeholder.com/1024x800.jpg?text=' + this.$t('media.image')
+    }
   },
 }
