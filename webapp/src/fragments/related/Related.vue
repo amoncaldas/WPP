@@ -1,5 +1,5 @@
 <template>
-  <box background="white">
+  <box background="white" noTopBorder>
     <div slot="header">
       <h3>{{boxTitle}}</h3>
     </div>

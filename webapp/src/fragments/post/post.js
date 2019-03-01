@@ -58,10 +58,10 @@ export default {
       return []
     },
     title () {
-      if (this.post.title && this.post.title.rendered) {
+      if (this.post.title.rendered) {
         return this.post.title.rendered
       }
-      return this.post.post_title
+      return this.post.title
     },
     excerpt () {
       let content = this.content || ''

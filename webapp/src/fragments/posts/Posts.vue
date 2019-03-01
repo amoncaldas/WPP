@@ -8,7 +8,7 @@
         <v-container style="padding:5px" grid-list-lg fluid >
           <v-layout row wrap>
             <template v-for="(post, index) in posts">
-            <v-flex v-if="index < max"  v-bind="{['xs'+columnsPerPost]: true}"  :key="post.id">
+            <v-flex v-if="index < max"  v-bind="{['sm'+columnsPerPost]: true}"  :key="post.id">
               <post :key="post.id" :no-top-border="true" :post-data="post"></post>
             </v-flex>
             </template>

@@ -1,12 +1,7 @@
 <template>
-  <v-img
-    :max-width="maxWidth"
-    position="top center"
-    :max-height="maxHeight"
-    :contains="contains" v-if="url" :src="url"
-    lazy-src="/static/img/image-1024x800.jpg"
-    style="max-width:100%"
-    :alt="title">
-  </v-img>
+  <div v-if="url" class="image-container" :class="{'list-mode': isListMode}">
+    <img :src="url" :alt="title" :title="title" class="image">
+  </div>
 </template>
 <script src="./media.js"></script>
+<style scoped src="./media.css"></style>

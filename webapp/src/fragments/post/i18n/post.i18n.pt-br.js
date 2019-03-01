@@ -3,6 +3,7 @@ export default {
     readMore: 'Veja mais',
     related: 'Conteúdo relacionado',
     thePostCouldNotBeLoaded: 'O conteúdo não pode ser carregado',
-    contentLanguage: 'Idioma'
+    contentLanguage: 'Idioma',
+    comments: 'Comentários'
   }
 }

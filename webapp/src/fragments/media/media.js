@@ -34,6 +34,10 @@ export default {
     },
     contains: {
       default: false
+    },
+    mode: {
+      type: String,
+      default: 'list'
     }
   },
   data () {
@@ -60,6 +64,9 @@ export default {
     },
     placeHolder () {
       return 'https://via.placeholder.com/1024x800.jpg?text=' + this.$t('media.image')
+    },
+    isListMode () {
+      return this.mode === 'list'
     }
   },
 }

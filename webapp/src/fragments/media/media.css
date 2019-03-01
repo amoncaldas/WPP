@@ -2,7 +2,10 @@
   max-width:100%;
 }
 .image-container {
-  max-height:150px;
   overflow-y:hidden;
-  cursor: pointer;
+  max-width:100%;
+}
+
+.list-mode {
+  max-height:150px;
 }

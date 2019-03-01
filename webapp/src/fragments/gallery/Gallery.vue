@@ -11,18 +11,9 @@
       <v-layout row wrap>
         <template v-for="(media, mediaIndex) in mediasData">
           <v-flex v-bind="{['xs'+ columnsPerPost]: true}" :key="mediaIndex">
-            <!-- <div class="image" :key="imageIndex" @click="galleryImageIndex = imageIndex"    :style="{ backgroundImage: 'url(' + image.url + ')', height: '200px' }" ></div> -->
-            <v-img v-if="media.poster"
-              :src="media.url"
-              :key="mediaIndex"
-              @click="galleryMediaIndex = mediaIndex"
-              position="top center"
-              :max-height="200"
-              :contains="true"
-              :lazy-src="placeHolder"
-              style="max-width:100%"
-              :alt="media.description">
-            </v-img>
+            <div class="image-container">
+              <img :src="media.url" :alt="media.title" :title="media.description"  @click="galleryMediaIndex = mediaIndex" class="image">
+            </div>
           </v-flex>
         </template>
       </v-layout>

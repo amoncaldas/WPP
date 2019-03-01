@@ -1,7 +1,6 @@
 <template>
   <div class="locale-changer">
     <v-select
-      prepend-icon="language"
       v-model="currentLocale"
       item-text="title"
       item-value="value"

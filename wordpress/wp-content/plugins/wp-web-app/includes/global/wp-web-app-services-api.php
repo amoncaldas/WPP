@@ -25,6 +25,13 @@
           'callback' => array($this, 'get_related' ),
         )
       ));
+
+      register_rest_route(WPP_API_NAMESPACE."/content", '/search', array(
+        array(
+          'methods'  => "GET",
+          'callback' => array($this, 'get_search' ),
+        )
+      ));
     }
 
     /**
@@ -81,20 +88,38 @@
 	    $args = $this->prepareRelatedArgs($request, $public_post_types);
     
       // Get the posts using the public post types
-      $items = get_posts($args); 
+      $posts = get_posts($args); 
 
       // If there is not related, try to get posts with same category
-      if (count($items) === 0) {
+      if (count($posts) === 0) {
         unset($args["post_parent"]);        
         unset($args["post__in"]);     
         $content_id = $request->get_param('contentId');   
         $args['category__in']  = wp_get_post_categories( $content_id);
-        $items = get_posts($args);
+        $posts = get_posts($args);
       }
 
-      // $parent_id = get_post_meta($post_id, SECTION_POST_TYPE, true);
+      $posts = $this->prepareRestData($posts, true);
+      $response = $this->prepareRestResponseWithPagination($posts, $args);
+      return $response;		
+    } 
+    
+    /**
+     * Get the posts from all post ypes
+     *
+     * @param [type] $request
+     * @return WP_REST_Response
+     */
+    public function get_search( $request ) {
+      $public_post_types = get_post_types(array("public"=>true));
+      unset($public_post_types["attachment"]);
+      unset($public_post_types["member"]);
 
-      $response = $this->prepareRelatedResponse($items, $public_post_types, $args);
+	    $args = $this->prepareSearchArgs($request, $public_post_types);
+      $posts = get_posts( $args ); 
+
+      $posts = $this->prepareRestData($posts, true);
+      $response = $this->prepareRestResponseWithPagination($posts, $args);
       return $response;		
 	  } 
 
@@ -147,49 +172,128 @@
     }
 
     /**
+     * Prepare related args based on the request
+     *
+     * @param Object $request
+     * @return Array
+     */
+    public function prepareSearchArgs($request, $public_post_types) {
+      // Receive and set the page parameter from the $request for pagination purposes
+      $paged = $request->get_param( 'page' );
+      $paged = (isset($paged) && !empty($paged)) ? $paged : 1;
+      
+      // Receive and set the per_page parameter from the $request for pagination purposes
+      $per_page = $request->get_param( 'per_page' );
+      $per_page = (isset($per_page) && !empty($per_page)) ? $per_page : 10;
+
+      $search_term = esc_sql( like_escape($request->get_param('s')));
+
+      $args = array(
+        'paged' => $paged,
+        'posts_per_page' => $per_page,            
+        'post_type' => $public_post_types,
+        's' => $search_term
+      );    
+
+      // I a section was specified, search 
+      // only posts within this section
+      $section = $request->get_param('section');
+      if (isset($section) && is_numeric($section)) {
+        $args['post_parent'] = $section;
+      } 
+      
+      // TODO: not working when passing ptype!
+      // I a post type was specified, search 
+      // only posts of the passed post type
+      $p_type = $request->get_param('ptype');
+      if (isset($p_type)) {
+        $args['post_type'] = $p_type;
+      }
+
+      // Receive and set the exclude parameter from the $request
+      $exclude = $request->get_param( 'exclude' );
+      $exclude = (isset($exclude) && !empty($exclude)) ? $exclude : [];
+      if (!is_array($exclude) && isset($exclude)) {
+        $exclude = explode(",", $exclude);
+      }
+      if (isset($exclude)) {
+        $args["post__not_in"] = $exclude;
+      }
+      
+      return $args;
+    }
+
+    /**
      * Prepare wp rest response for related items
      *
      * @param Array $items
      * @param Array $post_types
      * @return WP_REST_Response
      */
-    public function prepareRelatedResponse($items, $post_types, $args) {      
-      foreach( $items as $post ) {
-          $id = $post->ID; 
-          $embedded = new stdClass();
-          $author =new stdClass();
-          $author->id = $post->post_author;
-          $author->name = get_author_name($post->post_author);
-          $author->avatar_urls = [get_avatar_url($post->post_author)];
-          $embedded->author = [$author];
-
-          $feaured_media_key = "wp:featuredmedia";
-          $featured_media = new stdClass();
-          $featured_media->id = get_post_thumbnail_id($post->ID);
-          if ($featured_media->id) {
-            $media_data = wp_get_attachment_image_src($featured_media->id, null, false );
-            $details = new stdClass();
-            $details->width = $media_data[1];
-            $details->height = $media_data[2];
-            $details->sizes = ["full" => ["source_url"=>$media_data[0]]];
-            $featured_media->media_details = $details;
-            $featured_media->post_title = get_the_title($featured_media->id);
-            $featured_media->type = "attachment";
-            $featured_media->source_url = $media_data[0];
-            $embedded->$feaured_media_key = [$featured_media];
+    public function prepareRestData($posts, $embedded = false) {    
+      $rest_posts = [];
+      foreach( $posts as $post ) {
+          if ($embedded) {
+            // Resolve author data
+            $embedded = new stdClass();
+            $author =new stdClass();
+            $author->id = $post->post_author;
+            $author->name = get_author_name($post->post_author);
+            $author->avatar_urls = [get_avatar_url($post->post_author)];
+            $embedded->author = [$author];
+  
+            // Resolve featured media data
+            $feaured_media_key = "wp:featuredmedia";
+            $featured_media = new stdClass();
+            $featured_media->id = get_post_thumbnail_id($post->ID);
+            if ($featured_media->id) {
+              $media_data = wp_get_attachment_image_src($featured_media->id, null, false );
+              $details = new stdClass();
+              $details->width = $media_data[1];
+              $details->height = $media_data[2];
+              $details->sizes = ["full" => ["source_url"=>$media_data[0]]];
+              $featured_media->media_details = $details;
+              $featured_media->post_title = get_the_title($featured_media->id);
+              $featured_media->type = "attachment";
+              $featured_media->source_url = $media_data[0];
+              $embedded->$feaured_media_key = [$featured_media];
+            }
+            // Add embedded data
+            $post->_embedded = $embedded;
           }
-          $post->_embedded = $embedded;
 
+          // Resolve locale
           $terms = get_the_terms($post->ID, LOCALE_TAXONOMY_SLUG );
           $term = array_shift( $terms );
           $post->locale = $term->slug;
           $post->link = get_post_permalink($post->ID);
+
+          // create rest post data like (without the 'post_' prefix in the properties)
+          $rest_post = new stdClass();
+          foreach ($post as $key => $value) {
+            $cleaned_key = str_replace("post_", "", $key);
+            $rest_post->$cleaned_key = $value;
+          }
+          // Add the cleaned post object to the array to be returned
+          $rest_posts[] = $rest_post;
       }
-      
-      $wp_rest_response = rest_ensure_response($items);     
-      
+      return $rest_posts;      
+    }
+
+    /**
+     * Prepare the posts data for rest response includng pagination
+     *
+     * @param [type] $posts
+     * @param [type] $post_types
+     * @param [type] $posts_per_page
+     * @return void
+     */
+    public function prepareRestResponseWithPagination($posts, $args) {
+      $wp_rest_response = rest_ensure_response($posts);     
+
       // Prepare pagination
-      $posts_to_count = new WP_Query(array('post_type' => array($post_types)));
+      unset($args["paged"]);
+      $posts_to_count = new WP_Query($args);
       $total = $posts_to_count->post_count; 
       $wp_rest_response->header("X-WP-Total", $total);
 
@@ -200,7 +304,7 @@
       $pages = $pages > 0 ? $pages : 1;
       $wp_rest_response->header("X-WP-TotalPages", $pages);
 
-      // REturn wp rest response
+      // Return wp rest response
       return $wp_rest_response;
     }
   }

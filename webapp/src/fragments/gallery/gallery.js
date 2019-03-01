@@ -10,7 +10,15 @@ export default {
   data () {
     return {
       galleryMediaIndex: null,
-      options: {fullScreen: false, youTubeVideoIdProperty: 'youtube', youTubePlayerVars: {'autoplay': 1}, youTubeClickToPlay: true}
+      options: {
+        fullScreen: false,
+        youTubeVideoIdProperty: 'youtube',
+        youTubePlayerVars: {
+          'autoplay': 1,
+          'rel': 0
+        },
+        youTubeClickToPlay: true
+      }
     }
   },
   computed: {

@@ -12,6 +12,9 @@
         <app-h-menu :item="item" :showIcon="false" :key="index"></app-h-menu>
       </template >
     </v-toolbar-items>
+    <v-btn icon style="padding-right:30px; padding-left:20px">
+      <v-icon large>search</v-icon>
+    </v-btn>
     <locale-changer></locale-changer>
   </v-toolbar>
 </template>
