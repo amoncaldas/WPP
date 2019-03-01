@@ -34,26 +34,6 @@
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12>
-        <v-select
-          :label="$t('user.sector')"
-          chips
-          multiple
-          :items="sectors"
-          prepend-icon="filter_list"
-          append-icon=""
-          clearable
-          v-model="resource.metas.ors_usage">
-          <template slot="selection" slot-scope="data">
-            <v-chip
-              close
-              @input="removeSector(data.item)"
-              :selected="data.selected">
-              <strong>{{ data.item.text }}</strong>
-            </v-chip>
-          </template>
-        </v-select>
-      </v-flex>
-      <v-flex xs12>
         <v-text-field :label="$t('user.website')" v-model="resource.metas.reg_website" :rules="websiteRules"></v-text-field>
       </v-flex>
     </v-layout>

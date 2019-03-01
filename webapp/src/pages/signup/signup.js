@@ -20,7 +20,11 @@ export default {
     submit (context) {
       this.context = context
       this.showInfo(this.$t('signup.processingRegistration'), {timeout: 6000})
-      this.$refs.recaptcha.execute()
+      if (this.$store.getters.options.recaptcha_site_key) {
+        this.$refs.recaptcha.execute()
+      } else {
+        this.save()
+      }
     },
     onCaptchaVerified (recaptchaToken) {
       this.showInfo(this.$t('signup.processingRegistration'), {timeout: 6000})

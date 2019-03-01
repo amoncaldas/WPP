@@ -1,7 +1,6 @@
 import userService from '@/shared-services/user-service'
 import {CRUD, CRUDData} from '@/core/crud'
 import pattern from '@/support/pattern'
-import sectorService from './sector-service'
 
 // Custom endpoints used to run custom queries in user service
 let checkUserNameRegisteredEndpoint = 'ors-api/v1/user/username-registered'
@@ -18,12 +17,6 @@ export default {
     }
     CRUD.set(this, userService, options)
 
-    sectorService.query().then((sectors) => {
-      this.sectors = sectors
-      if(sectors.raw && sectors.data) {
-        this.sectors = sectors.data
-      }
-    })
     if (this.userId) {
       this.mode = 'edit'
 
