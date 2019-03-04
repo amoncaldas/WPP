@@ -11,11 +11,11 @@
       <br>
       <template v-if="mode === 'single'">
         <div v-html="content"></div>
-        <post-map v-if="post.data && post.data.has_places" :post="post"></post-map>
+        <post-map v-if="post.extra && post.extra.has_places" :post="post"></post-map>
         <br>
-        <box v-if="post.data.medias" background="white" :no-top-border="noTopBorder">
+        <box v-if="post.extra.medias" background="white" :no-top-border="noTopBorder">
           <div slot="header">Gallery</div>
-          <gallery :medias="post.data.medias" ></gallery>
+          <gallery :medias="post.extra.medias" ></gallery>
         </box>
       </template>
       <template v-else>

@@ -16,7 +16,7 @@ let options = {
   },
   transformRequest: (request) => {
     if (request.running === 'create') {
-      request.endPoint = 'ors-api/v1/user/register/'
+      request.endPoint = 'wpp/v1/user/register/'
     }
   }
 }

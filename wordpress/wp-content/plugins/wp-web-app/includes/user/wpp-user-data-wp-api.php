@@ -11,8 +11,7 @@ class WppUserAPI {
 
     private $baseNamespace;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->baseNamespace = WPP_API_NAMESPACE;
 
         // Load ors api routes/endpoints
@@ -34,36 +33,11 @@ class WppUserAPI {
     }
 
     /**
-     * The google recaptcha secret
-     *
-     * @var string
-     */
-    private static $recaptchaSecret = "6LcOa2MUAAAAAMjC-Nqnxcs1u4mX62PSrXeixDeI";
-
-    /**
      * The recaptcha validation url
      *
      * @var string
      */
     private static $recaptchaValidationUrl = "https://www.google.com/recaptcha/api/siteverify";
-
-    /**
-     * the ProfilePress form id used
-     *
-     * @return void
-     */
-    private static function getSignFormId() {
-        return 15;
-    }
-
-    /**
-     * the ProfilePress form id used
-     *
-     * @return void
-     */
-    private static function passwordResetFormId() {
-        return 10;
-    }
     
 
     /**
@@ -128,6 +102,15 @@ class WppUserAPI {
         ) );        
     }
 
+    /**
+     * Get the google recaptcha secret
+     *
+     * @var string
+     */
+    static function getRecaptchaSecret (){
+       $secret = get_option("recaptcha_secret", "6LcOa2MUAAAAAMjC-Nqnxcs1u4mX62PSrXeixDeI");
+       return $secret;
+    }
 
     /**
      * Checks if a username on the request is already registered or not
@@ -195,10 +178,7 @@ class WppUserAPI {
      * @param array $request (injected)
      * @return array new token
      */
-    public static function registerUser($request) {
-
-        $sigUpFormId = self::getSignFormId();
-        
+    public static function registerUser($request) {        
         $recaptchaToken = $request->get_param('recaptchaToken');
         $validCaptcha = self::validateCaptcha($recaptchaToken);        
         
@@ -218,7 +198,9 @@ class WppUserAPI {
                 $data = ["message"=>$result];
                 return new WP_REST_Response($data, 409); // CONFLICT 
             }			
-		}
+        } 
+        $data = ["message"=>null];
+        return new WP_REST_Response($data, 409); // CONFLICT
     }
 
     /**
@@ -232,40 +214,41 @@ class WppUserAPI {
             $metas = $request->get_param('metas');
 
             $userData = array(
-                'reg_username' => $metas["username"],
-                'reg_password' => $request->get_param('password'),
-                "reg_password2" => $request->get_param('confirmPassword'),
-                "reg_password_present" => "true",            
-                'reg_email' => $metas['email'],
-                'reg_email2' => $metas['email'],
-                'reg_website' => $metas['reg_website'],
-                'reg_nickname' => "",
-                'reg_display_name' => $metas['first_name'],
-                'reg_first_name' => $metas['first_name'],
-                'reg_last_name' => $metas['last_name'],
-                'reg_bio' => "",
-                'reg_select_role' => null
+                'username' => $request->get_param('username'),
+                'password' => $request->get_param('password'),
+                "password2" => $request->get_param('confirmPassword'),      
+                'email' => $request->get_param('email'),
+                'website' => $request->get_param('website'),
+                'nickname' => "",
+                'display_name' => $request->get_param('first_name'),
+                'first_name' => $request->get_param('first_name'),
+                'last_name' => $request->get_param('last_name'),
+                'bio' => "",
+                'select_role' => "subscriber",
+                "receive_news" => $request->get_param('receive_news')
             );
 
-            // It is assumed that the ProfilePress plugin is installed and loaded
-            $response = ProfilePress_Registration_Auth::register_new_user($userData, $sigUpFormId, [], null, false);
+            $user_id = wp_create_user($userData['username'], $userData['password'], $userData['email']);            
 
-            $wp_user = get_user_by('email', $userData['reg_email']);
+            if ($user_id) { // USER WAS CREATED
 
-            if ($wp_user) { // USER WAS CREATED
+                // Update additional user data from request
+                foreach (["website", "receive_news"] as $meta_key) {                    
+                    $value = $userData[$meta_key];
+                    update_user_meta($user_id, $meta_key, $value );                    
+                }                
 
-                // update additional user data from request
-                foreach ($metas as $key => $value) {
-                    if (in_array($key, ["reg_website", "ors_usage", "pp_mc_present", "pp_mailchimp"])) {
-                        update_user_meta( $wp_user->ID, $key, $value );
-                    }
+                if ($userData['receive_news'] == "true") { // can be boolean true or string true
+                    $request_lang = get_request_locale();
+                    WppNotifier::register_follower($userData['display_name'], $userData['email'], "news",  $request_lang);                    
                 }
-                if ($metas['pp_mailchimp'] == "true") {
-                    // add the user to the news letter list, if s/he has selected this option on the form
-                    // It is assumed that the PP_Mailchimp plugin is installed and loaded
-                    $mailChimp = new PP_Mailchimp_Addon();
-                    $mailChimp->add_to_list($userData['reg_email'], $userData['reg_first_name'], $userData['reg_last_name']);
-                }
+                
+                // Set activation code
+                $activation_code = self::set_activation_and_expiration($user_id);
+                self::send_new_user_notifications($user_id, $userData['email'], $activation_code);
+
+                // Get the user object
+                $wp_user = get_user_by('email', $userData['email']);
                 return $wp_user;
             }
             // In the case that the expected registered user was not found
@@ -280,6 +263,73 @@ class WppUserAPI {
         }
     }
 
+    /**
+     * Send user activation link emailand notification to admin about the new registration
+     *
+     * @param Integer $user_id
+     * @param String $activation_code
+     * @return void
+     */
+    private static function send_new_user_notifications ($user_id, $user_email, $activation_code) {
+        // Notify the admin
+        wp_new_user_notification($user_id);
+
+        $request_lang = get_request_locale();
+                
+        // Send user activation link       
+        $site_title = get_bloginfo("name");
+
+        // Currecntly we only support english and portuguese
+        $msg_txt = $request_lang === "pt-br" ? "Ative sua conta clicando no link abaixo" : "Activate your account clicking o the link below";
+        $msg_title = $request_lang === "pt-br" ? "[$site_title] Ative sua conta" : "[$site_title] Activate your account";        
+        
+        // Build the activation link
+        $activation_uri = "/#/activate/$user_id/$activation_code";
+        $activation_link = network_home_url($activation_uri);     
+        
+        // Build the message
+        $message = "$msg_txt <br><br><a href='$activation_link'>$activation_link</a>";
+        
+        WppMailer::send_message($user_email, $msg_title, $message);
+    }
+
+    /**
+     * User's email confirmation key in the database.
+     *
+     * @param $user_id
+     *
+     * @return mixed
+     */
+    public function get_user_activation_code($user_id) {
+        return get_user_meta($user_id, 'activation_code', true);
+    }
+
+
+    /**
+     * User's email confirmation expiration time in database.
+     *
+     * @param int $user_id
+     *
+     * @return mixed
+     */
+    public function get_user_expiration_time($user_id) {
+        return get_user_meta($user_id, 'activation_expiration', true);
+    }
+
+    /**
+     * Store user activation code and expiration time
+     *
+     * @param Integer $user_id
+     * @return void
+     */
+    static function set_activation_and_expiration ($user_id) {
+        $activation_code = wp_generate_password(20, false);
+        $expiration = time() + (60 * 30);
+
+        add_user_meta($user_id, 'activation_code', $activation_code);
+        add_user_meta($user_id, 'activation_expiration', $expiration);
+        return $activation_code;
+    }
 
     /**
      * Pre validate the request registration, checking for already existing user or password missing/no matching
@@ -354,9 +404,10 @@ class WppUserAPI {
      * @return boolean
      */
     private static function validateCaptcha($recaptchaToken) {
+        $secret = self::getRecaptchaSecret();
         $post_data = http_build_query(
             array(
-                'secret' => self::$recaptchaSecret,
+                'secret' => $secret,
                 'response' => $recaptchaToken,
                 'remoteip' => $_SERVER['REMOTE_ADDR']
             )
@@ -459,20 +510,19 @@ class WppUserAPI {
             return new WP_REST_Response(null, 404); // NOT FOUND - user not found by its id  
         }
 
-        if (PP_User_Email_Confirmation_Addon::is_user_confirm($wp_user->ID) === true) { 
+        $now = time();
+        $user_activation_code = $this->get_user_activation_code($wp_user->ID);
+        $activation_expiration = absint($this->get_user_expiration_time($wp_user->ID));
+        if ($now > $activation_expiration) {
             return new WP_REST_Response(null, 410); // GONE - activation code is not valid anymore because the user is already activated
         }
 
-        $now = time();
-        $ppEmailConfirmation = PP_User_Email_Confirmation_Addon::get_instance();
-        $db_activation_code = $ppEmailConfirmation->get_db_activation_code($wp_user->ID);
-        $db_expires = absint($ppEmailConfirmation->get_db_expiration_time($wp_user->ID));
-
-        if ($request["activationCode"] !== $db_activation_code || $db_expires < $now) {
-            return new WP_REST_Response(null, 409); // CONFLICT - activation code does not belong to specified user id or is expired
+        if ($request["activationCode"] !== $user_activation_code) {
+            return new WP_REST_Response(null, 409); // CONFLICT - activation code does not belong to specified user
         }        
 
-        PP_User_Email_Confirmation_Addon::confirm_user_email($wp_user->ID);
+        delete_user_meta($wp_user->ID, 'activation_code');
+        delete_user_meta($wp_user->ID, 'activation_expiration');
 
         return new WP_REST_Response(null, 204); // NO CONTENT - the request was processed, but there is not content to be returned   
     }

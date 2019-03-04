@@ -5,7 +5,7 @@
  * @listens redrawAndFitMap [via eventBus] - event that will trigger an map redraw and refit bounds - expects {isMaximized: Boolean, guid: String}
  */
 
-import { LMap, LTileLayer, LMarker, LTooltip, LPopup, LControlZoom, LControlAttribution, LControlScale, LControlLayers, LLayerGroup } from 'vue2-leaflet'
+import { LMap, LPolyline, LTileLayer, LMarker, LTooltip, LPopup, LControlZoom, LControlAttribution, LControlScale, LControlLayers, LLayerGroup } from 'vue2-leaflet'
 import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
 import theme from '@/common/theme'
@@ -50,7 +50,7 @@ export default {
       map: null,
       mapHeight: 300,
       initialMaxZoom: 18,
-      routeColor: theme.primary,
+      routeColor: theme.secondary,
       guid: null,
       mapData: null,
       info: null,
@@ -73,8 +73,17 @@ export default {
       }
     },
     polyline () {
-      if (this.mapData) {
-        return this.mapData.polyline
+      if (this.post && this.post.extra) {
+        if (this.post.extra.encodedpolyline) {
+          let polylineFromEncoded = GeoUtils.decodePolyline(this.post.extra.encodedpolyline)
+          return Array.isArray(polylineFromEncoded)? polylineFromEncoded : []
+        } else if (this.post.extra.polyline) {
+          let polylineFromArr = JSON.parse(this.post.extra.polyline)
+          if (Array.isArray(polylineFromArr)) {
+            return GeoUtils.switchLatLonIndex(polylineFromArr)
+          }
+          return []
+        }
       }
     },
     maxZoom () {
@@ -105,9 +114,11 @@ export default {
       if (this.post) {
         for (let placeKey in this.post.places) {
           let place = this.post.places[placeKey]
-          if (place.markers.length > 0) {
+          if (place.markers && place.markers.length > 0) {
             let location = place.markers[0]
             markersData.push([location.lng, location.lat, place.title, place])
+          } else if (place.lat && place.lng) {
+            markersData.push([place.lng, place.lat, place.title, place])
           }
         }
       }
@@ -127,26 +138,43 @@ export default {
         }, 10)
       })
     },
-    fitFeaturesBounds () {
+    /**
+     * Fit on the map elements in the current map view/zool
+     * @param {*} enableScrollWheelZoom
+     */
+    fitFeaturesBounds (enableScrollWheelZoom = false) {
       let context = this
       return new Promise((resolve, reject) => {
         // If te map object is already defined
         // then we can directly access it
         if (context.map) {
           context.map.fitBounds(context.dataBounds, {padding: [20, 20]})
+          if (!enableScrollWheelZoom) {
+            context.map.scrollWheelZoom.disable()
+          } else {
+            context.map.scrollWheelZoom.enable()
+          }
         } else {
           // If not, it wil be available only in the next tick
           this.$nextTick(() => {
             if (context.$refs.map) {
               context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
               context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
-              context.map.scrollWheelZoom.disable()
+              if (!enableScrollWheelZoom) {
+                context.map.scrollWheelZoom.disable()
+              } else {
+                context.map.scrollWheelZoom.enable()
+              }
             }
             resolve()
           })
         }
       })
     },
+    /**
+     * Show place details
+     * @param {*} place
+     */
     markerInfoClick (place) {
       this.infoDialog(place.label, null, {code: place.json, resizable: true, zIndex: 1001})
     },
@@ -170,7 +198,7 @@ export default {
             setTimeout(() => {
               // After redrawing and waiting
               // fit the bounds
-              this.fitFeaturesBounds()
+              this.fitFeaturesBounds(data.maximized) // if is maximized, we can leve the scroll enable
             }, 500)
           })
         }, 500)
@@ -200,6 +228,7 @@ export default {
   components: {
     LMap,
     LTileLayer,
+    LPolyline,
     LMarker,
     LLayerGroup,
     LTooltip,

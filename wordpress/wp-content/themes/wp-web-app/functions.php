@@ -133,8 +133,8 @@ function add_language_admin_menu(){
 function register_custom_types () {
 	$section_args = array (
 		'name' => SECTION_POST_TYPE,
-		'label' => 'Sections',
-		'singular_label' => 'Section',
+		'label' => ucfirst(SECTION_POST_TYPE),
+		'singular_label' => ucfirst(SECTION_POST_TYPE),
 		'public' => true,
 		'publicly_queryable' => true,
 		'show_ui' => true,

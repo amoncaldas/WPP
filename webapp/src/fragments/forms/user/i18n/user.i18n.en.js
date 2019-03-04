@@ -21,7 +21,9 @@ export default {
     passVisibility: true,
     yourProfileDataCouldNotBeLoaded: 'Fail: Your profile data could not be loaded',
     alreadyTakenUsername: 'Username already taken',
-    emailNotValidOrTaken: 'Email already registered or invalid'
+    emailNotValidOrTaken: 'Email already registered or invalid',
+    accountCreated: 'Account created successfully. Please check your email and follow the instructions.',
+    profileUpdated: 'Profile updated'
 
   }
 }

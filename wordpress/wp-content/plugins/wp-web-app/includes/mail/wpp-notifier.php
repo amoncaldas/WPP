@@ -16,7 +16,7 @@ class WppNotifier  {
 	public $debug_output = "";
 	public $max_notifications_per_time = 50;
 	public $sent_mails = array();
-	public $default_language = "pt-br";
+	public static $default_language = "pt-br";
 
 	// Defining values and keys to generate the notification
 	public $notification_post_type = "notification";
@@ -27,14 +27,14 @@ class WppNotifier  {
 	public $notification_content_type_desc = "newsletter";
 
 	// Defining follower values and keys
-	public $follower_post_type = "follower";
-	public $follower_initial_post_status = "pending";
-	public $follower_email = "email";
-	public $ip = "ip";
-	public $user_agent = "user_agent";
-	public $activated = "activated";
-	public $mail_list = "mail_list";
-	public $lang_tax_slug = "lang";
+	public static $follower_post_type = "follower";
+	public static $follower_initial_post_status = "pending";
+	public static $follower_email = "email";
+	public static $ip = "ip";
+	public static $user_agent = "user_agent";
+	public static $activated = "activated";
+	public static $mail_list = "mail_list";
+	public static $lang_tax_slug = "lang";
 	
 
 	function __construct () {
@@ -117,7 +117,7 @@ class WppNotifier  {
 
 
 		$follower_args = array (
-			'name' => $this->follower_post_type,
+			'name' => self::$follower_post_type,
 			'label' => 'Followers',
 			'singular_label' => 'Follower',
 			"description"=> "Emails about to be sent to newsletter subscribers",
@@ -129,7 +129,7 @@ class WppNotifier  {
 			'map_meta_cap' => true,
 			'has_archive' => false,
 			'exclude_from_search' => true,
-			'capability_type' => array($this->follower_post_type, $this->follower_post_type."s"),
+			'capability_type' => array(self::$follower_post_type, self::$follower_post_type."s"),
 			'hierarchical' => false,
 			'rewrite' => true,
 			'rewrite_withfront' => false,	
@@ -141,7 +141,7 @@ class WppNotifier  {
 			),
 		);
 
-		register_post_type($this->follower_post_type , $follower_args );
+		register_post_type(self::$follower_post_type , $follower_args );
 	}
 
 	/**
@@ -152,20 +152,38 @@ class WppNotifier  {
 	public function unsubscribe_for_notifications($request) {
 		$follower_id = $request["followerId"];
 		$follower = get_post($follower_id);
+		$result = self::deactivate_follower($follower_id);
 
-		if ($follower) {
-			$activated = get_post_meta($follower_id, $this->activated, true);
-			if ($activated === "0") {
-				return new WP_REST_Response(null, 400); // INVALID REQUEST
-			}
-			update_post_meta($follower_id, $this->activated, 0);
-			$message = "Name: ". $follower->post_title."<br/><br/>";
-			$message .= "Email: ". get_post_meta($follower_id, $this->follower_email, true);
-			$this->notify_admin("Follower opt out", $message, "Follower opt out");	
+		if ($result === "already_deactivated") {
+			return new WP_REST_Response(null, 400); // INVALID REQUEST
+		} else if ($result === "deactivated") {			
 			return new WP_REST_Response(null, 204); // ACCEPTED, NO CONTENT
 		} else {
 			return new WP_REST_Response(null, 404); // NOT FOUND
 		}
+	}
+
+	/**
+	 * Deactivate a follower from so that it stops receiving news letter
+	 *
+	 * @param Integer $follower_id
+	 * @return String already_deactivated|deactivated|not_found
+	 */
+	static function deactivate_follower ($follower_id) {
+		$follower = get_post($follower_id);
+
+		if ($follower) {
+			$activated = get_post_meta($follower_id, self::$activated, true);
+			if ($activated === "0") {
+				return "already_deactivated";
+			}
+			update_post_meta($follower_id, self::$activated, 0);
+			$message = "Name: ". $follower->post_title."<br/><br/>";
+			$message .= "Email: ". get_post_meta($follower_id, self::$follower_email, true);
+			WppMailer::notify_admin("Follower opt out", $message, self::$default_language);
+			return "deactivated";
+		}
+		return "not_found";
 	}
 
 	/**
@@ -182,7 +200,7 @@ class WppNotifier  {
 			$message = $request->get_param('message');
 			if (isset($subject) && isset($message)) {
 				$title = $subject;
-				$this->notify_admin($title, $message, "report error");
+				WppMailer::notify_admin($title, $message, self::$default_language);
 				return new WP_REST_Response(null, 204); // ACCEPTED/UPDATED, NO CONTENT TO RETURN
 			}
 			return new WP_REST_Response(null, 409); // CONFLICT, MISSING DATA
@@ -199,64 +217,84 @@ class WppNotifier  {
 	 */
 	public function subscribe_for_notifications($request) {
 		$name = $request->get_param('name');
-		$email = $request->get_param($this->follower_email);
+		$email = $request->get_param(self::$follower_email);
 
 		if (isset($name) && isset($email)) {
-			$lang = $request->get_param($this->lang_tax_slug) ? $request->get_param($this->lang_tax_slug) :$this->default_language;
+			$lang = $request->get_param(self::$lang_tax_slug) ? $request->get_param(self::$lang_tax_slug) :self::$default_language;
 			$mail_list =  $request->get_param($this->mail_list) ?  $request->get_param($this->mail_list) : $this->default_notification_type;
+			
+			$result = self::register_follower($name, $email, $mail_list, $lang);
+			if($result === "updated") {
+				return new WP_REST_Response(null, 204); // ACCEPTED/UPDATED, NO CONTENT TO RETURN
+			}
+			elseif  ($result === "already_exists") {
+				return new WP_REST_Response(null, 409); // CONFLICT, ALREADY EXISTS
+			} else { // is created
+				$message = "Name: ". strip_tags($name)."<br/><br/>";
+				$message .= "Email: ". strip_tags($email);
+				WppMailer::notify_admin("New follower registration", $message, self::$default_language);			
+		
+				return new WP_REST_Response(["id" => $follower_id ], 201); // CREATED, NO CONTENT TO RETURN
+			}
 
-			// check if there is already a generated notification for this post
-			$args = (
+		} else {
+			return new WP_REST_Response(null, 400); // INVALID REQUEST
+		}
+	}
+
+	/**
+	 * Register or upate a subscriber to receive news letters
+	 *
+	 * @param String $name
+	 * @param String $email
+	 * @param String $mail_list
+	 * @param String $lang
+	 * @return String updated|already_exists|created
+	 */
+	static function register_follower ($name, $email, $mail_list, $lang) {
+		// Check if the user is already a subscriber
+		$args = (
+			array(
+				"post_type"=> self::$follower_post_type, 
+				"post_status"=> array("publish", "pending"),
+				'meta_query' => array(
+					array(
+						'key'=> self::$follower_email,
+						'value'=> $email
+					)
+				)
+			)
+		);
+		$existing_followers = get_posts($args);
+
+		if (count($existing_followers) > 0) {
+			$existing_follower = $existing_followers[0];
+			if ($existing_follower->post_status === "publish") {
+				update_post_meta($existing_follower->ID, self::$activated, 1);
+				return "updated";
+			} else {
+				return "already_exists";
+			}
+		} else {
+			$follower_id = wp_insert_post(
 				array(
-					"post_type"=> $this->follower_post_type, 
-					"post_status"=> array("publish", "pending"),
-					'meta_query' => array(
-						array(
-							'key'=> $this->follower_email,
-							'value'=> $email
-						)
+					"post_type"=> self::$follower_post_type, 
+					"post_status"=> self::$follower_initial_post_status,
+					"post_author"=> 1, // 1 is always the admin, the first user created
+					"post_title"=> strip_tags($name), 
+					"meta_input"=> array(
+						self::$ip => get_request_ip(),
+						self::$follower_email => strip_tags($email),
+						self::$user_agent => $_SERVER['HTTP_USER_AGENT'],
+						self::$activated => 0,
+						self::$mail_list => $mail_list
 					)
 				)
 			);
-			$existing_followers = get_posts($args);
-
-			if (count($existing_followers) > 0) {
-				$existing_follower = $existing_followers[0];
-				if ($existing_follower->post_status === "publish") {
-					update_post_meta($existing_follower->ID, $this->activated, 1);
-					return new WP_REST_Response(null, 204); // ACCEPTED/UPDATED, NO CONTENT TO RETURN
-				} else {
-					return new WP_REST_Response(null, 409); // CONFLICT, ALREADY EXISTS
-				}
-			} else {
-				$follower_id = wp_insert_post(
-					array(
-						"post_type"=> $this->follower_post_type, 
-						"post_status"=> $this->follower_initial_post_status,
-						"post_author"=> 1, // 1 is always the admin, the first user created
-						"post_title"=> strip_tags($name), 
-						"meta_input"=> array(
-							$this->ip => $this->get_request_ip(),
-							$this->follower_email => strip_tags($email),
-							$this->user_agent => $_SERVER['HTTP_USER_AGENT'],
-							$this->activated => 0,
-							$this->mail_list => $mail_list
-						)
-					)
-				);
-				$term = get_term_by('slug', $this->default_language, $this->lang_tax_slug);
-				$term_arr = [$term->term_id];
-				wp_set_post_terms($follower_id, $term_arr, $this->lang_tax_slug);
-
-				$message = "Name: ". strip_tags($name)."<br/><br/>";
-				$message .= "Email: ". strip_tags($email);
-				$this->notify_admin("New follower registration", $message, "New follower");							
-
-			}
-	
-			return new WP_REST_Response(["id" => $follower_id ], 201); // CREATED, NO CONTENT TO RETURN
-		} else {
-			return new WP_REST_Response(null, 400); // INVALID REQUEST
+			$term = get_term_by('slug', $lang, self::$lang_tax_slug);
+			$term_arr = [$term->term_id];
+			wp_set_post_terms($follower_id, $term_arr, self::$lang_tax_slug);
+			return "created";
 		}
 	}
 
@@ -273,7 +311,7 @@ class WppNotifier  {
 			$message = $request->get_param('message');
 			if (isset($subject) && isset($message)) {
 				$title = $subject . " | ". get_bloginfo("name");
-				$this->notify_admin($title, $message, "contact form");
+				WppMailer::notify_admin($title, $message, self::$default_language);
 				return new WP_REST_Response(null, 204); // ACCEPTED/UPDATED, NO CONTENT TO RETURN
 			}
 			return new WP_REST_Response(null, 409); // CONFLICT, MISSING DATA
@@ -281,45 +319,7 @@ class WppNotifier  {
 		return new WP_REST_Response(null, 403); // FORBIDDEN
 	}
 
-	/**
-	 * Notify admin via email using basic notification template
-	 *
-	 * @param [type] $title
-	 * @param [type] $message
-	 * @param [type] $type
-	 * @return void
-	 */
-	public function notify_admin($title, $message, $type) {
-		$message .= "<br/><br/>";	
-		$message .= "IP: http://www.ip2location.com/". $this->get_request_ip();
-		$message .= "<br/><br/>";	
-		$message .=	"UserAgent:". $_SERVER['HTTP_USER_AGENT'];	
 
-		$template = $this->get_basic_notification_template();
-		$url_parts = explode("//", network_home_url());
-		$logo_url = network_home_url(get_option("wpp_site_relative_logo_url"));
-		
-		$template = str_replace("{news-type}", $type, $template);
-		$template = str_replace("{site-url}", network_home_url(), $template);
-		$template = str_replace("{site-name}", get_bloginfo("name"), $template);
-		$template = str_replace("{site-domain}", $url_parts[1], $template);
-		$template = str_replace("{site-logo-url}", $logo_url, $template);			
-		$template = str_replace("{site-url}", network_home_url(), $template);
-		$template = str_replace("{content-excerpt}", $message, $template);
-		$template = str_replace("{content-title}", $title, $template);
-		$html_message = str_replace("{current-year}", date('Y'), $template);	
-		
-		$senderName = get_option("wpp_email_sender_name");
-		$senderEmail = get_option("wpp_email_sender_email");
-		$headers[] = "From: $senderEmail <$senderName>";	
-		$headers[] = "Return-Path: <$senderName>";
-		$headers[] = "Sender: <$senderName>";			
-
-		add_filter('wp_mail_content_type', array($this, 'set_html_content_type'));	
-		$adminEmail = get_option("admin_email");
-		wp_mail($adminEmail, $title, $html_message, $headers);			
-		remove_filter('wp_mail_content_type', array($this, 'set_html_content_type'));
-	}
 
 	/**
 	 * Set the email content type to be html
@@ -346,25 +346,7 @@ class WppNotifier  {
 		}
 		return network_home_url($relative_image_url);
 	}
-	 
-
-	/**
-	 * Get the request ip address
-	 *
-	 * @return String
-	 */
-	public function get_request_ip () {
-		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
-			$ip = $_SERVER['REMOTE_ADDR'];
-		}
-		return $ip;
-	}
-
-
+	
 	/**
 	 * Run mass mail sender
 	 *
@@ -384,19 +366,8 @@ class WppNotifier  {
 	 * @return String
 	 */
 	public function get_news_template($lang = null) {
-		$lang = $lang ? $lang : $this->default_language;
+		$lang = $lang ? $lang : self::$default_language;
 		$template = file_get_contents(WPP_PLUGIN_PATH."/includes/mail/templates/$lang/news.html");
-		return $template;
-	}
-
-	/**
-	 * Get the news mail template
-	 *
-	 * @return String
-	 */
-	public function get_basic_notification_template($lang = null) {
-		$lang = $lang ? $lang : $this->default_language;
-		$template = file_get_contents(WPP_PLUGIN_PATH."/includes/mail/templates/$lang/notification.html");
 		return $template;
 	}
 
@@ -406,7 +377,7 @@ class WppNotifier  {
 	 * @return String
 	 */
 	public function get_related_template($lang = null) {
-		$lang = $lang ? $lang : $this->default_language;
+		$lang = $lang ? $lang : self::$default_language;
 		$template = file_get_contents(FAM_MAIL_PLUGIN_PATH."/includes/mail/templates/$lang/news_other_items.html");
 		return $template;
 	}
@@ -519,7 +490,7 @@ class WppNotifier  {
 			$content_lang_id = $this->get_post_language($post_ID);
 			if ($content_lang_id) {
 				$term_arr = [$content_lang_id];
-				wp_set_post_terms($notification_id, $term_arr, $this->lang_tax_slug);
+				wp_set_post_terms($notification_id, $term_arr, self::$lang_tax_slug);
 			}
 
 			function notification_created_notice() {
@@ -541,7 +512,7 @@ class WppNotifier  {
 	 * @return id|slug
 	 */
 	public function get_post_language($post_ID, $field = "id") {
-		$content_lang_taxonomies = wp_get_post_terms($post_ID, $this->lang_tax_slug);
+		$content_lang_taxonomies = wp_get_post_terms($post_ID, self::$lang_tax_slug);
 		if( is_array($content_lang_taxonomies) && count($content_lang_taxonomies) > 0) {
 			if ($field === "id") {
 				return $content_lang_taxonomies[0]->term_id;
@@ -786,7 +757,7 @@ class WppNotifier  {
 	 * @return void
 	 */
 	public function get_mail_list($id_pending_notification, $mail_title, $mail_list_type) {
-		$notification_term_list = wp_get_post_terms($id_pending_notification, $this->lang_tax_slug, array("fields" => "all"));	
+		$notification_term_list = wp_get_post_terms($id_pending_notification, self::$lang_tax_slug, array("fields" => "all"));	
 		$notification_lang_term_id = $notification_term_list[0]->term_id;
 
 		global $wpdb;
@@ -795,11 +766,11 @@ class WppNotifier  {
 		$post_meta_table_name = $prefix."postmeta";
 		$term_relationship_table_name = $prefix."term_relationships";
 
-		$sql = "select ID, (select meta_value from $post_meta_table_name where meta_key = '".$this->follower_email."' and post_id = ID limit 1) as email from 
-		$post_table_name where post_type = '".$this->follower_post_type."' and (select meta_value from $post_meta_table_name where meta_key = '".$this->follower_email."' and post_id = ID limit 1) 
+		$sql = "select ID, (select meta_value from $post_meta_table_name where meta_key = '".self::$follower_email."' and post_id = ID limit 1) as email from 
+		$post_table_name where post_type = '".self::$follower_post_type."' and (select meta_value from $post_meta_table_name where meta_key = '".self::$follower_email."' and post_id = ID limit 1) 
 		not in (select wp_mail_sent.email from wp_mail_sent where mail_title = '".$mail_title."')		
 		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = '".$this->mail_list."' and meta_value = '".$mail_list_type."' )
-		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = '".$this->activated."' and meta_value = 1 )
+		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = '".self::$activated."' and meta_value = 1 )
 		and ID in (SELECT object_id FROM $term_relationship_table_name where object_id = ID and term_taxonomy_id = $notification_lang_term_id) limit 0,".$this->max_notifications_per_time;
 		
 		$followers = $wpdb->get_results($sql);

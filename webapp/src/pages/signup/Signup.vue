@@ -18,8 +18,7 @@
                 </div>
 
                 <user-form :submitFn="submit"></user-form>
-                <vue-recaptcha v-if="$store.getters.options.recaptcha_site_key"
-                  :sitekey="$store.getters.options.recaptcha_site_key"
+                <vue-recaptcha :sitekey="$store.getters.options.recaptcha_site_key"
                   ref="recaptcha"
                   size="invisible"
                   @verify="onCaptchaVerified"

@@ -16,6 +16,7 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
 - [Setup environment](#setup-environment)
 - [Debug](#debug)
 - [Deploy](#deploy)
+- [Options](#options)
 
 ## Running locally ##
 
@@ -256,3 +257,14 @@ The project deployment is done via continuous integration with Gitlab CI. So, wh
 Remember that if you make changed on the dashboard app, if is necessary to build it locally before commit/deploy. Check the [build-and-deploy app section](webapp/README.md#build-and-deploy) to understand more.
 
 Check the [Continuous integration](#continuous-integration) section to see the details.
+
+## Options ##
+
+Options without `wpp_` prefix:
+
+- git_hub_client_secret
+- recaptcha_secret
+
+Options with `wpp_` prefix that are not mandatory:
+
+- signup_with_github

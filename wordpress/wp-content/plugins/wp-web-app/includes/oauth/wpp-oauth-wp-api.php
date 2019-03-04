@@ -282,12 +282,12 @@ class WppOauthApi {
 		try {
 			$email = $this->getGhUserEmail($gh_user);
 			$pass = uniqid();
-			wp_create_user( $email, $pass, $email );
-			$wp_user = get_user_by('email', $email);
+			$user_id = wp_create_user( $email, $pass, $email );
 
-			if ($wp_user) { // USER WAS CREATED
-				update_user_meta($wp_user->ID, '_signedup_via', 'github');
-				wp_new_user_notification($wp_user->ID);
+			if ($user_id) { // USER WAS CREATED
+				update_user_meta($user_id, '_signedup_via', 'github');
+				wp_new_user_notification($user_id );
+				$wp_user = get_user_by('email', $email);
 				$wp_user->data->emailVerified = true;								
 				return $wp_user;
 			}
@@ -357,7 +357,7 @@ class WppOauthApi {
 	 * @return string client secret
 	 */
 	protected function getGitHubClientSecret() {
-		$git_hub_client_secret = get_option("wpp_git_hub_client_secret");
+		$git_hub_client_secret = get_option("git_hub_client_secret");
 
 		if (isset($git_hub_client_secret)) {
 			return $git_hub_client_secret;

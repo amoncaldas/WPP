@@ -45,7 +45,7 @@ const actions = {
           let section = sections[key]
           parser.href = section.link
           sections[key].path = `/${parser.pathname.replace(regex, '')}`
-          sections[key].data = sections[key].acf
+          sections[key].extra = sections[key].acf
         }
 
         commit('sections', sections)

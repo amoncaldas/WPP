@@ -25,7 +25,7 @@
 	 *
 	 * @var string
 	 */
-	private static $devPath = "/dev";
+	private static $app_base_path = ""; // we are not using any base path for instance
 
 	/**
 	 * Constructor that sets the listeners to user related events
@@ -117,7 +117,7 @@
 	 * @return Array $replacements
 	 */
 	function replacePasswordResetLink($replacements, $user_login, $key, $user_email){
-		$customResetUrl = network_home_url(self::$devPath."/#/password/reset/$key/$user_login");
+		$customResetUrl = network_home_url(self::$app_base_path."/#/password/reset/$key/$user_login");
 		$replacements[1] = 	$customResetUrl;
 		return $replacements;
 	}
@@ -135,12 +135,12 @@
 		$userEmail = $replacements[2];
 		$wp_user = get_user_by('email', $userEmail);		
 
-        if ($wp_user !== false) {
+    if ($wp_user !== false) {
 			$userLogin = $wp_user->data->email;
 			$key = get_password_reset_key($wp_user);
-			$customResetUrl = network_home_url(self::$devPath."/#/password/reset/$key/$userLogin");
+			$customResetUrl = network_home_url(self::$app_base_path."/#/password/reset/$key/$userLogin");
 			$replacements[6] = 	$customResetUrl;       
-        }  
+    }  
 		
 		return $replacements;
 	}	
@@ -172,7 +172,7 @@
 		$extra_meta = get_user_meta( $user['id']);
 		
 		foreach ($extra_meta as $key => $value) {
-			if (in_array($key, ["reg_website", "ors_usage", "pp_mc_present", "pp_mailchimp"])) {
+			if (in_array($key, ["website", "receive_news"])) {
 			if (is_array($value) && count($value) == 1) {
 				$value_data = $value[0];
 				if($value_data !== "?") {
@@ -207,7 +207,7 @@
 		if ($field_name === "metas") {
 			$user_id = $user->ID;
 			foreach ($metas as $key => $value) {
-				if (in_array($key, ["reg_website", "ors_usage", "pp_mc_present", "pp_mailchimp"])) {
+				if (in_array($key, ["website", "receive_news"])) {
 					update_user_meta( $user_id, $key, $value );
 				}
 			}
@@ -224,40 +224,39 @@
 	 * (subject and recipient) it is the email that is being sent to the the user with 
 	 * the activation link and then we customize the link applying a regex in the message content
 	 *
-	 * @param Array $emailData
-	 * @return Array $emailData
+	 * @param Array $email_Data
+	 * @return Array $email_Data
 	 */
-	function changeEmailConfirmationContent ($emailData) {
+	function changeEmailConfirmationContent ($email_Data) {
 		// Get the ProfilePress activation message subject
-		$ppConfirmation = PP_User_Email_Confirmation_Addon::get_instance();	
-		$ppEmailConfirmationSubject = $ppConfirmation->subject();
+		$ppEmailConfirmationSubject = "New User Registration";
 
 		// Get the wordpress admin email
-		$adminEmail = get_option("admin_email");
+		$admin_email = get_option("admin_email");
 		
 		// If is the email confirmation and is not sending to the admin, change the link
-		if ($emailData["subject"] === $ppEmailConfirmationSubject && $emailData["to"] !== $adminEmail ) {
+		if ($email_Data["subject"] === $ppEmailConfirmationSubject && $email_Data["to"] !== $admin_email ) {
 
 			// Get all the links in the message
-			preg_match_all('/https?\:\/\/[^\" ]+/', $emailData["message"], $matches);
+			preg_match_all('/https?\:\/\/[^\" ]+/', $email_Data["message"], $matches);
 
 			// The activation link must start with the defined login url
-			$originalLoginUrl = pp_login_url(); // this is a ProfilePress global function
+			$original_login_url = network_home_url("/profile");
 
 			// we have to loop over all links on the email
 			if(is_array($matches) && is_array($matches[0])) {
-				foreach ($matches[0] as $matchUrl) {
-					// check if the current link matches the base dev url
-					if (strpos($matchUrl, $originalLoginUrl) !== false) {
+				foreach ($matches[0] as $match_url) {
+					// check if the current link matches the base url
+					if (strpos($match_url, $original_login_url) !== false) {
 						// Get the url parameters of the url and put them, as an array in $params variable
-						parse_str(parse_url($matchUrl, PHP_URL_QUERY), $params);
+						parse_str(parse_url($match_url, PHP_URL_QUERY), $params);
 
 						// After the change applied by the customizeLoginUrl method the
-						// In production, url in the email is expected to be like this: https://openrouteservice.org/dev/?user_id=12006&activation_code=qhCRMzHLkT/
+						// In production, url in the email is expected to be like this: https://domain.tld/?user_id=12006&activation_code=qhCRMzHLkT/
 						
 						// Build a new url using the parameters
-						$newUrl = network_home_url(self::$devPath."/#/activate/".$params["user_id"]."/".$params["activation_code"]);
-						$emailData["message"] = str_replace($matchUrl, $newUrl, $emailData["message"]);						
+						$new_url = network_home_url(self::$app_base_path."/#/activate/".$params["user_id"]."/".$params["activation_code"]);
+						$email_Data["message"] = str_replace($match_url, $new_url, $email_Data["message"]);						
 					}
 				}
 			}

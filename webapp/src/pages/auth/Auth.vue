@@ -3,16 +3,17 @@
     <v-slide-y-transition mode="out-in">
       <v-layout row wrap>
         <v-flex xs12 xl6 sm12 md8 lg8 md10 offset-md2>
+          <br><br><br><br>
           <v-form ref="form" @keyup.native.enter="submit">
             <box>
               <h1 slot="header" class="headline">{{ $t('login.signIn') | uppercase }}</h1>
               <div slot="content">
-                <a class="social-gh" @click="socialAuthentication('github')">
+                <a class="social-gh" v-if="$store.getters.options.signup_with_github" @click="socialAuthentication('github')">
                   <div></div>
                   <span class="social-gh-title">{{$t('login.signupWithGithub')}}</span>
                 </a>
 
-                <div class="social-or">
+                <div class="social-or" v-if="$store.getters.options.signup_with_github">
                   <div class="social-orText">or</div>
                   <div class="social-orStroke"></div>
                 </div>

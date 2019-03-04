@@ -3,8 +3,8 @@ import {CRUD, CRUDData} from '@/core/crud'
 import pattern from '@/support/pattern'
 
 // Custom endpoints used to run custom queries in user service
-let checkUserNameRegisteredEndpoint = 'ors-api/v1/user/username-registered'
-let checkEmailRegisteredEndpoint = 'ors-api/v1/user/email-registered'
+let checkUserNameRegisteredEndpoint = 'wpp/v1/user/username-registered'
+let checkEmailRegisteredEndpoint = 'wpp/v1/user/email-registered'
 
 export default {
   created () {
@@ -12,8 +12,8 @@ export default {
     let options = {
       queryOnStartup: false,
       skipAutoIndexAfterAllEvents: true,
-      updatedMsg: 'Profile updated',
-      savedMsg: 'Account created successfully. Please check your email and follow the instructions.'
+      updatedMsg: this.$t('user.profileUpdated'),
+      savedMsg: this.$t('user.accountCreated')
     }
     CRUD.set(this, userService, options)
 
@@ -29,8 +29,8 @@ export default {
         context.emailValid = true // if we are in edit mode, so the email starts as valid
 
         // bind the news letter option
-        if (context.resource.metas && context.resource.metas.pp_mailchimp) {
-          context.receiveNews = context.resource.metas.pp_mailchimp
+        if (context.resource && context.resource.receive_news) {
+          context.receiveNews = context.resource.receive_news
         }
 
         // As we have set up queryOnStartup as false
@@ -45,9 +45,6 @@ export default {
         context.showError(this.$t('user.yourProfileDataCouldNotBeLoaded'))
       })
     } else {
-      // Initialize the resource metas attribute
-      this.resource.metas = {}
-
       // Set the crud as ready
       this.crudReady = true
     }
@@ -77,7 +74,9 @@ export default {
       mode: 'create',
       receiveNews: false,
       usernameValid: null,
-      emailValid: null
+      emailValid: null,
+      debounceUsernameTimeoutId: null,
+      debounceEmailTimeoutId: null
     }
   },
   computed: {
@@ -108,6 +107,7 @@ export default {
     }
   },
   methods: {
+
     /**
      * Return the icon to be added according the input state
      */
@@ -143,7 +143,7 @@ export default {
      * When the switch for new letter is changed, set its value to the resource model
      */
     newsChanged () {
-      this.resource.metas.pp_mailchimp = this.receiveNews
+      this.resource.receive_news = this.receiveNews
     },
 
     /**
@@ -170,19 +170,23 @@ export default {
      * because by default the validator is only fired when the user input data into it
      */
     userNameChanged () {
-      if (this.resource.metas.username && this.resource.metas.username.length > 0) {
-        // this is a custom request, so we need to set the options
-        let options = {verb: 'post', data: { username: this.resource.metas.username }, raw: true}
-        let endPoint = checkUserNameRegisteredEndpoint
+      if (this.resource.username && this.resource.username.length > 0) {
+        let context = this
+        clearTimeout(this.debounceUsernameTimeoutId)
+        this.debounceUsernameTimeoutId = setTimeout(function () {
+          // this is a custom request, so we need to set the options
+          let options = {verb: 'post', data: { username: context.resource.username }, raw: true}
+          let endPoint = checkUserNameRegisteredEndpoint
 
-        // we want to set the username valid attribute as `checking` while the response is not ready
-        this.usernameValid = 'checking'
-        userService.customQuery(options, endPoint).then(response => {
-          this.usernameValid = !response.data.registered
+          // we want to set the username valid attribute as `checking` while the response is not ready
+          context.usernameValid = 'checking'
+          userService.customQuery(options, endPoint).then(response => {
+            context.usernameValid = !response.data.registered
 
-          // call the username input validator to update the message displayed
-          this.$refs.username.validate()
-        })
+            // call the username input validator to update the message displayed
+            context.$refs.username.validate()
+          })
+        }, 1000)
       }
     },
 
@@ -194,23 +198,27 @@ export default {
      * because by default the validator is only fired when the user input data into it
      */
     emailChanged () {
-      if (this.resource.metas.email) {
-        if (pattern.email.test(this.resource.metas.email)) {
-          // this is a custom request, so we need to set the options
-          let options = {verb: 'post', data: { email: this.resource.metas.email }, raw: true}
-          let endPoint = checkEmailRegisteredEndpoint
+      if (this.resource.email) {
+        let context = this
+        clearTimeout(this.debounceEmailTimeoutId)
+        this.debounceEmailTimeoutId = setTimeout(function () {
+          if (pattern.email.test(this.resource.email)) {
+            // this is a custom request, so we need to set the options
+            let options = {verb: 'post', data: { email: this.resource.email }, raw: true}
+            let endPoint = checkEmailRegisteredEndpoint
 
-          // we want to set the username valid attribute as `checking` while the response is not ready
-          this.emailValid = 'checking'
-          userService.customQuery(options, endPoint).then(response => {
-            this.emailValid = !response.data.registered
+            // we want to set the username valid attribute as `checking` while the response is not ready
+            this.emailValid = 'checking'
+            userService.customQuery(options, endPoint).then(response => {
+              this.emailValid = !response.data.registered
 
-            // call the username input validator to update the message displayed
-            this.$refs.userEmail.validate()
-          })
-        } else {
-          this.emailValid = false
-        }
+              // call the username input validator to update the message displayed
+              this.$refs.userEmail.validate()
+            })
+          } else {
+            this.emailValid = false
+          }
+        }, 1000)
       }
     },
 
@@ -229,16 +237,7 @@ export default {
         }
       }
     },
-    /**
-     * Handle the event related to remove one item from the sector select list
-     * @param {*} item to remove
-     */
-    removeSector (item) {
-      this.resource.metas.ors_usage.splice(this.resource.metas.ors_usage.indexOf(item), 1)
-      this.resource.metas.ors_usage = [...this.resource.metas.ors_usage]
-    },
-
-    /**
+       /**
      * The api provides some user data as a  meta property, but accept them as root object property
      * so, we set these data here, before updating the user
      * This callback is executed by the @core/crud.js before running the update method
@@ -247,9 +246,9 @@ export default {
       if (this.beforeUpdateFn) {
         this.beforeUpdateFn(this.resource)
       } else {
-        this.resource.email = this.resource.metas ? this.resource.metas.email : null
-        this.resource.first_name = this.resource.metas ? this.resource.metas.first_name : null
-        this.resource.last_name = this.resource.metas ? this.resource.metas.last_name : null
+        this.resource.email = this.resource.metas ? this.resource.email : null
+        this.resource.first_name = this.resource ? this.resource.first_name : null
+        this.resource.last_name = this.resource ? this.resource.last_name : null
       }
     },
 
@@ -274,8 +273,6 @@ export default {
     afterSave () {
       this.$refs.form.reset()
       this.resource = userService.newModelInstance()
-      this.resource.metas = {}
-      this.resource.metas.ors_usage = []
       this.receiveNews = false
       this.usernameValid = null
       this.emailValid = null

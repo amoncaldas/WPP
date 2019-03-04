@@ -120,20 +120,29 @@ export default {
         }, 10)
       })
     },
-    fitFeaturesBounds () {
+    fitFeaturesBounds (enableScrollWheelZoom = false) {
       let context = this
       return new Promise((resolve, reject) => {
         // If te map object is already defined
         // then we can directly access it
         if (context.map) {
           context.map.fitBounds(context.dataBounds, {padding: [20, 20]})
+          if (!enableScrollWheelZoom) {
+            context.map.scrollWheelZoom.disable()
+          } else {
+            context.map.scrollWheelZoom.enable()
+          }
         } else {
           // If not, it wil be available only in the next tick
           this.$nextTick(() => {
             if (context.$refs.map) {
               context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
               context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
-              context.map.scrollWheelZoom.disable()
+              if (!enableScrollWheelZoom) {
+                context.map.scrollWheelZoom.disable()
+              } else {
+                context.map.scrollWheelZoom.enable()
+              }
             }
             resolve()
           })
@@ -163,7 +172,7 @@ export default {
             setTimeout(() => {
               // After redrawing and waiting
               // fit the bounds
-              this.fitFeaturesBounds()
+              this.fitFeaturesBounds(data.maximized)
             }, 500)
           })
         }, 500)

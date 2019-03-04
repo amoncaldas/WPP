@@ -52,8 +52,8 @@ export default {
       }
     },
     related () {
-      if (this.post && this.post.data && this.post.data.related && Array.isArray(this.post.data.related)) {
-        return this.post.data.related
+      if (this.post && this.post.extra && this.post.extra.related && Array.isArray(this.post.extra.related)) {
+        return this.post.extra.related
       }
       return []
     },
@@ -73,8 +73,8 @@ export default {
       if (this.post.content) {
         content = this.post.content.rendered
       }
-      if (this.post.data && this.post.data.content) {
-        content = this.post.data.content
+      if (this.post.extra && this.post.extra.content) {
+        content = this.post.extra.content
       }
       return content
     }

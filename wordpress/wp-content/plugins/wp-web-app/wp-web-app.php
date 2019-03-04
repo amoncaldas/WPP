@@ -57,10 +57,12 @@ if ( ! function_exists( 'add_action' ) ) {
 	public function requiredDependencies () {		
 		require_once(WPP_PLUGIN_PATH . '/includes/user/wpp-user-data-wp-api.php');
 		require_once(WPP_PLUGIN_PATH . '/includes/user/user-events-listener.php');
+		require_once(WPP_PLUGIN_PATH . '/includes/mail/wpp-mailer.php');
 		require_once(WPP_PLUGIN_PATH . '/includes/mail/wpp-notifier.php');
 		require_once(WPP_PLUGIN_PATH . '/includes/mail/mail-from.php');
 		require_once(WPP_PLUGIN_PATH . '/includes/oauth/wpp-oauth-wp-api.php');
-		require_once(WPP_PLUGIN_PATH . '/includes/global/wp-web-app-services-api.php');		
+		require_once(WPP_PLUGIN_PATH . '/includes/global/wp-web-app-services-api.php');
+		require_once(WPP_PLUGIN_PATH . '/includes/global/functions.php');		
 	}
 
 	/**

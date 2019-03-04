@@ -5,7 +5,7 @@
       ref="username"
       class="username"
       :class="validatableInputClass(usernameValid)"
-      v-model="resource.metas.username"
+      v-model="resource.username"
       :rules="userNameRules"
       @keyup="userNameChanged"
       :counter="20"
@@ -19,22 +19,22 @@
       :class="validatableInputClass(emailValid)"
       :append-icon="validatableInputStateIcon(emailValid)"
       @keyup="emailChanged"
-      :readonly="mode === 'edit' && resource.metas.email === resource.metas.username"
-      v-model="resource.metas.email"
+      :readonly="mode === 'edit' && resource.email === resource.username"
+      v-model="resource.email"
       :rules="emailRules"
       required>
       </v-text-field>
     <v-layout row wrap>
       <v-flex xs6>
-        <v-text-field :label="$t('user.firstName')" v-model="resource.metas.first_name" required></v-text-field>
+        <v-text-field :label="$t('user.firstName')" v-model="resource.first_name" required></v-text-field>
       </v-flex>
       <v-flex xs6>
-        <v-text-field :label="$t('user.lastName')" v-model="resource.metas.last_name" required></v-text-field>
+        <v-text-field :label="$t('user.lastName')" v-model="resource.last_name" required></v-text-field>
       </v-flex>
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12>
-        <v-text-field :label="$t('user.website')" v-model="resource.metas.reg_website" :rules="websiteRules"></v-text-field>
+        <v-text-field :label="$t('user.website')" v-model="resource.website" :rules="websiteRules"></v-text-field>
       </v-flex>
     </v-layout>
 

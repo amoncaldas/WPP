@@ -10,7 +10,7 @@
             <div >{{marker.label}}</div>
           </l-popup>
       </l-marker>
-      <l-polyline v-if="polyline" :lat-lngs="polyline" :color="routeColor">
+      <l-polyline v-if="polyline" :lat-lngs="polyline" :weight="7" :color="routeColor">
         <!-- <l-tooltip v-html="routeToolTip"></l-tooltip> -->
       </l-polyline>
        <l-control-layers

@@ -1,9 +1,9 @@
 export default {
   login: {
     signIn: 'Sign in',
-    pageTitle: 'Sign in | ORS',
+    pageTitle: 'Sign in',
     signupWithGithub: 'Sign in with GitHub',
-    loginSubtitle: 'With your openrouteservice account',
+    loginSubtitle: 'With your account',
     quote: 'Everything is related to everything else, but near things are more related than distant things.',
     quoteAuthor: 'Waldo Tobler',
     resetPass: 'Reset password',
