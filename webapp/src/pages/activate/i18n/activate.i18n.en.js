@@ -1,6 +1,6 @@
 export default {
   activate: {
-    pageTitle: 'Activate your account | ORS',
+    pageTitle: 'Activate your account',
     activateYourAccount: 'Activate you account',
     validatingActivationData: 'Activating your account ...',
     activationKeyInvalid: 'Activation code is invalid',

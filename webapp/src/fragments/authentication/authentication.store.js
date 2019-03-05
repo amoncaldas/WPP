@@ -17,7 +17,8 @@ const getters = {
     }
   },
   isAuthenticated (state) {
-    return (state.token != null && validToken() !== false)
+    let authenticated = (state.token !== null && validToken() !== false)
+    return authenticated
   }
 }
 

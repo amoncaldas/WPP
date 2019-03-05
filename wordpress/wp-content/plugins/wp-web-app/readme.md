@@ -1,6 +1,10 @@
 # wP Web App plugin #
 
 This plugin adds custom behaviors based on the Wp Web App needs. It relies on the existence of JWTAuthentication plugin (they must be installed and active)
+This plugin provides:
+
+- Additional api endpoints to wpp services, like send message and return options
+- Ad the followers and newsletter logic, including followers subscribe and unsubscribe endpoints
 
 
 ## Login via oauth providers ####

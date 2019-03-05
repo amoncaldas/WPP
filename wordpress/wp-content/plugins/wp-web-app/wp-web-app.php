@@ -55,8 +55,9 @@ if ( ! function_exists( 'add_action' ) ) {
 	 * @return void
 	 */
 	public function requiredDependencies () {		
-		require_once(WPP_PLUGIN_PATH . '/includes/user/wpp-user-data-wp-api.php');
+		require_once(WPP_PLUGIN_PATH . '/includes/user/wpp-user.php');
 		require_once(WPP_PLUGIN_PATH . '/includes/user/user-events-listener.php');
+		require_once(WPP_PLUGIN_PATH . '/includes/user/wpp-follower.php');
 		require_once(WPP_PLUGIN_PATH . '/includes/mail/wpp-mailer.php');
 		require_once(WPP_PLUGIN_PATH . '/includes/mail/wpp-notifier.php');
 		require_once(WPP_PLUGIN_PATH . '/includes/mail/mail-from.php');
@@ -73,8 +74,9 @@ if ( ! function_exists( 'add_action' ) ) {
 	public function runClasses () {
 		// Start the user hooks listeners
 		new UserEventsListener();
-		new WppUserAPI();
+		new WppUser();
 		new WppMailFrom();
+		new WppFollower();
 		new WppNotifier();
 		new WppOauthApi();
 		new WppServicesApi();

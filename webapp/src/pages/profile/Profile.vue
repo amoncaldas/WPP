@@ -4,7 +4,7 @@
       <v-layout child-flex>
         <v-flex xs12>
           <box>
-            <h1 slot="header">{{ $t('home.title') }}</h1>
+            <h1 slot="header">{{ $t('profile.title') }}</h1>
             <div slot="content">
               <v-tabs class="tab app-tab" v-model="activeTab" slider-color="secondary">
                 <v-tab ripple :key="0" >

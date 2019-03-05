@@ -14,4 +14,24 @@
   }
 }
 
+.no-padding {
+  padding: 0px !important;
+  margin: 0px !important;
+}
+
+.no-padding::before {
+  content: none;
+}
+
+.floating-menu-activator {
+  width: 50px;
+}
+
+.account-floating-menu {
+ background:white;
+ padding: 10px;
+ width: auto;
+ min-width: auto !important;
+}
+
 /* End customize the ORS toolbar */

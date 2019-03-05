@@ -12,6 +12,14 @@ let options = {
       delete response.data.roles
       delete response.data.capabilities
       delete response.data.extra_capabilities
+      if (response.data.metas) {
+        delete response.data.metas.roles
+      }
+    }
+    if (response.config.method === 'get' && response.data.metas) {
+      for (let metaKey in response.data.metas) {
+        response.data[metaKey] = response.data.metas[metaKey]
+      }
     }
   },
   transformRequest: (request) => {

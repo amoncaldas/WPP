@@ -7,7 +7,7 @@
  */
 
 
-class WppUserAPI {
+class WppUser {
 
     private $baseNamespace;
 
@@ -18,8 +18,24 @@ class WppUserAPI {
 		if ( ! defined( 'JSON_API_VERSION' ) && ! in_array( 'json-rest-api/plugin.php', get_option( 'active_plugins' ) ) ) {
 
 			add_action('rest_api_init', array($this, 'register_routes'));
-		} 
+        } 
+        add_action('authenticate', array($this, 'after_determine_user'), 20, 3);
+        //add_filter('determine_current_user', array($this, 'wpp_authenticate'), 9);
     }
+
+    /**
+     * Check if the user is not with pending status before login
+     *
+     * @param [type] $username
+     * @return WP_User|false
+     */
+    public function after_determine_user($wp_user, $username, $password) {        
+        $status = get_user_meta($wp_user->ID, "status", true);
+        if ($status === "pending") {
+            return false;
+        }
+        return $wp_user;
+    }     
 
 
     /**
@@ -162,7 +178,7 @@ class WppUserAPI {
             // If the user is editing the profile, we should consider 
             // the already registered email as available for editing
             if ($logged_wp_user->ID > 0) {
-                $available = $logged_wp_user->data->email !== $wp_user->data->email;
+                $available = $logged_wp_user->data->user_email !== $wp_user->data->user_email;
             } else {
                 $available = $wp_user->ID === 0;
             }            
@@ -233,14 +249,14 @@ class WppUserAPI {
             if ($user_id) { // USER WAS CREATED
 
                 // Update additional user data from request
-                foreach (["website", "receive_news"] as $meta_key) {                    
+                foreach (["website", "receive_news", "first_name", "last_name"] as $meta_key) {                    
                     $value = $userData[$meta_key];
                     update_user_meta($user_id, $meta_key, $value );                    
                 }                
 
                 if ($userData['receive_news'] == "true") { // can be boolean true or string true
                     $request_lang = get_request_locale();
-                    WppNotifier::register_follower($userData['display_name'], $userData['email'], "news",  $request_lang);                    
+                    WppFollower::register_follower($userData['display_name'], $userData['email'], "news",  $request_lang);                    
                 }
                 
                 // Set activation code
@@ -328,6 +344,7 @@ class WppUserAPI {
 
         add_user_meta($user_id, 'activation_code', $activation_code);
         add_user_meta($user_id, 'activation_expiration', $expiration);
+        add_user_meta($user_id, 'status', "pending");
         return $activation_code;
     }
 
@@ -523,6 +540,7 @@ class WppUserAPI {
 
         delete_user_meta($wp_user->ID, 'activation_code');
         delete_user_meta($wp_user->ID, 'activation_expiration');
+        update_user_meta($wp_user->ID, 'status', "activated", "pending");
 
         return new WP_REST_Response(null, 204); // NO CONTENT - the request was processed, but there is not content to be returned   
     }
@@ -538,8 +556,13 @@ class WppUserAPI {
         if ($wp_user === false) {
             return new WP_REST_Response(null, 404); // NOT FOUND - user not found by its id  
         }
-        $ppUserEmailConfirmation = PP_User_Email_Confirmation_Addon::get_instance();
-        $ppUserEmailConfirmation->send_email_confirmation(null, null, $wp_user->ID);
+        delete_user_meta($wp_user->ID, 'activation_code');
+        delete_user_meta($wp_user->ID, 'activation_expiration');
+        delete_user_meta($wp_user->ID, 'status');
+
+        // Set activation code
+        $activation_code = self::set_activation_and_expiration($user_id);
+        self::send_new_user_notifications($wp_user->ID, $wp_user->data->user_email, $activation_code);
 
         return new WP_REST_Response(null, 204); // NO CONTENT - the request was processed, but there is not content to be returned
     }

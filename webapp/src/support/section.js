@@ -7,7 +7,7 @@ const section = {
     let currentSection = section.getCurrentSection()
     let VueInstance = Main.getInstance()
 
-    if (Array.isArray(currentSection.acf.list_post_endpoints)) {
+    if (Array.isArray(currentSection.extra.list_post_endpoints)) {
       let translations = store.getters.options.post_type_translations
 
       currentSection.acf.list_post_endpoints.forEach(endpoint => {
@@ -34,6 +34,9 @@ const section = {
         let currentPath = `/${VueInstance.$route.path.replace(regex, '')}`
         return section.path === currentPath && (section.path !== '/' || section.locale === store.getters.locale)
       })
+      if (!currentSection) {
+        currentSection = section.getCurrentHomeSection()
+      }
       return currentSection
     }
   },

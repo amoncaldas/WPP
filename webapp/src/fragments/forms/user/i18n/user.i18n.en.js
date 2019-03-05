@@ -8,7 +8,7 @@ export default {
     website: 'Website',
     newPassword: 'New password',
     confirmNewPassword: 'Confirm new password',
-    receiveNews: 'Monthly news about new features',
+    receiveNews: 'Receive news by mail',
     passwordMatch: 'Password must match with password confirmation',
     usernameRequired: 'Username is required',
     failWhileTryingToRegister: 'Fail while trying to register.',

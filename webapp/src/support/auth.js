@@ -3,11 +3,13 @@
  * @param {*} context
  * @param {*} userData
  */
-const setUserAndRedirect = (context, userData) => {
+const setUserAndRedirect = (context, userData, onAuthenticate) => {
   userData = parseUserData(userData)
   context.$store.dispatch('login', userData)
   .then((user) => {
-    context.$router.replace('/home')
+    if (onAuthenticate) {
+      onAuthenticate()
+    }
   }).catch(error => {
     console.log('login error', error)
   })

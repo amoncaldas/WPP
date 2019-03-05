@@ -15,6 +15,23 @@
     <v-btn icon style="padding-right:30px; padding-left:20px">
       <v-icon large>search</v-icon>
     </v-btn>
+    <template v-if="$store.getters.isAuthenticated">
+      <v-menu :close-on-click="true" :close-on-content-click="true" :open-on-hover="true" class="floating-menu-activator" left content-class="account-floating-menu">
+        <v-btn flat slot="activator" class="floating-profile-menu-activator no-padding" :title="$t('header.myProfile')">
+          <v-icon large left>personal_pin</v-icon>
+        </v-btn>
+          <div style="width:auto">
+            <v-btn class="profile-btn no-padding" href="/#/logout" flat :title="$t('header.logout')">
+              {{$t('header.logout')}}
+            </v-btn>
+          </div>
+          <div style="width:auto">
+            <v-btn class="profile-btn no-padding" href="/#/profile" flat :title="$t('header.myAccount')">
+              {{$t('header.myAccount')}}
+            </v-btn>
+          </div>
+      </v-menu>
+    </template>
     <locale-changer></locale-changer>
   </v-toolbar>
 </template>

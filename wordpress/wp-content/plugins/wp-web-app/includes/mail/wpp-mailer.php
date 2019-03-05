@@ -55,15 +55,24 @@ class WppMailer  {
 		$html_message = self::get_basic_notification_template($title, $message, $lang);
 		
 		$sender_name = get_option("wpp_email_sender_name");
-		$sender_email = get_option("wpp_email_sender_email");
-		// $headers[] = "From: $sender_email <$sender_name>";	
-		// $headers[] = "Return-Path: <$sender_name>";
-		// $headers[] = "Sender: <$sender_name>";			
+		$sender_email = get_option("wpp_email_sender_email");		
+
+		$headers = [];
+		
+		if ($sender_email && $sender_name) {
+			if(!is_localhost()) {
+				$headers[] = "From: $sender_email <$sender_name>";
+				$headers[] = "Reply-To: <$sender_email>";
+			}
+			$headers[] = "Return-Path: $sender_email <$sender_name>";
+			$headers[] = "Sender: <$sender_name>";			
+		}
 
 		add_filter('wp_mail_content_type','set_email_html_content_type');	
-		wp_mail($to_email, $title, $html_message);			
+		wp_mail($to_email, $title, $html_message, $headers);			
 		remove_filter('wp_mail_content_type', 'set_email_html_content_type');
 	}
+
 
 	/**
 	 * Get the news mail template
@@ -101,15 +110,6 @@ class WppMailer  {
     
 		return $html_message;
 	}
-}
-
-/**
- * Set the email content type to be html
- *
- * @return string
- */
-function set_email_html_content_type() {
-  return "text/html";
 }
 
 ?>

@@ -207,7 +207,7 @@
 		if ($field_name === "metas") {
 			$user_id = $user->ID;
 			foreach ($metas as $key => $value) {
-				if (in_array($key, ["website", "receive_news"])) {
+				if (in_array($key, ["website", "receive_news", "first_name", "last_name"])) {
 					update_user_meta( $user_id, $key, $value );
 				}
 			}

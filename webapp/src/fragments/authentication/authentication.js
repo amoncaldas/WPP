@@ -11,15 +11,21 @@ export default {
     password: '',
     hidePass: true
   }),
+  props: {
+    onAuthenticate: {
+      type: Function,
+      required: true
+    }
+  },
   computed: {
     userNameRules () {
       return [
-        v => !!v || this.$t('login.usernameRequired')
+        v => !!v || this.$t('authentication.usernameRequired')
       ]
     },
     passwordRules () {
       return [
-        v => !!v || this.$t('login.passwordRequired')
+        v => !!v || this.$t('authentication.passwordRequired')
       ]
     }
   },
@@ -37,21 +43,17 @@ export default {
 
         httpApi.post(authEndpoint, authData).then(userData => {
           if (userData.data.token) {
-            auth.setUserAndRedirect(this, userData.data)
+            auth.setUserAndRedirect(this, userData.data, this.onAuthenticate)
           } else {
-            this.showError(this.$t('login.invalidCredentials'))
+            this.showError(this.$t('authentication.invalidCredentials'))
           }
         })
         .catch(error => {
-          if (error.data && error.data.message) {
-            this.showError(error.data.message)
-          } else {
-            this.showError(this.$t('login.failWhileTryingToLogin'))
-            console.log(error)
-          }
+          this.showError(this.$t('authentication.failWhileTryingToLogin'))
+          console.log(error)
         })
       } else {
-        this.showError(this.$t('login.invalidCredentials'))
+        this.showError(this.$t('authentication.invalidCredentials'))
       }
     },
 
@@ -73,6 +75,6 @@ export default {
     })
     // emit the an event catch by root App component
     // telling it to update the page title
-    this.eventBus.$emit('titleChanged', this.$t('login.pageTitle'))
+    this.eventBus.$emit('titleChanged', this.$t('authentication.pageTitle'))
   }
 }

@@ -2,6 +2,7 @@ import postService from '@/shared-services/post-service'
 import Media from '@/fragments/media/Media'
 import PostMap from '@/fragments/post-map/PostMap'
 import Gallery from '@/fragments/gallery/Gallery'
+import Comments from '@/fragments/comments/Comments'
 
 export default {
   name: 'post',
@@ -104,7 +105,8 @@ export default {
   components: {
     Media,
     PostMap,
-    Gallery
+    Gallery,
+    Comments
   },
   beforeCreate: function () {
     this.$options.components.Related = require('@/fragments/related/Related.vue').default

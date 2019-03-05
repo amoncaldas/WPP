@@ -1,5 +1,5 @@
 export default {
-  login: {
+  authentication: {
     signIn: 'Sign in',
     pageTitle: 'Sign in',
     signupWithGithub: 'Sign in with GitHub',
@@ -12,7 +12,7 @@ export default {
     passwordRequired: 'Password is required',
     usernameRequired: 'Name is required',
     invalidCredentials: 'Invalid credentials',
-    failWhileTryingToLogin: 'Fail while trying to log in.',
+    failWhileTryingToLogin: 'It was not possible to autenticate. Check your credentials and if you have activated your account',
     login: 'login'
   }
 }

@@ -1,13 +1,13 @@
-import Auth from '@/pages/auth/Auth'
+import Login from '@/pages/login/Login'
 import store from '@/store/store'
 
 export default {
   path: '/login',
   name: 'Login',
-  component: Auth,
+  component: Login,
   beforeEnter: (to, from, next) => {
     if (store.getters.isAuthenticated) {
-      next('/home')
+      next('/profile')
     } else {
       next()
     }

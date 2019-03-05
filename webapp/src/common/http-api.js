@@ -73,7 +73,7 @@ const responseErrorInterceptors = (response) => {
       // If the the pending request counter is zero, so
       // we can hide the progress bar
       if (VueInstance.$pendingRequest === 0) {
-        VueInstance.$emit('showLoading', false)
+        VueInstance.eventBus.$emit('showLoading', false)
       }
     }
     response = response.response || response

@@ -16,6 +16,12 @@ export default {
       context: null
     }
   },
+  props: {
+    onSignup: {
+      type: Function,
+      required: true
+    }
+  },
   methods: {
     submit (context) {
       this.context = context
@@ -61,7 +67,7 @@ export default {
       this.$store.dispatch('login', userData).then(() => {
         // Tab 1 correspond to the profile tab, so after registering, the user is redirected to the home/profile
         // so s/he can complete the profile, if s/he want
-        this.$router.replace({path: '/home', query: {tab: '1'}})
+        this.$router.replace({path: '/profile', query: {tab: '1'}})
       }).catch(error => {
         console.log('login error', error)
       })
