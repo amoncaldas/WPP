@@ -53,7 +53,47 @@ class WppMailer  {
 	 */
 	public static function send_message($to_email, $title, $message, $lang = null) {
 		$html_message = self::get_basic_notification_template($title, $message, $lang);
-		
+		self::send_email($to_email, $title, $html_message, $lang);
+	}
+
+	/**
+	 * Send registration/activation mail
+	 *
+	 * @param String $to_email
+   * @param String $title
+	 * @param String $link
+	 * @param String $lang
+	 * @return void
+	 */
+	public static function send_registration_email($to_email, $title, $link, $lang = null) {
+		$html_message = self::get_registration_notification_template($link, $lang);
+		self::send_email($to_email, $title, $html_message, $lang);
+	}
+
+	/**
+	 * Send registration/activation mail
+	 *
+	 * @param String $to_email
+   * @param String $title
+	 * @param String $link
+	 * @param String $lang
+	 * @return void
+	 */
+	public static function send_reset_password_email($to_email, $title, $link, $lang = null) {
+		$html_message = self::get_password_reset_notification_template($link, $lang);
+		self::send_email($to_email, $title, $html_message, $lang);
+	}
+
+	/**
+	 * Notify admin via email using basic notification template
+	 *
+	 * @param String $to_email
+   * @param String $title
+	 * @param String $message
+	 * @param String $lang
+	 * @return void
+	 */
+	public static function send_email($to_email, $title, $html_message, $lang = null) {		
 		$sender_name = get_option("wpp_email_sender_name");
 		$sender_email = get_option("wpp_email_sender_email");		
 
@@ -88,7 +128,7 @@ class WppMailer  {
 
 	/**
 	 * Get the news mail template
-	 * @param String $name
+	 * @param String $title
    * @param String $message
    * @param String $lang
 	 * @return String html
@@ -103,9 +143,52 @@ class WppMailer  {
 		$template = str_replace("{site-name}", get_bloginfo("name"), $template);
 		$template = str_replace("{site-domain}", $url_parts[1], $template);
 		$template = str_replace("{site-logo-url}", $logo_url, $template);			
-		$template = str_replace("{site-url}", network_home_url(), $template);
 		$template = str_replace("{content-title}", $title, $template);
 		$template = str_replace("{content}", $message, $template);
+    $html_message = str_replace("{current-year}", date('Y'), $template);	
+    
+		return $html_message;
+	}
+
+	/**
+	 * Get the news mail template
+	 * @param String $link
+   * @param String $lang
+	 * @return String html
+	 */
+	public static function get_registration_notification_template($link, $lang = null) {
+		$lang = $lang ? $lang : self::$default_language;
+    $template = file_get_contents(WPP_PLUGIN_PATH."/includes/mail/templates/$lang/registration.html");
+    $logo_url = network_home_url(get_option("wpp_site_relative_logo_url"));
+    $url_parts = explode("//", network_home_url());
+    
+		$template = str_replace("{site-url}", network_home_url(), $template);
+		$template = str_replace("{link}", $link, $template);
+		$template = str_replace("{site-name}", get_bloginfo("name"), $template);
+		$template = str_replace("{site-domain}", $url_parts[1], $template);
+		$template = str_replace("{site-logo-url}", $logo_url, $template);			
+    $html_message = str_replace("{current-year}", date('Y'), $template);	
+    
+		return $html_message;
+	}
+
+	/**
+	 * Get the news mail template
+	 * @param String $link
+   * @param String $lang
+	 * @return String html
+	 */
+	public static function get_password_reset_notification_template($link, $lang = null) {
+		$lang = $lang ? $lang : self::$default_language;
+    $template = file_get_contents(WPP_PLUGIN_PATH."/includes/mail/templates/$lang/reset-password.html");
+    $logo_url = network_home_url(get_option("wpp_site_relative_logo_url"));
+    $url_parts = explode("//", network_home_url());
+    
+		$template = str_replace("{site-url}", network_home_url(), $template);
+		$template = str_replace("{link}", $link, $template);
+		$template = str_replace("{site-name}", get_bloginfo("name"), $template);
+		$template = str_replace("{site-domain}", $url_parts[1], $template);
+		$template = str_replace("{site-logo-url}", $logo_url, $template);			
     $html_message = str_replace("{current-year}", date('Y'), $template);	
     
 		return $html_message;
