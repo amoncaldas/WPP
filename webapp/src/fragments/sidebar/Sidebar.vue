@@ -1,7 +1,7 @@
 <template>
   <v-navigation-drawer temporary disable-resize-watcher hide-overlay dark :right="right" v-model="isSideBarOpen" fixed app>
     <v-list>
-      <v-list-tile light @click="right = !right">
+      <v-list-tile @click="right = !right">
         <v-list-tile-action>
           <v-icon>compare_arrows</v-icon>
         </v-list-tile-action>

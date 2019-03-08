@@ -8,11 +8,11 @@
         <br>
         <v-form ref="form" v-if="open">
           <v-layout row wrap class="comment-box">
-            <v-flex sm1>
-              <img v-if="$store.getters.isAuthenticated" :src="commenterAvatar" :alt="$store.getters.user.displayName" :title="$store.getters.user.displayName">
-              <img v-else src="https://www.gravatar.com/avatar/HASH">
+            <v-flex xs2 sm1>
+              <img class="max-100" v-if="$store.getters.isAuthenticated" :src="commenterAvatar" :alt="$store.getters.user.displayName" :title="$store.getters.user.displayName">
+              <img class="max-100" v-else src="https://www.gravatar.com/avatar/HASH">
             </v-flex>
-            <v-flex sm11 class="comment-input">
+            <v-flex xs10 sm11 class="comment-input">
               <v-textarea class="" type="text" autofocus hide-details
                 :label="$t('comments.yourComment')" box
                 :title="$t('comments.yourComment')"
@@ -43,10 +43,10 @@
         <template v-for="comment in comments">
           <div :key="comment.id">
             <v-layout row wrap>
-              <v-flex sm1>
-                <img :src="comment.author_avatar_urls[48]" :alt="comment.author_name" :title="comment.author_name">
+              <v-flex xs2 sm1>
+                <img class="max-100" :src="comment.author_avatar_urls[48]" :alt="comment.author_name" :title="comment.author_name">
               </v-flex>
-              <v-flex sm10>
+              <v-flex xs10 sm11>
                 <div>
                   <span class="author-name" :style="{color: theme.dark}">{{comment.author_name}}</span>
                 </div>

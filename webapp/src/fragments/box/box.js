@@ -292,7 +292,7 @@ export default {
         return false
       }
       // the initial color the the defined as primary at @/common/theme.js
-      var color = theme['dark']
+      var color = theme['accent']
 
       // if the topBorderPalette prop is defined, use it to define the color
       if (this.topBorderPalette) {
