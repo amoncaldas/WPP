@@ -1,5 +1,5 @@
 <template>
-<v-container grid-list-lg fluid >
+<v-container grid-list-lg fluid class="page-root page" >
   <br>
   <v-layout row wrap>
     <v-flex md9 >

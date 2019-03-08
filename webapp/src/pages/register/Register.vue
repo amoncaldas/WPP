@@ -3,7 +3,6 @@
     <v-slide-y-transition mode="out-in">
       <v-layout row wrap>
         <v-flex xs12 xl6 sm12 md8 lg8 md10 offset-md2>
-          <br><br><br>
           <signup :on-signup="afterSignup"></signup>
         </v-flex>
       </v-layout>

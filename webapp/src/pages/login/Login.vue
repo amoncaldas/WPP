@@ -3,7 +3,7 @@
     <v-slide-y-transition mode="out-in">
       <v-layout row wrap>
         <v-flex xs12 xl6 sm12 md8 lg8 md10 offset-md2>
-          <br><br><br><br>
+          <br><br>
           <authentication :on-authenticate="redirectToProfile"></authentication>
         </v-flex>
       </v-layout>

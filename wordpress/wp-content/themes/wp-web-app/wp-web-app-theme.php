@@ -37,19 +37,90 @@
 		add_filter('preview_post_link', array($this, 'set_post_preview_permalink'), 10, 2);
 		add_filter('page_link', array($this, 'set_page_permalink'), 10, 2);
 		add_filter('preview_page_link', array($this, 'set_page_preview_permalink'), 10, 2);
-		add_filter("wp_insert_post_data", array($this, 'before_insert_post'), 10, 2);
+		add_filter("pre_post_update", array($this, 'before_update_draft_post'), 9, 2);
+		add_action( 'admin_enqueue_scripts', array($this, 'may_disable_autosave'));
 		
 	}
 
 	/**
-	 * Set the imported post if, if sent via request
+	 * Check if the auto save should be skipped
 	 *
-	 * @param Array $data
-	 * @param Array $postarr
-	 * @return Array $data
+	 * @param Object $post
+	 * @return null
 	 */
-	public function before_insert_post($data, $postarr) {
-		// $postarr["import_id"] = 0;
+	public function may_disable_autosave() {
+
+		$skip_auto_save = get_option("wpp_disable_auto_save", "no");
+
+		if ($skip_auto_save === "yes") {
+			wp_dequeue_script( 'autosave' );
+		}	
+	}
+
+	/**
+	 * If it is a draft post and it has an import_id meta
+	 * create a new post with the defined import id and
+	 * remove the auto generated one
+	 *
+	 * @param Array $post_id
+	 * @param Array $data
+	 * @return Array $data - new post created
+	 */
+	public function before_update_draft_post($post_id, $data) {
+		$skip_auto_save = get_option("wpp_disable_auto_save", "no");
+
+		// We only process this imported post id stuff if auto save is disabled
+		if ($skip_auto_save === "yes") {			
+			$import_id = 0;	
+			$extra_data = $_POST['acf'];
+	
+			// If the acf data are present and the post is a draft
+			if (isset($extra_data) && is_array($extra_data) && $data["post_status"] === "draft") {
+				// Find the import id from the ACF fields extra data
+				foreach( $extra_data as $key => $value ) {			
+					// Get field.
+					$field = acf_get_field( $key );				
+					
+					// Get the import id value
+					if( $field && is_array($field) & $field["name"] === "import_id") {
+						if ($field["name"] === "import_id") {
+							$import_id = (int)$value;
+						}
+					}
+				}
+			}
+	
+			// If the import id was found and is different from the current post id
+			// If the imported post already exists (wordpress fires this callback multiple times)			
+			if ($import_id > 0 && $post_id !== $import_id) {
+				$post_exists = get_post($import_id);
+	
+				// return the already created post from database
+				if ($post_exists && $post_exists->post_name === $data["post_name"] && $post_exists->post_type === $data["post_type"]) {
+					$data = $post_exists->to_array();
+					return $data;
+				}
+				else { // if not, create a new post using the current post data
+					$data["import_id"] = $import_id;
+					unset($data["ID"]);
+					$inserted_id = wp_insert_post($data);
+					$data["ID"] = $import_id;
+
+					// This is not straight forward but we have
+					// to change the post id in the request
+					// to the one we have created
+					// so that all the following wordpress
+					// actions use the new post ID
+					$_REQUEST["post_ID"] = $import_id;
+					$_POST["post_ID"] = $import_id;
+
+					// Delete the draft created automatically
+					// by wordpress, we don need it any more
+					wp_delete_post($post_id, true);
+				} 
+			}
+		}
+
 		return $data;
 	}
 
