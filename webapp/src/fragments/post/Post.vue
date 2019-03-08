@@ -2,7 +2,7 @@
 <div>
   <box class="post" background="white" :no-top-border="noTopBorder" v-if="post">
     <div slot="header">
-      <a v-bind:href="post.path" :style="{color:theme.dark}" v-if="mode === 'list'" style="margin-left:0px; text-decoration:none" ><h3>{{title}}</h3></a>
+      <a v-bind:href="'/#'+post.path" :style="{color:theme.dark}" v-if="mode === 'list'" style="margin-left:0px; text-decoration:none" ><h3>{{title}}</h3></a>
       <h3 v-else>{{title}}</h3>
     </div>
     <div slot="content">
@@ -31,14 +31,14 @@
       <v-tab ripple>
         {{ $t('post.related') }}
       </v-tab>
-      <v-tab ripple v-if="post.comment_status === 'open'">
+      <v-tab ripple>
         {{$t('post.comments')}}
       </v-tab>
       <v-tab-item>
         <related :columns-per-post="4" :content-id="post.id" :max="6"> </related>
       </v-tab-item>
-      <v-tab-item v-if="post.comment_status === 'open'">
-        <comments :post-id="post.id"></comments>
+      <v-tab-item>
+        <comments :open="post.comment_status === 'open'" :post-id="post.id"></comments>
       </v-tab-item>
     </v-tabs>
 

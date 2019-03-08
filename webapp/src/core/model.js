@@ -40,7 +40,7 @@ class Model {
       '$extend', '$save', '$post', '$destroy',
       '$pending', '$update', '$copy',
       '$getName', '$strip', '$options',
-      '$name', '$endPoint', '$create',
+      '$name', '$endPoint', '$create', '$setEndpoint',
       '$clean', '$parseRequest', '$instanceKeywords'
     ]
   }
@@ -52,6 +52,15 @@ class Model {
    */
   $getName = () => {
     return this.$name
+  }
+
+  /**
+   * Set the endpoint
+   * @param value
+   * @memberof Model
+   */
+  $setEndpoint = (value) => {
+    this.$endPoint = value
   }
 
   /**

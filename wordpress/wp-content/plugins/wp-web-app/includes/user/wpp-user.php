@@ -11,6 +11,7 @@ class WppUser {
 
     public function __construct() {
         add_action('authenticate', array($this, 'after_determine_user'), 20, 3);
+        add_filter('jwt_auth_token_before_dispatch', array($this, 'set_jwt_user_data'), 10, 2);
     }
 
     /**
@@ -25,6 +26,18 @@ class WppUser {
             return false;
         }
         return $wp_user;
+    }
+
+    /**
+     * Add extra user data to the token data
+     *
+     * @param Array $data
+     * @param WP_User $user
+     * @return Array $data
+     */
+    public function set_jwt_user_data( $data, $user) {
+        $data["avatar_url"] = get_avatar_url($data["user_email"], array("size"=>48));
+        return $data;
     }
 
     /**
@@ -59,7 +72,9 @@ class WppUser {
                 // Update additional user data from request
                 foreach (["website", "receive_news", "first_name", "last_name"] as $meta_key) {                    
                     $value = $userData[$meta_key];
-                    update_user_meta($user_id, $meta_key, $value );                    
+                    update_user_meta($user_id, $meta_key, $value );
+                    update_user_meta($user_id, "registration_user_agent", $_SERVER['HTTP_USER_AGENT'] );
+                    update_user_meta($user_id, "registration_ip", get_request_ip() );                    
                 }                
 
                 if ($userData['receive_news'] == "true") { // can be boolean true or string true
@@ -122,10 +137,11 @@ class WppUser {
      * @return void
      */
     public static function send_new_user_notifications ($user_id, $user_email, $activation_code) {
-        // Notify the admin
-        wp_new_user_notification($user_id);
-
+        
         $request_lang = get_request_locale();
+        
+        // Notify the admin
+        WppMailer::notify_admin("New user registration", $user_email, $request_lang);
                 
         // Send user activation link       
         $site_title = get_bloginfo("name");
@@ -135,8 +151,7 @@ class WppUser {
         
         // Build the activation link
         $activation_uri = "/#/activate/$user_id/$activation_code";
-        $activation_link = network_home_url($activation_uri);     
-    
+        $activation_link = network_home_url($activation_uri);    
         
         WppMailer::send_registration_email($user_email, $msg_title, $activation_link, $request_lang);
     }
@@ -168,7 +183,7 @@ class WppUser {
      * Store user activation code and expiration time
      *
      * @param Integer $user_id
-     * @return void
+     * @return String $activation_code
      */
     public static function set_activation_and_expiration ($user_id) {
         $activation_code = wp_generate_password(20, false);
@@ -178,6 +193,53 @@ class WppUser {
         add_user_meta($user_id, 'activation_expiration', $expiration);
         add_user_meta($user_id, 'status', "pending");
         return $activation_code;
+    }
+
+    /**
+     * Store user activation code and expiration time
+     *
+     * @param Integer $user_id
+     * @return String $password_reset_key
+     */
+    public static function set_pass_reset_key_and_expiration ($user_id) {
+        $password_reset_key = wp_generate_password(20, false);
+        $expiration = time() + (60 * 30);
+
+        update_user_meta($user_id, 'password_reset_key', $password_reset_key);
+        update_user_meta($user_id, 'password_reset_expiration', $expiration);
+        return $password_reset_key;
+    }
+
+    /**
+     * Store user activation code and expiration time
+     *
+     * @param String $reset_key
+     * @return String $reset_login
+     * @return WP_User $wp_user
+     */
+    public static function get_user_by_pass_reset_key_login ($reset_key, $reset_login, $remove = false) {
+
+        $wp_user = get_user_by("login", $reset_login);
+        if (!$wp_user) {
+            $wp_user = get_user_by("email", $reset_login);
+        }
+
+        $password_reset_key = get_user_meta($wp_user->ID, 'password_reset_key', true);
+        $password_reset_expiration = get_user_meta($wp_user->ID, 'password_reset_expiration', true);
+        
+        $now = time();
+
+        if ($now > $password_reset_expiration) {
+            return false;
+        } elseif ($reset_key !== $password_reset_key) {
+            return false;
+        } else {
+            if ($remove) {
+                delete_user_meta($wp_user->ID, 'password_reset_key');
+                delete_user_meta($wp_user->ID, 'password_reset_expiration');
+            }
+            return $wp_user;
+        }
     }
 
     /**
@@ -263,16 +325,15 @@ class WppUser {
 		
 		foreach ($extra_meta as $key => $value) {
 			if (in_array($key, ["website", "receive_news"])) {
-			if (is_array($value) && count($value) == 1) {
-				$value_data = $value[0];
-				if($value_data !== "?") {
-					$value_data = $value_data === "1"? true: $value_data;
-					$metas[$key] = maybe_unserialize($value_data);
-				}
-				
-			} else {
-				$metas[$key] = $value;
-			}
+                if (is_array($value) && count($value) == 1) {
+                    $value_data = $value[0];
+                    if($value_data !== "?") {
+                        $value_data = $value_data === "1"? true: $value_data;
+                        $metas[$key] = maybe_unserialize($value_data);
+                    }				
+                } else {
+                    $metas[$key] = $value;
+                }
 			}
 		}
 		return $metas;

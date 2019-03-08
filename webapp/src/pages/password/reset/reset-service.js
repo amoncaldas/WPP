@@ -2,7 +2,7 @@ import ModelService from '@/core/model-service'
 
 let options = {
   raw: true,
-  pk: 'login'
+  pk: 'key'
 }
 const passwordResetService = new ModelService('wpp/v1/user/password/reset', 'password', options)
 

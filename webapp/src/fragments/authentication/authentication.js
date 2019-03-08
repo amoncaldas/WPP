@@ -15,6 +15,10 @@ export default {
     onAuthenticate: {
       type: Function,
       required: true
+    },
+    topBorder: {
+      default: true,
+      type: Boolean
     }
   },
   computed: {

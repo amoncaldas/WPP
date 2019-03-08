@@ -12,7 +12,6 @@ export default {
       verifiedCaptcha: false,
       resource: {},
       passVisibility: true,
-      sectors: [],
       context: null
     }
   },
@@ -20,6 +19,10 @@ export default {
     onSignup: {
       type: Function,
       required: true
+    },
+    topBorder: {
+      default: false,
+      type: Boolean
     }
   },
   methods: {

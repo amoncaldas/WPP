@@ -23,6 +23,8 @@ class WppMailer  {
 	 * @return void
 	 */
 	public static function notify_admin($title, $message, $lang = null) {
+		$site_title = get_bloginfo("name");
+		$title = "[$site_title] $title";
 		$message .= "<br/><br/>";	
 		$message .= "IP: http://www.ip2location.com/". get_request_ip();
 		$message .= "<br/><br/>";	

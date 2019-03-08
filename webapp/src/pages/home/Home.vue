@@ -2,10 +2,8 @@
   <v-container fluid class="page-root home">
     <v-slide-y-transition mode="out-in">
       <div>
-        <br>
         <slider v-if="currentSection.extra.has_image_slides" :contents="currentSection.extra.slide_images"></slider>
         <div v-if="currentSection.extra.has_content" v-html="currentSection.html_content"></div>
-        <br><br>
         <sections-map></sections-map>
         <br><br>
         <div v-if="currentSection.extra.list_posts">

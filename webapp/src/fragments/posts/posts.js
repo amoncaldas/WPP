@@ -14,6 +14,10 @@ export default {
     endpoint: {
       default: 'posts'
     },
+    parentId: {
+      type: Number,
+      required: false
+    },
     title: {
       required: false
     },
@@ -80,6 +84,10 @@ export default {
       // a return of always the first page ?
       if (this.offset > 0) {
         filters.offset = this.offset
+      }
+
+      if (this.parentId > 0) {
+        filters.parent_id = this.parentId
       }
 
       if (this.embed) {

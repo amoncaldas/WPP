@@ -37,7 +37,20 @@
 		add_filter('preview_post_link', array($this, 'set_post_preview_permalink'), 10, 2);
 		add_filter('page_link', array($this, 'set_page_permalink'), 10, 2);
 		add_filter('preview_page_link', array($this, 'set_page_preview_permalink'), 10, 2);
+		add_filter("wp_insert_post_data", array($this, 'before_insert_post'), 10, 2);
 		
+	}
+
+	/**
+	 * Set the imported post if, if sent via request
+	 *
+	 * @param Array $data
+	 * @param Array $postarr
+	 * @return Array $data
+	 */
+	public function before_insert_post($data, $postarr) {
+		// $postarr["import_id"] = 0;
+		return $data;
 	}
 
 	/**
@@ -105,7 +118,7 @@
 	 */
 	public function on_rest_api_init() {
 		// Apply the locale taxonomy filter to when running rest api requests
-		add_action( 'pre_get_posts', array($this, 'apply_locale_filter_get_posts') );
+		add_action( 'pre_get_posts', array($this, 'apply_wpp_filters_pre_get_posts') );
 
 		$public_post_types = get_post_types(array("public"=>true));
 		unset($public_post_types["attachment"]);
@@ -153,20 +166,31 @@
 	 * @param [type] $query
 	 * @return void
 	 */
-	public function apply_locale_filter_get_posts($query) {		
+	public function apply_wpp_filters_pre_get_posts($query) {		
+
+		//TODO: Change to: select post type by locale taxonomy support!
 		$public_post_types = get_post_types(array("public"=>true));
 		unset($public_post_types["attachment"]);
+
 		$post_type = $query->query["post_type"];
-		if ($post_type !== SECTION_POST_TYPE && in_array($post_type, $public_post_types)) {
-			$request_locale = get_request_locale();
-			$tax_query = array (
-				array(
-					'taxonomy' => LOCALE_TAXONOMY_SLUG,
-					'field' => 'slug',
-					'terms' => [$request_locale, "neutral"]
-				)
-			);
-			$query->set( 'tax_query', $tax_query );
+
+		if ($post_type !== SECTION_POST_TYPE) {
+			if (in_array($post_type, $public_post_types)) {
+				$request_locale = get_request_locale();
+				$tax_query = array (
+					array(
+						'taxonomy' => LOCALE_TAXONOMY_SLUG,
+						'field' => 'slug',
+						'terms' => [$request_locale, "neutral"]
+					)
+				);
+				$query->set( 'tax_query', $tax_query );
+			}
+	
+			$post_types_with_section = get_post_types_by_support("parent_section");
+			if (in_array($post_type, $post_types_with_section) && $_GET["parent_id"]) {
+				$query->set('post_parent', $_GET["parent_id"]);
+			}
 		}
 	}
 

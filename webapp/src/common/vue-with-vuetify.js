@@ -33,7 +33,8 @@ import {
   VSwitch,
   VAlert,
   VImg,
-  VPagination
+  VPagination,
+  VTextarea
 } from 'vuetify'
 
 Vue.use(Vuetify, {
@@ -68,7 +69,8 @@ Vue.use(Vuetify, {
     VSwitch,
     VAlert,
     VImg,
-    VPagination
+    VPagination,
+    VTextarea
   }
 })
 

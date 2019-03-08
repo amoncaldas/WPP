@@ -1,4 +1,4 @@
-import optOutService from './news-opt-out-service'
+import unsubscribeService from './unsubscribe-service'
 import {CRUD, CRUDData} from '@/core/crud'
 
 export default {
@@ -43,6 +43,7 @@ export default {
     CRUD.set(this, optOutService, crudOptions)
 
     // Set the properties that are gonna be used by the CRUD to update/activate the user
+    this.resource.key = this.$route.params.email
     this.resource.email = this.$route.params.email
 
     // Update the user, activating its account

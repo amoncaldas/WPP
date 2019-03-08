@@ -32,6 +32,24 @@
           'callback' => array($this, 'get_search' ),
         )
       ));
+
+      add_filter( 'rest_pre_insert_comment', array($this, 'wpp_pre_insert_comment'), 10, 2 );
+    }
+
+    /**
+     * Check if the captach is correct before insert a comment
+     *
+     * @param Array $prepared_comment
+     * @param Object $request
+     * @return void
+     */
+    public function wpp_pre_insert_comment( $prepared_comment, $request ){
+      $recaptchaToken = $request->get_param('recaptchaToken');
+      $validCaptcha = validate_captcha($recaptchaToken);
+      if ($validCaptcha === true) {
+        return $prepared_comment;
+      }
+      return new WP_Error( 'invalid_capatch', "invalid_capatch" );  
     }
 
     /**

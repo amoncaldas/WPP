@@ -4,7 +4,8 @@ const state = {
   token: null,
   displayName: null,
   userEmail: null,
-  id: null
+  id: null,
+  avatar: null
 }
 
 const getters = {
@@ -13,7 +14,8 @@ const getters = {
       token: state.token,
       userEmail: state.userEmail,
       displayName: state.displayName,
-      id: state.id
+      id: state.id,
+      avatar: state.avatar
     }
   },
   isAuthenticated (state) {
@@ -28,6 +30,7 @@ const mutations = {
     state.userEmail = userData.userEmail
     state.displayName = userData.displayName
     state.id = userData.id
+    state.avatar = userData.avatar_url
   },
   userDisplayName: (state, userDisplayName) => {
     state.displayName = userDisplayName
@@ -37,6 +40,7 @@ const mutations = {
     state.displayName = null
     state.userEmail = null
     state.id = null
+    state.avatar = null
   },
   socialOauthCode: (state, code) => {
    /**
@@ -89,6 +93,7 @@ const actions = {
       localStorage.setItem('displayName', authData.displayName)
       localStorage.setItem('userEmail', authData.userEmail)
       localStorage.setItem('userId', authData.id)
+      localStorage.setItem('userAvatar', authData.avatar_url)
 
       commit('authUser', authData)
       dispatch('setLogoutTimer', 3200)
@@ -102,11 +107,13 @@ const actions = {
         const userEmail = localStorage.getItem('userEmail')
         const displayName = localStorage.getItem('displayName')
         const id = localStorage.getItem('userId')
+        const avatar = localStorage.getItem('userAvatar')
         commit('authUser', {
           token: token,
           displayName: displayName,
           userEmail: userEmail,
-          id: id
+          id: id,
+          avatar_url: avatar
         })
       }
       resolve()
@@ -119,6 +126,7 @@ const actions = {
       localStorage.removeItem('displayName')
       localStorage.removeItem('userEmail')
       localStorage.removeItem('userId')
+      localStorage.removeItem('userAvatar')
       resolve()
     })
   },

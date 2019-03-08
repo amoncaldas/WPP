@@ -29,13 +29,6 @@ class WppUserApi {
   public function get_namespace() {
       return $this->baseNamespace."/user";
   }
-
-  /**
-   * The recaptcha validation url
-   *
-   * @var string
-   */
-  private static $recaptchaValidationUrl = "https://www.google.com/recaptcha/api/siteverify";
   
 
   /**
@@ -92,7 +85,7 @@ class WppUserApi {
           )
       ) );
 
-      register_rest_route( $this->get_namespace(), '/password/reset/(?P<login>[a-zA-Z0-9,.!_-]+)', array(
+      register_rest_route( $this->get_namespace(), '/password/reset/(?P<key>[a-zA-Z0-9,.!_-]+)', array(
           array(
               'methods'  => "PUT",
               'callback' => array( $this, 'redefine_password' ),
@@ -156,15 +149,7 @@ class WppUserApi {
     return $user;
   }
 
-  /**
-   * Get the google recaptcha secret
-   *
-   * @var string
-   */
-  static function getRecaptchaSecret (){
-      $secret = get_option("recaptcha_secret", "6LcOa2MUAAAAAMjC-Nqnxcs1u4mX62PSrXeixDeI");
-      return $secret;
-  }
+  
 
   /**
    * Checks if a username on the request is already registered or not
@@ -234,7 +219,7 @@ class WppUserApi {
    */
   public static function register_user($request) {        
       $recaptchaToken = $request->get_param('recaptchaToken');
-      $validCaptcha = self::validate_captcha($recaptchaToken);        
+      $validCaptcha = validate_captcha($recaptchaToken);        
       
       if ($validCaptcha === true) {
         $result = WppUser::pre_validate_user_registration($request);
@@ -256,34 +241,7 @@ class WppUserApi {
       return new WP_REST_Response($data, 409); // CONFLICT
   }
 
-  /**
-   * Validates the temp captcha code
-   *
-   * @param string $recaptchaToken
-   * @return boolean
-   */
-  private static function validate_captcha($recaptchaToken) {
-      $secret = self::getRecaptchaSecret();
-      $post_data = http_build_query(
-          array(
-              'secret' => $secret,
-              'response' => $recaptchaToken,
-              'remoteip' => $_SERVER['REMOTE_ADDR']
-          )
-      );
-      $opts = array('http' =>
-          array(
-              'method'  => 'POST',
-              'header'  => 'Content-type: application/x-www-form-urlencoded',
-              'content' => $post_data
-          )
-      );
-      $context  = stream_context_create($opts);
-      $response = file_get_contents(self::$recaptchaValidationUrl, false, $context);
-      $result = json_decode($response);
-      return $result->success;
-      
-  }
+  
 
   /**
    * Request the start of a password reset flow, which will send an email with a password reset link
@@ -296,21 +254,14 @@ class WppUserApi {
     try {
       $user_login = $request["login"];
 
-      $key = wp_generate_password(20, false);
-      $hashed = wp_hash_password($key);
-
       $wp_user = get_user_by("login", $user_login);
       if (!$wp_user) {
         $wp_user = get_user_by("email", $user_login);
       }
-      $hashed = get_password_reset_key($wp_user);
 
-      // Store the new reset key in the database
-      // global $wpdb;
-      // $wpdb->update($wpdb->users, array('user_activation_key' => $hashed), array('user_login' => $user_login));
+      $reset_key = WppUser::set_pass_reset_key_and_expiration($wp_user->ID);
 
-      // Send the reset link by email to the user
-      WppUser::send_pasword_reset_email($user_login, $hashed);
+      WppUser::send_pasword_reset_email($user_login, $reset_key);
       return new WP_REST_Response(null, 204); 
       
     } catch (\Exception $ex) {
@@ -330,11 +281,11 @@ class WppUserApi {
 
     // Get the Wp_User object using the reset key and user login
     // This is a native wordpress function
-    $user = check_password_reset_key($reset_key, $reset_login);
+    $wp_user = WppUser::get_user_by_pass_reset_key_login($reset_key, $reset_login);
 
-    $statusCode = 204;  // NO CONTENT - the request was processed, but there is not content to be returned
-    if (is_wp_error($user)) {
-      $statusCode = 404;  // NOT FOUND - the pair user login and valid key was not found
+    $statusCode = 404; // NOT FOUND - the pair user login and valid key was not found
+    if ($wp_user) {
+      $statusCode = 204;  // NO CONTENT - the request was processed, but there is not content to be returned 
     }
     return new WP_REST_Response(null, $statusCode);       
   }
@@ -355,18 +306,21 @@ class WppUserApi {
     if ($request['password1'] !== $request['password2']) {
       return new WP_REST_Response(null, 409); // CONFLICT
     }
+
+    $reset_login = $request["login"];
+    $reset_key = $request["key"];
     
     // Try to get the user by reset key and user login
-    $user = check_password_reset_key($request["key"], $request["login"]);
+    $wp_user = WppUser::get_user_by_pass_reset_key_login($reset_key, $reset_login, true);
 
     // If user variable contains an error, return and error
-    if (is_wp_error($user)) {
+    if (is_wp_error($wp_user)) {
       return new WP_REST_Response(null, 404); // NOT FOUND - the pair user login and valid key was not found
     }
     
     // If we arrived until here it is because there were no errors
     // So we can update the user password
-    reset_password($user, $request['password1']);    
+    reset_password($wp_user, $request['password1']);    
     return new WP_REST_Response(null, 204); // NO CONTENT - the request was processed, but there is not content to be returned
   }
 

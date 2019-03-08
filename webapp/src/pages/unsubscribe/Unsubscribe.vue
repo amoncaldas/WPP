@@ -19,6 +19,6 @@
   </v-container>
 </template>
 
-<script src="./news-opt-out.js"></script>
+<script src="./unsubscribe.js"></script>
 
-<style scoped src="./news-opt-out.css"></style>
+<style scoped src="./unsubscribe.css"></style>

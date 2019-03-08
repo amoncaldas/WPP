@@ -101,3 +101,43 @@
 			return $content;
 		}			
 	}
+
+	/**
+   * Get the google recaptcha secret
+   *
+   * @var string
+   */
+  function get_recaptcha_secret (){
+		$secret = get_option("recaptcha_secret", "6LcOa2MUAAAAAMjC-Nqnxcs1u4mX62PSrXeixDeI");
+		return $secret;
+	}
+
+	/**
+   * Validates the temp captcha code
+   *
+   * @param string $recaptchaToken
+   * @return boolean
+   */
+  function validate_captcha($recaptchaToken) {
+		$recaptchaValidationUrl = "https://www.google.com/recaptcha/api/siteverify";
+
+		$secret = get_recaptcha_secret();
+		$post_data = http_build_query(
+				array(
+						'secret' => $secret,
+						'response' => $recaptchaToken,
+						'remoteip' => $_SERVER['REMOTE_ADDR']
+				)
+		);
+		$opts = array('http' =>
+				array(
+						'method'  => 'POST',
+						'header'  => 'Content-type: application/x-www-form-urlencoded',
+						'content' => $post_data
+				)
+		);
+		$context  = stream_context_create($opts);
+		$response = file_get_contents($recaptchaValidationUrl, false, $context);
+		$result = json_decode($response);
+		return $result->success;		
+	}

@@ -6,7 +6,6 @@ import Section from '@/support/section'
 export default {
   data: () => ({
     valid: false,
-    activeTab: '0',
     homePosTypes: [],
     currentSection: null
   }),
