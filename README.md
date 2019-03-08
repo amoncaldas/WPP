@@ -8,7 +8,6 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
 - [Features](#features)
 - [Highlighted features](#highlighted-features)
   - [Auto update WordPress URL](#auto-update-wordpress-url)
-  - [Auto update theme post meta URLs](#auto-update-theme-post-meta-urls)
   - [Decoupled front-end dashboard](#decoupled-front-end-dashboard)
 - [WPP plugins](#wpp-plugins)
 - [Customization and updates](#customization-and-updates)
@@ -47,9 +46,7 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
 - wp-content folder mapped to an external folder
 - Customization and updates via update.sh and wp-cli
 - Mapped /dev url to run /var/www/webapp/index.html
-- Decoupled front-end dashboard with VueJS
-- Auto update WordPress URL
-- Auto update theme post meta absolute urls to match docker-compose SITE_URL
+- Decoupled front-end dashboard with Vuejs
 - Auto fix wordpress url to mach the one defined in the docker-compose yml file
 - Continues integration with GitLab to deploy branches staging and master
 - Auto update state via wp-cli
@@ -63,11 +60,6 @@ Some important features are described in this section
 ### Auto update WordPress URL ###
 
 WordPress store in db absolute urls and therefore we check if the url defined in the docker-compose yml file matches the one stored by WordPress. If not, we update it automatically. Like this we can run the same project and db in multiples environments, like `local`, `staging` and `production`. See [https://codex.wordpress.org/Changing_The_Site_URL](https://codex.wordpress.org/Changing_The_Site_URL)
-
-### Auto update theme post meta URLs ###
-
-In the Pursuit theme functions.php it was implemented some functions that verifies and updates the theme specific post meta values
-that points to absolute image urls. So, when the SITE_URL is changed on a *docker-compose.yml, the image urls will be updated so they are displayed correctly running the site in any domain/ip/port. This is a Wordpress/Pursuit theme bug and we had to implement this fix to be able to run the same solution in multiple environments (local, staging, production).
 
 ### Decoupled front-end dashboard ###
 
