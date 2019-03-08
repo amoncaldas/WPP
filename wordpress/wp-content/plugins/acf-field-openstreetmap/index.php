@@ -5,7 +5,7 @@ Plugin Name: ACF OpenStreetMap Field
 Plugin URI: https://github.com/mcguffin/acf-field-openstreetmap
 Description: Adds a configrable OpenStreetMap Field to ACF.
 Author: Jörn Lund
-Version: 0.1.8
+Version: 0.1.10
 Author URI: https://github.com/mcguffin
 License: GPL3
 Github Repository: mcguffin/acf-field-openstreetmap
@@ -51,7 +51,7 @@ define( 'ACF_FIELD_OPENSTREETMAP_PLUGIN', pathinfo( ACF_FIELD_OPENSTREETMAP_DIRE
 
 require_once ACF_FIELD_OPENSTREETMAP_DIRECTORY . 'include/autoload.php';
 
-Core\Core::instance();
+Core\Core::instance( __FILE__ );
 
 
 

@@ -2,7 +2,7 @@
 # Version 0.1
 # 26.01.2018
 
-FROM wordpress:php7.1-apache
+FROM wordpress:5.1.0-php7.1-apache
 
 ARG DEBUG_SUPPORT=false
 
