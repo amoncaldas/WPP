@@ -46,6 +46,7 @@ wordpress/wp-content/plugins/*
 !wordpress/wp-content/plugins/classic-editor
 !wordpress/wp-content/plugins/acf-field-openstreetmap
 !wordpress/wp-content/plugins/user-role-editor
+!wordpress/wp-content/plugins/wp-rest-api-cache
 
 
 ## Do not ignore wpp plugin

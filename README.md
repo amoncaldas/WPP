@@ -10,7 +10,7 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
   - [Auto update WordPress URL](#auto-update-wordpress-url)
   - [Auto update theme post meta URLs](#auto-update-theme-post-meta-urls)
   - [Decoupled front-end dashboard](#decoupled-front-end-dashboard)
-- [FAM plugins](#fam-websiteplugins)
+- [WPP plugins](#wpp-plugins)
 - [Customization and updates](#customization-and-updates)
 - [Continuous integration](#continuous-integration)
 - [Setup environment](#setup-environment)
@@ -22,7 +22,7 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
 
 1. First, make sure you have the requirements installed according [Setup environment](#setup-environment).
 
-1. Clone the project from the [gitlab repository](https://gitlab.gistools.geog.uni-heidelberg.de/giscience/openrouteservice-infrastructure/fam-website)
+1. Clone the project from the [gitlab repository](git@gitlab.com:amoncaldas/wpp.git)
 
 1. Go to the project root folder and run:
 
@@ -34,7 +34,7 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
     docker-compose -f local.docker-compose.yml up -d
 
     # then, when the docker-compose build and all the services are ready, run:
-    docker exec fam-website-local /bin/sh -c 'cd wp-content && sh update.sh'
+    docker exec wpp-website-local /bin/sh -c 'cd wp-content && sh update.sh'
     # important: it is necessary to be in the right folder, like `wp-content`,
     # so the wp-cli can use the right context
     ```
@@ -75,13 +75,12 @@ This solution includes a decoupled front-end dashboard built using VueJS and a c
 
 See more about it in the [Dashboard app readme](webapp/README.md)
 
-## FAM plugins ##
+## Wpp plugins ##
 
 Some custom plugins were created and added to wordpress to achieve the desired functionalities. They are:
 
-1. `fam-oauth` - take the requests related to social/oauth authentication. It adds custom endpoints to the wp json rest apis that are used by the dash board app to allow user authentication with third party services, like GitHub. See the [web app authentication/authorization](webapp/README.md#authentication-and-authorization) and [fam-oauth plugin source](wordpress/wp-content/plugins/fam-oauth/readme.md) for more details.
-1. `fam` - This plugin is custom fam solution and is intended to contain customizations to WordPress hooks/events, custom rest-api endpoints as well as customize third parties plugins that are supposed to be installed.
-    - It registers custom wp api end-points related to user registration and custom fam data regarding the business logic, like sectors and usernames available (in `wp-api` folder). The **dashboard app uses these endpoints** to communicate with the back-end during user registration and profile update.
+1. `wp-web-app` - This plugin is custom wpp solution and is intended to contain customizations to WordPress hooks/events, custom rest-api endpoints as well as customize third parties plugins that are supposed to be installed.
+    - It registers custom wp api end-points related to user registration and custom wpp data regarding the business logic, like sectors and usernames available (in `wp-api` folder). The **dashboard app uses these endpoints** to communicate with the back-end during user registration and profile update.
     - It also register custom actions for wordpress rest_api_init  to customize the response and return custom user data as well as custom error messages when the user api is called. In addition it also adds a filter to the jwt_auth_token_before_dispatch event thrown by the `jwt-authentication-for-wp-rest-api` plugin (in includes/users.php).
 
 ## Customization and updates ##
@@ -104,7 +103,7 @@ Example to add and activate a plug-in:
 
     ```sh
     # important: it is necessary to be in the right folder, like wp-content, so the wp-cli can use the right context
-    docker exec fam-website-local /bin/sh -c 'cd wp-content && sh update.sh'
+    docker exec wpp-website-local /bin/sh -c 'cd wp-content && sh update.sh'
     ```
 
 1. Commit in the **develop** branch (this branch has no deploy CI integration)
@@ -187,7 +186,7 @@ The followings triggers are configured:
 
  ```sh
  # access the docker container
- docker exec -it fam-website-local bash
+ docker exec -it wpp-website-local bash
 
  # go to folder
  cd ../webapp
@@ -219,7 +218,7 @@ Example to add and activate a plug-in:
 1. Run the updater locally:
 
     ```sh
-    docker exec fam-website-local /bin/sh -c 'cd wp-content && sh update.sh'
+    docker exec wpp-website-local /bin/sh -c 'cd wp-content && sh update.sh'
     ```
 
 1. Commit in the **develop** branch (this branch has no deploy CI integration)
@@ -243,7 +242,7 @@ docker-compose -f local.docker-compose.yml up -d
 **Important:** when all the services are ready, run
 
 ```sh
-docker exec fam-website-local /bin/sh -c 'cd wp-content && sh update.sh'
+docker exec wpp-website-local /bin/sh -c 'cd wp-content && sh update.sh'
 ```
 
 ## Debug ##
