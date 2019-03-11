@@ -50,7 +50,7 @@ export default {
       map: null,
       mapHeight: 300,
       initialMaxZoom: 18,
-      routeColor: theme.secondary,
+      routeColor: this.$vuetify.theme.secondary,
       guid: null,
       mapData: null,
       info: null,
@@ -172,11 +172,11 @@ export default {
       })
     },
     /**
-     * Show place details
-     * @param {*} place
+     * emit marker details clicked event
+     * @param {*} marker
      */
-    markerInfoClick (place) {
-      this.infoDialog(place.label, null, {code: place.json, resizable: true, zIndex: 1001})
+    markerInfoClick (marker) {
+      this.$emit('placeClicked', marker.json)
     },
     adjustMap (data) {
       if (data.guid === this.boxGuid) {

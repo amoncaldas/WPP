@@ -2,6 +2,7 @@ import commentService from './comment-service'
 import LogintOrRegister from '@/fragments/login-or-register/LoginOrRegister'
 import VueRecaptcha from 'vue-recaptcha'
 import {CRUD, CRUDData} from '@/core/crud'
+import utils from '@/support/utils'
 
 export default {
   name: 'comments',
@@ -117,9 +118,8 @@ export default {
 
       return cleaned
     },
-    when (commentDate) {
-      this.$moment.defineLocale(this.$store.getters.locale, {})
-      return this.$moment.duration(commentDate).humanize(true)
+    humanizedDate (commentDate) {
+      return utils.getFormattedDateTime(commentDate)
     },
     loadData () {
       let context = this

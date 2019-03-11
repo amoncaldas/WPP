@@ -63,7 +63,7 @@ export default {
       initialMaxZoom: 18,
       mapData: null,
       info: null,
-      routeColor: theme.primary,
+      routeColor: this.$vuetify.theme.primary,
       guid: null,
       center: GeoUtils.buildLatLong(49.510944, 8.76709) // By default, Heidelberg
     }

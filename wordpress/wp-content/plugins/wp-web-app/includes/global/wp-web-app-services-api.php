@@ -257,7 +257,7 @@
             $author =new stdClass();
             $author->id = $post->post_author;
             $author->name = get_author_name($post->post_author);
-            $author->avatar_urls = [get_avatar_url($post->post_author)];
+            $author->avatar_urls = ["96"=>get_avatar_url($post->post_author, 96)];
             $embedded->author = [$author];
   
             // Resolve featured media data
@@ -265,16 +265,35 @@
             $featured_media = new stdClass();
             $featured_media->id = get_post_thumbnail_id($post->ID);
             if ($featured_media->id) {
-              $media_data = wp_get_attachment_image_src($featured_media->id, null, false );
+              $media_data = wp_get_attachment_image_src($featured_media->id, "full", false );
               $details = new stdClass();
               $details->width = $media_data[1];
               $details->height = $media_data[2];
-              $details->sizes = ["full" => ["source_url"=>$media_data[0]]];
+              $details->sizes = [];
+              // Full image
+              $details->sizes["full"] = [
+                "source_url"=>$media_data[0],
+                "width"=>$media_data[1],
+                "height"=>$media_data[2]
+              ];
+
+              // Other sizes
+              foreach(get_intermediate_image_sizes() as $size){
+                if( in_array( $size, array( 'thumbnail', 'medium', 'large' ) ) ){
+                  $media_data = wp_get_attachment_image_src($featured_media->id, $size);
+                  $details->sizes[$size] = [
+                    "source_url"=>$media_data[0],
+                    "width"=>$media_data[1],
+                    "height"=>$media_data[2]
+                  ];
+                } 
+              }
+
               $featured_media->media_details = $details;
               $featured_media->post_title = get_the_title($featured_media->id);
               $featured_media->type = "attachment";
               $featured_media->source_url = $media_data[0];
-              $embedded->$feaured_media_key = [$featured_media];
+              $embedded->$feaured_media_key = [$featured_media];              
             }
             // Add embedded data
             $post->_embedded = $embedded;

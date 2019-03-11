@@ -1,3 +1,6 @@
+import main from '@/main'
+const moment = require('moment')
+
 const utils = {
   /**
    * Get the GET/query url params present in the url as an key value object
@@ -51,6 +54,26 @@ const utils = {
 
   getValidId: (str) => {
     return str.replace(/\./g, '').replace(/}/g, '').replace(/{/g, '').replace(/\//g, '_')
+  },
+
+  getFormattedDate: (value) => {
+    let date = moment(value)
+    let y = date.year()
+    let m = date.month()
+    let d = date.day()
+    d = d < 10 ? '0' + d.toString() : d
+    let instance = main.getInstance()
+    let months = instance.$t('global.monthsShort')
+    let month = months[Object.keys(months)[m]]
+    return `${d} ${month} ${y}`
+  },
+  getFormattedDateTime: (value) => {
+    let dateStr = utils.getFormattedDate(value)
+    let dateTime = moment(value)
+    let h = dateTime.hour()
+    let m = dateTime.minute()
+
+    return `${dateStr} ${h}:${m}`
   }
 }
 export default utils

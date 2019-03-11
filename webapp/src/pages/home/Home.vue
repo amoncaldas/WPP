@@ -3,7 +3,7 @@
     <v-slide-y-transition mode="out-in">
       <div>
         <slider v-if="currentSection.extra.has_image_slides" :contents="currentSection.extra.slide_images"></slider>
-        <div v-if="currentSection.extra.has_content" v-html="currentSection.html_content"></div>
+        <div class="content" v-if="currentSection.extra.has_content" v-html="currentSection.extra.html_content"></div>
         <sections-map></sections-map>
         <br><br>
         <div v-if="currentSection.extra.list_posts">

@@ -3,7 +3,7 @@
   <br>
   <v-layout row wrap>
     <v-flex md9 >
-      <post :post-name="$route.params.postName" mode="single"></post>
+      <post :is-page="true" :post-name="$route.params.postName" mode="single"></post>
     </v-flex>
     <v-flex md3>
       <posts></posts>

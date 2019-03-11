@@ -48,11 +48,11 @@
               </v-flex>
               <v-flex xs10 sm11>
                 <div>
-                  <span class="author-name" :style="{color: theme.dark}">{{comment.author_name}}</span>
+                  <span class="author-name" :style="{color: $vuetify.theme.dark}">{{comment.author_name}}</span>
                 </div>
                 <div v-html="getContent(comment)"></div>
                 <div class="comment-date">
-                  {{when(comment.date) | capitalize}}
+                  <time :datetime="comment.date">{{humanizedDate(comment.date)}}</time>
                 </div>
               </v-flex>
             </v-layout>

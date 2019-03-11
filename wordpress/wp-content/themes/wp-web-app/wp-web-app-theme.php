@@ -284,6 +284,7 @@
 					$places[$place_id]["title"] = get_the_title($place_id);
 					$locales = wp_get_post_terms($place_id, LOCALE_TAXONOMY_SLUG);
 					$places[$place_id][LOCALE_TAXONOMY_SLUG] = count($locales) > 0 ? $locales[0]->slug : null;
+					$places[$place_id]["link"] = get_permalink($place_id);
 				}
 			}
 		}
@@ -450,11 +451,14 @@
 
 		// built in `post` also supports `parent_section` and `section_in_permalink`
 		$section_in_permalink_types[] = "post";		
+
+		$match = false;
 		
 		// This covers the section  that is home
 		if (SECTION_POST_TYPE === $post->post_type) {
 			$section_type = get_post_meta($post->ID, "section_type", true);	
 			if ($section_type === SECTION_POST_HOME_FIELD_VALUE ) {
+				$match = true;
 				return "/";
 			} 
 		} 
@@ -490,12 +494,21 @@
 				}  else {
 					$permalink = network_site_url("/$parent_post_url_segment/$post_slug_translation/$post->ID");
 				}
+				$match = true;
 			}
 		}
 		// This covers the post types with no post type in permalink
 		if (in_array($post->post_type, $no_post_type_in_permalink_types)) {
 			$permalink = $this->get_permalink_with_no_post_type_in_it($post, $permalink);
-		} 
+			$match = true;
+		}  
+		// Content types that are not section or page can not have permalink without id 
+		if (!$match && $post->post_type !== "page") {
+			$permalink = trim($permalink, "/");
+			$link_parts = explode("/", $permalink);
+			$last_part = ($link_parts[count($link_parts) - 1]);
+			$permalink = is_numeric($last_part)? $permalink : $permalink."/".$post->ID;
+		}
 		return $permalink;	
 	}
 

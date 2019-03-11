@@ -5,7 +5,10 @@ const state = {
   leftSideBarOpen: false,
   mainMenu: [],
   secondaryMenu: [],
-  locale: null
+  locale: null,
+  defaultBackground: null,
+  defaultTheme: null,
+  isDark: null
 }
 
 const getters = {
@@ -20,6 +23,15 @@ const getters = {
   },
   locale: state => {
     return state.locale
+  },
+  defaultBackground: state => {
+    return state.defaultBackground
+  },
+  defaultTheme: state => {
+    return state.defaultTheme
+  },
+  isDark: state => {
+    return state.isDark
   }
 }
 
@@ -36,6 +48,15 @@ const mutations = {
   locale: (state, locale) => {
     state.locale = locale
     localStorage.setItem('locale', locale)
+  },
+  defaultBackground: (state, value) => {
+    state.defaultBackground = value
+  },
+  defaultTheme: (state, value) => {
+    state.defaultTheme = value
+  },
+  isDark: (state, value) => {
+    state.isDark = value
   }
 }
 

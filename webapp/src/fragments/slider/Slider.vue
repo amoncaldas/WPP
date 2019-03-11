@@ -1,5 +1,5 @@
 <template>
-  <vue-flux
+  <vue-flux class="slider"
    :options="fluxOptions"
    :captions="fluxCaptions"
    :images="fluxImages"

@@ -34,6 +34,12 @@ const wppRouter = {
     }
     return endpoints
   },
+  getPageLikeEndPoints: () => {
+    let pageTypes = store.getters.options.page_like_types
+    pageTypes = Array.isArray(pageTypes) ? pageTypes : [pageTypes]
+    return pageTypes
+  },
+
   addEndpointTranslations: (endpoint, endpoints) => {
     let translations = store.getters.options.post_type_translations
     if (translations) {

@@ -6,7 +6,7 @@
  *
  */
 
-define('DEFAULT_LOCALE', "en-us");
+define('DEFAULT_LOCALE', "pt-br");
 define('LOCALE_TAXONOMY_SLUG', "locale");
 define('SECTION_POST_TYPE', "section");
 define('SECTION_TYPE_FIELD_SLUG', "section_type");

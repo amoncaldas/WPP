@@ -1,5 +1,5 @@
 <template>
-  <v-footer dark color="accent" :height="height" :class="{'small': $vuetify.breakpoint.smAndDown}">
+  <v-footer :dark="$store.getters.isDark" color="accent" :height="height" :class="{'small': $vuetify.breakpoint.smAndDown}">
     <v-layout row wrap>
       <v-flex xs12>
         <template  v-for="(item, index) in menuItems">

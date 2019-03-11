@@ -47,7 +47,7 @@ export default {
       map: null,
       mapHeight: 300,
       initialMaxZoom: 18,
-      routeColor: theme.primary,
+      routeColor: this.$vuetify.theme.primary,
       guid: null,
       mapData: null,
       info: null,

@@ -20,6 +20,7 @@ import VeeValidate from 'vee-validate'
 import VueLodash from 'vue-lodash'
 import VueAuthenticate from 'vue-authenticate'
 import socialAuth from '@/common/social-auth'
+import VueAnalytics from 'vue-analytics'
 import VueMoment from 'vue-moment'
 import theme from '@/common/theme'
 /**
@@ -85,6 +86,13 @@ router.resolveDependencies().then(() => {
   // Set locale from store/local storage
   i18n.locale = store.getters.locale
   console.log('Locale:', i18n.locale)
+
+  if (store.getters.options.google_analytics_ua) {
+    Vue.use(VueAnalytics, {
+      id: store.getters.options.google_analytics_ua,
+      checkDuplicatedScript: true
+    })
+  }
 
   /* eslint-disable no-new */
   VueInstance = new Vue({

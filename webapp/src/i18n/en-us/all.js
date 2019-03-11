@@ -3,7 +3,7 @@ export default {
     send: 'Send',
     confirm: 'Confirm',
     cancel: 'Cancel',
-    appName: 'OpenRouteService',
+    appName: 'WPP',
     close: 'Close',
     select: 'Select',
     yes: 'Yes',
@@ -41,7 +41,7 @@ export default {
     }
   },
   auth: {
-    yourGithubAccountIsNotLinkedYet: 'Your GitHub account is not linked yet with OpenRouteService. Please make sure that you have already signed up with this GitHub account on ORS',
+    yourGithubAccountIsNotLinkedYet: 'Your GitHub account is not linked yet with this website. Please make sure that you have already signed up with this GitHub account on this website',
     processingOAuth: 'Processing authentication, please wait...',
     authenticationWithOAuthCompleted: 'Authentication completed'
   }

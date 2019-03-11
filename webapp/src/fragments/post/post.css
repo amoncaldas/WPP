@@ -1,3 +1,25 @@
 .post-tabs {
   padding: 0px;
 }
+
+.post-sponsored {
+  text-transform: capitalize
+}
+
+.authoring-container {
+  margin-bottom: 20px;
+}
+
+.authoring {
+  padding: 5px;
+  color: white;
+
+}
+
+.author {
+  font-weight: 500
+}
+
+.cat-and-tgs {
+  margin-bottom: 20px;
+}

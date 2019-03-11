@@ -10,7 +10,6 @@
  * @listens closeBox [global, via eventBus] expecting box guid
  * @listens closeBox [global, via eventBus] expecting {guid:<id>, maximized: boolean}
  */
-import theme from '@/common/theme'
 import utils from '@/support/utils'
 
 export default {
@@ -240,7 +239,7 @@ export default {
      * @returns String
      */
     backgroundColor () {
-      let color = theme[this.background] ? theme[this.background] : this.background
+      let color = this.$vuetify.theme[this.background] ? this.$vuetify.theme[this.background] : this.background
       return color || 'transparent'
     },
     /**
@@ -292,13 +291,13 @@ export default {
         return false
       }
       // the initial color the the defined as primary at @/common/theme.js
-      var color = theme['accent']
+      var color = this.$vuetify.theme['accent']
 
       // if the topBorderPalette prop is defined, use it to define the color
       if (this.topBorderPalette) {
-        color = theme[this.topBorderPalette]
+        color = this.$vuetify.theme[this.topBorderPalette]
       } else if (this.topBgColor) { // if not, try to use the topBgColor prop
-        color = theme[this.topBgColor] ? theme[this.topBgColor] : this.topBgColor
+        color = this.$vuetify.theme[this.topBgColor] ? this.$vuetify.theme[this.topBgColor] : this.topBgColor
       }
       return color
     },

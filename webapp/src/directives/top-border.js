@@ -1,4 +1,5 @@
 import theme from '@/common/theme'
+import Main from '@/main'
 const topBorder = {
   bind (el, binding) {
     render(el, binding)
@@ -24,7 +25,8 @@ const render = (el, binding) => {
   } else if (binding.arg === 'color') {
     el.style.borderTop = '5px solid ' + binding.value
   } else { // if arg is not defined, just apply the primary color from the theme
-    el.style.borderTop = '5px solid ' + theme.primary
+    let instance = Main.getInstance()
+    el.style.borderTop = '5px solid ' + instance.$vuetify.theme.primary
   }
 }
 
