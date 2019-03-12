@@ -1,7 +1,7 @@
 <template>
-  <box resizable background="white" @boxCreated="boxCreated" @resized="adjustMap" v-if="loaded && markers.length > 0">
+  <box tag="section" resizable background="white" @boxCreated="boxCreated" @resized="adjustMap" v-if="loaded && markers.length > 0">
     <div slot="header">
-          <h3>{{$t('sectionsMap.title')}}</h3>
+          <h2>{{$t('sectionsMap.title')}}</h2>
         </div>
     <v-alert :value="info" outline type="info" style="color:white" >{{ info }}</v-alert>
     <l-map ref="map" :max-zoom="maxZoom" style="z-index:3" :zoom="zoom" class="section-map" :style="{height: mapHeight + 'px'}">

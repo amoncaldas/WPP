@@ -1,5 +1,5 @@
 <template>
-      <box :no-top-border="!topBorder">
+      <box tag="section" :no-top-border="!topBorder">
         <h1 slot="header" class="headline">{{ $t('signup.register') | uppercase }}</h1>
         <div slot="content">
           <a class="social-gh" v-if="$store.getters.options.signup_with_github" @click="socialRegistration('github')">

@@ -22,6 +22,10 @@ const router = new Router({
       // this only works in we are using the `hash` mode
       let route = location.hash.replace('#', '')
 
+      if (route.indexOf('?s=')) {
+        next(`/search?s=${to.query.s}`)
+      }
+
       // If the current route is the root `/` page
       // send the user to the home page
       // the `/home` route guard will check if the user is not logged in

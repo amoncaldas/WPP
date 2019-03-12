@@ -20,9 +20,7 @@
   </v-footer>
 </template>
 
-<script src="./footer.js">
-
-</script>
+<script src="./footer.js"></script>
 
 <style src="./footer.css" scoped></style>
 

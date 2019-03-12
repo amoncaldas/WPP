@@ -1,8 +1,8 @@
 <template>
   <div>
-    <box class="comment" background="white" :no-top-border="true" v-if="comments">
+    <box tag="section" class="comment" background="white" :no-top-border="true" v-if="comments">
       <div slot="header">
-        <h3>{{$t('comments.comments')}}</h3>
+        <h2>{{$t('comments.comments')}}</h2>
       </div>
       <div slot="content">
         <br>
@@ -31,7 +31,7 @@
             @verify="onCaptchaVerified"
             @expired="onCaptchaExpired">
           </vue-recaptcha>
-          <logint-or-register v-if="showLogintOrRegister" :after-login="afterLogin" :persistent="false"></logint-or-register>
+          <logint-or-register @closed="showLogintOrRegister = false" v-if="showLogintOrRegister" :after-login="afterLogin" :persistent="false"></logint-or-register>
         </v-form>
         <div v-else>
           <h4>{{$t('comments.commentsAreClosed')}}</h4>

@@ -23,6 +23,7 @@ import socialAuth from '@/common/social-auth'
 import VueAnalytics from 'vue-analytics'
 import VueMoment from 'vue-moment'
 import theme from '@/common/theme'
+import wrapperTag from '@/fragments/wrapper/wrapper-tag'
 /**
  * Fix Vue leaflet issues:
  * - import leaflet styles for proper map rendering
@@ -73,6 +74,7 @@ Vue.component('box', box)
 Vue.component('app-h-menu', HMenu)
 Vue.component('app-v-menu', VMenu)
 Vue.component('date-picker', DatePicker)
+Vue.component('wrapper-tag', wrapperTag)
 
 // add global custom filters
 Vue.filter('uppercase', uppercase)

@@ -1,9 +1,17 @@
 <template>
 <div>
-  <box class="post" background="white" :no-top-border="noTopBorder" v-if="post">
+  <box :tag="mode === 'single' ? 'main' : 'article'" class="post" background="white" :no-top-border="noTopBorder" v-if="post">
     <div slot="header" v-if="mode !== 'compact'" >
-      <a  v-if="titleWithLink" v-bind:href="link" :style="{color:$vuetify.theme.dark}" style="margin-left:0px; text-decoration:none" ><h3>{{title}}</h3></a>
-      <h3 v-else>{{title}}</h3>
+      <template v-if="titleWithLink">
+        <a v-bind:href="link" :style="{color:$vuetify.theme.dark}" style="margin-left:0px; text-decoration:none" >
+          <h1 v-if="mode === 'single'">{{title}}</h1>
+          <h3 v-else>{{title}}</h3>
+        </a>
+      </template>
+      <template v-else>
+        <h1 v-if="mode === 'single'">{{title}}</h1>
+        <h3 v-else>{{title}}</h3>
+      </template>
     </div>
     <div slot="content">
       <template v-if="mode !== 'compact'">
@@ -13,21 +21,22 @@
       </template>
       <template v-if="mode === 'single'">
         <div class="authoring-container">
-          <span class="authoring" :style="{background: $vuetify.theme.dark}">
-            <span class="author" v-if="!renderAsPage"> {{$t('post.by')}} {{author}} </span> {{$t('post.on')}} <time :datetime="post.date">{{humanizedDate}}</time>
+          <span>
+            <v-alert :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
+              <span v-if="!renderAsPage"> {{$t('post.by')}} <b>{{author}}</b> </span> {{$t('post.on')}} <time :datetime="post.date">{{humanizedDate}}</time>
+            </v-alert>
           </span>
           </div>
         <div v-html="content"></div>
         <div class="cat-and-tgs">
           <template v-if="categories.length > 0">
             <h4>{{$t('post.categories') | capitalize}}</h4>
-            <v-chip :key="index" v-for="(category, index) in categories">{{category.name}}</v-chip>
+            <v-chip :key="index + '_cat'" v-for="(category, index) in categories">{{category.name}}</v-chip>
           </template>
           <template v-if="tags.length > 0">
             <h4>{{$t('post.tags') | capitalize}}</h4>
-            <v-chip :key="index" v-for="(tag, index) in tags">{{tag.name}}</v-chip>
+            <v-chip :key="index + '_tag'" v-for="(tag, index) in tags">{{tag.name}}</v-chip>
           </template>
-
         </div>
         <post-map v-if="post.extra && post.extra.has_places" @placeClicked="placeClicked" :post="post"></post-map>
         <box v-if="post.extra.medias" background="white" :no-top-border="noTopBorder">

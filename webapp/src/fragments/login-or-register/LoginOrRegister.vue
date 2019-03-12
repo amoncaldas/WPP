@@ -1,6 +1,6 @@
 <template>
-  <v-dialog v-model="visible" max-width="600" class="auth-modal" :persistent="persistent">
-      <box v-model="active" :resizable="true" :closable="!persistent" background="white">
+  <v-dialog v-model="visible" max-width="600" class="auth-modal" :persistent="true">
+      <box v-model="active" :resizable="true" :closable="!persistent" @closed="close" background="white">
         <div slot="header">
           <h3>{{ $t('loginOrRegister.authentication') }}</h3>
         </div>

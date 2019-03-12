@@ -79,9 +79,12 @@ export default {
       let maxLength = this.mode === 'compact' ? 150 : 300
       if (this.post.excerpt) {
         return this.post.excerpt
+      } else if (this.content.length > maxLength) {
+        let subContent = this.content.replace(/<(?:.|\n)*?>/gm, '').substring(0, maxLength)
+        return subContent.length > 0 ? `${subContent} [...]` : subContent
+      } else {
+        return this.content.replace(/<(?:.|\n)*?>/gm, '')
       }
-      let subContent = this.content.replace(/<(?:.|\n)*?>/gm, '').substring(0, maxLength)
-      return subContent.length > 0 ? `${subContent} [...]` : subContent
     },
     link () {
       if (this.post.extra && this.post.extra.custom_link) {
@@ -136,6 +139,10 @@ export default {
         }
         postService.get(endpointAppend).then((post) => {
           context.post = post
+          // If in single mdoe, set the site title
+          if (this.mode === 'single') {
+            this.eventBus.$emit('titleChanged', `${this.title} | ${ this.$store.getters.options.site_title}` )
+          }
         }).catch(error => {
           console.log(error)
           context.showError(this.$t('post.thePostCouldNotBeLoaded'))

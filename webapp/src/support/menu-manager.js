@@ -54,6 +54,13 @@ const parseMenu = (items) => {
  * @param {*} item
  */
 const parseItem = (item) => {
+  var parser = document.createElement('a')
+  // Make sure all themenu items have a single page url
+  if (item.url.startsWith('http') && item.url.indexOf('/#/') === -1) {
+    parser.href = item.url
+    item.url = `/#${parser.pathname}`
+  }
+
   let parsedItem = {
     href: item.url,
     external: true,

@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer temporary disable-resize-watcher hide-overlay dark :right="right" v-model="isSideBarOpen" fixed app>
+  <v-navigation-drawer name="sidebar" temporary disable-resize-watcher hide-overlay dark :right="right" v-model="isSideBarOpen" fixed app>
     <v-list>
       <v-list-tile @click="right = !right">
         <v-list-tile-action>

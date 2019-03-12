@@ -1,5 +1,5 @@
 export default {
   searchComponent: {
-    placeholder: 'Your search term'
+    placeholder: 'O seu termo de busca'
   }
 }

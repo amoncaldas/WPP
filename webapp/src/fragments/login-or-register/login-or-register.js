@@ -24,6 +24,10 @@ export default {
   methods: {
     afterSignup () {
       this.activeTab = '0'
+    },
+    close () {
+      this.visible = false
+      this.$emit('closed')
     }
   },
   components: {

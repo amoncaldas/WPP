@@ -1,5 +1,5 @@
 <template>
-  <box background="white">
+  <box background="white" tag="section">
     <div slot="header">
       <h3>{{boxTitle}}</h3>
     </div>

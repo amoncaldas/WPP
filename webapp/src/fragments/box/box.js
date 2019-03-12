@@ -49,10 +49,15 @@ export default {
       type: Boolean
     },
     background: {
-      type: String
+      type: String,
+      default: 'white'
     },
     value: { // model (v-model parameter) that indicates if the box must be shown or not
       default: true
+    },
+    tag: {
+      type: String,
+      default: 'div'
     }
   },
   data () {

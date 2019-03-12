@@ -6,7 +6,8 @@ export default {
     return {
       drawer: true,
       clipped: false,
-      menuData: []
+      menuData: [],
+      h1: ''
     }
   },
   methods: {
@@ -47,6 +48,12 @@ export default {
       if (this.menuItems.length > 0) {
         menuManager.setMenuActiveStatus(this.menuItems, routeParams.to)
       }
+    })
+
+    this.h1 = this.$store.getters.options.site_title
+
+    this.eventBus.$on('titleChanged', (title) => {
+      this.h1 = title
     })
   }
 }
