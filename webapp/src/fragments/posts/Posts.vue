@@ -1,7 +1,7 @@
 <template>
   <box background="white" tag="section">
     <div slot="header">
-      <h2>{{boxTitle}}</h2>
+      <h2>{{boxTitle | capitalize}}</h2>
     </div>
     <div slot="content" v-if="posts">
       <template  >

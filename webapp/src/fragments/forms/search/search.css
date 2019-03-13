@@ -2,9 +2,15 @@
   margin-bottom: 10px;
 }
 
+.search-box {
+  padding-right: 5px;
+}
+
 .search-box >>> input {
-  font-size: 30px;
+  font-size: 28px;
   line-height: 27px;
+  padding-right: 5px;
+  padding-top: 12px;
 }
 
 .results-title {

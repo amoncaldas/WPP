@@ -15,10 +15,10 @@ services:
           args:
             DEBUG_SUPPORT: "true" # builds an image with/without debug support (xdebug)
         ports:
-          - 5002:80
+          - 5003:80
         environment:
           WORDPRESS_DB_PASSWORD: admin
-          SITE_URL: http://localhost:5002
+          SITE_URL: http://localhost:5003
           ENABLE_DEBUG: "true" # enable/disable debug mode in wordpress at run time
         volumes:
           - ./wordpress/wp-content:/var/www/html/wp-content

@@ -24,7 +24,7 @@ export default {
       required: false
     },
     size: {
-      default: 'medium_large'
+      default: 'large'
     },
     maxHeight: {
       default: null
@@ -47,7 +47,7 @@ export default {
   },
   computed: {
     url () {
-      if(this.mediaPost) {
+      if (this.mediaPost) {
         if (this.mediaPost.media_details.sizes[this.size]) {
           return this.mediaPost.media_details.sizes[this.size].source_url
         } else {
@@ -68,5 +68,5 @@ export default {
     isListMode () {
       return this.mode === 'list'
     }
-  },
+  }
 }

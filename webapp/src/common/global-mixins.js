@@ -1,4 +1,5 @@
 import * as showToaster from './show-toaster-mixin'
+import store from '@/store/store'
 import main from '@/main'
 
 const globalMixins = {
@@ -34,6 +35,13 @@ const globalMixins = {
           resolve()
         })
       })
+    },
+    buildLink (path) {
+      let link = path
+      if (store.getters.options.router_mode === 'hash') {
+        link = `/#${path}`
+      }
+      return link
     }
   }
 }

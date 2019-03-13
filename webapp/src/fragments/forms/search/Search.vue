@@ -4,7 +4,7 @@
     <v-form ref="form" @keyup.native.enter="submit">
        <v-layout row wrap>
         <v-flex xs12 sm8 >
-            <v-text-field height="60"
+            <v-text-field height="60" box clearable :style="{paddingRight: $vuetify.breakpoint.smAndDown? '0px': '5px'}"
               :label="$t('searchComponent.placeholder')"
               ref="searchInput"
               class="search-box"
@@ -15,7 +15,7 @@
             </v-text-field>
         </v-flex>
         <v-flex xs12 sm4>
-          <v-select height="60" clearable
+          <v-select height="60" clearable box
             v-model="section"
             @change="search"
             item-text="title.rendered"
@@ -33,7 +33,7 @@
         <br>
       </template>
     </v-form>
-    <post v-for="post in results" mode="list" class="search-result" :key="post.id" :no-top-border="true" :post-data="post"></post>
+    <post v-for="post in results" mode="list" class="search-result" :show-type="true" :key="post.id" :no-top-border="true" :post-data="post"></post>
     <br>
     <div class="text-xs-left" v-if="totalPages > 1">
         <v-pagination

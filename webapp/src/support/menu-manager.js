@@ -58,7 +58,7 @@ const parseItem = (item) => {
   // Make sure all themenu items have a single page url
   if (item.url.startsWith('http') && item.url.indexOf('/#/') === -1) {
     parser.href = item.url
-    item.url = `/#${parser.pathname}`
+    item.url = parser.pathname
   }
 
   let parsedItem = {

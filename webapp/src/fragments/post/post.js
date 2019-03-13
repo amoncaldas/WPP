@@ -47,6 +47,9 @@ export default {
     explicitLocale: {
       type: Boolean,
       default: false
+    },
+    showType: {
+      default: false
     }
   },
   data () {
@@ -90,7 +93,7 @@ export default {
       if (this.post.extra && this.post.extra.custom_link) {
         return this.post.extra.custom_link
       }
-      return `/#${this.post.path}`
+      return this.post.path
     },
 
     titleWithLink () {
@@ -122,6 +125,13 @@ export default {
     tags () {
       let categories = this.getTerms('post_tag')
       return categories
+    },
+    type () {
+      let trans = this.$store.getters.options.post_type_translations[this.post.type]
+      if (trans && trans[this.$store.getters.locale]) {
+        return trans[this.$store.getters.locale].title
+      }
+      return this.post.type
     }
   },
   methods: {

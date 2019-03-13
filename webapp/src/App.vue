@@ -4,7 +4,6 @@
     <app-toaster></app-toaster>
     <app-header></app-header>
     <v-content class="main-container">
-      <app-welcome></app-welcome>
       <app-confirm></app-confirm>
       <app-info></app-info>
       <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" mode="out-in">

@@ -47,7 +47,7 @@ export default {
     loadData () {
       if (this.$route.query.s) {
         this.term = this.$route.query.s
-        this.section = this.$route.query.section
+        this.section = Number(this.$route.query.section)
 
         // Build the filters object
         let filters = {s: this.term, page: this.currentPage, per_page: this.max}

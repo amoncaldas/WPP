@@ -5,7 +5,7 @@
         <v-icon>menu</v-icon>
       </v-btn>
       <h1 class='site-title'>
-			  <a href="/#/" class="logo"
+			  <a :href="buildLink('/')" class="logo"
           :title="$store.getters.options.site_title"
           :alt="$store.getters.options.site_title"
           :style="{ backgroundImage: 'url(' + logoUrl + ')' }">
@@ -18,7 +18,7 @@
           <app-h-menu :item="item" :showIcon="false" :key="index"></app-h-menu>
         </template >
       </v-toolbar-items>
-      <v-btn icon href="/#/?s=" style="padding-right:30px; padding-left:20px">
+      <v-btn icon :href="buildLink('/?s=')" style="padding-right:30px; padding-left:20px">
         <v-icon large>search</v-icon>
       </v-btn>
       <template v-if="$store.getters.isAuthenticated">
@@ -27,12 +27,12 @@
             <v-icon large left>personal_pin</v-icon>
           </v-btn>
             <div style="width:auto">
-              <v-btn class="profile-btn no-padding" href="/#/logout" flat :title="$t('header.logout')">
+              <v-btn class="profile-btn no-padding" :href="buildLink('/logout')" flat :title="$t('header.logout')">
                 {{$t('header.logout')}}
               </v-btn>
             </div>
             <div style="width:auto">
-              <v-btn class="profile-btn no-padding" href="/#/profile" flat :title="$t('header.myAccount')">
+              <v-btn class="profile-btn no-padding" :href="buildLink('/profile')" flat :title="$t('header.myAccount')">
                 {{$t('header.myAccount')}}
               </v-btn>
             </div>

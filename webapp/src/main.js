@@ -3,7 +3,7 @@
 
 import Vue from '@/common/vue-with-vuetify.js'
 import App from '@/App'
-import router from '@/router'
+import routerBuilder from '@/router'
 import store from '@/store/store'
 import i18n from '@/i18n/locale'
 import topBorder from '@/directives/top-border'
@@ -24,6 +24,7 @@ import VueAnalytics from 'vue-analytics'
 import VueMoment from 'vue-moment'
 import theme from '@/common/theme'
 import wrapperTag from '@/fragments/wrapper/wrapper-tag'
+import wppRouter from '@/support/wpp-router'
 /**
  * Fix Vue leaflet issues:
  * - import leaflet styles for proper map rendering
@@ -82,7 +83,8 @@ Vue.filter('capitalize', capitalize)
 
 let VueInstance = null
 
-router.resolveDependencies().then(() => {
+wppRouter.resolveDependencies().then(() => {
+  let router = routerBuilder.getRouter()
   router.loadRoutes()
 
   // Set locale from store/local storage

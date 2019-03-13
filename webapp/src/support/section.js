@@ -10,7 +10,7 @@ const section = {
     if (Array.isArray(currentSection.extra.list_post_endpoints)) {
       let translations = store.getters.options.post_type_translations
 
-      currentSection.acf.list_post_endpoints.forEach(endpoint => {
+      currentSection.extra.list_post_endpoints.forEach(endpoint => {
         let localesTranslation = VueInstance.lodash.find(translations, (locales) => {
           return VueInstance.lodash.find(locales, locale => {
             return locale.path === endpoint

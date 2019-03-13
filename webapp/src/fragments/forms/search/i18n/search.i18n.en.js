@@ -1,7 +1,7 @@
 export default {
   searchComponent: {
-    placeholder: 'Your search term',
-    section: 'Section',
+    placeholder: 'Type your search',
+    section: 'Filter section',
     results: 'Results',
     noResult: 'Nothing found'
   }

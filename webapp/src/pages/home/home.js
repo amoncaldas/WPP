@@ -6,7 +6,7 @@ import Section from '@/support/section'
 export default {
   data: () => ({
     valid: false,
-    homePostYpes: [],
+    homePosTypes: [],
     currentSection: null
   }),
   components: {
@@ -25,15 +25,14 @@ export default {
   },
   computed: {
     listingPosts () {
-      return this.homePostYpes
+      return this.homePosTypes
     }
   },
   methods: {
     loadData () {
       this.currentSection = Section.getCurrentHomeSection()
       this.$store.commit('currentSection', this.currentSection)
-      this.homePostYpes = Section.getListingPosts()
+      this.homePosTypes = Section.getListingPosts()
     }
-  },
-
+  }
 }

@@ -33,7 +33,7 @@ function update_site_url() {
 	global $wpdb;
 	$current_url = $wpdb->get_col( "SELECT option_value from ".$wpdb->prefix."options where option_name = 'siteurl'" )[0];
 	if(WP_HOME != null && $current_url != WP_HOME){
-		// for some reason update_option function is not working in this case, so we direct update the db
+		// For some reason (maybe cache ?) update_option function is not working in this case, so we direct update the db
 		$wpdb->update($wpdb->prefix."options", array('option_value'=>WP_HOME), array('option_name' => 'siteurl'));
 		$wpdb->update($wpdb->prefix."options", array('option_value'=>WP_HOME), array('option_name' => 'home'));
 	}
@@ -271,7 +271,6 @@ function wpp_login_logo() {
  * @return void
  */
 function after_init() {
-	update_site_url();
 	allow_cors();
 	register_custom_types();
 	set_output();
@@ -281,6 +280,8 @@ function after_init() {
 	add_theme_support( 'post-thumbnails');
 	add_action( 'login_head', 'wpp_login_logo' );	
 }
+
+update_site_url();
 
 add_action('init', 'after_init', 10);
 

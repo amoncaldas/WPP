@@ -10,6 +10,7 @@ export default {
     by: 'By',
     on: 'on',
     categories: 'Categories',
-    tags: 'Tags'
+    tags: 'Tags',
+    contentType: 'Content type'
   }
 }

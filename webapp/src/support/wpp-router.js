@@ -70,6 +70,17 @@ const wppRouter = {
       }
     }
     return match
+  },
+
+  resolveDependencies: () => {
+    return new Promise((resolve) => {
+      let promise1 = store.dispatch('fetchSections')
+      let promise2 = store.dispatch('fetchOptions')
+      let promise3 = store.dispatch('autoSetLocale')
+      Promise.all([promise1, promise2, promise3]).then((data) => {
+        resolve(data)
+      })
+    })
   }
 }
 

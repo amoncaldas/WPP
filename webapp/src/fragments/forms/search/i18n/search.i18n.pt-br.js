@@ -1,8 +1,8 @@
 export default {
   searchComponent: {
-    placeholder: 'O seu termo de busca',
-    section: 'Seção',
+    placeholder: 'Digite sua busca',
+    section: 'Filtrar seção',
     results: 'Resultados',
-    noResult: 'Nothing found'
+    noResult: 'Nenhum resultado'
   }
 }

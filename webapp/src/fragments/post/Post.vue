@@ -3,7 +3,7 @@
   <box :tag="mode === 'single' ? 'main' : 'article'" class="post" background="white" :no-top-border="noTopBorder" v-if="post">
     <div slot="header" v-if="mode !== 'compact'" >
       <template v-if="titleWithLink">
-        <a v-bind:href="link" :style="{color:$vuetify.theme.dark}" style="margin-left:0px; text-decoration:none" >
+        <a v-bind:href="buildLink(link)" :title="title" :style="{color:$vuetify.theme.dark}" style="margin-left:0px; text-decoration:none" >
           <h1 v-if="mode === 'single'">{{title}}</h1>
           <h3 v-else>{{title}}</h3>
         </a>
@@ -14,7 +14,7 @@
       </template>
     </div>
     <div slot="content">
-      <template v-if="mode !== 'compact'">
+      <template v-if="mode !== 'compact' && mode !== 'list'">
         <media :mode="mode" v-if="post._embedded" :media="featuredMedia" :max-height="mode === 'single'? 500 : 200"></media>
         <media :mode="mode" v-else-if="post.featured_media" :media-id="post.featured_media" :max-height="mode === 'single'? 500 : 200"></media>
         <br>
@@ -50,8 +50,25 @@
       <template v-else>
         <div v-if="post.locale !== 'neutral' && post.locale !== $store.getters.locale" class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': $vuetify.theme.accent}"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>
         <div v-if="post.extra && post.extra.is_sponsored" class="post-sponsored" :title="$t('post.sponsored')" :style="{'border-bottom-color': $vuetify.theme.accent}"> <i>{{$t('post.sponsored')}}</i></div>
-        <div v-if="excerpt && excerpt.length > 0">{{excerpt}}</div>
-        <v-btn style="margin-left:0px" :href="'/#'+post.path" :title="$t('post.readMore')" flat>{{ $t('post.readMore')}}</v-btn>
+
+        <v-layout row wrap v-if="mode === 'list'">
+          <v-flex sm3 style="padding-right:10px">
+            <media :mode="mode" v-if="featuredMedia" :media="featuredMedia" :max-height="200"></media>
+            <media :mode="mode" v-else-if="post.featured_media" :media-id="post.featured_media" :max-height="200"></media>
+          </v-flex>
+          <v-flex sm9 >
+            <div v-if="excerpt && excerpt.length > 0">{{excerpt}}</div>
+          </v-flex>
+        </v-layout>
+        <template v-else>
+          <div v-if="excerpt && excerpt.length > 0">{{excerpt}}</div>
+        </template>
+        <span v-if="showType">
+          <v-chip  :title="$t('post.contentType')" >{{type | capitalize}}</v-chip>
+        </span>
+        <div style="text-align:right" :style="{float:showType ? 'right' : 'none'}">
+          <v-btn style="margin-left:0px" :href="buildLink(link)" :title="$t('post.readMore')" flat>{{ $t('post.readMore')}}</v-btn>
+        </div>
       </template>
     </div>
   </box>

@@ -66,7 +66,8 @@
      * @return string
      */
     public function getWebAppHtml () {
-        if ($_SERVER["REQUEST_URI"] !== "/") {
+        $router_mode = get_option("wpp_router_mode");
+        if ($_SERVER["REQUEST_URI"] !== "/" && $router_mode === "hash") {
             $uri = $_SERVER["REQUEST_URI"];
             return "<html><title>".get_bloginfo("name")."</title><script> window.location = '/#$uri' </script></html>";
         }
