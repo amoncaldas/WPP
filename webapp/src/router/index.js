@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import store from '@/store/store'
 import loader from '@/support/loader'
 import socialAuth from '@/common/social-auth'
-import Home from '@/pages/home/Home'
+import HomeOrSearch from '@/pages/home-or-search/HomeOrSearch'
 
 Vue.use(Router)
 
@@ -15,16 +15,12 @@ const router = new Router({
   // because it is an abstract route, so every route contains the base `/` route
   routes: [ {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'HomeOrSearch',
+    component: HomeOrSearch,
     beforeEnter: (to, from, next) => {
       // Get current route
       // this only works in we are using the `hash` mode
       let route = location.hash.replace('#', '')
-
-      if (route.indexOf('?s=')) {
-        next(`/search?s=${to.query.s}`)
-      }
 
       // If the current route is the root `/` page
       // send the user to the home page

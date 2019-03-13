@@ -77,7 +77,7 @@ export default {
       // @see http://v2.wp-api.org/reference/posts/
       let filters = {
         page: this.currentPage,
-        per_page: this.max,
+        per_page: this.max
       }
 
       // Offset value in the query is causing

@@ -1,25 +1,48 @@
 <template>
   <div>
+    <br><br>
     <v-form ref="form" @keyup.native.enter="submit">
-      <v-text-field
-        :label="$t('searchComponent.placeholder')"
-        ref="searchInput"
-        class="search-box"
-        v-model="term"
-        @keyup="search"
-        append-icon="search">
-      </v-text-field>
+       <v-layout row wrap>
+        <v-flex xs12 sm8 >
+            <v-text-field height="60"
+              :label="$t('searchComponent.placeholder')"
+              ref="searchInput"
+              class="search-box"
+              v-model="term"
+              @keyup="search"
+              hide-details
+              append-icon="search">
+            </v-text-field>
+        </v-flex>
+        <v-flex xs12 sm4>
+          <v-select height="60" clearable
+            v-model="section"
+            @change="search"
+            item-text="title.rendered"
+            item-value="id"
+            hide-details
+            :items="$store.getters.sections"
+            :label="$t('searchComponent.section')">
+          </v-select>
+        </v-flex>
+      </v-layout>
+      <br>
+      <template v-if="searched">
+        <h2 class="results-title" v-if="results.length > 0">{{$t('searchComponent.results')}}</h2>
+        <h2 class="results-title" v-else>{{$t('searchComponent.noResult')}}</h2>
+        <br>
+      </template>
     </v-form>
-    <post v-for="post in results" mode="list" :key="post.id" :no-top-border="true" :post-data="post"></post>
-
-    <div class="text-xs-left" v-if="totalPages >  1 && pagination">
+    <post v-for="post in results" mode="list" class="search-result" :key="post.id" :no-top-border="true" :post-data="post"></post>
+    <br>
+    <div class="text-xs-left" v-if="totalPages > 1">
         <v-pagination
           v-model="currentPage"
           :length="totalPages">
         </v-pagination>
         <br><br>
       </div>
-  </div> 
+  </div>
 </template>
 
 <script src="./search.js"></script>

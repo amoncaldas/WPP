@@ -330,12 +330,15 @@
 
       // Prepare pagination
       unset($args["paged"]);
+      $posts_per_page = intval($args["posts_per_page"]);
+      unset($args["posts_per_page"]);
+
       $posts_to_count = new WP_Query($args);
       $total = $posts_to_count->post_count; 
       $wp_rest_response->header("X-WP-Total", $total);
 
-      $pages = intval($total / $args["posts_per_page"]);
-      if (($total % $args["posts_per_page"] ) > 0) {
+      $pages = intval($total / $posts_per_page);
+      if (($total % $posts_per_page ) > 0) {
         $pages++;
       }
       $pages = $pages > 0 ? $pages : 1;

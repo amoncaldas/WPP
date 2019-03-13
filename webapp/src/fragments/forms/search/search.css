@@ -1,0 +1,12 @@
+.search-result {
+  margin-bottom: 10px;
+}
+
+.search-box >>> input {
+  font-size: 30px;
+  line-height: 27px;
+}
+
+.results-title {
+  text-align: left;
+}

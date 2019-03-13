@@ -9,12 +9,21 @@ export default {
       max: 5,
       total: null,
       totalPages: null,
-      currentPage: 1
+      currentPage: 1,
+      section: null,
+      searched: false,
+      debounceTimeoutId: null
     }
   },
   watch: {
-    '$route': function () {
-      this.loadData()
+    currentPage: function () {
+      this.search()
+    },
+    '$route.query': {
+      handler: function () {
+        this.loadData()
+      },
+      deep: true
     }
   },
   components: {
@@ -22,13 +31,32 @@ export default {
   },
   methods: {
     search () {
-      this.$route.query.s = this.term
+      let context = this
+      clearTimeout(this.debounceTimeoutId)
+      this.debounceTimeoutId = setTimeout(function () {
+        context.doSearch()
+      }, 1000)
     },
-    loadData() {
+    doSearch () {
+      let query = {s: this.term, page: this.currentPage}
+      if (this.section) {
+        query.section = this.section
+      }
+      this.$router.push({name: 'HomeOrSearch', query: query})
+    },
+    loadData () {
       if (this.$route.query.s) {
         this.term = this.$route.query.s
-        searchService.query({'s': this.term, page: this.currentPage, per_page: this.max}).then((response)=> {
+        this.section = this.$route.query.section
+
+        // Build the filters object
+        let filters = {s: this.term, page: this.currentPage, per_page: this.max}
+        if (this.$route.query.section) {
+          filters.section = this.$route.query.section
+        }
+        searchService.query(filters).then((response) => {
           this.results = response
+          this.searched = true
           if (response.raw && response.data) {
             this.results = response.data
             this.total = Number(response.headers['x-wp-total'])
@@ -44,6 +72,5 @@ export default {
     this.eventBus.$emit('titleChanged', this.$t('search.pageTitle'))
 
     this.loadData()
-
   }
 }

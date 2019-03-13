@@ -2,7 +2,7 @@ import Search from '@/fragments/forms/search/Search'
 
 export default {
   data: () => ({
-    loaded: false,
+    loaded: false
   }),
   computed: {
   },
