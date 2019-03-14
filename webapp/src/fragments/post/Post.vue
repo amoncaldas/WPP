@@ -31,11 +31,11 @@
         <div class="cat-and-tgs">
           <template v-if="categories.length > 0">
             <h4>{{$t('post.categories') | capitalize}}</h4>
-            <v-chip :key="index + '_cat'" v-for="(category, index) in categories">{{category.name}}</v-chip>
+            <v-chip color="primary" dark :key="index + '_cat'" v-for="(category, index) in categories">{{category.name}}</v-chip>
           </template>
           <template v-if="tags.length > 0">
             <h4>{{$t('post.tags') | capitalize}}</h4>
-            <v-chip :key="index + '_tag'" v-for="(tag, index) in tags">{{tag.name}}</v-chip>
+            <v-chip color="primary" dark :key="index + '_tag'" v-for="(tag, index) in tags">{{tag.name}}</v-chip>
           </template>
         </div>
         <post-map v-if="post.extra && post.extra.has_places" @placeClicked="placeClicked" :post="post"></post-map>

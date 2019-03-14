@@ -80,37 +80,40 @@
      * @return void
      */
     public function renderNoJSHtml () {
+        $REQUEST_URI = strtok($_SERVER["REQUEST_URI"],'?');
         // render the section that is the some page for the request locale
-        if ($_SERVER["REQUEST_URI"] === "/") {
+        if ($REQUEST_URI === "/") {
             $home_section = $this->get_home_section_post();
             if($home_section) {
                 $post_or_page_object = $home_section;
                 define('IS_HOME_SECTION', TRUE);          
             } 
         } else { // Define the single page or post
-            $uri = ltrim($_SERVER["REQUEST_URI"], '/');
+            $uri = ltrim($REQUEST_URI, '/');
             $uri_segments = explode("/", $uri);
             $uri_segments = array_map('trim', $uri_segments);
             $last_segment = $uri_segments[count($uri_segments) - 1 ];
 
-            $public_post_types = get_post_types(array("public"=>true));
-            unset($public_post_types["attachment"]);
-
-            if(in_array($last_segment, $public_post_types)){
-                define('RENDER_ARCHIVE_POST_TYPE', $last_segment);
-            } else {
-                $post_or_page_object = $this->get_single($last_segment);
+            if (isset($last_segment) && $last_segment !== "") {
+                $post_slug_translated = $this->get_translated_endpoint($last_segment);
+                if($post_slug_translated !== false){
+                    define('RENDER_ARCHIVE_POST_TYPE', $post_slug_translated);
+                } elseif (is_integer($last_segment)) { // if the last segment is a post id
+                    $post_or_page_object = $this->get_single($last_segment);
+                }
             }
         }
 
         // If a page or post is defined, set it as global object
         if($post_or_page_object) {
-            global $section;
-            $section = $post_or_page_object;
             //setup_postdata( $post);
             if(defined("IS_HOME_SECTION")) {
+                global $section;
+                $section = $post_or_page_object;
                 require_once("index.php");
-            } else {                
+            } else {   
+                global $post;
+                $post = $post_or_page_object;             
                 require_once("single.php");
             }
         } else { // if not, or we are in an archive or it is 404
@@ -123,12 +126,63 @@
     }
 
     /**
-     * Get home section post based on the request locale
+	 * 
+     * get the translated endpoint of a post type endpoint
+	 *
+	 * @param string $post_url_slug
+	 * @param string $lang
+	 * @return String|false
+	 */
+	public function get_translated_endpoint($last_segment) {
+        $public_post_types = get_post_types(array("public"=>true));
+        unset($public_post_types["attachment"]);
+
+        if(in_array($last_segment, $public_post_types)){
+            return $last_segment;
+        } else {
+            $registered_post_types = get_post_types([ "public"=>true], "object");
+
+            foreach ($registered_post_types as $registered_post_type) {
+                $rest_base_translation = $this->get_post_type_translation($registered_post_type->name, get_request_locale());
+                if ($rest_base_translation === $last_segment || $registered_post_type->rest_base === $last_segment) {
+                    return $registered_post_type->name;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Get the post url slug translated, if available
+     *
+     * @param String $post_url_slug
+     * @param String $lang
+     * @return String|false
+     */
+    public function get_post_type_translation($post_url_slug, $lang) {
+        $dictionary = get_option("wpp_post_type_translations", "{}");
+        $dictionary = str_replace("\\", "", $dictionary);
+        $dictionary = json_decode($dictionary, true);
+
+        if (!isset($dictionary[$post_url_slug])) {
+            return false;
+        } elseif (!isset($dictionary[$post_url_slug][$lang])) {
+            return false;
+        } elseif (!isset($dictionary[$post_url_slug][$lang]["path"])) {
+            return false;
+        }
+        else {
+            return $dictionary[$post_url_slug][$lang]["path"];
+        }
+    }
+
+    /**
+     * Get home section for the considering the request locale
      *
      * @return void
      */
     public function get_home_section_post() {
-        // Get section home for the request locale
+        // Get the request locale
         $locale = get_request_locale();
     
         $args = array(
