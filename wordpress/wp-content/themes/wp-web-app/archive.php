@@ -9,8 +9,12 @@ $the_query = new WP_Query( array( "post_type"=> RENDER_ARCHIVE_POST_TYPE,  "post
 
 	<!-- the loop -->
 	<?php while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
-		<h2><?php the_title(); ?></h2>
-        <h2><?php the_content(); ?></h2>
+		<article>
+			<h2><?php the_title(); ?></h2>
+			<div> <?php get_the_post_thumbnail(get_the_ID()) ?></div>
+			<div><?php the_content(); ?></div>
+			<?php echo "<a href='". get_the_permalink()."' >".get_the_title(). "</a>" ?>
+		</article>        
 	<?php endwhile; ?>
 	<!-- end of the loop -->
     <?php  
