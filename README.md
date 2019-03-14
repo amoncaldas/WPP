@@ -223,7 +223,7 @@ Example to add and activate a plug-in:
 
 **Important:** the auto update does not run locally. See [Running locally](#running-locally)
 
-## Running locally ##
+## Running locally the back end ##
 
 To run the project locally, go to the project root folder and run:
 
@@ -259,3 +259,7 @@ Options without `wpp_` prefix:
 Options with `wpp_` prefix that are not mandatory:
 
 - signup_with_github
+
+## ACF ##
+
+Date ACF fields must have the return format `Ymd` to be correctly displayed

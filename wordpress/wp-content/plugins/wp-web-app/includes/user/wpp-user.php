@@ -103,23 +103,56 @@ class WppUser {
     }
 
     /**
-     * Send user activation link emailand notification to admin about the new registration
+     * Get mail subject translation
+     *
+     * @param String $key
+     * @param String $request_lang
+     * @param String $fallback
+     * @return String $fallback
+     */
+    public static function get_mail_subject_translation ($key, $request_lang, $fallback) {
+        try {
+            // Get translation definitions and parse it
+            $wpp_email_subject_translations = get_option("wpp_email_subject_translations", "{}");
+            $dictionary = str_replace("\\", "", $wpp_email_subject_translations);
+            $dictionary = json_decode($dictionary, true);
+    
+            // Check if translation key exist
+            if (isset($dictionary[$key]) && isset($dictionary[$key][$request_lang])) {
+                return $dictionary[$key][$request_lang];
+            } else  {
+                return $fallback; // fallback msg title
+            } 
+        }
+        catch (Exception $e) {                
+            return $fallback; // fallback msg title           
+        }       
+    }
+
+    /**
+     * Send user activation link email and notification to admin about the new registration
      *
      * @param Integer $user_id
      * @param String $activation_code
      * @return void
      */
-    public static function send_pasword_reset_email ($user_login, $key) {
+    public static function send_password_reset_email ($user_login, $key) {
         $request_lang = get_request_locale();
 
-        // Send user activation link       
-        $site_title = get_bloginfo("name");
+        // Get subject translation
+        $msg_title = self::get_mail_subject_translation("reset_password", $request_lang, "Password reset");
 
-        // Currenctly we only support english and portuguese
-        $msg_title = $request_lang === "pt-br" ? "[$site_title] Redefinição de senha" : "[$site_title] Password reset";            
+        // Prepend site name         
+        $site_title = get_bloginfo("name");
+        $msg_title = "[$site_title] $msg_title";          
         
-        // Build the message
-        $reset_link = network_home_url("/#/password/reset/$key/$user_login");
+        // Build the reset link
+        $uri = "/password/reset/$key/$user_login";
+        $router_mode = get_option("wpp_router_mode");
+        if ($router_mode === "hash") {
+            $uri = "/#$uri";
+        }
+        $reset_link = network_home_url($uri);
 
         $wp_user = get_user_by("login", $user_login);
         if (!$wp_user) {
@@ -130,30 +163,41 @@ class WppUser {
     }
 
     /**
-     * Send user activation link emailand notification to admin about the new registration
+     * Send user activation link email and notification to admin about the new registration
      *
      * @param Integer $user_id
      * @param String $activation_code
      * @return void
      */
-    public static function send_new_user_notifications ($user_id, $user_email, $activation_code) {
-        
+    public static function send_new_user_notifications ($user_id, $user_email, $activation_code) {        
         $request_lang = get_request_locale();
-        
-        // Notify the admin
-        WppMailer::notify_admin("New user registration", $user_email, $request_lang);
-                
-        // Send user activation link       
         $site_title = get_bloginfo("name");
 
-        // Currenctly we only support english and portuguese
-        $msg_title = $request_lang === "pt-br" ? "[$site_title] Ative sua conta" : "[$site_title] Activate your account";        
+        // Get admin msg subject translation
+        $admin_msg_title = self::get_mail_subject_translation("new_user", $request_lang, "New user registration");
+
+        // Prepend site name
+        $admin_msg_title = "[$site_title] $admin_msg_title";
         
-        // Build the activation link
-        $activation_uri = "/#/activate/$user_id/$activation_code";
-        $activation_link = network_home_url($activation_uri);    
+        // Notify the admin
+        WppMailer::notify_admin($admin_msg_title, $user_email, $request_lang);
+
+        // Get user msg subject translation
+        $user_msg_title = self::get_mail_subject_translation("activate_account", $request_lang, "Activate your account");
+
+        // Prepend site name       
+        $site_title = get_bloginfo("name");
+        $user_msg_title = "[$site_title] $user_msg_title"; 
         
-        WppMailer::send_registration_email($user_email, $msg_title, $activation_link, $request_lang);
+        // Build the reset link
+        $uri = "/activate/$user_id/$activation_code";
+        $router_mode = get_option("wpp_router_mode");
+        if ($router_mode === "hash") {
+            $uri = "/#$uri";
+        }
+        $activation_link = network_home_url($uri);    
+        
+        WppMailer::send_registration_email($user_email, $user_msg_title, $activation_link, $request_lang);
     }
 
     /**

@@ -261,7 +261,7 @@ class WppUserApi {
 
       $reset_key = WppUser::set_pass_reset_key_and_expiration($wp_user->ID);
 
-      WppUser::send_pasword_reset_email($user_login, $reset_key);
+      WppUser::send_password_reset_email($user_login, $reset_key);
       return new WP_REST_Response(null, 204); 
       
     } catch (\Exception $ex) {

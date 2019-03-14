@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="page-root search">
+  <v-container text-xs-center fluid-xs class="page-root search">
     <v-slide-y-transition mode="out-in">
      <search></search>
     </v-slide-y-transition>

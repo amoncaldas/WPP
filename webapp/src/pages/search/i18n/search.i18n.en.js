@@ -1,5 +1,5 @@
 export default {
   search: {
-    pageTitle: 'Seach'
+    pageTitle: 'Search'
   }
 }

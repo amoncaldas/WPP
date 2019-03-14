@@ -170,8 +170,7 @@
             return false;
         } elseif (!isset($dictionary[$post_url_slug][$lang]["path"])) {
             return false;
-        }
-        else {
+        } else {
             return $dictionary[$post_url_slug][$lang]["path"];
         }
     }

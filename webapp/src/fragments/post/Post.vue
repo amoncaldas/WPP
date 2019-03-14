@@ -23,19 +23,26 @@
         <div class="authoring-container">
           <span>
             <v-alert :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
-              <span v-if="!renderAsPage"> {{$t('post.by')}} <b>{{author}}</b> </span> {{$t('post.on')}} <time :datetime="post.date">{{humanizedDate}}</time>
+              <span v-if="!renderAsPage"> {{$t('post.by')}} <b>{{author}}</b> </span> {{$t('post.on')}} <time :datetime="post.date">{{formatDateTime(post.date)}}</time>
             </v-alert>
           </span>
           </div>
-        <div v-html="content"></div>
+        <div class="html-content" v-html="content"></div>
+        <div class="availability">
+          <v-chip v-if="post.extra.available" color="secondary" dark :title="$t('post.available')" >{{ $t('post.available') | capitalize}}</v-chip>
+          <span v-else-if="post.extra.available_at">
+            <b> {{$t('post.availableAt')}} </b>
+            <v-chip color="secondary" dark :title="$t('post.available_at')" >{{formatDate(post.extra.available_at)}}</v-chip>
+          </span>
+        </div>
         <div class="cat-and-tgs">
           <template v-if="categories.length > 0">
             <h4>{{$t('post.categories') | capitalize}}</h4>
-            <v-chip color="primary" dark :key="index + '_cat'" v-for="(category, index) in categories">{{category.name}}</v-chip>
+            <v-chip color="secondary" :title="category.name" dark :key="index + '_cat'" v-for="(category, index) in categories">{{category.name}}</v-chip>
           </template>
           <template v-if="tags.length > 0">
             <h4>{{$t('post.tags') | capitalize}}</h4>
-            <v-chip color="primary" dark :key="index + '_tag'" v-for="(tag, index) in tags">{{tag.name}}</v-chip>
+            <v-chip color="secondary" :title="tag.name" dark :key="index + '_tag'" v-for="(tag, index) in tags">{{tag.name}}</v-chip>
           </template>
         </div>
         <post-map v-if="post.extra && post.extra.has_places" @placeClicked="placeClicked" :post="post"></post-map>
@@ -64,10 +71,10 @@
           <div v-if="excerpt && excerpt.length > 0">{{excerpt}}</div>
         </template>
         <span v-if="showType">
-          <v-chip  :title="$t('post.contentType')" >{{type | capitalize}}</v-chip>
+          <v-chip :title="$t('post.contentType')" >{{type | capitalize}}</v-chip>
         </span>
         <div style="text-align:right" :style="{float:showType ? 'right' : 'none'}">
-          <v-btn style="margin-left:0px" :href="buildLink(link)" :title="$t('post.readMore')" flat>{{ $t('post.readMore')}}</v-btn>
+          <v-btn style="margin-left:0px" :href="buildLink(link)" :title="$t('post.readMore')" flat ><b>{{ $t('post.readMore')}}</b></v-btn>
         </div>
       </template>
     </div>

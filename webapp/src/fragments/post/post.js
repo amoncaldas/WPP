@@ -111,9 +111,6 @@ export default {
       }
       return content
     },
-    humanizedDate () {
-      return utils.getFormattedDateTime(this.post.date)
-    },
     author () {
       return this.post._embedded.author[0].name
     },
@@ -151,13 +148,20 @@ export default {
           context.post = post
           // If in single mdoe, set the site title
           if (this.mode === 'single') {
-            this.eventBus.$emit('titleChanged', `${this.title} | ${ this.$store.getters.options.site_title}` )
+            this.eventBus.$emit('titleChanged', `${this.title} | ${this.$store.getters.options.site_title}` )
           }
         }).catch(error => {
           console.log(error)
           context.showError(this.$t('post.thePostCouldNotBeLoaded'))
         })
       }
+    },
+
+    formatDate (date) {
+      return utils.getFormattedDate(date)
+    },
+    formatDateTime (date) {
+      return utils.getFormattedDateTime(date)
     },
     placeClicked (place) {
       if (place && place.link) {

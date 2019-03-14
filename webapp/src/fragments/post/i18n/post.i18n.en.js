@@ -11,6 +11,8 @@ export default {
     on: 'on',
     categories: 'Categories',
     tags: 'Tags',
-    contentType: 'Content type'
+    contentType: 'Content type',
+    available: 'Available',
+    availableAt: 'Available at'
   }
 }

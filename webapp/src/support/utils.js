@@ -72,6 +72,7 @@ const utils = {
     let dateTime = moment(value)
     let h = dateTime.hour()
     let m = dateTime.minute()
+    m = m < 10 ? '0' + m.toString() : m
 
     return `${dateStr} ${h}:${m}`
   }
