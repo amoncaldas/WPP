@@ -1,7 +1,7 @@
 <?php
 /**
- * Theme: FAM WebApp *
- * Author:      Amon Caldas
+ * Theme: WPP
+ * Author: Amon Caldas
  * Author URI:  https://github.com/amoncaldas
  *
  */

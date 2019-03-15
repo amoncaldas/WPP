@@ -1,7 +1,7 @@
 <?php
 /**
- * Theme: FAM WebApp *
- * Author:      Amon Caldas
+ * Theme: WPP
+ * Author: Amon Caldas
  * Author URI:  https://github.com/amoncaldas
  *
  */
@@ -9,8 +9,7 @@
  class WpWebAppTheme {
 	public $section_type_field_slug = "section_type";
 	public $section_type_home_field_value = "home";
-	public $WPP_SKIP_AFTER_SAVE = false;
-	
+	public $WPP_SKIP_AFTER_SAVE = false;	
 
 	public function __construct () {
 		if (!defined('WPP_API_NAMESPACE')) {

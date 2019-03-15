@@ -47,9 +47,11 @@
         $post_id = $this->getPostId();
         if ($post_id) {
             $post = get_post($post_id);
-            $title = $post->post_title. " | ". $title;
-            $og_image_url = get_the_post_thumbnail_url($post_id);
-            $description = get_sub_content($post->post_content, 200);
+            if ($post) {
+                $title = $post->post_title. " | ". $title;
+                $og_image_url = get_the_post_thumbnail_url($post_id);
+                $description = get_sub_content($post->post_content, 200);
+            }
         }
         $header_injection = "<title>$title</title>";
         $ext = pathinfo($og_image_url, PATHINFO_EXTENSION);
