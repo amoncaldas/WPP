@@ -260,6 +260,45 @@ Options with `wpp_` prefix that are not mandatory:
 
 - signup_with_github
 
-## ACF ##
+## ACF extras ##
 
-Date ACF fields must have the return format `Ymd` to be correctly displayed
+Post extras:
+
+- no_link (boolean)
+- resizable (boolean)
+- target_blank (boolean)
+- not_searchable (boolean)
+- medias 
+- available (boolean)
+- available_at (date, format `Ymd`)
+- has_places (boolean)
+- sponsored (boolean)
+- places (array of posts)
+- has_route (boolean)
+- polyline (textarea/string representing a pplyline array)
+
+Section extras:
+
+- has_image_slides (boolean)
+- html_content (text/html)
+- list_posts (array of string)
+
+Attachment extras:
+
+- video_url (message string)
+
+Place extras:
+
+- location (OpenStreetMaps field)
+- is_country (boolean)
+- flag (image array)
+
+Follower extras:
+
+- email (string)
+- ip (string)
+- user_agent (string)
+- activated (boolean)
+- mail_list (string)
+
+*Date ACF fields must have the return format `Ymd` to be correctly displayed*

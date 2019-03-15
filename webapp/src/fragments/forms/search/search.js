@@ -63,6 +63,9 @@ export default {
             this.totalPages = Number(response.headers['x-wp-totalpages'])
           }
         })
+      } else {
+        this.results = []
+        this.totalPages = 0
       }
     }
   },

@@ -10,9 +10,9 @@ export default {
   name: 'post',
   created () {
     this.renderAsPage = this.isPage
-    let treaAsPage = wppRouter.getPageLikeEndPoints()
-    if (treaAsPage.includes(this.$store.getters.postTypeEndpoint)) {
-      this.renderAsPage = true;
+    let treatAsPage = wppRouter.getPageLikeEndPoints()
+    if (treatAsPage.includes(this.$store.getters.postTypeEndpoint)) {
+      this.renderAsPage = true
     }
     this.loadData()
   },
@@ -96,9 +96,6 @@ export default {
       return this.post.path
     },
 
-    titleWithLink () {
-      return (this.mode === 'list' || this.mode === 'block') && (!this.post.extra || !this.post.extra.no_title_link)
-    },
     content () {
       let content = ''
       if (this.post.content) {
@@ -142,13 +139,17 @@ export default {
         if (this.postId) {
           endpointAppend = `${endpoint}/${this.postId}?_embed=1`
         } else if (this.postName) {
-          endpointAppend = `${endpoint}?name=${this.postName}&_embed=1`
+          endpointAppend = `${endpoint}?slug=${this.postName}&_embed=1`
         }
         postService.get(endpointAppend).then((post) => {
-          context.post = post
+          if (Array.isArray(post)) {
+            context.post = post[0]
+          } else {
+            context.post = post
+          }
           // If in single mdoe, set the site title
           if (this.mode === 'single') {
-            this.eventBus.$emit('titleChanged', `${this.title} | ${this.$store.getters.options.site_title}` )
+            this.eventBus.$emit('titleChanged', `${this.title} | ${this.$store.getters.options.site_title}`)
           }
         }).catch(error => {
           console.log(error)
@@ -169,6 +170,11 @@ export default {
         parser.href = place.link
         this.$router.push(parser.pathname)
       }
+    },
+
+    getTermUri (term, queryVar) {
+      let uri = this.buildLink(`/${this.$store.getters.postTypeEndpoint}?${queryVar}=${term.slug}`)
+      return uri
     },
 
     getTerms (type) {

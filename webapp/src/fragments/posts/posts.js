@@ -70,6 +70,18 @@ export default {
   computed: {
     boxTitle () {
       return this.title || this.$t('posts.title')
+    },
+    categories () {
+      if (this.$route.query.cats) {
+        return this.$route.query.cats.indexOf(',') > -1 ? this.$route.query.cats.split('') : [this.$route.query.cats]
+      }
+      return []
+    },
+    tags () {
+      if (this.$route.query.p_tags) {
+        return this.$route.query.p_tags.indexOf(',') > -1 ? this.$route.query.p_tags.split('') : [this.$route.query.p_tags]
+      }
+      return []
     }
   },
   methods: {
@@ -92,6 +104,14 @@ export default {
 
       if (this.embed) {
         filters._embed = 1
+      }
+
+      if (this.$route.query.cats) {
+        filters.cats = this.$route.query.cats
+      }
+
+      if (this.$route.query.p_tags) {
+        filters.p_tags = this.$route.query.p_tags
       }
 
       if (this.exclude.length > 0) {

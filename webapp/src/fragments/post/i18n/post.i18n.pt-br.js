@@ -13,6 +13,7 @@ export default {
     tags: 'Tags',
     contentType: 'Tipo de conteúdo',
     available: 'Disponível',
-    availableAt: 'Disponível a partir de'
+    availableAt: 'Disponível a partir de',
+    lastUpdate: 'Última atualização'
   }
 }

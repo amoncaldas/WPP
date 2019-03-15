@@ -1,5 +1,5 @@
 <template>
-<v-container class="page-root" grid-list-lg fluid >
+<v-container grid-list-lg fluid class="page-root single" >
   <v-layout row wrap>
     <v-flex md9 >
       <post :post-id="$route.params.postId" mode="single"></post>

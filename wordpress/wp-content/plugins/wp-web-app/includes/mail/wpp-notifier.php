@@ -231,7 +231,7 @@ class WppNotifier  {
 	 * @param string $relative_image_url
 	 * @return string
 	 */
-	public function try_get_image_in_base6($relative_image_url) {
+	public function try_get_image_in_base64($relative_image_url) {
 		$type = pathinfo($relative_image_url, PATHINFO_EXTENSION);
 		$local_path = $_SERVER["DOCUMENT_ROOT"].$relative_image_url;
 		$data = file_get_contents($local_path);

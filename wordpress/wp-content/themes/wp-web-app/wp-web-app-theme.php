@@ -246,6 +246,7 @@
 		$post_type = $query->query["post_type"];
 
 		if ($post_type !== SECTION_POST_TYPE) {
+			// Build the locale query
 			if (in_array($post_type, $public_post_types)) {
 				$request_locale = get_request_locale();
 				$tax_query = array (
@@ -255,8 +256,32 @@
 						'terms' => [$request_locale, "neutral"]
 					)
 				);
+				// Build the categories query, if passed
+				if (isset($_GET["cats"])) {
+					$categories = strpos($_GET["cats"], ",") > 1 ? explode(",", $_GET["cats"]) : [$_GET["cats"]];					
+					$cat_query  = array(
+						'taxonomy' => 'category',
+						'field' => 'slug',
+						'terms' => $categories
+					);
+					$tax_query[] = $cat_query;
+				}
+
+				// Build the tags query, if passed
+				if (isset($_GET["p_tags"])) {
+					$tags = strpos($_GET["p_tags"], ",") > 1 ? explode(",", $_GET["p_tags"]) : [$_GET["p_tags"]];					
+					$tag_query  = array(
+						'taxonomy' => 'post_tag',
+						'field' => 'slug',
+						'terms' => $tags
+					);
+					$tax_query[] = $tag_query;
+				}
+
+				// Assign the tax query
 				$query->set( 'tax_query', $tax_query );
 			}
+			
 	
 			$post_types_with_section = get_post_types_by_support("parent_section");
 			if (in_array($post_type, $post_types_with_section) && $_GET["parent_id"]) {

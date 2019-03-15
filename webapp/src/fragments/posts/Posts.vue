@@ -5,6 +5,16 @@
     </div>
     <div slot="content" v-if="posts">
       <template  >
+        <div v-if="categories && categories.length > 0">
+          <h3>{{$t('posts.categoriesFilter')}}:</h3>
+          <v-chip color="secondary" :title="category" dark :key="index + '_cat'" v-for="(category, index) in categories">{{category}}</v-chip>
+          <br><br>
+        </div>
+         <div v-if="tags && tags.length > 0">
+          <h3>{{$t('posts.tagsFilter')}}:</h3>
+          <v-chip color="secondary" :title="tag" dark :key="index + '_cat'" v-for="(tag, index) in tags">{{tag}}</v-chip>
+          <br><br>
+        </div>
         <v-container style="padding:5px" grid-list-lg fluid >
           <v-layout row wrap>
             <template v-for="(post, index) in posts">

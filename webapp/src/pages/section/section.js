@@ -16,12 +16,12 @@ export default {
   },
   computed: {
     listingPosts () {
-      return this.homePosTypes
+      return this.homePostTypes
     }
   },
   created () {
     this.currentSection = Section.getCurrentSection()
-    this.homePosTypes = Section.getListingPosts()
+    this.homePostTypes = Section.getListingPosts()
 
     // Emit the an event catch by root App component
     // telling it to update the page title

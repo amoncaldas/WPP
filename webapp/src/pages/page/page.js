@@ -1,9 +1,9 @@
 import Post from '@/fragments/post/Post'
-import Posts from '@/fragments/posts/Posts'
+import Sections from '@/fragments/sections/Sections'
 
 export default {
   components: {
     Post,
-    Posts
+    Sections
   }
 }

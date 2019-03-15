@@ -6,39 +6,68 @@ import Section from '@/support/section'
 const routes = {
   get: () => {
     let routes = []
+    var regex = new RegExp('/', 'g')
 
-    let sectionEndPoints = wppRouter.getSectionEndpoints()
-    sectionEndPoints.forEach(sectionEndPoint => {
+    let isInSection = false
+
+    for (let key in store.getters.sections) {
+      let section = store.getters.sections[key]
+      if (section.path !== '/' && location.pathname.startsWith(section.path)) {
+        isInSection = true
+        break
+      }
+    }
+
+    if (!isInSection) {
       routes.push(
         {
           path: `/:postName/`,
-          name: 'Page',
+          name: 'RootPage',
           component: Page,
           beforeEnter: (to, from, next) => {
-            let currentSection = Section.getCurrentSection()
+            let currentSection = Section.getCurrentHomeSection()
             store.commit('currentSection', currentSection)
-            store.commit('postTypeEndpoint', 'page')
+            store.commit('postTypeEndpoint', 'pages')
             next()
           }
         }
       )
       routes.push(
         {
+          path: `/:parentPage/:postName/`,
+          name: 'PageWithParent',
+          component: Page,
+          beforeEnter: (to, from, next) => {
+            let currentSection = Section.getCurrentHomeSection()
+            store.commit('currentSection', currentSection)
+            store.commit('postTypeEndpoint', 'pages')
+            next()
+          }
+        }
+      )
+    }
+
+    let sectionEndPoints = wppRouter.getSectionEndpoints()
+    sectionEndPoints.forEach(sectionEndPoint => {
+      sectionEndPoint = sectionEndPoint.replace(regex, '')
+      routes.push(
+        {
           path: `/${sectionEndPoint}/:postName`,
-          name: 'Page',
+          name: 'SectionPage',
           component: Page,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
             store.commit('currentSection', currentSection)
-            store.commit('postTypeEndpoint', 'page')
+            store.commit('postTypeEndpoint', 'pages')
             next()
           }
         }
       )
     })
+    return routes
   }
 }
 
-const singleRoutes = routes.get()
+const pageRoutes = routes.get()
 
-export default singleRoutes
+export default pageRoutes

@@ -10,12 +10,12 @@ let options = {
           let post = response.data[key]
           parser.href = post.link
           response.data[key].path = `${parser.pathname}`
-          response.data[key].extra = response.data[key].acf
+          response.data[key].extra = response.data[key].acf || {}
         }
       } else {
         parser.href = response.data.link
         response.data.path = `${parser.pathname}`
-        response.data.extra = response.data.acf
+        response.data.extra = response.data.acf || {}
       }
     }
   }

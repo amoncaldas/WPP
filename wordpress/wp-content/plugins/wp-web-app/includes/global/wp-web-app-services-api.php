@@ -156,10 +156,13 @@
       $per_page = $request->get_param( 'per_page' );
       $per_page = (isset($per_page) && !empty($per_page)) ? $per_page : 10;
 
+      $meta_query = $this->not_searchable_meta_query();
+
       $args = array(
         'paged' => $paged,
         'posts_per_page' => $per_page,            
-        'post_type' => $public_post_types
+        'post_type' => $public_post_types,
+        'meta_query' => $meta_query,
       );
 
       $content_id = $request->get_param('contentId');
@@ -206,14 +209,18 @@
 
       $search_term = esc_sql( like_escape($request->get_param('s')));
 
+      $meta_query = $this->not_searchable_meta_query();
+     
       $args = array(
         'paged' => $paged,
         'posts_per_page' => $per_page,            
         'post_type' => $public_post_types,
+        'meta_query' => $meta_query,
         's' => $search_term
-      );    
+      ); 
+      
 
-      // I a section was specified, search 
+      // When a section was specified, search 
       // only posts within this section
       $section = $request->get_param('section');
       if (isset($section) && is_numeric($section)) {
@@ -239,6 +246,28 @@
       }
       
       return $args;
+    }
+
+    /**
+     * Returns the not searchable meta query array
+     *
+     * @return Array
+     */
+    public function not_searchable_meta_query() {
+      $meta_query = array(
+        'relation' => 'OR',
+        array(
+          'key'     => 'not_searchable',
+          'value'   => 0,
+          'compare' => '=',
+        ),
+        array(
+          'key'     => 'not_searchable',
+          'value'   => '', // This is ignored, but is necessary
+          'compare' => 'NOT EXISTS',
+        ),
+      );
+      return $meta_query;
     }
 
     /**
