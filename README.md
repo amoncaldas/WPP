@@ -262,13 +262,15 @@ Options with `wpp_` prefix that are not mandatory:
 
 ## ACF extras ##
 
-Post extras:
+Possible post extras:
 
 - no_link (boolean)
 - resizable (boolean)
 - target_blank (boolean)
 - not_searchable (boolean)
-- medias 
+- medias
+- custom_link (string/url)
+- imported_id (integer)
 - available (boolean)
 - available_at (date, format `Ymd`)
 - has_places (boolean)
@@ -277,11 +279,11 @@ Post extras:
 - has_route (boolean)
 - polyline (textarea/string representing a pplyline array)
 
-Section extras:
+Possible section extras:
 
 - has_image_slides (boolean)
 - html_content (text/html)
-- list_posts (array of string)
+- list_posts (array of strings)
 
 Attachment extras:
 

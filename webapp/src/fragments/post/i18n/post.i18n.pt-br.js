@@ -7,8 +7,6 @@ export default {
     comments: 'Comentários',
     gallery: 'Galeria',
     sponsored: 'Patrocinado',
-    by: 'Por',
-    on: 'em',
     categories: 'Categorias',
     tags: 'Tags',
     contentType: 'Tipo de conteúdo',

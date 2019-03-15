@@ -41,20 +41,27 @@
 
         $title = get_bloginfo("name");
         $og_image_url = network_site_url(trim(get_option("wpp_site_relative_logo_url")));
+        $locale = get_request_locale();
+        $description = get_bloginfo("description");
         
         $post_id = $this->getPostId();
         if ($post_id) {
-            $title = get_the_title($post_id). " | ". $title;
+            $post = get_post($post_id);
+            $title = $post->post_title. " | ". $title;
             $og_image_url = get_the_post_thumbnail_url($post_id);
+            $description = get_sub_content($post->post_content, 200);
         }
         $header_injection = "<title>$title</title>";
         $ext = pathinfo($og_image_url, PATHINFO_EXTENSION);
         $header_injection .= "<link rel='image_src' type='image/$ext' href='$og_image_url' />";
-        $header_injection .= "<meta property='og:title' content='$title' />";
+        $header_injection .= "<meta property='og:title' content='$title' />";        
         $header_injection .= "<meta property='og:image' content='$og_image_url' />";
+        $header_injection .= "<meta property='og:locale' content='$locale' />";
+        $header_injection .= "<meta property='og:description' content='$description' />";
 
         $url = network_site_url($_SERVER["REQUEST_URI"]);
         $header_injection .= "<link rel='canonical' id='page_canonical' href='$url' />";
+        $header_injection .= "<meta property='og:url' content='$url' />";
 
         $skeleton = preg_replace("/<title[^>]*>.*?<\/title>/i", $header_injection, $skeleton);
         return $skeleton;
@@ -67,7 +74,8 @@
      */
     public function getWebAppHtml () {
         $router_mode = get_option("wpp_router_mode");
-        if ($_SERVER["REQUEST_URI"] !== "/" && $router_mode === "hash") {
+        $REQUEST_URI = strtok($_SERVER["REQUEST_URI"],'?');
+        if ( $REQUEST_URI !== "/" && $router_mode === "hash") {
             $uri = $_SERVER["REQUEST_URI"];
             return "<html><title>".get_bloginfo("name")."</title><script> window.location = '/#$uri' </script></html>";
         }
@@ -238,7 +246,8 @@
      * @return void
      */
     public function getSection() {
-        $uri_parts = explode("/", $_SERVER["REQUEST_URI"]);
+        $REQUEST_URI = strtok($_SERVER["REQUEST_URI"],'?');
+        $uri_parts = explode("/",  $REQUEST_URI);
         $sections = get_posts( array( 'post_type' => 'section', 'post_name'  => $uri_parts[0]));		
         if (count($sections) > 0) {
             return $sections[0];
@@ -251,10 +260,11 @@
      * @return Integer
      */
     public function getPostId() {
-        if ($_SERVER["REQUEST_URI"] !== "/") {
-            $uri_parts = explode("/", $_SERVER["REQUEST_URI"]);
+        $REQUEST_URI = strtok($_SERVER["REQUEST_URI"],'?');
+        if ($REQUEST_URI !== "/") {
+            $uri_parts = explode("/", $REQUEST_URI);
             $last_url_segment = $uri_parts[count($uri_parts) -1];
-            if(is_integer($last_url_segment)) {
+            if(is_numeric($last_url_segment)) {
                 return $last_url_segment;
             } else {
                 $sections = get_posts( array( 'post_type' => 'section', 'post_name'  => $uri_parts[0]));		

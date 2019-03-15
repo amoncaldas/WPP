@@ -26,6 +26,45 @@ const routes = {
       )
       routes.push(
         {
+          path: `/${postTypeEndpointUrl}/:postParent1/:postId`,
+          name: `${postTypeEndpointUrl}-Single`,
+          component: Single,
+          beforeEnter: (to, from, next) => {
+            let currentSection = Section.getCurrentSection()
+            store.commit('currentSection', currentSection)
+            store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+            next()
+          }
+        }
+      )
+      routes.push(
+        {
+          path: `/${postTypeEndpointUrl}/:postParent1/:postName/:postId`,
+          name: `${postTypeEndpointUrl}-Single-with-one-parent`,
+          component: Single,
+          beforeEnter: (to, from, next) => {
+            let currentSection = Section.getCurrentSection()
+            store.commit('currentSection', currentSection)
+            store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+            next()
+          }
+        }
+      )
+      routes.push(
+        {
+          path: `/${postTypeEndpointUrl}/:postParent1/:postParent2/:postName/:postId`,
+          name: `${postTypeEndpointUrl}-Single-with-two-parents`,
+          component: Single,
+          beforeEnter: (to, from, next) => {
+            let currentSection = Section.getCurrentSection()
+            store.commit('currentSection', currentSection)
+            store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+            next()
+          }
+        }
+      )
+      routes.push(
+        {
           path: `/${postTypeEndpointUrl}/:postId`,
           name: `${postTypeEndpointUrl}-SingleId`,
           component: Single,

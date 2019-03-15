@@ -312,6 +312,16 @@
 					$places[$place_id]["link"] = get_permalink($place_id);
 				}
 			}
+		} else {			
+			$location = get_post_meta($post_arr["id"], "location", true);			
+			if($location) {
+				$title = is_array($post_arr["title"]) ? $post_arr["title"]["rendered"] : $post_arr["title"];
+				$places[$post_arr["id"]] = $location;
+				$places[$post_arr["id"]]["title"] = $title;
+				$locales = wp_get_post_terms($post_arr["id"], LOCALE_TAXONOMY_SLUG);
+				$places[$post_arr["id"]][LOCALE_TAXONOMY_SLUG] = count($locales) > 0 ? $locales[0]->slug : null;
+				$places[$post_arr["id"]]["link"] = $post_arr["link"];
+			}
 		}
 		return $places;
 	}	

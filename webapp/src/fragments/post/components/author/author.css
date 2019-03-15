@@ -1,0 +1,19 @@
+
+.authoring-container {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid  lightgray
+}
+
+.authoring {
+  padding: 5px;
+  color: white;
+}
+
+.author {
+  font-weight: 500
+}
+
+.author-avatar img {
+  max-width: 100%;
+}

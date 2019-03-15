@@ -65,12 +65,25 @@ const getRouter = () => {
     let routes = loader.load(require.context('@/pages/', true, /\.route\.js$/))
 
     // Once we have all additional routes, we add them to the router
+
+    // Register first the single routes returns, because
+    // they represent, usually, routes to static components
+    // like `profile`, `register`, `logout` and ect.
+    routes.forEach(componentRoute => {
+      if (componentRoute) {
+        if (!Array.isArray(componentRoute)) {
+          router.addRoutes([componentRoute]) // as it is a single route, transform it in an array
+        }
+      }
+    })
+
+    // Then register the array of routes returned by
+    // the components, that are routes build dynamically
+    // based on values returned by the back-end
     routes.forEach(componentRoute => {
       if (componentRoute) {
         if (Array.isArray(componentRoute)) {
           router.addRoutes(componentRoute)
-        } else {
-          router.addRoutes([componentRoute])
         }
       }
     })

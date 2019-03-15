@@ -19,11 +19,7 @@
         <br>
       </template>
       <template v-if="mode === 'single'">
-        <div class="authoring-container" v-if="!renderAsPage">
-          <v-alert  :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
-            <span> {{$t('post.by')}} <b>{{author}}</b> </span> {{$t('post.on')}} <time :datetime="post.date">{{formatDateTime(post.date)}}</time>
-          </v-alert>
-        </div>
+        <author v-if="!renderAsPage" :post="post"> </author>
         <div class="html-content" v-html="content"></div>
 
         <v-alert v-if="renderAsPage" :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
@@ -37,7 +33,7 @@
             <v-chip color="secondary" dark :title="$t('post.available_at')" >{{formatDate(post.extra.available_at)}}</v-chip>
           </span>
         </div>
-        <div class="cat-and-tgs">
+        <div class="cat-and-tgs" v-if="categories.length > 0 || tags.length > 0">
           <template v-if="categories.length > 0">
             <h4>{{$t('post.categories') | capitalize}}</h4>
             <v-btn v-for="(category) in categories" :key="category.id" round depressed :href="getTermUri(category, 'cats')" color="secondary" dark :title="category.name"  >{{category.name}}</v-btn>
@@ -47,7 +43,7 @@
             <v-btn v-for="(tag) in tags" :key="tag.id" round depressed :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
           </template>
         </div>
-        <post-map v-if="post.extra.has_places" @placeClicked="placeClicked" :post="post"></post-map>
+        <post-map v-if="hasPlaces" @placeClicked="placeClicked" :post="post"></post-map>
         <box v-if="post.extra.medias" background="white" :no-top-border="noTopBorder">
           <div slot="header">{{$t('post.gallery')}}</div>
           <div slot="content">
@@ -55,6 +51,8 @@
             <gallery :medias="post.extra.medias" ></gallery>
           </div>
         </box>
+        <br><br>
+        <author mode="bio" v-if="!renderAsPage" :post="post"> </author>
       </template>
       <template v-else>
         <div v-if="post.locale !== 'neutral' && post.locale !== $store.getters.locale" class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': $vuetify.theme.accent}"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>

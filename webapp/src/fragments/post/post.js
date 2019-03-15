@@ -3,15 +3,17 @@ import Media from '@/fragments/media/Media'
 import PostMap from '@/fragments/post-map/PostMap'
 import Gallery from '@/fragments/gallery/Gallery'
 import Comments from '@/fragments/comments/Comments'
-import wppRouter from '@/support/wpp-router'
 import utils from '@/support/utils'
+import Author from './components/author/Author'
 
 export default {
   name: 'post',
   created () {
     this.renderAsPage = this.isPage
-    let treatAsPage = wppRouter.getPageLikeEndPoints()
-    if (treatAsPage.includes(this.$store.getters.postTypeEndpoint)) {
+    let pageTypes = this.$store.getters.options.page_like_types
+    pageTypes = Array.isArray(pageTypes) ? pageTypes : [pageTypes]
+
+    if (pageTypes.includes(this.$store.getters.postTypeEndpoint)) {
       this.renderAsPage = true
     }
     this.loadData()
@@ -66,6 +68,9 @@ export default {
         return media
       }
     },
+    hasPlaces () {
+      return this.post.places && Object.keys(this.post.places).length > 0
+    },
     related () {
       if (this.post && this.post.extra && this.post.extra.related && Array.isArray(this.post.extra.related)) {
         return this.post.extra.related
@@ -90,7 +95,7 @@ export default {
       }
     },
     link () {
-      if (this.post.extra && this.post.extra.custom_link) {
+      if (this.post.extra.custom_link && this.post.extra.custom_link.length > 0 && this.post.extra.custom_link !== ' ') {
         return this.post.extra.custom_link
       }
       return this.post.path
@@ -107,9 +112,6 @@ export default {
         console.log('a');
       }
       return content
-    },
-    author () {
-      return this.post._embedded.author[0].name
     },
 
     categories () {
@@ -197,7 +199,8 @@ export default {
     Media,
     PostMap,
     Gallery,
-    Comments
+    Comments,
+    Author
   },
   beforeCreate: function () {
     this.$options.components.Related = require('@/fragments/related/Related.vue').default

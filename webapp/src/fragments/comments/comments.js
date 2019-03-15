@@ -59,7 +59,7 @@ export default {
       verifiedCaptcha: false,
       resource: {},
       context: null,
-      baseEndpoint:null
+      baseEndpoint: null
     }
   },
   computed: {
@@ -73,7 +73,7 @@ export default {
   },
 
   methods: {
-    sendComment() {
+    sendComment () {
       let endPoint = this.baseEndpoint + '?post=' + this.postId
       this.resource.$setEndpoint(endPoint)
       let content = this
@@ -83,7 +83,7 @@ export default {
       })
     },
     afterLogin () {
-      if(this.resource.content && this.resource.content.length > 1) {
+      if (this.resource.content && this.resource.content.length > 1) {
         this.submit()
       }
       this.showLogintOrRegister = false
@@ -127,7 +127,7 @@ export default {
       let filters = {
         post: this.postId,
         page: this.currentPage,
-        per_page: this.max,
+        per_page: this.max
       }
       commentService.query(filters).then((response) => {
         context.comments = response
