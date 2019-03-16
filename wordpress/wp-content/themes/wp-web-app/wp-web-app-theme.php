@@ -63,7 +63,7 @@
 	 *
 	 * @param Array $post_id
 	 * @param Array $data
-	 * @return Array $data - new post created
+	 * @return Array $data - new post created or the existing one
 	 */
 	public function before_update_draft_post($post_id, $data) {
 		$skip_auto_save = get_option("wpp_disable_auto_save", "no");
@@ -89,8 +89,8 @@
 				}
 			}
 	
-			// If the import id was found and is different from the current post id
-			// If the imported post already exists (wordpress fires this callback multiple times)			
+			// If the import id was found and it is different from the current post id
+			// If the import post already exists (wordpress fires this callback multiple times)			
 			if ($import_id > 0 && $post_id !== $import_id) {
 				$post_exists = get_post($import_id);
 	
@@ -101,9 +101,13 @@
 				}
 				else { // if not, create a new post using the current post data
 					$data["import_id"] = $import_id;
-					unset($data["ID"]);
+				
+			        // Remove the id to trigger a creation of a new post
+			        unset($data["ID"]);
 					$inserted_id = wp_insert_post($data);
-					$data["ID"] = $import_id;
+			
+			        // Redefine the id from the inserted post
+				    $data["ID"] = $import_id;
 
 					// This is not straight forward but we have
 					// to change the post id in the request
@@ -124,7 +128,7 @@
 	}
 
 	/**
-	 * Check if home section exists. If does not exist, create it
+	 * Make sure the mandatory locales exists exists. If any one required does not exist, create it
 	 *
 	 * @return void
 	 */
@@ -157,7 +161,7 @@
 						continue;
 					}
 	
-					// Get the home for a given language. If does not exist, create it
+					// Get the home for a given language. If it does not exist, create it
 					$home_sections = $this->get_home_section($lang_term->term_id);
 	
 					if (count($home_sections) === 0) {
