@@ -1,4 +1,4 @@
-# wP Web App plugin #
+# WPP plugin #
 
 This plugin adds custom behaviors based on the Wp Web App needs. It relies on the existence of JWTAuthentication plugin (they must be installed and active)
 This plugin provides:
