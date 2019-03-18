@@ -8,11 +8,11 @@
     <v-flex md3 v-if="hasSidebar">
       <template v-for="postType in sidebarPostTypes">
         <template v-if="postType.endpoint === 'sections'">
-          <sections :key="postType.endpoint"  :random="true"></sections>
+          <sections :key="postType.endpoint" :max="maxInSidebar"  :random="true"></sections>
           <br :key="postType.endpoint + 'br'">
         </template>
         <template v-else>
-          <posts :parent-id="parentSectionId" :exclude="[post.id]" :columns-per-post="12" :key="postType.endpoint" :endpoint="postType.endpoint" :title="postType.title"></posts>
+          <posts :parent-id="parentSectionId" :max="maxInSidebar" :exclude="[post.id]" :columns-per-post="12" :key="postType.endpoint" :endpoint="postType.endpoint" :title="postType.title"></posts>
           <br :key="postType.endpoint + 'br'">
         </template>
       </template>

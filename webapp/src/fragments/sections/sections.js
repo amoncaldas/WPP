@@ -42,11 +42,12 @@ export default {
         return s.path !== '/'
        })
        if (this.max !== -1) {
-        this.sections = sections.slice(0, this.max)
+        sections = sections.slice(0, this.max)
        }
        if (this.random) {
-        this.sections = this.lodash.shuffle(sections)
+        sections = this.lodash.shuffle(sections)
        }
+       this.sections = sections
     }
   },
   components: {

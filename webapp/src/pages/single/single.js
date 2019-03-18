@@ -1,7 +1,6 @@
 import Post from '@/fragments/post/Post'
 import Posts from '@/fragments/posts/Posts'
 import Sections from '@/fragments/sections/Sections'
-import Section from '@/support/section'
 import NotFoundComponent from '@/fragments/not-found/NotFound'
 import postService from '@/shared-services/post-service'
 import postSupport from '@/support/post'
@@ -34,6 +33,10 @@ export default {
       if (this.currentSection && this.currentSection.id) {
         return this.currentSection.id
       }
+    },
+    maxInSidebar () {
+      let max = this.post.extra.max_in_side_bar !== undefined ? this.post.extra.max_in_side_bar : 3
+      return Number(max)
     }
   },
   created () {

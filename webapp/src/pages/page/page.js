@@ -41,5 +41,5 @@ export default {
         context.showError(this.$t('post.thePostCouldNotBeLoaded'))
       })
     }
-  },
+  }
 }

@@ -5,6 +5,7 @@ import Gallery from '@/fragments/gallery/Gallery'
 import Comments from '@/fragments/comments/Comments'
 import utils from '@/support/utils'
 import Author from './components/author/Author'
+import Sharer from '@/fragments/sharer/Sharer'
 
 export default {
   name: 'post',
@@ -161,7 +162,8 @@ export default {
     PostMap,
     Gallery,
     Comments,
-    Author
+    Author,
+    Sharer
   },
   beforeCreate: function () {
     this.$options.components.Related = require('@/fragments/related/Related.vue').default

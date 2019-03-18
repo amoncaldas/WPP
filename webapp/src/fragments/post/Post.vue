@@ -21,6 +21,7 @@
       <template v-if="mode === 'single'">
         <author v-if="!renderAsPage" :post="post"> </author>
         <br>
+        <sharer :path="post.path" ></sharer>
         <div class="html-content" v-html="content"></div>
 
         <v-alert v-if="renderAsPage" :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
@@ -35,6 +36,7 @@
           </span>
         </div>
         <div class="cat-and-tgs" v-if="categories.length > 0 || tags.length > 0">
+          <br>
           <template v-if="categories.length > 0">
             <h4>{{$t('post.categories') | capitalize}}</h4>
             <v-btn v-for="(category) in categories" :key="category.id" round depressed :href="getTermUri(category, 'cats')" color="secondary" dark :title="category.name"  >{{category.name}}</v-btn>
@@ -44,7 +46,10 @@
             <v-btn v-for="(tag) in tags" :key="tag.id" round depressed :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
           </template>
         </div>
-        <post-map v-if="hasPlaces" @placeClicked="placeClicked" :post="post"></post-map>
+        <template v-if="hasPlaces">
+          <post-map @placeClicked="placeClicked" :post="post"></post-map>
+          <br>
+        </template>
         <box v-if="post.extra.medias" background="white" :no-top-border="noTopBorder">
           <div slot="header">{{$t('post.gallery')}}</div>
           <div slot="content">
@@ -53,6 +58,8 @@
           </div>
         </box>
         <br><br>
+        <sharer :path="post.path" ></sharer>
+        <br>
         <author mode="bio" v-if="showSingleBottomAuthor" :post="post"> </author>
       </template>
       <template v-else>
@@ -96,7 +103,7 @@
         {{$t('post.comments')}}
       </v-tab>
       <v-tab-item v-if="!renderAsPage">
-        <related :columns-per-post="4" :content-id="post.id" :max="6"> </related>
+        <related :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :content-id="post.id" :max="6"> </related>
       </v-tab-item>
       <v-tab-item>
         <comments :open="post.comment_status === 'open'" :post-id="post.id"></comments>

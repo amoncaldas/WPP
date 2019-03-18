@@ -279,6 +279,9 @@ Possible post extras:
 - has_route (boolean)
 - polyline (textarea/string representing a pplyline array)
 - hide_author_bio (boolean) hide author bio in single mode
+- show_sidebar (boolean)
+- sidebar_post_types (array of strings)
+- max_in_side_bar (integer)
 
 Possible section extras:
 
@@ -293,7 +296,9 @@ Possible section extras:
 - bg_color (html color string)
 - bg_repeat (css repeat string)
 - bg_position (css repeat string)
+- has_places (boolean)
 - places (array of posts)
+- has_section_map (booelan)
 
 Attachment extras:
 

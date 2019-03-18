@@ -1,0 +1,15 @@
+.sharer {
+  height: 50px;
+}
+
+.item {
+  width: 40px;
+  height: 40px;
+  display: block;
+  float: left;
+  margin-right: 10px;
+}
+
+img.sharer-img {
+  fill: #9c27b0
+}
