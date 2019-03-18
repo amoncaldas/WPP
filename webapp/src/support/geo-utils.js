@@ -59,6 +59,10 @@ const geoUtils = {
       let lastIndexKey = markersData.length - 1
       let coloredMarkerName = geoUtils.getMarkerColor(key, lastIndexKey, isRoute)
 
+      options.isRoute = isRoute
+      options.key = key
+      options.lastIndexKey = lastIndexKey
+
       // Build the marker
       let markerIcon = geoUtils.buildMarkerIcon(coloredMarkerName, options)
       let marker = { position: { lng: wayPoint[0], lat: wayPoint[1] }, icon: markerIcon }
@@ -89,7 +93,7 @@ const geoUtils = {
     let shadowUrl = require('leaflet/dist/images/marker-shadow.png')
     let iconSize = [28, 36]
 
-    if (options.mapIconUrl) {
+    if (options.mapIconUrl && (!options.isRoute || options.key === options.lastIndexKey)) {
       iconFile = options.mapIconUrl
       shadowUrl = null
       iconSize = [36, 36]

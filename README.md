@@ -278,12 +278,22 @@ Possible post extras:
 - places (array of posts)
 - has_route (boolean)
 - polyline (textarea/string representing a pplyline array)
+- hide_author_bio (boolean) hide author bio in single mode
 
 Possible section extras:
 
 - has_image_slides (boolean)
 - html_content (text/html)
-- list_posts (array of strings)
+- list_posts (boolean)
+- list_post_endpoints (array of strings)
+- compact_list_posts (boolean)
+- compact_list_post_endpoints (array of strings)
+- set_custom_appearance (boolean)
+- bg_image (string/url)
+- bg_color (html color string)
+- bg_repeat (css repeat string)
+- bg_position (css repeat string)
+- places (array of posts)
 
 Attachment extras:
 

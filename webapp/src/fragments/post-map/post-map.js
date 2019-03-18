@@ -97,7 +97,7 @@ export default {
     },
     loadMapData () {
       this.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
-      this.mapData = { markers: GeoUtils.buildMarkers(this.getMarkersData(), false, {mapIconUrl: this.$store.getters.options.map_icon_url}) }
+      this.mapData = { markers: GeoUtils.buildMarkers(this.getMarkersData(), this.post.extra.has_route, {mapIconUrl: this.$store.getters.options.map_icon_url}) }
       this.mapData.polyline = this.post.route
       this.dataBounds = GeoUtils.getBBoxAndMarkersBounds(this.dataBounds, this.mapData.markers)
       this.loaded = true

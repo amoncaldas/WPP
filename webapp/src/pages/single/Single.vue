@@ -1,11 +1,21 @@
 <template>
 <v-container grid-list-lg fluid class="page-root single" >
   <v-layout row wrap>
-    <v-flex md9 >
-      <post :post-id="$route.params.postId" mode="single"></post>
+    <v-flex md9 v-bind="{[ hasSidebar? 'md9' : 'md12']: true }" >
+      <not-found-component v-if="notFound"></not-found-component>
+      <post v-else-if="loaded" :post-data="post" mode="single"></post>
     </v-flex>
-    <v-flex md3>
-      <sections :random="true"></sections>
+    <v-flex md3 v-if="hasSidebar">
+      <template v-for="postType in sidebarPostTypes">
+        <template v-if="postType.endpoint === 'sections'">
+          <sections :key="postType.endpoint"  :random="true"></sections>
+          <br :key="postType.endpoint + 'br'">
+        </template>
+        <template v-else>
+          <posts :parent-id="parentSectionId" :exclude="[post.id]" :columns-per-post="12" :key="postType.endpoint" :endpoint="postType.endpoint" :title="postType.title"></posts>
+          <br :key="postType.endpoint + 'br'">
+        </template>
+      </template>
     </v-flex>
   </v-layout>
 </v-container>

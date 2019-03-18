@@ -1,5 +1,6 @@
 import menuManager from '@/support/menu-manager'
 import LocaleChanger from '@/fragments/locale/Locale'
+import Section from '@/support/section'
 
 export default {
   data () {
@@ -24,6 +25,10 @@ export default {
   computed : {
     logoUrl ()  {
       let url = this.$store.getters.options.site_relative_logo_url.trim()
+
+      if (this.$store.getters.currentSection && this.$store.getters.currentSection.extra.logo_url) {
+        url = this.$store.getters.currentSection.extra.logo_url.trim()
+      }
       return url
     },
     appTitle ()  {

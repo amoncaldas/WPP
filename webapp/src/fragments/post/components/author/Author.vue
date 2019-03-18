@@ -1,12 +1,12 @@
 <template>
   <div class="authoring-container" v-if="hasAuthor">
     <v-layout row wrap>
-      <v-flex xs2 sm1 style="padding-right:10px">
+      <v-flex xs3 sm2 md1 style="padding-right:5px; padding-left:5px">
         <div class="author-avatar">
           <img :src="authorAvatar" :alt="author" :title="author">
         </div>
       </v-flex>
-      <v-flex xs10 sm11 >
+      <v-flex xs9 sm10 md11>
         <div>
           <span> {{$t('author.by')}} <b>{{author}}</b></span>
         </div>

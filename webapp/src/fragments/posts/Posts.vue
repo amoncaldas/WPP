@@ -19,7 +19,7 @@
           <v-layout row wrap>
             <template v-for="(post, index) in posts">
             <v-flex v-if="index < max"  v-bind="{['sm'+columnsPerPost]: true}"  :key="post.id">
-              <post :key="post.id" :no-top-border="true" :post-data="post"></post>
+              <post :mode="mode" :key="post.id" :no-top-border="true" :post-data="post"></post>
             </v-flex>
             </template>
           </v-layout>
@@ -28,11 +28,22 @@
     </div>
     <div slot="footer">
       <div class="text-xs-left" v-if="totalPages >  1 && pagination">
-        <v-pagination
-          v-model="currentPage"
-          :length="totalPages">
-        </v-pagination>
+        <v-layout row wrap>
+          <v-flex sm6>
+            <v-pagination
+              v-model="currentPage"
+              :length="totalPages">
+            </v-pagination>
+          </v-flex>
+          <v-flex sm6>
+            <v-btn style="float:right" :href="buildLink(archiveLink)" >{{ $t('posts.seeArchive')}}</v-btn>
+          </v-flex>
+          </v-layout>
         <br><br>
+      </div>
+      <div v-else-if="posts.length === 0 && loaded">
+        <h3>{{$t('posts.noContent')}}</h3>
+        <br>
       </div>
     </div>
   </box>

@@ -1,7 +1,7 @@
 <template>
 <div>
   <box :tag="mode === 'single' ? 'main' : 'article'" :resizable="post.extra.resizable" class="post" background="white" :no-top-border="noTopBorder" v-if="post">
-    <div slot="header" v-if="mode !== 'compact'" >
+    <div slot="header">
       <template v-if="mode === 'single'">
         <h1 v-if="mode === 'single'">{{title}}</h1>
       </template>
@@ -20,6 +20,7 @@
       </template>
       <template v-if="mode === 'single'">
         <author v-if="!renderAsPage" :post="post"> </author>
+        <br>
         <div class="html-content" v-html="content"></div>
 
         <v-alert v-if="renderAsPage" :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
@@ -52,7 +53,7 @@
           </div>
         </box>
         <br><br>
-        <author mode="bio" v-if="!renderAsPage" :post="post"> </author>
+        <author mode="bio" v-if="showSingleBottomAuthor" :post="post"> </author>
       </template>
       <template v-else>
         <div v-if="post.locale !== 'neutral' && post.locale !== $store.getters.locale" class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': $vuetify.theme.accent}"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>
@@ -71,6 +72,10 @@
         </v-layout>
         <template v-else>
           <div v-if="excerpt && excerpt.length > 0">{{excerpt}}</div>
+          <div v-if="mode === 'compact' || post.extra.hide_author_bio">
+            <br>
+            <author v-if="!renderAsPage" :post="post"> </author>
+          </div>
         </template>
         <span v-if="showType">
           <v-chip :title="$t('post.contentType')" >{{type | capitalize}}</v-chip>

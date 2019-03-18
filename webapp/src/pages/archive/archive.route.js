@@ -1,6 +1,7 @@
 import Archive from './Archive'
 import wppRouter from '@/support/wpp-router'
 import store from '@/store/store'
+import Section from '@/support/section'
 
 const routes = {
   get: () => {
@@ -17,6 +18,8 @@ const routes = {
           name: `${postTypeEndpointUrl}-Archive`,
           component: Archive,
           beforeEnter: (to, from, next) => {
+            let currentSection = Section.getCurrentSection()
+            store.commit('currentSection', currentSection)
             store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
             next()
           }

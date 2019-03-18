@@ -2,7 +2,7 @@
   <v-container fluid class="page-root archive">
     <br>
     <v-slide-y-transition mode="out-in">
-      <posts :parent-id="parentSectionId" :columns-per-post="6" :endpoint="postType" :title="title"></posts>
+      <posts :parent-id="parentSectionId" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 6: 12" :endpoint="postType" :title="title"></posts>
     </v-slide-y-transition>
   </v-container>
 </template>

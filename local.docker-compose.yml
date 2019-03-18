@@ -14,6 +14,7 @@ services:
           context: wordpress/build
           args:
             DEBUG_SUPPORT: "true" # builds an image with/without debug support (xdebug)
+            NOTIFICATIONS_TASK_SUPPORT: "true" # add crontab to send notifications
         ports:
           - 5003:80
         environment:
