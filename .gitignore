@@ -23,7 +23,7 @@ wordpress/wp-content/debug.log
 wordpress/wp-content/themes/*
 
 # do not ignore FAM theme
-!wordpress/wp-content/themes/wp-web-app
+!wordpress/wp-content/themes/wpp
 
 
 # Ignore all plugins ...
@@ -50,7 +50,7 @@ wordpress/wp-content/plugins/*
 
 
 ## Do not ignore wpp plugin
-!wordpress/wp-content/plugins/wp-web-app
+!wordpress/wp-content/plugins/wpp
 
 # Ignore files that contains custom enviroment config/data
 wordpress/wp-config.php
