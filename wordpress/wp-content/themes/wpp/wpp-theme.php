@@ -82,9 +82,7 @@
 					
 					// Get the import id value
 					if( $field && is_array($field) & $field["name"] === "import_id") {
-						if ($field["name"] === "import_id") {
-							$import_id = (int)$value;
-						}
+						$import_id = (int)$value;
 					}
 				}
 			}
@@ -659,6 +657,10 @@
 				return $name;
 			}
 		};
+		$parent_id = $this->get_parent_section_id($page_id);
+		if ($parent_id > 0) {
+			update_post_meta($page_id, SECTION_POST_TYPE, $parent_id);
+		}
 
 		if(isset($page->post_name) && $page->post_name !== "") {
 			$no_post_type_in_permalink_types = get_post_types_by_support("no_post_type_in_permalink");
@@ -787,6 +789,29 @@
 		$parent_id = is_array($parent_id) && count($parent_id)> 0 ? $parent_id[0] : $parent_id;
 		if (isset($parent_id)) {
 			$parent_id = intval($parent_id);
+		}
+		if (!$parent_id) {
+			$extra_data = $_POST['acf'];
+	
+
+			// If the acf data are present and the post is a draft
+			if (isset($extra_data) && is_array($extra_data)) {
+				// Find the import id from the ACF fields extra data
+				foreach( $extra_data as $key => $value ) {			
+					// Get field.
+					$field = acf_get_field( $key );				
+					
+					// Get the import id value
+					if( $field && is_array($field) & $field["name"] === SECTION_POST_TYPE) {
+						
+						if (is_array($value) && count($value) > 0 ) {
+							$value = $value[0];
+						}
+						$parent_id = (int)$value;
+						break;
+					}
+				}
+			}
 		}
 		return $parent_id;
 	}
