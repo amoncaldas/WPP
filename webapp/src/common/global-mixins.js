@@ -42,6 +42,19 @@ const globalMixins = {
         link = `/#${path}`
       }
       return link
+    },
+    loadRecaptcha () {
+      return new Promise((resolve, reject) => {
+        let recaptchaScript = document.createElement('script')
+        recaptchaScript.setAttribute('src', 'https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit')
+        document.head.appendChild(recaptchaScript)
+
+        // We tried to use onreadystatechange, but it doe snot fire
+        // Try to find another better solution
+        setTimeout(() => {
+          resolve()
+        }, 1000)
+      })
     }
   }
 }

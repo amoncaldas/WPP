@@ -17,7 +17,7 @@ export default {
     },
     max: {
       type: Number,
-      default: 10
+      default: 3
     },
     random: {
       type: Boolean,
@@ -38,15 +38,16 @@ export default {
   },
   methods: {
     loadSections () {
-       let sections = this.lodash.filter(this.$store.getters.sections, (s)=> {
+      let sections = this.lodash.filter(this.$store.getters.sections, (s)=> {
         return s.path !== '/'
-       })
-       if (this.max !== -1) {
-        this.sections = sections.slice(0, this.max)
-       }
-       if (this.random) {
-        this.sections = this.lodash.shuffle(sections)
-       }
+      })
+      if (this.max !== -1) {
+        sections = sections.slice(0, this.max)
+      }
+      if (this.random) {
+        sections = this.lodash.shuffle(sections)
+      }
+      this.sections = sections
     }
   },
   components: {

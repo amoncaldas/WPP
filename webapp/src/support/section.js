@@ -19,20 +19,49 @@ const section = {
         if (localesTranslation) {
           let translation = localesTranslation[store.getters.locale]
           listPostEndpoints.push({endpoint: endpoint, title: translation.title})
+        } else {
+          listPostEndpoints.push({endpoint: endpoint, title: endpoint})
         }
       })
     }
     return listPostEndpoints
+  },
+  getCompactListingPosts () {
+    let compactListPostEndpoints = []
+    let currentSection = section.getCurrentSection()
+    let VueInstance = Main.getInstance()
+
+    if (Array.isArray(currentSection.extra.compact_list_post_endpoints)) {
+      let translations = store.getters.options.post_type_translations
+
+      currentSection.extra.compact_list_post_endpoints.forEach(endpoint => {
+        let localesTranslation = VueInstance.lodash.find(translations, (locales) => {
+          return VueInstance.lodash.find(locales, locale => {
+            return locale.path === endpoint
+          })
+        })
+        if (localesTranslation) {
+          let translation = localesTranslation[store.getters.locale]
+          compactListPostEndpoints.push({endpoint: endpoint, title: translation.title})
+        } else {
+          compactListPostEndpoints.push({endpoint: endpoint, title: endpoint})
+        }
+      })
+    }
+    return compactListPostEndpoints
   },
   getCurrentSection () {
     let VueInstance = Main.getInstance()
     if (!VueInstance) {
       return store.getters.currentSection
     } else {
-      var regex = new RegExp('/', 'g')
+      let currentFirstPathSegment = location.pathname.replace(/^\/+/g, '')
+      if (currentFirstPathSegment.indexOf('/') > 0) {
+        currentFirstPathSegment = currentFirstPathSegment.split('/')[0]
+      }
+      currentFirstPathSegment = `/${currentFirstPathSegment}`
       let currentSection = VueInstance.lodash.find(store.getters.sections, (section) => {
-        let currentPath = `/${VueInstance.$route.path.replace(regex, '')}`
-        return section.path === currentPath && (section.path !== '/' || section.locale === store.getters.locale)
+        return section.path === currentFirstPathSegment && (section.path !== '/' || section.locale === store.getters.locale)
       })
       if (!currentSection) {
         currentSection = section.getCurrentHomeSection()

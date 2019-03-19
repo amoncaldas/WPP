@@ -26,17 +26,18 @@ export default {
       if (this.post._embedded.author[0].avatar_urls) {
         return this.post._embedded.author[0].avatar_urls[96] || this.post._embedded.author[0].avatar_urls[48]
       } else {
-        return 'https://www.gravatar.com/avatar/HASH'
+        return 'https://www.gravatar.com/avatar/HASH' // returns a generic avatar image
       }
     },
     place () {
       if (typeof this.post.extra.has_places && Object.keys(this.post.places).length > 0) {
-        let firstPlaceKey = Object.keys(this.post.places)
-        let firstPlace = this.post.places[firstPlaceKey]
+        let placeKeys = Object.keys(this.post.places)
+        let lastKey = placeKeys[placeKeys.length -1]
+        let lastPlace = this.post.places[lastKey]
         var parser = document.createElement('a')
-        parser.href = firstPlace.link
+        parser.href = lastPlace.link
         return {
-          title: firstPlace.title,
+          title: lastPlace.title,
           path: parser.pathname
         }
       }

@@ -13,7 +13,7 @@
               <img class="max-100" v-else src="https://www.gravatar.com/avatar/HASH">
             </v-flex>
             <v-flex xs10 sm11 class="comment-input">
-              <v-textarea class="" type="text" autofocus hide-details
+              <v-textarea class="" type="text" autofocus hide-details auto-grow counter
                 :label="$t('comments.yourComment')" box
                 :title="$t('comments.yourComment')"
                 v-model="resource.content"
@@ -21,9 +21,9 @@
               </v-textarea>
             </v-flex>
           </v-layout>
-          <div class="comment-btns">
+          <div class="comment-btns" v-if="ready">
             <v-btn color="secondary" left v-if="$store.getters.isAuthenticated" @click.native="submit">{{$t('global.send')}}</v-btn>
-            <v-btn color="secondary" v-else @click.native="openAuthenticatio()">{{$t('comments.autneticateAndSend')}}</v-btn>
+            <v-btn color="secondary" v-else @click.native="openAuthentication()">{{$t('comments.autneticateAndSend')}}</v-btn>
           </div>
           <vue-recaptcha :sitekey="$store.getters.options.recaptcha_site_key"
             ref="recaptcha"
@@ -31,7 +31,7 @@
             @verify="onCaptchaVerified"
             @expired="onCaptchaExpired">
           </vue-recaptcha>
-          <logint-or-register @closed="showLogintOrRegister = false" v-if="showLogintOrRegister" :after-login="afterLogin" :persistent="false"></logint-or-register>
+          <login-or-register @closed="showLoginOrRegister = false" v-if="showLoginOrRegister" :after-login="afterLogin" :persistent="false"></login-or-register>
         </v-form>
         <div v-else>
           <h4>{{$t('comments.commentsAreClosed')}}</h4>

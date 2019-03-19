@@ -48,7 +48,9 @@ export default {
       }
 
       if (customBackground) {
-        document.getElementById('app').style.background = `url(${customBackground}) no-repeat center top`
+        let bg_repeat = extra.bg_repeat || 'no-repeat'
+        let bg_position = extra.bg_position || 'center top'
+        document.getElementById('app').style.background = `url(${customBackground}) ${bg_repeat} ${bg_position}`
       } else {
         document.getElementById('app').style.background = this.$store.getters.defaultBackground
       }
@@ -61,6 +63,8 @@ export default {
 
       if (extra.is_dark !== undefined) {
         this.$store.commit('isDark', extra.is_dark)
+      } else {
+        this.$store.commit('isDark', true)
       }
       this.$forceUpdate()
     },

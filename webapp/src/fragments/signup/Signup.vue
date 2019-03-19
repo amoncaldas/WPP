@@ -12,7 +12,7 @@
             <div class="social-orStroke"></div>
           </div>
 
-          <user-form :submitFn="submit"></user-form>
+          <user-form v-if="ready" :submitFn="submit"></user-form>
           <vue-recaptcha :sitekey="$store.getters.options.recaptcha_site_key"
             ref="recaptcha"
             size="invisible"

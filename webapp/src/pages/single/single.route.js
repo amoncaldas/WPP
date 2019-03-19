@@ -14,7 +14,6 @@ const routes = {
       routes.push(
         {
           path: `/${postTypeEndpointUrl}/:postName/:postId`,
-          name: `${postTypeEndpointUrl}-Single`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -27,7 +26,6 @@ const routes = {
       routes.push(
         {
           path: `/${postTypeEndpointUrl}/:postParent1/:postId`,
-          name: `${postTypeEndpointUrl}-Single`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -40,7 +38,6 @@ const routes = {
       routes.push(
         {
           path: `/${postTypeEndpointUrl}/:postParent1/:postName/:postId`,
-          name: `${postTypeEndpointUrl}-Single-with-one-parent`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -53,7 +50,6 @@ const routes = {
       routes.push(
         {
           path: `/${postTypeEndpointUrl}/:postParent1/:postParent2/:postName/:postId`,
-          name: `${postTypeEndpointUrl}-Single-with-two-parents`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -66,7 +62,6 @@ const routes = {
       routes.push(
         {
           path: `/${postTypeEndpointUrl}/:postId`,
-          name: `${postTypeEndpointUrl}-SingleId`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -82,7 +77,6 @@ const routes = {
         routes.push(
           {
             path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postName/:postId`,
-            name: `${sectionEndPoint}-${postTypeEndpointUrl}-Single`,
             component: Single,
             beforeEnter: (to, from, next) => {
               store.commit('currentSection', section)
@@ -94,7 +88,6 @@ const routes = {
         routes.push(
           {
             path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postId`,
-            name: `${sectionEndPoint}-${postTypeEndpointUrl}-SingleId`,
             component: Single,
             beforeEnter: (to, from, next) => {
               store.commit('currentSection', section)

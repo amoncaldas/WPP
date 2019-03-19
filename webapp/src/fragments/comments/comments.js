@@ -1,5 +1,5 @@
 import commentService from './comment-service'
-import LogintOrRegister from '@/fragments/login-or-register/LoginOrRegister'
+import LoginOrRegister from '@/fragments/login-or-register/LoginOrRegister'
 import VueRecaptcha from 'vue-recaptcha'
 import {CRUD, CRUDData} from '@/core/crud'
 import utils from '@/support/utils'
@@ -55,11 +55,12 @@ export default {
       totalPages: null,
       currentPage: null,
       showAuth: false,
-      showLogintOrRegister: false,
+      showLoginOrRegister: false,
       verifiedCaptcha: false,
       resource: {},
       context: null,
-      baseEndpoint: null
+      baseEndpoint: null,
+      ready: true
     }
   },
   computed: {
@@ -77,7 +78,7 @@ export default {
       let endPoint = this.baseEndpoint + '?post=' + this.postId
       this.resource.$setEndpoint(endPoint)
       let content = this
-      this.save().then(()=> {
+      this.save().then(() => {
         content.resource = commentService.newModelInstance()
         content.loadData()
       })
@@ -86,10 +87,10 @@ export default {
       if (this.resource.content && this.resource.content.length > 1) {
         this.submit()
       }
-      this.showLogintOrRegister = false
+      this.showLoginOrRegister = false
     },
-    openAuthenticatio () {
-      this.showLogintOrRegister = true
+    openAuthentication () {
+      this.showLoginOrRegister = true
     },
     submit () {
       this.showInfo(this.$t('comments.processingYourComment'), {timeout: 6000})
@@ -142,8 +143,16 @@ export default {
       })
     }
   },
+  mounted () {
+    if (this.$store.getters.options.recaptcha_site_key) {
+      this.ready = false
+      this.loadRecaptcha().then(() => {
+        this.ready = true
+      })
+    }
+  },
   components: {
-    LogintOrRegister,
+    LoginOrRegister,
     VueRecaptcha
   }
 }

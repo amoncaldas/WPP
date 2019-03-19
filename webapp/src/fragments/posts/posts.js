@@ -52,12 +52,17 @@ export default {
     pagination: {
       type: Boolean,
       default: true
+    },
+    mode: {
+      type: String,
+      default: 'block'
     }
   },
   data () {
     return {
       posts: [],
       total: null,
+      loaded: false,
       totalPages: null,
       currentPage: null
     }
@@ -82,6 +87,13 @@ export default {
         return this.$route.query.p_tags.indexOf(',') > -1 ? this.$route.query.p_tags.split('') : [this.$route.query.p_tags]
       }
       return []
+    },
+    archiveLink () {
+      if (this.$store.getters.currentSection.path !== '/') {
+        return `${this.$store.getters.currentSection.path}/${this.endpoint}`
+      } else {
+        return `/${this.endpoint}`
+      }
     }
   },
   methods: {
@@ -128,9 +140,11 @@ export default {
           this.total = Number(response.headers['x-wp-total'])
           this.totalPages = Number(response.headers['x-wp-totalpages'])
         }
+        this.loaded = true
       }).catch(error => {
         console.log(error)
         this.showError(this.$t('posts.thePostListCouldNotBeLoaded'))
+        this.loaded = true
       })
     }
   },

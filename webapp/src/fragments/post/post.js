@@ -5,6 +5,7 @@ import Gallery from '@/fragments/gallery/Gallery'
 import Comments from '@/fragments/comments/Comments'
 import utils from '@/support/utils'
 import Author from './components/author/Author'
+import Sharer from '@/fragments/sharer/Sharer'
 
 export default {
   name: 'post',
@@ -16,28 +17,14 @@ export default {
     if (pageTypes.includes(this.$store.getters.postTypeEndpoint)) {
       this.renderAsPage = true
     }
-    this.loadData()
-  },
-  watch: {
-    $route: function () {
-      this.post = null
-      setTimeout(() => {
-        this.loadData()
-      }, 100)
-    }
+    this.post = this.postData
   },
   props: {
-    postId: {
-      required: false
-    },
     isPage: {
       default: false
     },
-    postName: {
-      required: false
-    },
     postData: {
-      required: false
+      required: true
     },
     noTopBorder: {
       default: false
@@ -86,7 +73,8 @@ export default {
     excerpt () {
       let maxLength = this.mode === 'compact' ? 150 : 300
       if (this.post.excerpt) {
-        return this.post.excerpt
+        let excerpt = this.post.excerpt.rendered || this.post.excerpt
+        return excerpt.replace(/<(?:.|\n)*?>/gm, '').substring(0, maxLength)
       } else if (this.content.length > maxLength) {
         let subContent = this.content.replace(/<(?:.|\n)*?>/gm, '').substring(0, maxLength)
         return subContent.length > 0 ? `${subContent} [...]` : subContent
@@ -108,8 +96,8 @@ export default {
       } else if (this.post.extra && this.post.extra.content) {
         content = this.post.extra.content
       }
-      if (!content) {
-        console.log('a');
+      if (!content && this.post.excerpt) {
+        content = this.post.excerpt.rendered || this.post.excerpt
       }
       return content
     },
@@ -128,38 +116,12 @@ export default {
         return trans[this.$store.getters.locale].title
       }
       return this.post.type
+    },
+    showSingleBottomAuthor () {
+      return !this.renderAsPage && !this.post.extra.hide_author_bio
     }
   },
   methods: {
-    loadData () {
-      if (this.postData) {
-        this.post = this.postData
-      } else {
-        let context = this
-        let endpoint = this.$store.getters.postTypeEndpoint
-        let endpointAppend = null
-        if (this.postId) {
-          endpointAppend = `${endpoint}/${this.postId}?_embed=1`
-        } else if (this.postName) {
-          endpointAppend = `${endpoint}?slug=${this.postName}&_embed=1`
-        }
-        postService.get(endpointAppend).then((post) => {
-          if (Array.isArray(post)) {
-            context.post = post[0]
-          } else {
-            context.post = post
-          }
-          // If in single mdoe, set the site title
-          if (this.mode === 'single') {
-            this.eventBus.$emit('titleChanged', `${this.title} | ${this.$store.getters.options.site_title}`)
-          }
-        }).catch(error => {
-          console.log(error)
-          context.showError(this.$t('post.thePostCouldNotBeLoaded'))
-        })
-      }
-    },
-
     formatDate (date) {
       return utils.getFormattedDate(date)
     },
@@ -200,7 +162,8 @@ export default {
     PostMap,
     Gallery,
     Comments,
-    Author
+    Author,
+    Sharer
   },
   beforeCreate: function () {
     this.$options.components.Related = require('@/fragments/related/Related.vue').default

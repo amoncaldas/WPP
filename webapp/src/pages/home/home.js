@@ -1,4 +1,5 @@
 import SectionsMap from '@/fragments/sections-map/SectionsMap'
+import PostMap from '@/fragments/post-map/PostMap'
 import Posts from '@/fragments/posts/Posts'
 import Slider from '@/fragments/slider/Slider'
 import Section from '@/support/section'
@@ -6,13 +7,15 @@ import Section from '@/support/section'
 export default {
   data: () => ({
     valid: false,
-    homePosTypes: [],
+    listingPosts: [],
+    compactListingPosts: [],
     currentSection: null
   }),
   components: {
     SectionsMap,
     Posts,
-    Slider
+    Slider,
+    PostMap
   },
   created () {
     // emit the an event catch by root App component
@@ -23,16 +26,12 @@ export default {
       this.loadData()
     })
   },
-  computed: {
-    listingPosts () {
-      return this.homePosTypes
-    }
-  },
   methods: {
     loadData () {
       this.currentSection = Section.getCurrentHomeSection()
       this.$store.commit('currentSection', this.currentSection)
-      this.homePosTypes = Section.getListingPosts()
+      this.listingPosts = Section.getListingPosts()
+      this.compactListingPosts = Section.getCompactListingPosts()
     }
   }
 }

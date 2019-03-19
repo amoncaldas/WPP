@@ -1,5 +1,5 @@
 <template>
-  <div class="locale-changer">
+  <div class="locale-changer" v-if="locales.length > 1">
     <v-select
       v-model="currentLocale"
       item-text="title"

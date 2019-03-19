@@ -22,7 +22,6 @@ const routes = {
       routes.push(
         {
           path: `/:postName/`,
-          name: 'RootPage',
           component: Page,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentHomeSection()
@@ -35,7 +34,6 @@ const routes = {
       routes.push(
         {
           path: `/:parentPage/:postName/`,
-          name: 'PageWithParent',
           component: Page,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentHomeSection()
@@ -53,7 +51,18 @@ const routes = {
       routes.push(
         {
           path: `/${sectionEndPoint}/:postName`,
-          name: 'SectionPage',
+          component: Page,
+          beforeEnter: (to, from, next) => {
+            let currentSection = Section.getCurrentSection()
+            store.commit('currentSection', currentSection)
+            store.commit('postTypeEndpoint', 'pages')
+            next()
+          }
+        }
+      )
+      routes.push(
+        {
+          path: `/${sectionEndPoint}/:parentPage/:postName`,
           component: Page,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()

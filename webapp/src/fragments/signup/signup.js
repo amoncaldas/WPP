@@ -12,7 +12,8 @@ export default {
       verifiedCaptcha: false,
       resource: {},
       passVisibility: true,
-      context: null
+      context: null,
+      ready: true
     }
   },
   props: {
@@ -75,6 +76,14 @@ export default {
         console.log('login error', error)
       })
     })
+  },
+  mounted () {
+    if (this.$store.getters.options.recaptcha_site_key) {
+      this.ready = false
+      this.loadRecaptcha().then(() => {
+        this.ready = true
+      })
+    }
   },
   components: {
     VueRecaptcha,
