@@ -251,14 +251,14 @@ Check the [Continuous integration](#continuous-integration) section to see the d
 
 ## Options ##
 
-Options without `wpp_` prefix:
+All WPP Options starts with `wpp_` prefix, except:
 
 - git_hub_client_secret
 - recaptcha_secret
 
-Options with `wpp_` prefix that are not mandatory:
+Options with `wpp_` prefix that is not present by default:
 
-- signup_with_github
+- wpp_signup_with_github
 
 ## ACF extras ##
 
@@ -278,12 +278,29 @@ Possible post extras:
 - places (array of posts)
 - has_route (boolean)
 - polyline (textarea/string representing a pplyline array)
+- hide_author_bio (boolean) hide author bio in single mode
+- show_sidebar (boolean)
+- sidebar_post_types (array of strings)
+- max_in_side_bar (integer)
+- custom_post_date (date, format `Ymd`)
 
 Possible section extras:
 
 - has_image_slides (boolean)
 - html_content (text/html)
-- list_posts (array of strings)
+- list_posts (boolean)
+- list_post_endpoints (array of strings)
+- compact_list_posts (boolean)
+- compact_list_post_endpoints (array of strings)
+- set_custom_appearance (boolean)
+- bg_image (string/url)
+- bg_color (html color string)
+- bg_repeat (css repeat string)
+- bg_position (css repeat string)
+- has_places (boolean)
+- places (array of posts)
+- has_section_map (boolean)
+- max_listing_posts (integer)
 
 Attachment extras:
 

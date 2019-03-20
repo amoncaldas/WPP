@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="page-root home">
+  <v-container v-if="currentSection" fluid class="page-root home">
     <slider v-if="currentSection.extra.has_image_slides" :contents="currentSection.extra.slide_images"></slider>
     <div class="content" v-if="currentSection.extra.has_content" v-html="currentSection.extra.html_content"></div>
     <template>
@@ -14,11 +14,11 @@
     </template>
     <template v-if="currentSection.extra.compact_list_posts">
       <br>
-      <posts mode="compact" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint + '_compact'" v-for="postType in compactListingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
+      <posts :max="maxCompact" mode="compact" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint + '_compact'" v-for="postType in compactListingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
       <br>
     </template>
     <template v-if="currentSection.extra.list_posts">
-      <posts :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in listingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
+      <posts :max="max" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in listingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
     </template>
   </v-container>
 </template>

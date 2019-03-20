@@ -3,7 +3,6 @@ export default {
     shareViaFacebook: 'Share via Facebook',
     shareViaTwitter: 'Share via Twitter',
     shareViaPinterest: 'Share via Pinterest',
-    shareViaWhatsapp: 'Share via Whatsapp',
-    shareViaEmail: 'Share via e-mail'
+    shareViaWhatsapp: 'Share via Whatsapp'
   }
 }

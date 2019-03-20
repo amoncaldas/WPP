@@ -35,7 +35,7 @@ export default {
     },
     max: {
       type: Number,
-      default: 10
+      default: 6
     },
     page: {
       type: Number,

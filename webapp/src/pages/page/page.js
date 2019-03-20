@@ -27,16 +27,19 @@ export default {
       postService.get(endpointAppend).then((post) => {
         if (Array.isArray(post)) {
           if (post.length === 0) {
-            this.$emit('notFound')
+            context.notFound = true
           } else {
             context.post = post[0]
           }
         } else {
           context.post = post
         }
-        // If in single mdoe, set the site title
-        let pageTitle = this.post.title.rendered || context.post.title
-        context.eventBus.$emit('titleChanged', `${pageTitle} | ${context.$store.getters.options.site_title}`)
+        if (context.post) {
+          // If in single mdoe, set the site title
+          let pageTitle = this.post.title.rendered || context.post.title
+          context.eventBus.$emit('titleChanged', `${pageTitle} | ${context.$store.getters.options.site_title}`)
+          context.eventBus.$emit('setLocaleFromContentLocale', context.post.locale)
+        }
         context.loaded = true
       }).catch(error => {
         console.log(error)

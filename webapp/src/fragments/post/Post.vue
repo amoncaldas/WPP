@@ -25,7 +25,7 @@
         <div class="html-content" v-html="content"></div>
 
         <v-alert v-if="renderAsPage" :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
-          {{$t('post.lastUpdate') | capitalize}} <time :datetime="post.date">{{formatDateTime(post.date)}}</time>
+          {{$t('post.lastUpdate') | capitalize}} <time :datetime="post.date">{{postDate}}</time>
         </v-alert>
 
         <div class="availability">

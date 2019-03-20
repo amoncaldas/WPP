@@ -10,7 +10,7 @@
           <v-textarea auto-grow class="contact-message" :height="$vuetify.breakpoint.mdAndUp ? 300 : 150" type="text" hide-details counter
             :label="$t('contactForm.yourMsg')" box
             :title="$t('contactForm.yourMsg')"
-            v-model="resource.content"
+            v-model="resource.message"
             :required="true">
           </v-textarea>
           <div class="contact-btn-container" v-if="ready">

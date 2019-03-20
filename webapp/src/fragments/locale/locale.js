@@ -16,15 +16,20 @@ export default {
         this.locales.push({title: title, value: locales[key].slug})
       }
     }
-    if (this.locales.length == 1) {
+    if (this.locales.length === 1) {
       this.currentLocale = this.locales[0]
       this.afterLocaleUpdate()
     }
+    let context = this
+    this.eventBus.$on('setLocaleFromContentLocale', (locale) => {
+      context.currentLocale = locale
+      context.$i18n.locale = this.currentLocale
+      context.$store.commit('locale', this.currentLocale)
+    })
   },
   watch: {
     /**
-     * Every time the route change, we have to run the scroll
-     * to make sure the page content is focused/scrolled to the current route content
+     * Every time the locale changes, we need to run afterLocaleUpdate
      * @param {*} to
      * @param {*} from
      */
@@ -41,11 +46,12 @@ export default {
 
       // if not, go to home after change the locale
       // Once the home is reloaded, the content in the new language wil be listed
-      this.$router.push({ name: 'Home' })
-      this.eventBus.$emit('localeChanged', this.currentLocale)
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 100)
     },
-    supportedLocales() {
-      return Object.keys(this.$i18n.messages);
+    supportedLocales () {
+      return Object.keys(this.$i18n.messages)
     }
   }
 }

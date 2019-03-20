@@ -32,6 +32,18 @@ export default {
       this.$store.commit('currentSection', this.currentSection)
       this.listingPosts = Section.getListingPosts()
       this.compactListingPosts = Section.getCompactListingPosts()
+      this.eventBus.$emit('setLocaleFromContentLocale', this.currentSection.locale)
+    }
+  },
+  computed: {
+    max () {
+      let max = this.currentSection.extra.max_listing_posts !== undefined ? this.currentSection.extra.max_listing_posts : 4
+      return Number(max)
+    },
+
+    maxCompact () {
+      let max = this.currentSection.extra.max_compact_listing_posts !== undefined ? this.currentSection.extra.max_compact_listing_posts : 4
+      return Number(max)
     }
   }
 }

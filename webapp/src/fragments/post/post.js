@@ -119,6 +119,10 @@ export default {
     },
     showSingleBottomAuthor () {
       return !this.renderAsPage && !this.post.extra.hide_author_bio
+    },
+    postDate () {
+      let postDate = this.post.custom_post_date || this.post.date
+      return this.formatDateTime(postDate)
     }
   },
   methods: {

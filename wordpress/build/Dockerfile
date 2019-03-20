@@ -2,13 +2,14 @@
 # Version 0.1
 # 26.01.2018
 
-FROM wordpress:5.1.0-php7.1-apache
+FROM wordpress:5.1.1-php7.1-apache
 
 ARG DEBUG_SUPPORT=false
+ARG NOTIFICATIONS_TASK_SUPPORT=false
 
 
 # Install nano
-RUN apt-get update && apt-get install nano -y
+RUN apt-get update && apt-get install nano -y && apt-get install cron -y && apt-get install wget -y
 
 RUN if ($DEBUG_SUPPORT == "true"); \
     then \
@@ -35,6 +36,12 @@ RUN if ($DEBUG_SUPPORT == "true"); then \
     # if your IDE has problems with the debug idekey you can comment out the following line
     echo "xdebug.idekey=docker" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
     sed -i 's/display_errors = Off/display_errors = On/' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+    fi
+
+# Create crontab task for notifications sending every 5 minute
+RUN if ($NOTIFICATIONS_TASK_SUPPORT == "true"); then \
+    echo "### CONFIGURING NOTIFICATIONS TASK SUPPORT...###"; \
+    echo "*/5 * * * * wget -O - http://localhost/wp-json/wpp/v1/notifications/send > /dev/null 2>&1" | crontab - \
     fi
 
 COPY ["wp-config.php", "/var/www/html/wp-config.php"]

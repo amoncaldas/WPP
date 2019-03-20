@@ -14,7 +14,7 @@ export default {
       }],
       miniVariant: false,
       fixed: false,
-      title: 'WPP',
+      title: null,
       showLoading: false
     }
   },
@@ -48,9 +48,9 @@ export default {
       }
 
       if (customBackground) {
-        let bg_repeat = extra.bg_repeat || 'no-repeat'
-        let bg_position = extra.bg_position || 'center top'
-        document.getElementById('app').style.background = `url(${customBackground}) ${bg_repeat} ${bg_position}`
+        let bgRepeat = extra.bg_repeat || 'no-repeat'
+        let bgPosition = extra.bg_position || 'center top'
+        document.getElementById('app').style.background = `url(${customBackground}) ${bgRepeat} ${bgPosition}`
       } else {
         document.getElementById('app').style.background = this.$store.getters.defaultBackground
       }
@@ -82,6 +82,7 @@ export default {
     }
   },
   created () {
+    this.title = this.$store.getters.options.site_title
     this.eventBus.$on('showLoading', (value) => {
       this.showLoading = value
     })

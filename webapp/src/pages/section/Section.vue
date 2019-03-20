@@ -9,10 +9,10 @@
     <post-map v-if="currentSection && currentSection.extra.has_places" :post="currentSection"></post-map>
     <br>
     <template v-if="currentSection.extra.compact_list_posts">
-      <posts mode="compact" :parent-id="currentSection.id" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in compactListingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
+      <posts :max="maxCompact" mode="compact" :parent-id="currentSection.id" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in compactListingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
     </template>
     <template v-if="currentSection.extra.list_posts">
-      <posts :parent-id="currentSection.id" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in listingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
+      <posts :max="max" :parent-id="currentSection.id" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in listingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
     </template>
   </v-container>
 </template>

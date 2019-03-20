@@ -15,13 +15,6 @@
   </v-app>
 </template>
 <script src="./app.js"></script>
-
-<style lang="css" src="@/assets/css/font-roboto.css"></style>
-<style lang="css" src="@/assets/css/font-raleway.css"></style>
-<style lang="css" src="@/assets/css/font-open-sans.css"></style>
-<style lang="css" src="@/assets/css/material-icons.css"></style>
-<style lang="css" src="@/assets/css/animate.min.css"></style>
-
 <style lang="scss" src="./app.scss"></style>
 
 

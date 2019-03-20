@@ -5,7 +5,6 @@ import NotFoundComponent from '@/fragments/not-found/NotFound'
 import postService from '@/shared-services/post-service'
 import postSupport from '@/support/post'
 
-
 export default {
   components: {
     Post,
@@ -68,12 +67,13 @@ export default {
         context.loaded = true
         let postTitle = context.post.title.rendered || context.post.title
         context.eventBus.$emit('titleChanged', `${postTitle} | ${context.$store.getters.options.site_title}`)
+        context.eventBus.$emit('setLocaleFromContentLocale', context.post.locale)
       }).catch(error => {
         console.log(error)
         context.loaded = true
         context.showError(this.$t('post.thePostCouldNotBeLoaded'))
         context.notFound = true
       })
-    },
-  },
+    }
+  }
 }

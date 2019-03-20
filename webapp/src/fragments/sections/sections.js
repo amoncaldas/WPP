@@ -38,7 +38,7 @@ export default {
   },
   methods: {
     loadSections () {
-      let sections = this.lodash.filter(this.$store.getters.sections, (s)=> {
+      let sections = this.lodash.filter(this.$store.getters.sections, (s) => {
         return s.path !== '/'
       })
       if (this.max !== -1) {
