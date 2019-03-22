@@ -51,6 +51,8 @@ function get_request_locale() {
 	$locale = get_theme_default_locale();
 	if (isset($_GET["locale"])) {
 		$locale = $_GET["locale"];
+	} elseif (isset($_GET["l"])) {
+		$locale = $_GET["l"];
 	} elseif (isset($_SERVER["HTTP_LOCALE"])) {
 		$locale = $_SERVER["HTTP_LOCALE"];
 	} else {
@@ -65,6 +67,29 @@ function get_request_locale() {
 		$locale = get_theme_default_locale();
 	}
 	return $locale;
+}
+
+/**
+ * Get cotent related posts
+ *
+ * @param Integer $content_id
+ * @return Array
+ */
+function get_related ($content_id) {
+  $posts = [];
+  
+  $public_post_types = get_post_types(array("public"=>true));
+  unset($public_post_types["attachment"]);
+  unset($public_post_types[SECTION_POST_TYPE]);
+  $args = ["post_type" => $public_post_types];
+
+	$include = get_post_meta($content_id, "related", true);
+	if (is_array($include)) {
+    $args["post__in"] = $include;
+    $posts = get_posts($args); 
+	}
+
+	return $posts;
 }
 
 /**
@@ -186,6 +211,67 @@ function register_custom_types () {
 	register_taxonomy( LOCALE_TAXONOMY_SLUG, null, $lang_tax_args );
 }
 
+
+/**
+ * Determine if the request is being made by a crawler
+ *
+ * @return boolean
+ */
+function is_crawler_request () {
+  $is_crawler_request = false;
+  $crawlers_user_agents = get_option("wpp_crawlers_user_agents", "fake-crawler-agent");
+  $crawlers_user_agents = strpos($crawlers_user_agents, ",") > -1 ? explode(",", $crawlers_user_agents) : [$crawlers_user_agents];
+  $crawlers_user_agents = array_map('trim', $crawlers_user_agents);
+
+  $is_crawler_user_agent = false;
+  foreach ($crawlers_user_agents as $crawler) {
+    if (strpos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($crawler)) !== false) {
+      $is_crawler_user_agent = true;
+      break;
+    }
+  }
+  if (isset($_GET["_escaped_fragment_"]) && get_option("wpp_treat_escaped_fragment_as_crawler") === "yes" || $is_crawler_user_agent) {
+    $is_crawler_request = true;
+  }
+  return $is_crawler_request;
+}
+
+
+/**
+ * Add the locale query string to each menu item href
+ *
+ * @param Array $atts
+ * @param WP_Post $item
+ * @param stdClass $args
+ * @return void
+ */
+function add_crawler_menu_iems_locale ($atts, $item, $args) {
+  $atts["href"] .= "?l=".get_request_locale();
+  return $atts;
+}
+
+/**
+ * Get the amount of pages for a given pot type and posts per page
+ *
+ * @param String $post_type
+ * @param Integer $posts_per_page
+ * @return Integer
+ */
+function wpp_get_post_type_pages($post_type, $posts_per_page) {
+  // Prepare pagination
+  $posts_to_count = new WP_Query(array( "post_type"=> $post_type,  "post_status"=> "publish"));
+	$total = $posts_to_count->post_count;
+	$pages = 1;
+	if ($total > $posts_per_page) {
+		$pages = $total / $posts_per_page;
+		$rest = $total % $posts_per_page;
+		if ($rest > 0) {
+			$pages++;
+		}
+  }
+  return $pages;
+}
+
 /**
  * Set the output of the theme
  *
@@ -193,20 +279,9 @@ function register_custom_types () {
  */
 function set_output () {
 	if (is_front_end()) {
-		$crawlers_user_agents = get_option("wpp_crawlers_user_agents", "fake-crawler-agent");
-		$crawlers_user_agents = strpos($crawlers_user_agents, ",") > -1 ? explode(",", $crawlers_user_agents) : [$crawlers_user_agents];
-		$crawlers_user_agents = array_map('trim', $crawlers_user_agents);
-
-		$is_crawler_request = false;
-		foreach ($crawlers_user_agents as $crawler) {
-			if (strpos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($crawler)) !== false) {
-				$is_crawler_request = true;
-				break;
-			}
-		}
-
-		if (isset($_GET["_escaped_fragment_"]) && get_option("wpp_treat_escaped_fragment_as_crawler") === "yes" || $is_crawler_request) {
-			define('RENDER_AUDIENCE', 'CRAWLER_BROWSER');
+		if (is_crawler_request()) {
+      define('RENDER_AUDIENCE', 'CRAWLER_BROWSER');
+      add_filter('nav_menu_link_attributes','add_crawler_menu_iems_locale', 10, 3);
 		} else {
 			define('RENDER_AUDIENCE', 'USER_BROWSER');
 		}
@@ -314,6 +389,81 @@ function get_acf_post_request_field_value ($field_name, $first = true) {
 		}
 	}
 	return $field_value;
+}
+
+/**
+	* 
+	* get the translated endpoint of a post type endpoint
+	*
+	* @param string $post_url_slug
+	* @param string $lang
+	* @return String|false
+	*/
+function get_post_type_by_endpoint($endpoint) {
+	$public_post_types = get_post_types(array("public"=>true));
+	unset($public_post_types["attachment"]);
+
+	if(in_array($endpoint, $public_post_types)){
+			return $endpoint;
+	} else {
+			$registered_post_types = get_post_types([ "public"=>true], "object");
+
+			foreach ($registered_post_types as $registered_post_type) {
+					$rest_base_translation = get_post_path_translation($registered_post_type->name, get_request_locale());
+					if ($rest_base_translation === $endpoint || $registered_post_type->rest_base === $endpoint) {
+							return $registered_post_type->name;
+					}
+			}
+	}
+	return false;
+}
+
+/**
+ * Translate a post type slug
+ *
+ * @param string $post_type
+ * @param string $lang
+ * @return void
+ */
+function get_post_path_translation($post_type, $lang) {
+	$dictionary = get_option("wpp_post_type_translations", "{}");
+	$dictionary = str_replace("\\", "", $dictionary);
+	$dictionary = json_decode($dictionary, true);
+
+	if (!isset($dictionary[$post_type])) {
+		return $post_type;
+	} elseif (!isset($dictionary[$post_type][$lang])) {
+		return $post_type;
+	} elseif (!isset($dictionary[$post_type][$lang]["path"])) {
+		return $post_type;
+	}
+	else {
+		return $dictionary[$post_type][$lang]["path"];
+	}
+}
+
+/**
+ * Translate a post type slug
+ *
+ * @param string $post_type
+ * @param string $lang
+ * @return void
+ */
+function get_post_type_title_translation($post_type, $lang) {
+	$dictionary = get_option("wpp_post_type_translations", "{}");
+	$dictionary = str_replace("\\", "", $dictionary);
+	$dictionary = json_decode($dictionary, true);
+
+	if (!isset($dictionary[$post_type])) {
+		return $post_type;
+	} elseif (!isset($dictionary[$post_type][$lang])) {
+		return $post_type;
+	} elseif (!isset($dictionary[$post_type][$lang]["title"])) {
+		return $post_type;
+	}
+	else {
+		return $dictionary[$post_type][$lang]["title"];
+	}
 }
 
 

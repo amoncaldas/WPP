@@ -7,7 +7,7 @@
       <app-confirm></app-confirm>
       <app-info></app-info>
       <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" mode="out-in">
-        <router-view v-title="title"></router-view>
+        <router-view v-title="title" v-lang="lang"></router-view>
       </transition>
     </v-content>
     <app-sidebar></app-sidebar>

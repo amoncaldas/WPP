@@ -10,10 +10,16 @@
  */
 
 ?><!DOCTYPE html>
-<html lang="<?php get_request_locale() ?>" class="no-js">
+<html lang="<?php echo get_request_locale(); ?>" class="no-js">
 <head>
-	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<title><?php echo WPP_TITLE ?></title>
+	<meta charset="<?php bloginfo('charset'); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="<?php echo WPP_TITLE; ?>"" />
+  <meta property="og:image" content="<?php echo WPP_OG_URL; ?>" />
+  <meta property="og:locale" content="<?php echo get_request_locale(); ?>" />
+  <meta property="og:description" content="<?php echo WPP_OG_URL; ?>" />
+	<link rel="image_src" type="image/<?php echo WPP_OG_IMAGE_EXT ?>" href="<?php echo WPP_OG_URL; ?>" />
 
 	<?php foreach (get_wpp_metas() as $key => $value) {
 		echo "<meta name='$key' content='$value'>";
@@ -26,25 +32,33 @@
 </head>
 
 <body>
-<div id="page" class="site">
-	<div class="site-inner">
-		<header id="masthead" class="site-header" role="banner">
-			<div class="site-header-main">
-				<div class="site-branding">
-					<?php if ( defined("IS_HOME_SECTION") ) : ?>
-						<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
+<div >
+	<div>
+		<header>
+			<div>
+				<div>
+					<?php 
+					foreach (get_wpp_locales() as $locale) {
+						echo "<a href='/?l=$locale'>$locale</a><br/>";
+					}
+					?>
+				</div>
+				<div>
+					<?php if ( defined("IS_SECTION") || defined("RENDER_ARCHIVE_POST_TYPE")) : ?>
+						<h1 ><?php echo WPP_TITLE?></h1>
 					<?php else : ?>
-						<p class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></p>
+						<p ><a href="/?l=<?php echo get_request_locale() ?>" rel="home"><?php echo WPP_TITLE ?></a></p>
 					<?php endif;
-					?><p class="site-description"><?php bloginfo( 'description', 'display' ); ?></p>
+					?><p><?php bloginfo( 'description', 'display' ); ?></p>
 				</div><!-- .site-branding -->			
-					<div id="site-header-menu" class="site-header-menu">						
-						<nav id="site-navigation" class="main-navigation" role="navigation">
+					<div>						
+						<nav role="navigation">
 							<?php
 								$locale = get_request_locale();
 								wp_nav_menu( array(
 									'theme_location' => "primary-menu-$locale",
 									'menu_class'     => "primary-menu-$locale",
+									"depth"=> 3
 									) );
 							?>
 						</nav><!-- .main-navigation -->					
@@ -53,4 +67,4 @@
 			</div><!-- .site-header-main -->
 		</header><!-- .site-header -->
 
-		<div id="content" class="site-content">
+		<div>

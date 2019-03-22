@@ -5,7 +5,7 @@
       <v-layout row wrap>
         <v-flex md9>
           <not-found-component v-if="notFound"></not-found-component>
-          <posts :parent-id="parentSectionId" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 6: 12" :endpoint="postType"
+          <posts :page="page" :max="12" :parent-id="parentSectionId" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 6: 12" :endpoint="postType"
             :title="title"></posts>
         </v-flex>
         <v-flex md3>

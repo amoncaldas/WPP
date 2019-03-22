@@ -8,6 +8,7 @@ import store from '@/store/store'
 import i18n from '@/i18n/locale'
 import topBorder from '@/directives/top-border'
 import title from '@/directives/title'
+import lang from '@/directives/lang'
 import bg from '@/directives/bg'
 import uppercase from '@/filters/uppercase'
 import capitalize from '@/filters/capitalize'
@@ -69,6 +70,7 @@ Vue.mixin(globalMixins)
 Vue.directive('top-border', topBorder)
 Vue.directive('bg', bg)
 Vue.directive('title', title)
+Vue.directive('lang', lang)
 
 // add global custom components
 Vue.component('box', box)

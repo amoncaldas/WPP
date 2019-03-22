@@ -8,23 +8,17 @@
  */
 ?>
 	</div><!-- .site-content -->
-		<footer id="colophon" class="site-footer" role="contentinfo">
-      <?php 
-      	$locale = get_request_locale();
-        if ( has_nav_menu( "primary-menu-$locale")) : ?>
-				<nav class="main-navigation" role="navigation">
-					<?php
-						wp_nav_menu( array(
-							'theme_location' => 'secondary-menu',
-							'menu_class'     => 'secondary-menu',
-						 ) );
-					?>
-				</nav><!-- .main-navigation -->
-			<?php endif; ?>
-
-			<div class="site-info">
-				<span class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></span>
-			</div><!-- .site-info -->
+		<footer>
+			<nav>
+				<?php
+					$locale = get_request_locale();
+					wp_nav_menu( array(
+						'theme_location' => "secondary-menu-$locale",
+						'menu_class'     => "secondary-menu-$locale",
+						"depth"=> 3
+					));
+				?>
+			</nav>
 		</footer><!-- .site-footer -->
 	</div><!-- .site-inner -->
 </div><!-- .site -->

@@ -5,7 +5,8 @@ export default {
     postType: null,
     currentSection: null,
     title: null,
-    parentSectionId: null
+    parentSectionId: null,
+    page: 1
   }),
   components: {
     Posts
@@ -15,6 +16,9 @@ export default {
     this.eventBus.$on('localeChanged', () => {
       this.loadData()
     })
+    if (this.$route.query.page) {
+      this.page = Number(this.$route.query.page)
+    }
   },
   methods: {
     loadData () {

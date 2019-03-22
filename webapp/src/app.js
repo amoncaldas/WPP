@@ -8,13 +8,8 @@ import Info from '@/fragments/dialogs/info/Info'
 export default {
   data () {
     return {
-      items: [{
-        icon: 'bubble_chart',
-        title: 'Inspire'
-      }],
-      miniVariant: false,
-      fixed: false,
       title: null,
+      lang: null,
       showLoading: false
     }
   },
@@ -89,6 +84,13 @@ export default {
     this.eventBus.$on('titleChanged', (title) => {
       this.title = title
     })
+
+    this.eventBus.$on('langChanged', (lang) => {
+      this.lang = lang
+    })
+    this.lang = this.$store.getters.locale
+
+
     this.backupDefaultAppearance()
   }
 }

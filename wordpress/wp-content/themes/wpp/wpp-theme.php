@@ -709,35 +709,11 @@
 		if ( !empty( $lang_list ) ) {
 			// Should contains always one
 			$lang = $lang_list[0]->slug;
-			$post_slug_translation = $this->get_post_slug_url_translation($post_slug, $lang);
+			$post_slug_translation = get_post_path_translation($post_slug, $lang);
 			return $post_slug_translation;
 		}
 
 		return $post_slug;
-	}
-
-	/**
-	 * Translate a post type slug
-	 *
-	 * @param string $post_url_slug
-	 * @param string $lang
-	 * @return void
-	 */
-	public function get_post_slug_url_translation($post_url_slug, $lang) {
-		$dictionary = get_option("wpp_post_type_translations", "{}");
-		$dictionary = str_replace("\\", "", $dictionary);
-		$dictionary = json_decode($dictionary, true);
-
-		if (!isset($dictionary[$post_url_slug])) {
-			return $post_url_slug;
-		} elseif (!isset($dictionary[$post_url_slug][$lang])) {
-			return $post_url_slug;
-		} elseif (!isset($dictionary[$post_url_slug][$lang]["path"])) {
-			return $post_url_slug;
-		}
-		else {
-			return $dictionary[$post_url_slug][$lang]["path"];
-		}
 	}
 
 	/**

@@ -16,7 +16,7 @@
 <!-- 7. WordPress will then import each of the posts, pages, comments, categories, etc. -->
 <!--    contained in this file into your site. -->
 
-	<!-- generator="WordPress/5.1" created="2019-03-20 18:59" -->
+	<!-- generator="WordPress/5.1" created="2019-03-21 08:48" -->
 <rss version="2.0"
 	xmlns:excerpt="http://wordpress.org/export/1.2/excerpt/"
 	xmlns:content="http://purl.org/rss/1.0/modules/content/"
@@ -29,7 +29,7 @@
 	<title>Fazendo as Malas</title>
 	<link>http://localhost:5003</link>
 	<description>Just another WordPress site</description>
-	<pubDate>Wed, 20 Mar 2019 18:59:46 +0000</pubDate>
+	<pubDate>Thu, 21 Mar 2019 08:48:58 +0000</pubDate>
 	<language>en-US</language>
 	<wp:wxr_version>1.2</wp:wxr_version>
 	<wp:base_site_url>http://localhost:5003</wp:base_site_url>
@@ -660,7 +660,7 @@
 		<wp:post_name><![CDATA[field_5c30068db19ba]]></wp:post_name>
 		<wp:status><![CDATA[publish]]></wp:status>
 		<wp:post_parent>166</wp:post_parent>
-		<wp:menu_order>12</wp:menu_order>
+		<wp:menu_order>10</wp:menu_order>
 		<wp:post_type><![CDATA[acf-field]]></wp:post_type>
 		<wp:post_password><![CDATA[]]></wp:post_password>
 		<wp:is_sticky>0</wp:is_sticky>
@@ -685,7 +685,7 @@
 		<wp:post_name><![CDATA[field_5c3006c796763]]></wp:post_name>
 		<wp:status><![CDATA[publish]]></wp:status>
 		<wp:post_parent>166</wp:post_parent>
-		<wp:menu_order>13</wp:menu_order>
+		<wp:menu_order>11</wp:menu_order>
 		<wp:post_type><![CDATA[acf-field]]></wp:post_type>
 		<wp:post_password><![CDATA[]]></wp:post_password>
 		<wp:is_sticky>0</wp:is_sticky>
@@ -710,7 +710,7 @@
 		<wp:post_name><![CDATA[field_5c30072996764]]></wp:post_name>
 		<wp:status><![CDATA[publish]]></wp:status>
 		<wp:post_parent>166</wp:post_parent>
-		<wp:menu_order>14</wp:menu_order>
+		<wp:menu_order>12</wp:menu_order>
 		<wp:post_type><![CDATA[acf-field]]></wp:post_type>
 		<wp:post_password><![CDATA[]]></wp:post_password>
 		<wp:is_sticky>0</wp:is_sticky>
@@ -1246,7 +1246,7 @@
 		<wp:post_name><![CDATA[field_5c8d0721f6941]]></wp:post_name>
 		<wp:status><![CDATA[publish]]></wp:status>
 		<wp:post_parent>166</wp:post_parent>
-		<wp:menu_order>9</wp:menu_order>
+		<wp:menu_order>8</wp:menu_order>
 		<wp:post_type><![CDATA[acf-field]]></wp:post_type>
 		<wp:post_password><![CDATA[]]></wp:post_password>
 		<wp:is_sticky>0</wp:is_sticky>
@@ -1271,7 +1271,7 @@
 		<wp:post_name><![CDATA[field_5c8d06def6940]]></wp:post_name>
 		<wp:status><![CDATA[publish]]></wp:status>
 		<wp:post_parent>166</wp:post_parent>
-		<wp:menu_order>10</wp:menu_order>
+		<wp:menu_order>9</wp:menu_order>
 		<wp:post_type><![CDATA[acf-field]]></wp:post_type>
 		<wp:post_password><![CDATA[]]></wp:post_password>
 		<wp:is_sticky>0</wp:is_sticky>
@@ -1296,7 +1296,7 @@
 		<wp:post_name><![CDATA[field_5c8d0758a0ecb]]></wp:post_name>
 		<wp:status><![CDATA[publish]]></wp:status>
 		<wp:post_parent>166</wp:post_parent>
-		<wp:menu_order>15</wp:menu_order>
+		<wp:menu_order>13</wp:menu_order>
 		<wp:post_type><![CDATA[acf-field]]></wp:post_type>
 		<wp:post_password><![CDATA[]]></wp:post_password>
 		<wp:is_sticky>0</wp:is_sticky>
@@ -1321,7 +1321,7 @@
 		<wp:post_name><![CDATA[field_5c8d73bf270c6]]></wp:post_name>
 		<wp:status><![CDATA[publish]]></wp:status>
 		<wp:post_parent>166</wp:post_parent>
-		<wp:menu_order>16</wp:menu_order>
+		<wp:menu_order>14</wp:menu_order>
 		<wp:post_type><![CDATA[acf-field]]></wp:post_type>
 		<wp:post_password><![CDATA[]]></wp:post_password>
 		<wp:is_sticky>0</wp:is_sticky>
@@ -1453,50 +1453,25 @@
 														</item>
 					<item>
 		<title>
-				Max listing posts		</title>
-		<link>http://localhost:5003/?post_type=acf-field&#038;p=878/878</link>
-		<pubDate>Wed, 20 Mar 2019 18:14:06 +0000</pubDate>
+				Custom post date		</title>
+		<link>http://localhost:5003/?post_type=acf-field&#038;p=861/861</link>
+		<pubDate>Thu, 21 Mar 2019 08:48:04 +0000</pubDate>
 		<dc:creator><![CDATA[famadmin]]></dc:creator>
-		<guid isPermaLink="false">http://localhost:5003/?post_type=acf-field&#038;p=878/878</guid>
+		<guid isPermaLink="false">http://localhost:5003/?post_type=acf-field&#038;p=861/861</guid>
 		<description></description>
 		<content:encoded>
-				<![CDATA[a:12:{s:4:"type";s:6:"number";s:12:"instructions";s:0:"";s:8:"required";i:0;s:17:"conditional_logic";a:1:{i:0;a:1:{i:0;a:3:{s:5:"field";s:19:"field_5c2ffb0651e6c";s:8:"operator";s:2:"==";s:5:"value";s:1:"1";}}}s:7:"wrapper";a:3:{s:5:"width";s:0:"";s:5:"class";s:0:"";s:2:"id";s:0:"";}s:13:"default_value";i:4;s:11:"placeholder";s:0:"";s:7:"prepend";s:0:"";s:6:"append";s:0:"";s:3:"min";i:0;s:3:"max";i:26;s:4:"step";i:1;}]]>		</content:encoded>
+				<![CDATA[a:8:{s:4:"type";s:11:"date_picker";s:12:"instructions";s:0:"";s:8:"required";i:0;s:17:"conditional_logic";i:0;s:7:"wrapper";a:3:{s:5:"width";s:0:"";s:5:"class";s:0:"";s:2:"id";s:0:"";}s:14:"display_format";s:5:"d/m/Y";s:13:"return_format";s:3:"Ymd";s:9:"first_day";i:1;}]]>		</content:encoded>
 		<excerpt:encoded>
-				<![CDATA[max_listing_posts]]>		</excerpt:encoded>
-		<wp:post_id>878</wp:post_id>
-		<wp:post_date><![CDATA[2019-03-20 18:14:06]]></wp:post_date>
-		<wp:post_date_gmt><![CDATA[2019-03-20 18:14:06]]></wp:post_date_gmt>
+				<![CDATA[custom_post_date]]>		</excerpt:encoded>
+		<wp:post_id>861</wp:post_id>
+		<wp:post_date><![CDATA[2019-03-21 08:48:04]]></wp:post_date>
+		<wp:post_date_gmt><![CDATA[2019-03-21 08:48:04]]></wp:post_date_gmt>
 		<wp:comment_status><![CDATA[closed]]></wp:comment_status>
 		<wp:ping_status><![CDATA[closed]]></wp:ping_status>
-		<wp:post_name><![CDATA[field_5c9282acf70ea]]></wp:post_name>
+		<wp:post_name><![CDATA[field_5c934f2af440b]]></wp:post_name>
 		<wp:status><![CDATA[publish]]></wp:status>
-		<wp:post_parent>166</wp:post_parent>
-		<wp:menu_order>8</wp:menu_order>
-		<wp:post_type><![CDATA[acf-field]]></wp:post_type>
-		<wp:post_password><![CDATA[]]></wp:post_password>
-		<wp:is_sticky>0</wp:is_sticky>
-														</item>
-					<item>
-		<title>
-				Max compact listing posts		</title>
-		<link>http://localhost:5003/?post_type=acf-field&#038;p=879/879</link>
-		<pubDate>Wed, 20 Mar 2019 18:15:06 +0000</pubDate>
-		<dc:creator><![CDATA[famadmin]]></dc:creator>
-		<guid isPermaLink="false">http://localhost:5003/?post_type=acf-field&#038;p=879/879</guid>
-		<description></description>
-		<content:encoded>
-				<![CDATA[a:12:{s:4:"type";s:6:"number";s:12:"instructions";s:0:"";s:8:"required";i:0;s:17:"conditional_logic";a:1:{i:0;a:1:{i:0;a:3:{s:5:"field";s:19:"field_5c8d0721f6941";s:8:"operator";s:2:"==";s:5:"value";s:1:"1";}}}s:7:"wrapper";a:3:{s:5:"width";s:0:"";s:5:"class";s:0:"";s:2:"id";s:0:"";}s:13:"default_value";i:4;s:11:"placeholder";s:0:"";s:7:"prepend";s:0:"";s:6:"append";s:0:"";s:3:"min";i:0;s:3:"max";i:26;s:4:"step";i:1;}]]>		</content:encoded>
-		<excerpt:encoded>
-				<![CDATA[max_compact_listing_posts]]>		</excerpt:encoded>
-		<wp:post_id>879</wp:post_id>
-		<wp:post_date><![CDATA[2019-03-20 18:15:06]]></wp:post_date>
-		<wp:post_date_gmt><![CDATA[2019-03-20 18:15:06]]></wp:post_date_gmt>
-		<wp:comment_status><![CDATA[closed]]></wp:comment_status>
-		<wp:ping_status><![CDATA[closed]]></wp:ping_status>
-		<wp:post_name><![CDATA[field_5c92830ce89f9]]></wp:post_name>
-		<wp:status><![CDATA[publish]]></wp:status>
-		<wp:post_parent>166</wp:post_parent>
-		<wp:menu_order>11</wp:menu_order>
+		<wp:post_parent>778</wp:post_parent>
+		<wp:menu_order>6</wp:menu_order>
 		<wp:post_type><![CDATA[acf-field]]></wp:post_type>
 		<wp:post_password><![CDATA[]]></wp:post_password>
 		<wp:is_sticky>0</wp:is_sticky>

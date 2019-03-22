@@ -18,6 +18,7 @@
             }            
         }	
     }
+    
     /**
      * Het the html web page skeleton
      *
@@ -40,7 +41,14 @@
         $skeleton = str_replace("</head>", $head_inject, $skeleton);
 
         $title = get_bloginfo("name");
-        $og_image_url = network_site_url(trim(get_option("wpp_site_relative_logo_url")));
+
+        $ext = "";
+        $main_simage_url = get_option("wpp_site_relative_logo_url");
+        if ($main_simage_url && strlen($main_simage_url) > 5) {
+            $main_simage_url = network_site_url(trim($main_simage_url));
+            $ext = pathinfo($og_image_url, PATHINFO_EXTENSION);
+        }
+
         $locale = get_request_locale();
         $description = get_bloginfo("description");
         
@@ -49,15 +57,14 @@
             $post = get_post($post_id);
             if ($post) {
                 $title = $post->post_title. " | ". $title;
-                $og_image_url = get_the_post_thumbnail_url($post_id);
+                $main_simage_url = get_the_post_thumbnail_url($post_id);
                 $description = get_sub_content($post->post_content, 200);
             }
         }
-        $header_injection = "<title>$title</title>";
-        $ext = pathinfo($og_image_url, PATHINFO_EXTENSION);
-        $header_injection .= "<link rel='image_src' type='image/$ext' href='$og_image_url' />";
+        $header_injection = "<title>$title</title>";        
+        $header_injection .= "<link rel='image_src' type='image/$ext' href='$main_simage_url' />";
         $header_injection .= "<meta property='og:title' content='$title' />";        
-        $header_injection .= "<meta property='og:image' content='$og_image_url' />";
+        $header_injection .= "<meta property='og:image' content='$main_simage_url' />";
         $header_injection .= "<meta property='og:locale' content='$locale' />";
         $header_injection .= "<meta property='og:description' content='$description' />";
 
@@ -102,38 +109,52 @@
             $home_section = $this->get_home_section_post();
             if($home_section) {
                 $post_or_page_object = $home_section;
-                define('IS_HOME_SECTION', TRUE);          
+                define('IS_SECTION', TRUE);
+                define('WPP_TITLE', bloginfo('name'));          
             } 
         } else { // Define the single page or post
-            $uri = ltrim($REQUEST_URI, '/');
+            $uri = trim($REQUEST_URI, '/');
             $uri_segments = explode("/", $uri);
             $uri_segments = array_map('trim', $uri_segments);
             $last_segment = $uri_segments[count($uri_segments) - 1 ];
 
             if (isset($last_segment) && $last_segment !== "") {
-                $post_slug_translated = $this->get_translated_endpoint($last_segment);
-                if($post_slug_translated !== false){
-                    define('RENDER_ARCHIVE_POST_TYPE', $post_slug_translated);
-                } elseif (is_integer($last_segment)) { // if the last segment is a post id
-                    $post_or_page_object = $this->get_single($last_segment);
+                $post_or_page_object = $this->get_single($last_segment);
+                if (!$post_or_page_object) {
+                    $post_type = get_post_type_by_endpoint($last_segment);
+                    if($post_type !== false){
+                        $archive_title = get_post_type_title_translation($post_type, get_request_locale());
+                        define('WPP_TITLE', $archive_title . " | ". get_bloginfo('name'));
+                        define('RENDER_ARCHIVE_POST_TYPE', $post_type);
+                    }
+                } else {
+                    define('WPP_TITLE', $post_or_page_object->post_title . " | ". get_bloginfo('name'));
+                    if ($post_or_page_object->post_type === SECTION_POST_TYPE) {
+                        define('IS_SECTION', TRUE);
+                    }
                 }
             }
         }
 
         // If a page or post is defined, set it as global object
-        if($post_or_page_object) {
-            //setup_postdata( $post);
-            if(defined("IS_HOME_SECTION")) {
+        if(isset($post_or_page_object)) {
+            // Define OG:DECRIPTION
+            $this->set_content_wpp_og_constans($post_or_page_object);
+            
+            // Define the template
+            if(defined("IS_SECTION")) {
                 global $section;
-                $section = $post_or_page_object;
-                require_once("index.php");
+                $section = $post_or_page_object;                
+                require_once("section.php");
             } else {   
                 global $post;
-                $post = $post_or_page_object;             
+                $post = $post_or_page_object;
                 require_once("single.php");
             }
         } else { // if not, or we are in an archive or it is 404
             if (defined('RENDER_ARCHIVE_POST_TYPE')){
+                $this->set_default_og_image_constants();
+                define('WPP_OG_DESCRIPTION', get_bloginfo("description"));
                 require_once("archive.php");
             } else {
                 require_once("404.php");
@@ -142,30 +163,42 @@
     }
 
     /**
-	 * 
-     * get the translated endpoint of a post type endpoint
-	 *
-	 * @param string $post_url_slug
-	 * @param string $lang
-	 * @return String|false
-	 */
-	public function get_translated_endpoint($last_segment) {
-        $public_post_types = get_post_types(array("public"=>true));
-        unset($public_post_types["attachment"]);
-
-        if(in_array($last_segment, $public_post_types)){
-            return $last_segment;
-        } else {
-            $registered_post_types = get_post_types([ "public"=>true], "object");
-
-            foreach ($registered_post_types as $registered_post_type) {
-                $rest_base_translation = $this->get_post_type_translation($registered_post_type->name, get_request_locale());
-                if ($rest_base_translation === $last_segment || $registered_post_type->rest_base === $last_segment) {
-                    return $registered_post_type->name;
-                }
-            }
+     * Set the default WPP_OG_URL and WPP_OG_IMAGE_EXT constants
+     *
+     * @return void
+     */
+    public function set_default_og_image_constants() {        
+        $ext = "";
+        $main_simage_url = get_option("wpp_site_relative_logo_url");
+        if ($main_simage_url && strlen($main_simage_url) > 5) {
+            $main_simage_url = network_site_url(trim($main_simage_url));
+            $ext = pathinfo($main_simage_url, PATHINFO_EXTENSION);
         }
-        return false;
+        define('WPP_OG_URL', $main_simage_url);
+        define('WPP_OG_IMAGE_EXT', $ext);        
+    }
+
+    /**
+     * Set the og WPP_OG_DESCRIPTION, WPP_OG_URL and WPP_OG_IMAGE_EXT  constants
+     *
+     * @param [type] $post
+     * @return void
+     */
+    public function set_content_wpp_og_constans($post) {
+        $content = strip_tags(apply_filters('the_content', $post->post_content));
+        if ($content && strlen($content) > 1) {
+            $description = get_sub_content($content, 200);
+            define('WPP_OG_DESCRIPTION', $description);     
+        } else {
+            define('WPP_OG_DESCRIPTION', get_bloginfo("description"));
+        }  
+
+        $featured_image_url = get_the_post_thumbnail_url($post->ID);
+        if ($featured_image)  {
+            define('WPP_OG_URL', $featured_image_url);
+        } else {
+            $this->set_default_og_image_constants();
+        }
     }
     
     /**
@@ -233,16 +266,14 @@
      */
     public function get_single($last_uri_segment) {
         $post_object = null;
-        if (is_integer($last_uri_segment)) {
+        if (is_numeric($last_uri_segment)) {
             $post_object = get_post($last_uri_segment);
             
         } else {
-            $post_object = get_page_by_path($last_uri_segment);
-            if(!$post_object) {
-                $posts = get_posts(array("name"=>$last_uri_segment));
-                if(is_array($posts) && count($posts) > 0) {
-                    $post_object = $posts[0];
-                }
+            global $wpdb;
+            $post_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_status = 'publish' && post_name = '".$last_uri_segment."'");
+            if ($post_id) {
+                $post_object = get_post($post_id);
             }
         }
         return $post_object;
