@@ -11,22 +11,31 @@ if(defined("SECTION_ID")) {
 $the_query = new WP_Query($args);
 
 if ( $the_query->have_posts() ) {
-	while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
-		<?php 
+	while ( $the_query->have_posts() ) : $the_query->the_post();
+		$post = get_post(); 
 		$excerpt =  get_the_excerpt();
 		if (!$excerpt || $excerpt === "") {
 			$excerpt = strip_tags(apply_filters('the_content', get_the_content()));
-			$post = get_post();
+			
 			$append = "";
 			if (strlen($excerpt) > 300) {
 				$excerpt = substr($excerpt,0, 300);
 				$excerpt .= " [...]";
 			}			
 		}
+		$permalink = get_post_meta($post->ID, "custom_link", true);
+		if (!$permalink) {
+			$permalink = get_the_permalink($post->ID);
+		}
+		$raw_date = get_post_meta($post->ID, "custom_post_date", true);
+		if (!$raw_date) {
+			$raw_date = $post->post_date;
+		}
+		$formatted_date = date("j F Y",(strtotime($raw_date)));
 		?>
 		<article>
-			<h2><a href="<?php the_permalink()?>"><?php the_title()?></a></h2>
-			<time :datetime="<?php echo $post->post_date;?>"><?php echo get_the_date("", $post);?></time><br/><br/>
+			<h2><a href="<?php echo $permalink; ?>"><?php the_title()?></a></h2>
+			<time :datetime="<?php echo $raw_date;?>"><?php echo $formatted_date;?></time><br/><br/>
 			<div> <?php echo get_the_post_thumbnail(get_the_ID()); ?></div><br/>
 			<div><?php echo $excerpt; ?></div><br/>
 			<a href="<?php the_permalink()?>"><?php the_title()?></a>
