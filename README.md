@@ -321,3 +321,8 @@ Follower extras:
 - mail_list (string)
 
 *Date ACF fields must have the return format `Ymd` to be correctly displayed*
+
+## Admin credentials ##
+
+username: wppadmin
+pass: T9y6jGS3C9^7#VvNYXzAMuw#
