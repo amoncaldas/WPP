@@ -29,6 +29,13 @@
         </svg>
       </div>
     </a>
+    <a class="item" target="_blank" :href="'mailto:?body=' + link + '&subject=' + title" :title="$t('sharer.shareViaEmail')">
+      <div>
+        <svg viewBox="0 0 100 100" :style="{fill: $vuetify.theme.secondary}" class="share-icon">
+          <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-email"></use>
+        </svg>
+      </div>
+    </a>
 
     <div style="display: none;">
       <svg xmlns="http://www.w3.org/2000/svg">

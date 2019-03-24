@@ -23,7 +23,7 @@
           <author :post="post"> </author>
           <br>
         </template>
-        <sharer :path="post.path" ></sharer>
+        <sharer :title="title" :path="post.path" ></sharer>
         <div class="html-content" v-html="content"></div>
 
         <v-alert v-if="renderAsPage" :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
@@ -62,7 +62,7 @@
           </div>
         </box>
         <br><br>
-        <sharer :path="post.path" ></sharer>
+        <sharer :title="title" :path="post.path" ></sharer>
         <br>
         <author mode="bio" v-if="showSingleBottomAuthor" :post="post"> </author>
       </template>

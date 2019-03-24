@@ -3,6 +3,10 @@ export default {
     path: {
       type: String,
       required: true
+    },
+    title: {
+      type: String,
+      required: true
     }
   },
   computed: {
