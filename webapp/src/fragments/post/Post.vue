@@ -19,8 +19,10 @@
         <br>
       </template>
       <template v-if="mode === 'single'">
-        <author v-if="!renderAsPage" :post="post"> </author>
-        <br>
+        <template v-if="!renderAsPage">
+          <author :post="post"> </author>
+          <br>
+        </template>
         <sharer :path="post.path" ></sharer>
         <div class="html-content" v-html="content"></div>
 
@@ -46,6 +48,8 @@
             <v-btn v-for="(tag) in tags" :key="tag.id" round depressed :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
           </template>
         </div>
+        <v-btn color="error" @click.native="showReportError = true"> <v-icon>report_problem</v-icon> &nbsp;{{$t('post.reportError')}}</v-btn>
+        <report-error @closed="showReportError = false" :persistent="false" v-if="showReportError"></report-error>
         <template v-if="hasPlaces">
           <post-map @placeClicked="placeClicked" :post="post"></post-map>
           <br>

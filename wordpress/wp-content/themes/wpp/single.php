@@ -9,6 +9,17 @@
   <br/>
   <div> 
     <?php 
+      $places = get_post_meta($post->ID, "places", true);
+      if (is_array($places) && $places > 0) {
+        $last_place = $places[count($places)-1];
+        $place_title = get_the_title($last_place);
+        $place_link = get_the_permalink($last_place);
+        echo "<a href='$place_link'>$place_title</a>";
+      }
+    ?>  
+  </div>
+  <div> 
+    <?php 
       $content = apply_filters('the_content', $post->post_content); 
       $content = !$content || $content === "" ? $post->post_excerpt : $content;
       echo $content;
@@ -20,7 +31,6 @@
     foreach ($medias as $media_id) {
       $media_html = wp_get_attachment_image($media_id, "medium");
       echo $media_html;
-
     }
   ?>
   </div>

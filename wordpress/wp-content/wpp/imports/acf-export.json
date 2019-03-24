@@ -1,0 +1,1920 @@
+[
+    {
+        "key": "group_5c6fcc4059377",
+        "title": "Album gallery",
+        "fields": [
+            {
+                "key": "field_5bf7c39f057a6",
+                "label": "Gallery",
+                "name": "medias",
+                "type": "gallery",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "min": 1,
+                "max": "",
+                "insert": "append",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "album"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5c8eb8c12c83a",
+        "title": "Content extras",
+        "fields": [
+            {
+                "key": "field_5c8eb8e864d80",
+                "label": "Show sidebar",
+                "name": "show_sidebar",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c8eb8fe64d81",
+                "label": "Sidebar post types",
+                "name": "sidebar_post_types",
+                "type": "checkbox",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c8eb8e864d80",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "sections": "Sections",
+                    "stories": "Stories",
+                    "albums": "Albums",
+                    "posts": "Posts"
+                },
+                "allow_custom": 0,
+                "default_value": [
+                    "sections"
+                ],
+                "layout": "vertical",
+                "toggle": 0,
+                "return_format": "value",
+                "save_custom": 0
+            },
+            {
+                "key": "field_5c8f65dc7d1d6",
+                "label": "Max items in sidebar",
+                "name": "max_in_side_bar",
+                "type": "number",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c8eb8e864d80",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": 3,
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "min": 1,
+                "max": 10,
+                "step": 1
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "album"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "story"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "status"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "post"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5bf7c38de28df",
+        "title": "Content gallery",
+        "fields": [
+            {
+                "key": "field_5c6fcbac8ef42",
+                "label": "Has gallery ?",
+                "name": "has_gallery",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c6fcc58c5005",
+                "label": "Gallery",
+                "name": "medias",
+                "type": "gallery",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c6fcbac8ef42",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "min": 1,
+                "max": "",
+                "insert": "append",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "album"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "story"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "post"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "place"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "status"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5c1a50f4964cf",
+        "title": "Follower fields",
+        "fields": [
+            {
+                "key": "field_5c1a513d971fb",
+                "label": "Email",
+                "name": "email",
+                "type": "email",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_5c1a515f971fc",
+                "label": "IP",
+                "name": "ip",
+                "type": "text",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "maxlength": ""
+            },
+            {
+                "key": "field_5c1a5182971fd",
+                "label": "User Agent",
+                "name": "user_agent",
+                "type": "text",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "maxlength": ""
+            },
+            {
+                "key": "field_5c1a51a7971fe",
+                "label": "Activated",
+                "name": "activated",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 1,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c1a5b9e035b6",
+                "label": "Mail list",
+                "name": "mail_list",
+                "type": "radio",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "news": "news",
+                    "temp": "temp"
+                },
+                "allow_null": 0,
+                "other_choice": 0,
+                "default_value": "",
+                "layout": "vertical",
+                "return_format": "value",
+                "save_other_choice": 0
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "follower"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5c77a02ec5637",
+        "title": "Image extra fields",
+        "fields": [
+            {
+                "key": "field_5c77a063731ac",
+                "label": "Video url",
+                "name": "",
+                "type": "message",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "If you put a youtube video url in the caption field the video will be displayed on the site",
+                "new_lines": "wpautop",
+                "esc_html": 0
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "attachment",
+                    "operator": "==",
+                    "value": "image"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "acf_after_title",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5c825d25dab93",
+        "title": "Imported",
+        "fields": [
+            {
+                "key": "field_5c825d35d65fc",
+                "label": "Import ID",
+                "name": "import_id",
+                "type": "number",
+                "instructions": "How to insert an imported post:\r\n\r\n1 - Make sure that the 'wpp_disable_auto_save' is defined as 'yes';\r\n2 - Define a title, import_id and save as draft;\r\n3 - Search the post using the title given;\r\n4 - Edit and save as published",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "50",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "Imported post ID",
+                "prepend": "",
+                "append": "",
+                "min": 1,
+                "max": "",
+                "step": 1
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "story"
+                },
+                {
+                    "param": "current_user_role",
+                    "operator": "==",
+                    "value": "administrator"
+                },
+                {
+                    "param": "post_status",
+                    "operator": "!=",
+                    "value": "publish"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "album"
+                },
+                {
+                    "param": "current_user_role",
+                    "operator": "==",
+                    "value": "administrator"
+                },
+                {
+                    "param": "post_status",
+                    "operator": "!=",
+                    "value": "publish"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "post"
+                },
+                {
+                    "param": "current_user_role",
+                    "operator": "!=",
+                    "value": "administrator"
+                },
+                {
+                    "param": "post_status",
+                    "operator": "!=",
+                    "value": "publish"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "status"
+                },
+                {
+                    "param": "current_user_role",
+                    "operator": "==",
+                    "value": "administrator"
+                },
+                {
+                    "param": "post_status",
+                    "operator": "!=",
+                    "value": "publish"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "acf_after_title",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5bfff8fc78719",
+        "title": "Locale",
+        "fields": [
+            {
+                "key": "field_5bf80438887e1",
+                "label": "Select a locale",
+                "name": "locale",
+                "type": "taxonomy",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "taxonomy": "locale",
+                "field_type": "radio",
+                "allow_null": 0,
+                "add_term": 1,
+                "save_terms": 1,
+                "load_terms": 1,
+                "return_format": "id",
+                "multiple": 0
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "section"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "story"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "album"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "post"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "follower"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "notification"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "place"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "status"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "side",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5bfeb5134f435",
+        "title": "Location fields",
+        "fields": [
+            {
+                "key": "field_5c26655731bf4",
+                "label": "Location",
+                "name": "location",
+                "type": "open_street_map",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "leaflet",
+                "layers": [
+                    "OpenStreetMap"
+                ],
+                "center_lat": "",
+                "center_lng": "",
+                "zoom": "",
+                "allow_map_layers": 1,
+                "height": 400,
+                "max_markers": 1,
+                "leaflet_map": {
+                    "center_lat": "-37.81411",
+                    "center_lng": "144.96328",
+                    "zoom": "14",
+                    "layers": [
+                        "OpenStreetMap"
+                    ],
+                    "markers": []
+                }
+            },
+            {
+                "key": "field_5c2d01ac2ef3a",
+                "label": "Is a country?",
+                "name": "is_country",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Is it a country?",
+                "default_value": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c2d02052ef3b",
+                "label": "Flag",
+                "name": "flag",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "array",
+                "preview_size": "thumbnail",
+                "library": "all",
+                "min_width": 200,
+                "min_height": 200,
+                "min_size": "",
+                "max_width": 1024,
+                "max_height": 1024,
+                "max_size": 2,
+                "mime_types": "jpg, png, jpeg"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "place"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5c1a53d517c9a",
+        "title": "Notification fields",
+        "fields": [
+            {
+                "key": "field_5c1a53e5fd6af",
+                "label": "Mail list type",
+                "name": "mail_list_type",
+                "type": "radio",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "news": "news",
+                    "temp": "temp"
+                },
+                "allow_null": 0,
+                "other_choice": 0,
+                "default_value": "news",
+                "layout": "vertical",
+                "return_format": "value",
+                "save_other_choice": 0
+            },
+            {
+                "key": "field_5c1a595f61f60",
+                "label": "Content type",
+                "name": "content_type",
+                "type": "radio",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "html": "html",
+                    "text": "text"
+                },
+                "allow_null": 0,
+                "other_choice": 0,
+                "default_value": "html",
+                "layout": "vertical",
+                "return_format": "value",
+                "save_other_choice": 0
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "notification"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "side",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5c20c7370e2b6",
+        "title": "Page extras",
+        "fields": [
+            {
+                "key": "field_5c20c748408d3",
+                "label": "Select the section",
+                "name": "section",
+                "type": "relationship",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "section"
+                ],
+                "taxonomy": "",
+                "filters": [
+                    "search"
+                ],
+                "elements": "",
+                "min": "",
+                "max": "",
+                "return_format": "id"
+            },
+            {
+                "key": "field_5c20fda13e01d",
+                "label": "Page type",
+                "name": "page_type",
+                "type": "radio",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "Content": "Content",
+                    "Members": "Members"
+                },
+                "allow_null": 0,
+                "other_choice": 0,
+                "default_value": "Content",
+                "layout": "vertical",
+                "return_format": "value",
+                "save_other_choice": 0
+            },
+            {
+                "key": "field_5c20fb3dead48",
+                "label": "Members",
+                "name": "members",
+                "type": "relationship",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c20fda13e01d",
+                            "operator": "==",
+                            "value": "Members"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "member"
+                ],
+                "taxonomy": "",
+                "filters": [
+                    "search"
+                ],
+                "elements": [
+                    "featured_image"
+                ],
+                "min": "",
+                "max": "",
+                "return_format": "object"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5c7ce71c6123d",
+        "title": "Related content",
+        "fields": [
+            {
+                "key": "field_5c1a6271d9eac",
+                "label": "Related",
+                "name": "related",
+                "type": "relationship",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "story",
+                    "album",
+                    "page"
+                ],
+                "taxonomy": "",
+                "filters": [
+                    "search",
+                    "post_type",
+                    "taxonomy"
+                ],
+                "elements": "",
+                "min": "",
+                "max": 6,
+                "return_format": "id"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "post"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "story"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "album"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "place"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "status"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5bfeb95088ad1",
+        "title": "Section fields",
+        "fields": [
+            {
+                "key": "field_5bfeb9ae8ba25",
+                "label": "Section type",
+                "name": "type",
+                "type": "radio",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "archive": "Archive",
+                    "home": "Home"
+                },
+                "allow_null": 0,
+                "other_choice": 0,
+                "default_value": "Archive",
+                "layout": "vertical",
+                "return_format": "value",
+                "save_other_choice": 0
+            },
+            {
+                "key": "field_5c2fe7ee1583a",
+                "label": "Has slide?",
+                "name": "has_image_slides",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c2fe8171583b",
+                "label": "Slide images",
+                "name": "slide_images",
+                "type": "gallery",
+                "instructions": "Select the images to be displayed in the slide",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c2fe7ee1583a",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "min": "",
+                "max": "",
+                "insert": "append",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": "jpg, png, jpeg"
+            },
+            {
+                "key": "field_5c2fe8681583c",
+                "label": "Has content?",
+                "name": "has_content",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c2fe8741583d",
+                "label": "Content",
+                "name": "html_content",
+                "type": "wysiwyg",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c2fe8681583c",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "tabs": "all",
+                "toolbar": "full",
+                "media_upload": 1,
+                "delay": 0
+            },
+            {
+                "key": "field_5c8e9ea2330a8",
+                "label": "Has sections map?",
+                "name": "has_section_map",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c2ffb0651e6c",
+                "label": "Should list posts?",
+                "name": "list_posts",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c2ffa064f6b3",
+                "label": "List post types",
+                "name": "list_post_endpoints",
+                "type": "checkbox",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c2ffb0651e6c",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "stories": "Stories",
+                    "albums": "Albums",
+                    "posts": "Posts"
+                },
+                "allow_custom": 0,
+                "default_value": [],
+                "layout": "vertical",
+                "toggle": 0,
+                "return_format": "value",
+                "save_custom": 0
+            },
+            {
+                "key": "field_5c8d0721f6941",
+                "label": "Should list posts in compact mode?",
+                "name": "compact_list_posts",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c8d06def6940",
+                "label": "List compact post types",
+                "name": "compact_list_post_endpoints",
+                "type": "checkbox",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c8d0721f6941",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "status": "Status"
+                },
+                "allow_custom": 0,
+                "default_value": [],
+                "layout": "vertical",
+                "toggle": 0,
+                "return_format": "value",
+                "save_custom": 0
+            },
+            {
+                "key": "field_5c30068db19ba",
+                "label": "Set custom appearance?",
+                "name": "set_custom_appearance",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c3006c796763",
+                "label": "Background color",
+                "name": "bg_color",
+                "type": "color_picker",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c30068db19ba",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": ""
+            },
+            {
+                "key": "field_5c30072996764",
+                "label": "Background image",
+                "name": "bg_image",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c30068db19ba",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "url",
+                "preview_size": "thumbnail",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": ""
+            },
+            {
+                "key": "field_5c8d0758a0ecb",
+                "label": "Background repeat",
+                "name": "bg_repeat",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c30072996764",
+                            "operator": "!=empty"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "no-repeat": "No repeat",
+                    "repeat": "Repeat",
+                    "repeat-y": "Repeat y",
+                    "repeat-x": "Repeat x"
+                },
+                "default_value": [],
+                "allow_null": 0,
+                "multiple": 0,
+                "ui": 0,
+                "return_format": "value",
+                "ajax": 0,
+                "placeholder": ""
+            },
+            {
+                "key": "field_5c8d73bf270c6",
+                "label": "Logo image",
+                "name": "logo_url",
+                "type": "image",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c30068db19ba",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "url",
+                "preview_size": "thumbnail",
+                "library": "all",
+                "min_width": "",
+                "min_height": "",
+                "min_size": "",
+                "max_width": "",
+                "max_height": "",
+                "max_size": "",
+                "mime_types": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "section"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5bf8040db68ce",
+        "title": "Section of the content",
+        "fields": [
+            {
+                "key": "field_5bfbcdabcc81c",
+                "label": "Select the section",
+                "name": "section",
+                "type": "relationship",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "section"
+                ],
+                "taxonomy": "",
+                "filters": [
+                    "search"
+                ],
+                "elements": "",
+                "min": 1,
+                "max": 1,
+                "return_format": "id"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "story"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "album"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "post"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "status"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "side",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5c8ea0e059d8e",
+        "title": "Status extra fields",
+        "fields": [
+            {
+                "key": "field_5c8ea0e9281e7",
+                "label": "Hide author bio",
+                "name": "hide_author_bio",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 1,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "status"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5c1a62490b577",
+        "title": "Content geography",
+        "fields": [
+            {
+                "key": "field_5c6d231b9def0",
+                "label": "Has places?",
+                "name": "has_places",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c6d234fcba1d",
+                "label": "Places",
+                "name": "places",
+                "type": "relationship",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c6d231b9def0",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "place"
+                ],
+                "taxonomy": "",
+                "filters": [
+                    "search",
+                    "taxonomy"
+                ],
+                "elements": [
+                    "featured_image"
+                ],
+                "min": 1,
+                "max": "",
+                "return_format": "id"
+            },
+            {
+                "key": "field_5c7ce76ee5061",
+                "label": "Has route?",
+                "name": "has_route",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c6d231b9def0",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c7ce7b2e5062",
+                "label": "Route",
+                "name": "polyline",
+                "type": "textarea",
+                "instructions": "Generate a route on https:\/\/openrouteservie.org\/dev\/#\/api-docs\/ in Directions service and paste here the geometry attribute of the response.",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c6d231b9def0",
+                            "operator": "==",
+                            "value": "1"
+                        },
+                        {
+                            "field": "field_5c7ce76ee5061",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "maxlength": "",
+                "rows": "",
+                "new_lines": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "story"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "album"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "status"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "section"
+                }
+            ]
+        ],
+        "menu_order": 2,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    },
+    {
+        "key": "group_5c8b8aa8c7672",
+        "title": "Advanced fields",
+        "fields": [
+            {
+                "key": "field_5c8b8acabe3b4",
+                "label": "Not searchable",
+                "name": "not_searchable",
+                "type": "true_false",
+                "instructions": "The content will not be listed in search results or auto related listing",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c8a7bb1c79f2",
+                "label": "Available",
+                "name": "available",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c8b8aefbe3b5",
+                "label": "Open in new page",
+                "name": "target_blank",
+                "type": "true_false",
+                "instructions": "Open the content in a new page when clicked in the list mode",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c8b8b0fbe3b6",
+                "label": "Resizable",
+                "name": "resizable",
+                "type": "true_false",
+                "instructions": "Allow the post box to be resized",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c8a7bc5c79f3",
+                "label": "Available at",
+                "name": "available_at",
+                "type": "date_picker",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "50",
+                    "class": "",
+                    "id": ""
+                },
+                "display_format": "d\/m\/Y",
+                "return_format": "Ymd",
+                "first_day": 1
+            },
+            {
+                "key": "field_5c8b8b22be3b7",
+                "label": "No link",
+                "name": "no_link",
+                "type": "true_false",
+                "instructions": "No link to single will be added when listing this content",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c8b90e539c31",
+                "label": "Sponsored",
+                "name": "sponsored",
+                "type": "true_false",
+                "instructions": "If the content is sponsored",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5c8bd79fe3353",
+                "label": "Custom link",
+                "name": "custom_link",
+                "type": "text",
+                "instructions": "An custom\/external URL\/link for the content",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "maxlength": ""
+            },
+            {
+                "key": "field_5c934f2af440b",
+                "label": "Custom post date",
+                "name": "custom_post_date",
+                "type": "date_picker",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "50",
+                    "class": "",
+                    "id": ""
+                },
+                "display_format": "d\/m\/Y",
+                "return_format": "Ymd",
+                "first_day": 1
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "post"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "story"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "album"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "place"
+                }
+            ]
+        ],
+        "menu_order": 5,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    }
+]

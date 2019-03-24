@@ -6,6 +6,9 @@ import Comments from '@/fragments/comments/Comments'
 import utils from '@/support/utils'
 import Author from './components/author/Author'
 import Sharer from '@/fragments/sharer/Sharer'
+import ReportError from '@/fragments/report-error/ReportError'
+
+
 
 export default {
   name: 'post',
@@ -45,7 +48,8 @@ export default {
     return {
       post: null,
       galleryImageIndex: null,
-      renderAsPage: false
+      renderAsPage: false,
+      showReportError: false,
     }
   },
   computed: {
@@ -147,7 +151,7 @@ export default {
 
     getTerms (type) {
       let termsFound = []
-      if (this.post._embedded['wp:term'] && this.post._embedded['wp:term'].length > 0) {
+      if (this.post._embedded && this.post._embedded['wp:term'] && this.post._embedded['wp:term'].length > 0) {
         for (let termKey in this.post._embedded['wp:term']) {
           let terms = this.post._embedded['wp:term'][termKey]
           for (let key in terms) {
@@ -167,7 +171,8 @@ export default {
     Gallery,
     Comments,
     Author,
-    Sharer
+    Sharer,
+    ReportError
   },
   beforeCreate: function () {
     this.$options.components.Related = require('@/fragments/related/Related.vue').default

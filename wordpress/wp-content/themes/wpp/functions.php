@@ -278,7 +278,10 @@ function wpp_get_post_type_pages($post_type, $posts_per_page) {
  * @return void
  */
 function set_output () {
-	if (is_front_end()) {
+	if ($_SERVER["REQUEST_URI"] === "/manifest.json") {
+		define('RENDER_AUDIENCE', 'MANIFEST');
+		require_once("app-renderer.php");
+	} elseif (is_front_end()) {
 		if (is_crawler_request()) {
       define('RENDER_AUDIENCE', 'CRAWLER_BROWSER');
       add_filter('nav_menu_link_attributes','add_crawler_menu_iems_locale', 10, 3);
@@ -286,7 +289,7 @@ function set_output () {
 			define('RENDER_AUDIENCE', 'USER_BROWSER');
 		}
 		require_once("app-renderer.php");
-	}
+	} 
 }
 
 /**
@@ -343,6 +346,16 @@ function wpp_login_logo() {
 			}
 		</style>";
 		echo $login_style;
+}
+
+/**
+ * Costumize the wp login logo url
+ *
+ * @param String $url
+ * @return String
+ */
+function wpp_loginlogo_url($url) {
+  return network_site_url();
 }
 
 /**
@@ -466,6 +479,45 @@ function get_post_type_title_translation($post_type, $lang) {
 	}
 }
 
+/**
+ * Get home sections with a given language term id
+ *
+ * @param Integer $lang_term_id
+ * @return Array
+ */
+function get_home_section($locale = null) {
+	if (!$locale) {
+		$locale = get_request_locale();
+	}
+
+	$wpp_locales_terms = get_terms( array('taxonomy' => LOCALE_TAXONOMY_SLUG, 'hide_empty' => false, 'slug' => $locale));
+	$wpp_locales_term = $wpp_locales_terms[0];
+
+	// Set the get posts args to retrieve the home section
+	$home_section_args = array(
+		"post_type"=> SECTION_POST_TYPE, 
+		"post_status"=> "publish", 
+		'meta_query' => array(
+			array(
+				'key'=> SECTION_TYPE_FIELD_SLUG,
+				'value'=> SECTION_POST_HOME_FIELD_VALUE
+			)
+		),
+		'tax_query' => array (
+			array(
+				'taxonomy' => LOCALE_TAXONOMY_SLUG,
+				'field' => 'term_id',
+				'terms' => $wpp_locales_term->term_id
+			)
+		)
+	);
+	$home_sections = get_posts($home_section_args);	
+	if (is_array($home_sections) && count($home_sections) > 0) {
+		return $home_sections[0];
+	} 
+	return $home_sections;
+}
+
 
 /**
  * After init run custom functions
@@ -481,6 +533,7 @@ function after_init() {
 	add_theme_support( 'menus' );
 	add_theme_support( 'post-thumbnails');
 	add_action( 'login_head', 'wpp_login_logo' );	
+	add_filter( 'login_headerurl', 'wpp_loginlogo_url' );
 }
 
 update_site_url();

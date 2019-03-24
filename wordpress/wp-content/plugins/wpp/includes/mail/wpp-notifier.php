@@ -57,7 +57,7 @@ class WppNotifier  {
 	 *
 	 * @since  1.2.0
 	 */
-  	public function register_routes() {
+  public function register_routes() {
 		register_rest_route(WPP_API_NAMESPACE."/notifications", '/send', array(
 			array(
 				'methods'  => "GET",
@@ -171,8 +171,13 @@ class WppNotifier  {
 	 * @return void
 	 */
 	public function report_error($request) {
-		if ($_SERVER['HTTP_REFERER'] === $_SERVER["HTTP_HOST"]) {
+		$recaptchaToken = $request->get_param('recaptchaToken');
+		$validCaptcha = validate_captcha($recaptchaToken);
+
+		if ($validCaptcha === true) {
 			$message = $request->get_param('message');
+			$url = $request->get_param('url');
+			$message = "URL: $url <br/><br/> $message";
 			if (isset($message)) {
 				$subject = "Error notification";
 				WppMailer::notify_admin($subject, $message, get_default_locale());
@@ -225,7 +230,6 @@ class WppNotifier  {
 	 * @return WP_REST_Response
 	 */
 	public function send_message($request) {
-		// Only validate the recaptcha if the client id is present
 		$recaptchaToken = $request->get_param('recaptchaToken');
 		$validCaptcha = validate_captcha($recaptchaToken);
 

@@ -9,7 +9,8 @@
  class WpWebAppTheme {
 	public $section_type_field_slug = "section_type";
 	public $section_type_home_field_value = "home";
-	public $WPP_SKIP_AFTER_SAVE = false;	
+	public $WPP_SKIP_AFTER_SAVE = false;
+	public $WPP_SKIP_BEFORE_UPDATE = false;
 
 	public function __construct () {
 		if (!defined('WPP_API_NAMESPACE')) {
@@ -36,7 +37,7 @@
 		add_filter('preview_post_link', array($this, 'set_post_preview_permalink'), 10, 2);
 		add_filter('page_link', array($this, 'set_page_permalink'), 10, 2);
 		add_filter('preview_page_link', array($this, 'set_page_preview_permalink'), 10, 2);
-		add_filter("pre_post_update", array($this, 'before_update_draft_post'), 9, 2);
+		add_action("pre_post_update", array($this, 'before_update_draft_post'), 9, 2);
 		add_action( 'admin_enqueue_scripts', array($this, 'may_disable_autosave'));
 		
 	}
@@ -68,12 +69,14 @@
 		$skip_auto_save = get_option("wpp_disable_auto_save", "no");
 
 		// We only process this imported post id stuff if auto save is disabled
-		if ($skip_auto_save === "yes") {			
+		if ($skip_auto_save === "yes" && $this->WPP_SKIP_BEFORE_UPDATE === false) {			
 			$import_id = 0;
 
-			// If the post is a draft
+			// If the post is a saved in the db as draft
+			$post_in_db = get_post($post_id);
+
 			if ($data["post_status"] === "draft") {
-				$import_id = get_acf_post_request_field_value("import_id", true);
+				$import_id = intval(get_acf_post_request_field_value("import_id", true));
 			}
 	
 			// If the import id was found and it is different from the current post id
@@ -89,12 +92,21 @@
 				else { // if not, create a new post using the current post data
 					$data["import_id"] = $import_id;
 				
-			        // Remove the id to trigger a creation of a new post
-			        unset($data["ID"]);
+			    // Remove the id to trigger a creation of a new post
+					unset($data["ID"]);
+					
+					// Avoid infinity loop
+					remove_action("pre_post_update", array($this, 'before_update_draft_post'), 9, 2);
+					$this->WPP_SKIP_AFTER_SAVE = true;
+
+					$data["post_name"] = sanitize_title($data["post_title"]);
+
+					// Create new clone post with the specified id
+					
 					$inserted_id = wp_insert_post($data);
 			
-			        // Redefine the id from the inserted post
-				    $data["ID"] = $import_id;
+			    // Redefine the id from the inserted post
+				  $data["ID"] = $import_id;
 
 					// This is not straight forward but we have
 					// to change the post id in the request
@@ -103,9 +115,12 @@
 					// actions use the new post ID
 					$_REQUEST["post_ID"] = $import_id;
 					$_POST["post_ID"] = $import_id;
+					$_POST["_acf_post_id"] = $import_id;		
+					$_REQUEST["_acf_post_id"] = $import_id;			
 
 					// Delete the draft created automatically
 					// by wordpress, we don need it any more
+					$this->WPP_SKIP_BEFORE_UPDATE = true;
 					wp_delete_post($post_id, true);
 				} 
 			}
@@ -149,7 +164,7 @@
 					}
 	
 					// Get the home for a given language. If it does not exist, create it
-					$home_sections = $this->get_home_section($lang_term->term_id);
+					$home_sections = $this->get_home_sections($lang_term->term_id);
 	
 					if (count($home_sections) === 0) {
 						$section_title = "Home | ". $lang_term->name;
@@ -377,7 +392,7 @@
 	 * @param Integer $lang_term_id
 	 * @return Array
 	 */
-	public function get_home_section($lang_term_id) {
+	public function get_home_sections($lang_term_id) {
 		// Set the get posts args to retrieve the home section
 		$home_section_args = array(
 			"post_type"=> SECTION_POST_TYPE, 
@@ -413,7 +428,7 @@
 			$post_langs_terms = wp_get_post_terms($post->ID, LOCALE_TAXONOMY_SLUG);
 
 			if (is_array($post_langs_terms)) {
-				$home_sections = $this->get_home_section($post_langs_terms[0]->term_id);
+				$home_sections = $this->get_home_sections($post_langs_terms[0]->term_id);
 				
 				if ($section_type === SECTION_POST_HOME_FIELD_VALUE && count($home_sections) > 1) {
 					$this->WPP_SKIP_AFTER_SAVE = true;
@@ -661,6 +676,7 @@
 			$valid_page_name = $get_valid_name($page->post_name, $no_post_type_in_permalink_types);
 			if($valid_page_name !== $page->post_name) {
 				$page->post_name = $valid_page_name;
+				$this->WPP_SKIP_BEFORE_UPDATE = true;
 				wp_update_post( array('ID' => $page->ID, 'post_name' => $valid_page_name));
 			}
 		}		
@@ -741,6 +757,8 @@
 			// If we could find an available parent and this is not already the post parent
 			// set this parent as parent of the post
 			if($parent_id && $post->post_parent !== $parent_id) {
+				$this->WPP_SKIP_AFTER_SAVE = true;
+				$this->WPP_SKIP_BEFORE_UPDATE = true;
 				wp_update_post( array('ID' => $post->ID, 'post_parent' => $parent_id));
 				$post->post_parent = $parent_id;		
 			}

@@ -50,10 +50,11 @@ const globalMixins = {
         document.head.appendChild(recaptchaScript)
 
         // We tried to use onreadystatechange, but it doe snot fire
-        // Try to find another better solution
+        // Try to find a better solution insted of timeout to detect
+        // when the script has been loaded
         setTimeout(() => {
           resolve()
-        }, 1000)
+        }, 2000)
       })
     }
   }

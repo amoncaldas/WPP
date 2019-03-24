@@ -1,9 +1,14 @@
 <?php require_once("header.php");
 
-// the query
+// The query
 $page = isset($_GET["page"])? $_GET["page"] : 1;
 $posts_per_page = 12;
-$the_query = new WP_Query( array( "post_type"=> RENDER_ARCHIVE_POST_TYPE,  "post_status"=> "publish", "paged"=> $page, "posts_per_page"=> $posts_per_page ));
+$args = array( "post_type"=> RENDER_ARCHIVE_POST_TYPE,  "post_status"=> "publish", "paged"=> $page, "posts_per_page"=> $posts_per_page);
+
+if(defined("SECTION_ID")) {
+	$args["post_parent"] = SECTION_ID;
+} 
+$the_query = new WP_Query($args);
 
 if ( $the_query->have_posts() ) {
 	while ( $the_query->have_posts() ) : $the_query->the_post(); ?>

@@ -12,6 +12,7 @@ export default {
     contentType: 'Tipo de conteúdo',
     available: 'Disponível',
     availableAt: 'Disponível a partir de',
-    lastUpdate: 'Última atualização'
+    lastUpdate: 'Última atualização',
+    reportError: 'Informar erro'
   }
 }

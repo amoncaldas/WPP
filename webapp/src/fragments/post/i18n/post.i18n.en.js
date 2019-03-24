@@ -12,6 +12,7 @@ export default {
     contentType: 'Content type',
     available: 'Available',
     availableAt: 'Available at',
-    lastUpdate: 'Last update'
+    lastUpdate: 'Last update',
+    reportError: 'Report error'
   }
 }

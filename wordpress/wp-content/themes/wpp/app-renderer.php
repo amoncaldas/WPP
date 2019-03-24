@@ -15,8 +15,56 @@
             }
             elseif (RENDER_AUDIENCE === 'CRAWLER_BROWSER') {
                 $this->renderNoJSHtml();
-            }            
+            } elseif (RENDER_AUDIENCE === "MANIFEST") {
+                $manifest = $this->getManifest();
+                header('Content-Type: application/json');
+                echo $manifest;
+                exit;
+            }         
         }	
+    }
+
+    /**
+     * Build the app manifest json
+     *
+     * @return String
+     */
+    public function getManifest() {
+        $main_image_url = get_option("wpp_site_relative_logo_url");
+        $ext = "";
+        if ($main_image_url && strlen($main_image_url) > 5) {
+            $ext = pathinfo($og_image_url, PATHINFO_EXTENSION);
+        }
+        $locale = get_request_locale();
+        $short_name = get_option("wpp_short_name");
+        $title = get_bloginfo("name");
+        $home_section = get_home_section();
+        $bg_color = get_post_meta($home_section->ID, "bg_color", true);
+
+        $manifest = new stdClass();
+        $manifest->short_name = $short_name;
+        $manifest->name = $title;
+        $icons = [];
+        $icon192 = new stdClass();
+        $icon192->src = $main_image_url;
+        $icon192->type = "image/$ext";
+        $icon192->sizes = "192x192";
+        $icons[] = $icon192;
+
+        $icon512 = new stdClass();
+        $icon512->src = $main_image_url;
+        $icon512->type = "image/$ext";
+        $icon512->sizes = "512x512";
+        $icons[] = $icon512;
+
+        $manifest->icons = $icons;
+        $manifest->start_url = "/?l=$locale";
+        $manifest->background_color = $bg_color;
+        $manifest->display = "standalone";
+        $manifest->scope = "/";
+        $manifest->theme_color = $bg_color;
+
+        return json_encode($manifest);
     }
     
     /**
@@ -37,34 +85,32 @@
             }
         }
         $head_inject .= "</head>";
-
         $skeleton = str_replace("</head>", $head_inject, $skeleton);
-
         $title = get_bloginfo("name");
-
-        $ext = "";
-        $main_simage_url = get_option("wpp_site_relative_logo_url");
-        if ($main_simage_url && strlen($main_simage_url) > 5) {
-            $main_simage_url = network_site_url(trim($main_simage_url));
-            $ext = pathinfo($og_image_url, PATHINFO_EXTENSION);
-        }
-
         $locale = get_request_locale();
         $description = get_bloginfo("description");
+        $ext = "";
+
+        $main_image_url = get_option("wpp_site_relative_logo_url");
+        if ($main_image_url && strlen($main_image_url) > 5) {
+            $main_image_url = network_site_url(trim($main_image_url));
+            $ext = pathinfo($og_image_url, PATHINFO_EXTENSION);
+        }
         
         $post_id = $this->getPostId();
         if ($post_id) {
             $post = get_post($post_id);
             if ($post) {
                 $title = $post->post_title. " | ". $title;
-                $main_simage_url = get_the_post_thumbnail_url($post_id);
+                $main_image_url = get_the_post_thumbnail_url($post_id);
                 $description = get_sub_content($post->post_content, 200);
             }
         }
-        $header_injection = "<title>$title</title>";        
-        $header_injection .= "<link rel='image_src' type='image/$ext' href='$main_simage_url' />";
+        $header_injection = "<title>$title</title>";  
+        $header_injection = "<link rel='manifest' href='/manifest.json'>";        
+        $header_injection .= "<link rel='image_src' type='image/$ext' href='$main_image_url' />";
         $header_injection .= "<meta property='og:title' content='$title' />";        
-        $header_injection .= "<meta property='og:image' content='$main_simage_url' />";
+        $header_injection .= "<meta property='og:image' content='$main_image_url' />";
         $header_injection .= "<meta property='og:locale' content='$locale' />";
         $header_injection .= "<meta property='og:description' content='$description' />";
 
@@ -121,16 +167,11 @@
             if (isset($last_segment) && $last_segment !== "") {
                 $post_or_page_object = $this->get_single($last_segment);
                 if (!$post_or_page_object) {
-                    $post_type = get_post_type_by_endpoint($last_segment);
-                    if($post_type !== false){
-                        $archive_title = get_post_type_title_translation($post_type, get_request_locale());
-                        define('WPP_TITLE', $archive_title . " | ". get_bloginfo('name'));
-                        define('RENDER_ARCHIVE_POST_TYPE', $post_type);
-                    }
+                    $this->set_archive_rendering_data($last_segment, $uri_segments);
                 } else {
-                    define('WPP_TITLE', $post_or_page_object->post_title . " | ". get_bloginfo('name'));
+                    define('WPP_TITLE', ucfirst($post_or_page_object->post_title) . " | ". get_bloginfo('name'));
                     if ($post_or_page_object->post_type === SECTION_POST_TYPE) {
-                        define('IS_SECTION', TRUE);
+                        define('IS_SECTION', true);
                     }
                 }
             }
@@ -163,18 +204,43 @@
     }
 
     /**
+     * Set archive rendering contansts
+     *
+     * @param String $last_segment
+     * @param Array $uri_segments
+     * @return void
+     */
+    public function set_archive_rendering_data ($last_segment, $uri_segments) {
+        $post_type = get_post_type_by_endpoint($last_segment);
+        if($post_type !== false){
+            $archive_title = ucfirst(get_post_type_title_translation($post_type, get_request_locale()));
+            define('WPP_TITLE', $archive_title . " | ". get_bloginfo('name'));
+            define('RENDER_ARCHIVE_POST_TYPE', $post_type);
+            if (count($uri_segments) > 1) {
+                $first_segment = $uri_segments[0];
+                global $wpdb;
+                $sql = "SELECT ID FROM $wpdb->posts WHERE post_status = 'publish' && post_type = '".SECTION_POST_TYPE."' && post_name = '".$first_segment."'";
+                $post_id = $wpdb->get_var($sql);
+                if ($post_id) {
+                    define('SECTION_ID', $post_id);
+                }
+            }
+        }
+    }
+
+    /**
      * Set the default WPP_OG_URL and WPP_OG_IMAGE_EXT constants
      *
      * @return void
      */
     public function set_default_og_image_constants() {        
         $ext = "";
-        $main_simage_url = get_option("wpp_site_relative_logo_url");
-        if ($main_simage_url && strlen($main_simage_url) > 5) {
-            $main_simage_url = network_site_url(trim($main_simage_url));
-            $ext = pathinfo($main_simage_url, PATHINFO_EXTENSION);
+        $main_image_url = get_option("wpp_site_relative_logo_url");
+        if ($main_image_url && strlen($main_image_url) > 5) {
+            $main_image_url = network_site_url(trim($main_image_url));
+            $ext = pathinfo($main_image_url, PATHINFO_EXTENSION);
         }
-        define('WPP_OG_URL', $main_simage_url);
+        define('WPP_OG_URL', $main_image_url);
         define('WPP_OG_IMAGE_EXT', $ext);        
     }
 
