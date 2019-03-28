@@ -24,7 +24,9 @@
           <br>
         </template>
         <sharer :title="title" :path="post.path" ></sharer>
+        <div class="html-prepend" v-if="prepend" v-html="prepend"></div>
         <div class="html-content" v-html="content"></div>
+        <div class="html-append" v-if="append" v-html="append"></div>
 
         <v-alert v-if="renderAsPage" :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
           {{$t('post.lastUpdate') | capitalize}} <time :datetime="post.date">{{postDate}}</time>
@@ -48,7 +50,7 @@
             <v-btn v-for="(tag) in tags" :key="tag.id" round depressed :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
           </template>
         </div>
-        <v-btn color="error" @click.native="showReportError = true"> <v-icon>report_problem</v-icon> &nbsp;{{$t('post.reportError')}}</v-btn>
+        <v-btn @click.native="showReportError = true" style="margin-left:0px" > <v-icon color="error">report_problem</v-icon> &nbsp;{{$t('post.reportError')}}</v-btn>
         <report-error @closed="showReportError = false" :persistent="false" v-if="showReportError"></report-error>
         <template v-if="hasPlaces">
           <post-map @placeClicked="placeClicked" :post="post"></post-map>

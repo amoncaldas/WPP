@@ -102,6 +102,7 @@
     public function get_related( $request ) {
       $public_post_types = get_post_types(array("public"=>true));
       unset($public_post_types["attachment"]);
+      unset($public_post_types["adding"]);
       unset($public_post_types[SECTION_POST_TYPE]);
 
 	    $args = $this->prepareRelatedArgs($request, $public_post_types);
@@ -133,6 +134,7 @@
       $public_post_types = get_post_types(array("public"=>true));
       unset($public_post_types["attachment"]);
       unset($public_post_types["member"]);
+      unset($public_post_types["adding"]);
 
 	    $args = $this->prepareSearchArgs($request, $public_post_types);
       $posts = get_posts( $args ); 

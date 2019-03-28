@@ -34,6 +34,7 @@
 
 		// Customize permalinks
 		add_filter('post_type_link', array($this, 'set_post_permalink'), 10, 2);
+		add_filter('post_link', array($this, 'set_post_permalink'), 10, 2);
 		add_filter('preview_post_link', array($this, 'set_post_preview_permalink'), 10, 2);
 		add_filter('page_link', array($this, 'set_page_permalink'), 10, 2);
 		add_filter('preview_page_link', array($this, 'set_page_preview_permalink'), 10, 2);

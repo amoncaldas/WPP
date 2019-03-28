@@ -8,8 +8,6 @@ import Author from './components/author/Author'
 import Sharer from '@/fragments/sharer/Sharer'
 import ReportError from '@/fragments/report-error/ReportError'
 
-
-
 export default {
   name: 'post',
   created () {
@@ -21,6 +19,19 @@ export default {
       this.renderAsPage = true
     }
     this.post = this.postData
+
+    if (this.post.extra.prepend) {
+      let id = Array.isArray(this.post.extra.prepend) && this.post.extra.prepend.length > 0 ? this.post.extra.prepend[0] : this.post.extra.prepend
+      postService.get(`addings/${id}`).then((prepend) => {
+        this.prepend = prepend.content.rendered
+      })
+    }
+    if (this.post.extra.append) {
+      let id = Array.isArray(this.post.extra.prepend) && this.post.extra.prepend.length > 0 ? this.post.extra.prepend[0] : this.post.extra.prepend
+      postService.get(`addings/${id}`).then((append) => {
+        this.append = append.content.rendered
+      })
+    }
   },
   props: {
     isPage: {
@@ -50,6 +61,8 @@ export default {
       galleryImageIndex: null,
       renderAsPage: false,
       showReportError: false,
+      prepend: null,
+      append: null
     }
   },
   computed: {
