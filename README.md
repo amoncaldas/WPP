@@ -283,6 +283,8 @@ Possible post extras:
 - sidebar_post_types (array of strings)
 - max_in_side_bar (integer)
 - custom_post_date (date, format `Ymd`)
+- prepend (integer, adding prepend post id)
+- append (integer, adding append post id)
 
 Possible section extras:
 
