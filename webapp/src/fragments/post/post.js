@@ -90,7 +90,10 @@ export default {
     excerpt () {
       let maxLength = this.mode === 'compact' ? 150 : 300
       if (this.post.excerpt) {
-        let excerpt = this.post.excerpt.rendered || this.post.excerpt
+        let excerpt = this.post.excerpt
+        if (this.post.excerpt.rendered !== undefined) {
+          excerpt = this.post.excerpt.rendered
+        }
         return excerpt.replace(/<(?:.|\n)*?>/gm, '').substring(0, maxLength)
       } else if (this.content.length > maxLength) {
         let subContent = this.content.replace(/<(?:.|\n)*?>/gm, '').substring(0, maxLength)

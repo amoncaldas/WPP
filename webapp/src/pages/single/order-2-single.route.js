@@ -13,7 +13,7 @@ const routes = {
       let postTypeEndpointUrl = postTypeEndpoint.path.replace(regex, '')
       routes.push(
         {
-          path: `/${postTypeEndpointUrl}/:postName/:postId`,
+          path: `/${postTypeEndpointUrl}/:postName/(.*-)?:postId(\\d+)(\\d+)`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -25,7 +25,7 @@ const routes = {
       )
       routes.push(
         {
-          path: `/${postTypeEndpointUrl}/:postParent1/:postId`,
+          path: `/${postTypeEndpointUrl}/:postParent1/(.*-)?:postId(\\d+)(\\d+)`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -37,7 +37,7 @@ const routes = {
       )
       routes.push(
         {
-          path: `/${postTypeEndpointUrl}/:postParent1/:postName/:postId`,
+          path: `/${postTypeEndpointUrl}/:postParent1/:postName/:postId(\\d+)`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -49,7 +49,7 @@ const routes = {
       )
       routes.push(
         {
-          path: `/${postTypeEndpointUrl}/:postParent1/:postParent2/:postName/:postId`,
+          path: `/${postTypeEndpointUrl}/:postParent1/:postParent2/:postName/:postId(\\d+)`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -61,7 +61,7 @@ const routes = {
       )
       routes.push(
         {
-          path: `/${postTypeEndpointUrl}/:postId`,
+          path: `/${postTypeEndpointUrl}/:postId(\\d+)`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -76,7 +76,7 @@ const routes = {
         let sectionEndPoint = section.path.replace(regex, '')
         routes.push(
           {
-            path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postName/:postId`,
+            path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postName/:postId(\\d+)`,
             component: Single,
             beforeEnter: (to, from, next) => {
               store.commit('currentSection', section)
@@ -87,7 +87,29 @@ const routes = {
         )
         routes.push(
           {
-            path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postId`,
+            path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postId(\\d+)`,
+            component: Single,
+            beforeEnter: (to, from, next) => {
+              store.commit('currentSection', section)
+              store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+              next()
+            }
+          }
+        )
+        routes.push(
+          {
+            path: `/${sectionEndPoint}/:postName/:postId(\\d+)`,
+            component: Single,
+            beforeEnter: (to, from, next) => {
+              store.commit('currentSection', section)
+              store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+              next()
+            }
+          }
+        )
+        routes.push(
+          {
+            path: `/${sectionEndPoint}/:postId(\\d+)`,
             component: Single,
             beforeEnter: (to, from, next) => {
               store.commit('currentSection', section)
