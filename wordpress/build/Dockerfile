@@ -38,11 +38,6 @@ RUN if ($DEBUG_SUPPORT == "true"); then \
     sed -i 's/display_errors = Off/display_errors = On/' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
     fi
 
-# Create crontab task for notifications sending every 5 minute
-RUN if ($NOTIFICATIONS_TASK_SUPPORT == "true"); then \
-    echo "### CONFIGURING NOTIFICATIONS TASK SUPPORT...###"; \
-    echo "*/5 * * * * wget -O - http://localhost/wp-json/wpp/v1/notifications/send > /dev/null 2>&1" | crontab - \
-    fi
 
 COPY ["wp-config.php", "/var/www/html/wp-config.php"]
 
