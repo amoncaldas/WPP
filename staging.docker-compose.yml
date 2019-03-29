@@ -1,7 +1,7 @@
 version: '3.1'
 
 networks:
-  wpp:
+  wpp-staging:
     driver: bridge
 
 services:
@@ -9,7 +9,7 @@ services:
         container_name: wpp-website-staging
         image: wpp-custom-wordpress-staging
         networks:
-          - wpp
+          - wpp-staging
         restart: always
         build:
           context: wordpress/build
@@ -28,7 +28,7 @@ services:
         container_name: wpp-mysql-staging
         image: wpp-custom-mysql-staging
         networks:
-          - wpp
+          - wpp-staging
         restart: always
         build:
           context: mysql/
