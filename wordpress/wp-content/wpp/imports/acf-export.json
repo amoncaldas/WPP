@@ -134,6 +134,56 @@
                 "min": 1,
                 "max": 10,
                 "step": 1
+            },
+            {
+                "key": "field_5c9c8e12177e9",
+                "label": "Prepend",
+                "name": "prepend",
+                "type": "relationship",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "adding"
+                ],
+                "taxonomy": "",
+                "filters": [
+                    "search"
+                ],
+                "elements": "",
+                "min": 0,
+                "max": 1,
+                "return_format": "id"
+            },
+            {
+                "key": "field_5c9c8deb177e8",
+                "label": "Append",
+                "name": "append",
+                "type": "relationship",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "adding"
+                ],
+                "taxonomy": "",
+                "filters": [
+                    "search"
+                ],
+                "elements": "",
+                "min": 0,
+                "max": 1,
+                "return_format": "id"
             }
         ],
         "location": [
