@@ -16,6 +16,7 @@ wp plugin install classic-editor --allow-root --activate
 wp plugin install extra-user-details --allow-root
 wp plugin install remote-medias-lite --allow-root
 wp plugin install wp-mail-smtp --allow-root
+wp plugin install imsanity --allow-root
 
 # wp plugin install quick-and-easy-post-creation-for-acf-relationship-fields --allow-root --activate
 

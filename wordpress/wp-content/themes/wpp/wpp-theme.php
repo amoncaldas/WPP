@@ -832,7 +832,10 @@
 	 */
 	public function set_image_before_send_to_editor ($html, $id, $caption, $title, $align, $url) {
 		$src_data  = wp_get_attachment_image_src( $id, null, false );
-		if(is_array($src_data)) {
+		
+		$insert_image_as_base64_in_editor = get_option("wpp_insert_image_as_base64_in_editor", "no");
+
+		if(is_array($src_data) && $insert_image_as_base64_in_editor) {
 			$src_url =  $src_data[0];
 			$relative_src = str_replace(network_home_url(), "", $src_url);
 			$local_path = $_SERVER["DOCUMENT_ROOT"].$relative_src;			
