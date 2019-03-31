@@ -61,7 +61,7 @@ export default {
       let context = this
       let endpoint = this.$store.getters.postTypeEndpoint
       let endpointAppend = null
-      endpointAppend = `${endpoint}/${this.$route.params.postId}?_embed=1`
+      endpointAppend = `${endpoint}/${this.$route.params.postId}?_embed`
       postService.get(endpointAppend).then((post) => {
         context.post = post
         context.loaded = true
