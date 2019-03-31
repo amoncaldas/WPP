@@ -23,7 +23,7 @@ export default {
     loadData () {
       let context = this
       let endpoint = this.$store.getters.postTypeEndpoint
-      let endpointAppend = `${endpoint}?slug=${this.$route.params.postName}&_embed=1`
+      let endpointAppend = `${endpoint}?slug=${this.$route.params.postName}&_embed`
       postService.get(endpointAppend).then((post) => {
         if (Array.isArray(post)) {
           if (post.length === 0) {
