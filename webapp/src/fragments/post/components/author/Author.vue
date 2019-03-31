@@ -2,7 +2,7 @@
   <div class="authoring-container" v-if="hasAuthor">
     <v-layout row wrap>
       <v-flex xs3 sm2 md1 style="padding-right:5px; padding-left:5px">
-        <div class="author-avatar">
+        <div class="author-avatar" :class="{'only-author': mode === 'author'}">
           <img :src="authorAvatar" :alt="author" :title="author">
         </div>
       </v-flex>

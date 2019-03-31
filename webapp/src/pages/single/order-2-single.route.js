@@ -13,7 +13,7 @@ const routes = {
       let postTypeEndpointUrl = postTypeEndpoint.path.replace(regex, '')
       routes.push(
         {
-          path: `/${postTypeEndpointUrl}/:postName/(.*-)?:postId(\\d+)(\\d+)`,
+          path: `/${postTypeEndpointUrl}/:postName/(.*-)?:postId(\\d+)`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -25,7 +25,7 @@ const routes = {
       )
       routes.push(
         {
-          path: `/${postTypeEndpointUrl}/:postParent1/(.*-)?:postId(\\d+)(\\d+)`,
+          path: `/${postTypeEndpointUrl}/:postParent1/(.*-)?:postId(\\d+)`,
           component: Single,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()

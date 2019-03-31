@@ -15,7 +15,26 @@
   padding-top: 10px;
   border-top: 1px solid  lightgray
 }
-.html-content {
-  overflow: hidden;
+.html-content img {
+  max-width: 100% !important;
+  height: auto !important;
 }
+
+.html-content >>> .wp-caption {
+  text-align: center;
+  border: 1px solid #ddd;
+  background: #f3f3f3;
+  padding: 3px;
+  border-radius: 3px;
+  margin-right: 10px;
+  max-width: 100%;
+  margin-bottom: 30px;
+}
+
+.html-content >>> .wp-caption img {
+  border-bottom: 1px solid #ddd;
+}
+
+
+
 
