@@ -23,8 +23,14 @@ wp plugin install wp-mail-smtp --allow-root
 # Install wpp plugin
 wp plugin install wp-web-app --allow-root --activate
 
+# Set htacess modifiable
+chmod 777 /var/www/html/.htaccess 
+
 # copy custom htaccess to root
 yes | cp -rf /var/www/html/wp-content/wpp/.htaccess /var/www/html/.htaccess
+
+# Set htacess as only readable
+chmod 0444 /var/www/html/.htaccess
 
 
 # copy custom robots to root
