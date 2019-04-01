@@ -507,6 +507,15 @@
 				return "/";
 			} 
 		} 
+
+		// Translate the post type url
+		$post_type_obj = get_post_type_object($post->post_type);
+		$post_slug = $post->post_type;
+		if ($post_type_obj->rewrite !== false) {
+			$post_slug = $post_type_obj->rewrite["slug"];
+		} 
+		$post_slug_translation = $this->get_post_url_slug($post);		
+		$permalink = str_replace("/$post_slug/", "/$post_slug_translation/", $permalink);
 		
 		// This covers all custom post types with support for `post_type_after_section_in_permalink`
 		if (in_array($post->post_type, $section_in_permalink_types)) {
