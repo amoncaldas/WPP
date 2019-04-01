@@ -14,10 +14,9 @@ export default {
       let link = this.buildLink(this.path)
       link = location.origin + link
       return link
+    },
+    whatsappBase () {
+      this.$vuetify.breakpoint.smAndDown ? 'whatsapp://send?text=' : 'web.whatsapp.com/send?text='
     }
-  },
-  created() {
-    // let item = document.querySelector(".sharer-img")
-    // item.getSVGDocument().getElementById("svgInternalID").setAttribute("fill", "red")
-  },
+  }
 }
