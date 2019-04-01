@@ -16,7 +16,12 @@ export default {
       return link
     },
     whatsappBase () {
-      this.$vuetify.breakpoint.smAndDown ? 'whatsapp://send?text=' : 'web.whatsapp.com/send?text='
+      let isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        return 'whatsapp://send?text='
+      }
+
+      return 'https://web.whatsapp.com/send?text='
     }
   }
 }
