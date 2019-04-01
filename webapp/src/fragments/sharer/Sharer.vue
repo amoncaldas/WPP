@@ -21,7 +21,7 @@
         </svg>
       </div>
     </a>
-    <a class="item" target="_blank" :href="'whatsapp://send?text=' + link" data-action="share/whatsapp/share"
+    <a class="item" target="_blank" :href="whatsappBase + link" data-action="share/whatsapp/share"
       :title="$t('sharer.shareViaWhatsapp')">
       <div>
         <svg viewBox="0 0 100 100" :style="{fill: $vuetify.theme.secondary}" class="share-icon">
