@@ -203,7 +203,7 @@ export default {
           })
         }, 500)
       }
-    }
+    },
   },
   mounted () {
     // Define a unique identifier to the map component instance

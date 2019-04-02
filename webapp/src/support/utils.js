@@ -57,10 +57,10 @@ const utils = {
   },
 
   getFormattedDate: (value) => {
-    let date = moment(value)
-    let y = date.year()
-    let m = date.month()
-    let d = date.day()
+    let momentDate = moment(value)
+    let y = momentDate.year()
+    let m = momentDate.month() + 1
+    let d = momentDate.date()
     d = d < 10 ? '0' + d.toString() : d
     let instance = main.getInstance()
     let months = instance.$t('global.monthsShort')

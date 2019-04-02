@@ -26,7 +26,7 @@ const wppRouter = {
 
       for (let key in endpoints) {
         if (typeof endpoints[key] === 'string') {
-          let declaredEndpoint = endpoints[key]
+          let declaredEndpoint = endpoints[key].trim()
           wppRouter.addEndpointTranslations(declaredEndpoint, endpoints)
           endpoints[key] = {endpoint: declaredEndpoint, path: declaredEndpoint}
         }

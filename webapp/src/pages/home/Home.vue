@@ -9,7 +9,7 @@
     </template>
     <template v-if="currentSection && currentSection.extra.has_places">
       <br>
-      <post-map :post="currentSection"></post-map>
+      <post-map @placeClicked="placeClicked" :post="currentSection"></post-map>
       <br>
     </template>
     <template v-if="currentSection.extra.compact_list_posts">
@@ -18,7 +18,13 @@
       <br>
     </template>
     <template v-if="currentSection.extra.list_posts">
-      <posts :max="max" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in listingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
+      <template v-if="postType.endpoint === 'sections'">
+        <sections :key="postType.endpoint" :max="max"  :random="true"></sections>
+        <br :key="postType.endpoint + 'br'">
+      </template>
+      <template v-else>
+        <posts :max="max" :parent-id="currentSection.id" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in listingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
+      </template>
     </template>
   </v-container>
 </template>

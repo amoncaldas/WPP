@@ -4,7 +4,7 @@ import PostMap from '@/fragments/post-map/PostMap'
 import Gallery from '@/fragments/gallery/Gallery'
 import Comments from '@/fragments/comments/Comments'
 import utils from '@/support/utils'
-import Author from './components/author/Author'
+import AuthorAndPlace from './components/author-and-place/AuthorAndPlace'
 import Sharer from '@/fragments/sharer/Sharer'
 import ReportError from '@/fragments/report-error/ReportError'
 
@@ -20,18 +20,7 @@ export default {
     }
     this.post = this.postData
 
-    if (this.post.extra.prepend) {
-      let id = Array.isArray(this.post.extra.prepend) && this.post.extra.prepend.length > 0 ? this.post.extra.prepend[0] : this.post.extra.prepend
-      postService.get(`addings/${id}`).then((prepend) => {
-        this.prepend = prepend.content.rendered
-      })
-    }
-    if (this.post.extra.append) {
-      let id = Array.isArray(this.post.extra.prepend) && this.post.extra.prepend.length > 0 ? this.post.extra.prepend[0] : this.post.extra.prepend
-      postService.get(`addings/${id}`).then((append) => {
-        this.append = append.content.rendered
-      })
-    }
+    this.loadAddings()
   },
   props: {
     isPage: {
@@ -88,19 +77,22 @@ export default {
       return this.post.title
     },
     excerpt () {
-      let maxLength = this.mode === 'compact' ? 150 : 300
+      let excerpt = this.content
       if (this.post.excerpt) {
-        let excerpt = this.post.excerpt
-        if (this.post.excerpt.rendered !== undefined) {
-          excerpt = this.post.excerpt.rendered
+        excerpt = this.post.excerpt
+        if (excerpt.rendered !== undefined) {
+          excerpt = excerpt.rendered
         }
-        return excerpt.replace(/<(?:.|\n)*?>/gm, '').substring(0, maxLength)
-      } else if (this.content.length > maxLength) {
-        let subContent = this.content.replace(/<(?:.|\n)*?>/gm, '').substring(0, maxLength)
-        return subContent.length > 0 ? `${subContent} [...]` : subContent
-      } else {
-        return this.content.replace(/<(?:.|\n)*?>/gm, '')
       }
+
+      excerpt = excerpt.replace(/<(?:.|\n)*?>/gm, '')
+      let maxLength = this.mode === 'compact' ? 150 : 300
+      if (excerpt.length > maxLength) {
+        excerpt = excerpt.substring(0, maxLength)
+        return excerpt.length > 0 ? `${excerpt} [...]` : excerpt
+      }
+
+      return excerpt
     },
     link () {
       if (this.post.extra.custom_link && this.post.extra.custom_link.length > 0 && this.post.extra.custom_link !== ' ') {
@@ -179,6 +171,20 @@ export default {
         }
       }
       return termsFound
+    },
+    loadAddings () {
+      if (this.post.extra.prepend) {
+        let id = Array.isArray(this.post.extra.prepend) && this.post.extra.prepend.length > 0 ? this.post.extra.prepend[0] : this.post.extra.prepend
+        postService.get(`addings/${id}`).then((prepend) => {
+          this.prepend = prepend.content.rendered
+        })
+      }
+      if (this.post.extra.append) {
+        let id = Array.isArray(this.post.extra.prepend) && this.post.extra.prepend.length > 0 ? this.post.extra.prepend[0] : this.post.extra.prepend
+        postService.get(`addings/${id}`).then((append) => {
+          this.append = append.content.rendered
+        })
+      }
     }
   },
   components: {
@@ -186,7 +192,7 @@ export default {
     PostMap,
     Gallery,
     Comments,
-    Author,
+    AuthorAndPlace,
     Sharer,
     ReportError
   },

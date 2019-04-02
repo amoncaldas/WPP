@@ -113,9 +113,13 @@
       // If there is not related, try to get posts with same category
       if (count($posts) === 0) {
         unset($args["post_parent"]);        
-        unset($args["post__in"]);     
+        unset($args["post__in"]);
+
+        // If we are loading the auto related posts, get only the posts 
+        // that support `auto_related` 
+        $args["post_type"] = get_post_types_by_support("auto_related");
         $content_id = $request->get_param('contentId');   
-        $args['category__in']  = wp_get_post_categories( $content_id);
+        $args['category__in'] = wp_get_post_categories( $content_id);
         $posts = get_posts($args);
       }
 
@@ -336,6 +340,7 @@
           $term = array_shift( $terms );
           $post->locale = $term->slug;
           $post->link = get_post_permalink($post->ID);
+          $post->content = apply_filters('the_content', $post->post_content);
 
           // create rest post data like (without the 'post_' prefix in the properties)
           $rest_post = new stdClass();
