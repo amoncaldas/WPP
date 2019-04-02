@@ -11,15 +11,17 @@
     <template v-if="currentSection.extra.compact_list_posts">
       <posts :max="maxCompact" mode="compact" :parent-id="currentSection.id" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in compactListingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
     </template>
-    <template v-if="currentSection.extra.list_posts">
-      <template v-if="postType.endpoint === 'sections'">
-        <sections :key="postType.endpoint" :max="max"  :random="true"></sections>
-        <br :key="postType.endpoint + 'br'">
+    <div v-if="currentSection.extra.list_posts">
+      <template v-for="postType in listingPosts" >
+        <template v-if="postType.endpoint === 'sections'">
+          <sections :key="postType.endpoint" :max="max"  :random="true"></sections>
+          <br :key="postType.endpoint + 'br'">
+        </template>
+        <template v-else>
+          <posts :max="max" :parent-id="currentSection.id" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" :endpoint="postType.endpoint" :title="postType.title"></posts>
+        </template>
       </template>
-      <template v-else>
-        <posts :max="max" :parent-id="currentSection.id" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in listingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>
-      </template>
-    </template>
+    </div>
   </v-container>
 </template>
 

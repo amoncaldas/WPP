@@ -28,7 +28,8 @@ export default {
     return {
       sections: [],
       total: null,
-      totalPages: null
+      totalPages: null,
+      loaded: false
     }
   },
   computed: {
@@ -48,6 +49,7 @@ export default {
         sections = this.lodash.shuffle(sections)
       }
       this.sections = sections
+      this.loaded = true
     }
   },
   components: {
