@@ -304,8 +304,7 @@
 	
 			$post_types_with_section = get_post_types_by_support("parent_section");
 			if (in_array($post_type, $post_types_with_section) && $_GET["parent_id"]) {
-				// $query->set('post_parent', $_GET["parent_id"]);
-				$query->set('post_parent__in', array($_GET["parent_id"]), "0");
+				$query->set('post_parent', $_GET["parent_id"]);				
 			}
 		}
 	}
