@@ -37,7 +37,7 @@ export default {
     },
 
     authorAvatar () {
-      if (this.post.author_member) {
+      if (this.post.author_member && this.post.author_member.featured_thumb_url) {
         return this.post.author_member.featured_thumb_url
       }
       if (this.post._embedded.author[0].avatar_urls) {
