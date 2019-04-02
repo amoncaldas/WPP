@@ -33,7 +33,14 @@ export default {
       this.listingPosts = Section.getListingPosts()
       this.compactListingPosts = Section.getCompactListingPosts()
       this.eventBus.$emit('setLocaleFromContentLocale', this.currentSection.locale)
-    }
+    },
+    placeClicked (place) {
+      if (place && place.link) {
+        var parser = document.createElement('a')
+        parser.href = place.link
+        this.$router.push(parser.pathname)
+      }
+    },
   },
   computed: {
     max () {
