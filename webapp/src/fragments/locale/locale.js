@@ -14,8 +14,6 @@ export default {
     let context = this
     this.eventBus.$on('setLocaleFromContentLocale', (locale) => {
       context.currentLocale = locale
-      context.$i18n.locale = this.currentLocale
-      context.$store.commit('locale', this.currentLocale)
     })
 
     this.populateLocalesFromOptions()
@@ -30,6 +28,8 @@ export default {
      */
     'currentLocale' (to, from) {
       if (this.$i18n.locale !== this.currentLocale) {
+        context.$i18n.locale = this.currentLocale
+        context.$store.commit('locale', this.currentLocale)
         this.afterLocaleUpdate()
       }
     }
