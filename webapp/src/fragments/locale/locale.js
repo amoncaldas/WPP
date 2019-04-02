@@ -13,12 +13,13 @@ export default {
 
     let context = this
     this.eventBus.$on('setLocaleFromContentLocale', (locale) => {
-      context.currentLocale = locale
+      context.$i18n.locale = context.currentLocale = locale
+      context.$store.commit('locale', context.currentLocale)
+      context.eventBus.$emit('langChanged', context.currentLocale)
     })
 
     this.populateLocalesFromOptions()
     this.setFromUrl()
-
   },
   watch: {
     /**
