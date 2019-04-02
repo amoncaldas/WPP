@@ -1,7 +1,7 @@
 <template>
   <div class="locale-changer" v-if="locales.length > 1">
     <v-select
-      v-model="currentLocale"
+      v-model="currentLocale" @change="selectChanged"
       item-text="title"
       item-value="value"
       :items="locales"
