@@ -355,7 +355,8 @@
 	 * @return Array
 	 */
 	public function resolve_author_member($post_arr, $field_name, $request) {
-		$linked_member_id = get_user_meta($post_arr["author"], "linked_member", true);
+		$author_id = get_post_field( 'post_author', $post_arr["id"]);
+		$linked_member_id = get_user_meta($author_id, "linked_member", true);
 
 		if (is_array($linked_member_id) && count($linked_member_id) === 0) {
 			return;
@@ -365,12 +366,13 @@
 		if (isset($linked_member_id) && $linked_member_id > 0) {			
 			$author_member = get_post($linked_member_id);
 			if ($author_member) {
-				return [
+				$data = [
 					"title" => $author_member->post_title,
 					"content" => strip_tags(apply_filters('the_content', $author_member->post_content)),
 					"featured_thumb_url" => get_the_post_thumbnail_url($author_member->ID, "thumbnail"),
 					"link" => get_the_permalink($author_member->ID)
 				];
+				return $data;
 			}
 		} 
 	}	
