@@ -20,7 +20,7 @@
     <template v-if="currentSection.extra.list_posts">
       <template v-for="postType in listingPosts">
         <template v-if="postType.endpoint === 'sections'">
-          <sections :key="postType.endpoint" :max="max"  :random="true"></sections>
+          <sections :key="postType.endpoint" :max="max" :columns-per-section="$vuetify.breakpoint.mdAndUp ? 4 : 6" :random="true"></sections>
           <br :key="postType.endpoint + 'br'">
         </template>
         <template v-else>
