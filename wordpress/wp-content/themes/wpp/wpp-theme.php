@@ -218,6 +218,15 @@
 					'schema' => null,
 				)
 			);
+
+			register_rest_field($post_type, 'author_member',
+				array(
+					'get_callback'  => function ($post, $field_name, $request) {
+						return $this->resolve_author_member($post, $field_name, $request);
+					},
+					'schema' => null,
+				)
+			);
 		}
 	}
 
@@ -295,18 +304,19 @@
 	
 			$post_types_with_section = get_post_types_by_support("parent_section");
 			if (in_array($post_type, $post_types_with_section) && $_GET["parent_id"]) {
-				$query->set('post_parent', $_GET["parent_id"]);
+				// $query->set('post_parent', $_GET["parent_id"]);
+				$query->set('post_parent__in', array($_GET["parent_id"]), "0");
 			}
 		}
 	}
 
 	/**
-	 * Resolve the slide images gallery data based on the ids postmeta
+	 * Resolve the the post places
 	 *
 	 * @param Array $post_arr
 	 * @param string $field_name
 	 * @param Object $request
-	 * @return array of data
+	 * @return array of palces
 	 */
 	public function resolve_places($post_arr, $field_name, $request) {
 		$place_ids = get_post_meta($post_arr["id"], "places", true);
@@ -334,6 +344,35 @@
 			}
 		}
 		return $places;
+	}	
+
+	/**
+	 * Resolve the author linked member
+	 *
+	 * @param Array $post_arr
+	 * @param string $field_name
+	 * @param Object $request
+	 * @return Array
+	 */
+	public function resolve_author_member($post_arr, $field_name, $request) {
+		$linked_member_id = get_user_meta($post_arr["author"], "linked_member", true);
+
+		if (is_array($linked_member_id) && count($linked_member_id) === 0) {
+			return;
+		}
+		$linked_member_id = is_array($linked_member_id) ? $linked_member_id[0] : $linked_member_id;
+		
+		if (isset($linked_member_id) && $linked_member_id > 0) {			
+			$author_member = get_post($linked_member_id);
+			if ($author_member) {
+				return [
+					"title" => $author_member->post_title,
+					"content" => strip_tags(apply_filters('the_content', $author_member->post_content)),
+					"featured_thumb_url" => get_the_post_thumbnail_url($author_member->ID, "thumbnail"),
+					"link" => get_the_permalink($author_member->ID)
+				];
+			}
+		} 
 	}	
 
 

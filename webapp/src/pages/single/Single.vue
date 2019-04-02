@@ -13,7 +13,6 @@
         </template>
         <template v-else>
           <posts :parent-id="parentSectionId" :max="maxInSidebar" :exclude="[post.id]" :columns-per-post="12" :key="postType.endpoint" :endpoint="postType.endpoint" :title="postType.title"></posts>
-          <br :key="postType.endpoint + 'br'">
         </template>
       </template>
     </v-flex>

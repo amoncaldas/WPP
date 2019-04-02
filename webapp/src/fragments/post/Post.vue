@@ -20,7 +20,7 @@
       </template>
       <template v-if="mode === 'single'">
         <template v-if="!renderAsPage">
-          <author :post="post"> </author>
+          <author-and-place :post="post"> </author-and-place>
           <br>
         </template>
         <sharer :title="title" :path="post.path" ></sharer>
@@ -66,7 +66,7 @@
         <br><br>
         <sharer :title="title" :path="post.path" ></sharer>
         <br>
-        <author mode="bio" v-if="showSingleBottomAuthor" :post="post"> </author>
+        <author-and-place mode="bio" v-if="showSingleBottomAuthor" :post="post"> </author-and-place>
       </template>
       <template v-else>
         <div v-if="post.locale !== 'neutral' && post.locale !== $store.getters.locale" class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': $vuetify.theme.accent}"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>
@@ -84,10 +84,10 @@
           </v-flex>
         </v-layout>
         <template v-else>
-          <div v-if="excerpt && excerpt.length > 0">{{excerpt}}</div>
+          <div v-if="excerpt && excerpt.length > 0" v-html="excerpt"></div>
           <div v-if="mode === 'compact' || post.extra.hide_author_bio">
             <br>
-            <author v-if="!renderAsPage" :post="post"> </author>
+            <author-and-place v-if="!renderAsPage" :post="post"> </author-and-place>
           </div>
         </template>
         <span v-if="showType">

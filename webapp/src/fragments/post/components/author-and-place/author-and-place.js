@@ -15,14 +15,31 @@ export default {
     hasAuthor () {
       return this.post._embedded && this.post._embedded.author && this.post._embedded.author[0]
     },
-    author () {
+    authorName () {
+      if (this.post.author_member) {
+        return this.post.author_member.title
+      }
       return this.post._embedded.author[0].name
     },
     bio () {
+      if (this.post.author_member) {
+        return this.post.author_member.content
+      }
       return this.post._embedded.author[0].description
     },
 
+    authorLink () {
+      if (this.post.author_member) {
+        var parser = document.createElement('a')
+        parser.href = this.post.author_member.link
+        return this.buildLink(parser.pathname)
+      }
+    },
+
     authorAvatar () {
+      if (this.post.author_member) {
+        return this.post.author_member.featured_thumb_url
+      }
       if (this.post._embedded.author[0].avatar_urls) {
         return this.post._embedded.author[0].avatar_urls[96] || this.post._embedded.author[0].avatar_urls[48]
       } else {

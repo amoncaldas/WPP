@@ -3,12 +3,15 @@
     <v-layout row wrap>
       <v-flex xs3 sm2 md1 style="padding-right:5px; padding-left:5px">
         <div class="author-avatar" :class="{'only-author': mode === 'author'}">
-          <img :src="authorAvatar" :alt="author" :title="author">
+          <img :src="authorAvatar" :alt="authorName" :title="authorName">
         </div>
       </v-flex>
       <v-flex xs9 sm10 md11>
         <div>
-          <span> {{$t('author.by')}} <b>{{author}}</b></span>
+          <template v-if="authorLink">
+            <span> {{$t('author.by')}}</span> <a :title="authorName" :href="authorLink"><b>{{authorName}}</b></a>
+          </template>
+          <span v-else> {{$t('author.by')}} <b>{{authorName}}</b></span>
         </div>
         <div>
           <span v-if="mode === 'author'">
@@ -31,5 +34,5 @@
 </template>
 
 
-<script src="./author.js"></script>
-<style scoped src="./author.css"></style>
+<script src="./author-and-place.js"></script>
+<style scoped src="./author-and-place.css"></style>

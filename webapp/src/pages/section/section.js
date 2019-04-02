@@ -27,6 +27,13 @@ export default {
     this.eventBus.$emit('titleChanged', title)
   },
   methods: {
+    placeClicked (place) {
+      if (place && place.link) {
+        var parser = document.createElement('a')
+        parser.href = place.link
+        this.$router.push(parser.pathname)
+      }
+    },
   },
   computed: {
     max () {
