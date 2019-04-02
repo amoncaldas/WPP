@@ -3,7 +3,7 @@
     <div slot="header">
      <h2>{{boxTitle | capitalize}}</h2>
     </div>
-    <div slot="content" v-if="sections">
+    <div slot="content" v-if="sections.length > 0">
       <template  >
         <v-layout row wrap>
           <v-flex  v-for="section in sections" v-bind="{['sm'+columnsPerSection]: true}"  :key="section.id">
@@ -12,6 +12,9 @@
           </v-flex>
         </v-layout>
       </template>
+    </div>
+    <div v-else-if="loaded">
+      <h3>{{$t('sections.noContent')}}</h3>
     </div>
   </box>
 </template>

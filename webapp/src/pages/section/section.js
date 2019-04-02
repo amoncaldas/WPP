@@ -2,6 +2,7 @@ import PostMap from '@/fragments/post-map/PostMap'
 import Posts from '@/fragments/posts/Posts'
 import Slider from '@/fragments/slider/Slider'
 import Section from '@/support/section'
+import Sections from '@/fragments/sections/Sections'
 
 export default {
   data: () => ({
@@ -13,7 +14,8 @@ export default {
   components: {
     PostMap,
     Posts,
-    Slider
+    Slider,
+    Sections
   },
   created () {
     this.currentSection = this.$store.getters.currentSection
