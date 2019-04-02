@@ -13,34 +13,30 @@ export default {
 
     let context = this
     this.eventBus.$on('setLocaleFromContentLocale', (locale) => {
-      context.$i18n.locale = context.currentLocale = locale
-      context.$store.commit('locale', context.currentLocale)
-      context.eventBus.$emit('langChanged', context.currentLocale)
+      if (locale != context.currentLocale) {
+        context.$i18n.locale = context.currentLocale = locale
+        context.$store.commit('locale', context.currentLocale)
+      }
     })
 
     this.populateLocalesFromOptions()
     this.setFromUrl()
   },
   watch: {
-    /**
-     * Every time the locale changes, we need to run afterLocaleUpdate
-     * @param {*} to
-     * @param {*} from
-     */
-    'currentLocale' (to, from) {
-      if (this.$i18n.locale !== this.currentLocale) {
-        this.$i18n.locale = this.currentLocale
-        this.$store.commit('locale', this.currentLocale)
-        this.afterLocaleUpdate()
-      }
-    }
+    '$store.getters.locale': function () {
+      this.eventBus.$emit('localeChanged', this.currentLocale)
+    },
   },
   methods: {
+    selectChanged (newLocale) {
+      this.$i18n.locale = this.currentLocale = newLocale
+      this.$store.commit('locale', this.currentLocale)
+      this.afterLocaleUpdate()
+    },
     afterLocaleUpdate () {
       this.$i18n.locale = this.currentLocale
       // Store the new locale and reload going to home
       this.$store.commit('locale', this.currentLocale)
-      this.eventBus.$emit('langChanged', this.currentLocale)
       window.location.href = '/'
     },
     supportedLocales () {

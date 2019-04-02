@@ -15,7 +15,6 @@ const routes = {
       routes.push(
         {
           path: `/${postTypeEndpointUrl}`,
-          name: `${postTypeEndpointUrl}-Archive`,
           component: Archive,
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
@@ -32,7 +31,6 @@ const routes = {
         routes.push(
           {
             path: `/${sectionEndPoint}/${postTypeEndpointUrl}`,
-            name: `${sectionEndPoint}-${postTypeEndpointUrl}-Archive`,
             component: Archive,
             beforeEnter: (to, from, next) => {
               store.commit('currentSection', section)
