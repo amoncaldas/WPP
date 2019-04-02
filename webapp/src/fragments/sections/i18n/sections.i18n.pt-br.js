@@ -1,5 +1,6 @@
 export default {
   sections: {
-    title: 'Seções'
+    title: 'Seções',
+    noContent: 'Não há conteúdo para listar'
   }
 }
