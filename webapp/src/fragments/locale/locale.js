@@ -28,8 +28,8 @@ export default {
      */
     'currentLocale' (to, from) {
       if (this.$i18n.locale !== this.currentLocale) {
-        context.$i18n.locale = this.currentLocale
-        context.$store.commit('locale', this.currentLocale)
+        this.$i18n.locale = this.currentLocale
+        this.$store.commit('locale', this.currentLocale)
         this.afterLocaleUpdate()
       }
     }
