@@ -105,8 +105,8 @@ export default {
       let content = ''
       if (this.post.content) {
         content = this.post.content.rendered !== undefined ? this.post.content.rendered : this.post.content
-      } else if (this.post.extra && this.post.extra.content) {
-        content = this.post.extra.content
+      } else if (this.post.extra && this.post.extra.html_content) {
+        content = this.post.extra.html_content
       }
       if (!content && this.post.excerpt) {
         content = this.post.excerpt.rendered || this.post.excerpt
