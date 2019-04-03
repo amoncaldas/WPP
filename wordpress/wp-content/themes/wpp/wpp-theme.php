@@ -205,7 +205,7 @@
 			register_rest_field($post_type, 'locale',
 				array(
 					'get_callback'  => function ($post, $field_name, $request) {
-						return $this->attach_post_locale( $post);
+						return $this->get_post_locale( $post);
 					},
 					'schema' => null,
 				)
@@ -237,7 +237,7 @@
 	 * @param Array $post
 	 * @return String - locale slug
 	 */
-	public function attach_post_locale ($post) {
+	public function get_post_locale ($post) {
 		$terms = get_the_terms( $post["id"], LOCALE_TAXONOMY_SLUG );
 		if ( !empty( $terms ) ){
 			// get the first term
@@ -544,7 +544,8 @@
 			$section_type = get_post_meta($post->ID, "section_type", true);	
 			if ($section_type === SECTION_POST_HOME_FIELD_VALUE ) {
 				$match = true;
-				return "/";
+				$locale = $this->get_post_locale( $post->to_array());
+				return network_site_url("/?l=$locale");
 			} 
 		} 
 
@@ -637,7 +638,8 @@
 		$section_url_segment = "";
 		if($parent_section_id) {
 			$parent_section = get_post($parent_section_id);
-			$section_url_segment = "/$parent_section->post_name";
+			$section_type = get_post_meta($parent_section_id, "section_type", true);	
+			$section_url_segment = $section_type === SECTION_POST_HOME_FIELD_VALUE ? "/" : "/$parent_section->post_name";
 		} 
 
 		// Get the url segment of the page ancestors
@@ -822,13 +824,13 @@
 	 * @return Integer|null
 	 */
 	public function get_parent_section_id($post_id) {
-		$parent_id = get_post_meta($post_id, SECTION_POST_TYPE, true);	
-		$parent_id = is_array($parent_id) && count($parent_id)> 0 ? $parent_id[0] : $parent_id;
+		$parent_id = get_acf_post_request_field_value(SECTION_POST_TYPE, true);
+		if (!$parent_id) {
+			$parent_id = get_post_meta($post_id, SECTION_POST_TYPE, true);	
+			$parent_id = is_array($parent_id) && count($parent_id)> 0 ? $parent_id[0] : $parent_id;
+		}
 		if (isset($parent_id)) {
 			$parent_id = intval($parent_id);
-		}
-		if (!$parent_id) {
-			$parent_id = get_acf_post_request_field_value(SECTION_POST_TYPE, true);
 		}
 		return $parent_id;
 	}
