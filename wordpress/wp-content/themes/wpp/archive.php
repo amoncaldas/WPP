@@ -5,7 +5,9 @@ $page = isset($_GET["page"])? $_GET["page"] : 1;
 $posts_per_page = 12;
 $args = array( "post_type"=> RENDER_ARCHIVE_POST_TYPE,  "post_status"=> "publish", "paged"=> $page, "posts_per_page"=> $posts_per_page);
 
-if(defined("SECTION_ID")) {
+$post_types_with_section = get_post_types_by_support("parent_section");
+
+if(defined("SECTION_ID") && in_array(RENDER_ARCHIVE_POST_TYPE, $post_types_with_section)) {
 	$args["post_parent"] = SECTION_ID;
 } 
 $the_query = new WP_Query($args);
