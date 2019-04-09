@@ -15,7 +15,7 @@
         </div>
         <div>
           <span v-if="mode === 'author'">
-            {{$t('author.on') | capitalize}} <time :datetime="post.date">{{formatDateTime(post.date)}}</time>
+            {{$t('author.on') | capitalize}} <time :datetime="postDate">{{formatDateTime(postDate)}}</time>
           </span>
           <span v-else>
             {{$t('author.authorProfile')}}

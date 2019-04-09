@@ -58,6 +58,10 @@ export default {
           path: parser.pathname
         }
       }
+    },
+    postDate () {
+      let postDate = this.post.extra.custom_post_date || this.post.date
+      return this.formatDateTime(postDate)
     }
   },
   methods: {
