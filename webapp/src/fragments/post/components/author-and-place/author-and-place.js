@@ -61,12 +61,12 @@ export default {
     },
     postDate () {
       let postDate = this.post.extra.custom_post_date || this.post.date
-      return this.formatDateTime(postDate)
+      return postDate
     }
   },
   methods: {
     formatDateTime (date) {
-      return utils.getFormattedDateTime(date)
+      return utils.getFormattedDate(date)
     }
   }
 }
