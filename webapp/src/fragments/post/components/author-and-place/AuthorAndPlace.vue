@@ -21,7 +21,7 @@
             {{$t('author.authorProfile')}}
           </span>
         </div>
-        <div v-if="mode === 'author' && place">
+        <div v-if="mode === 'author' && place && !this.post.extra.no_authoring_place">
           <v-icon>place</v-icon>
           <a :href="buildLink(place.path)" :title="place.title" flat ><b>{{place.title}}</b></a>
         </div>
