@@ -88,6 +88,14 @@ export default {
     },
     maxZoom () {
       return this.initialMaxZoom
+    },
+    title () {
+      if ( Object.keys(this.post.places).length === 1) {
+        let keys = Object.keys(this.post.places)
+        let lastKey = keys[0]
+        return this.post.places[lastKey].title
+      }
+      return this.$t('postMap.title')
     }
   },
 
