@@ -48,7 +48,7 @@ export default {
     },
     columnsPerPost () {
       if (this.medias.length >= 4) {
-        return $vuetify.breakpoint.mdAndUp ? 3 : 6
+        return this.$vuetify.breakpoint.mdAndUp ? 3 : 6
       }
       return 4
     },
