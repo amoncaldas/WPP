@@ -371,10 +371,9 @@
             $last_uri_segment = $uri_parts[count($uri_parts) -1];
             if(is_numeric($last_url_segment)) {
                 return $last_uri_segment;
-            } else {	
-                $first_segment = $uri_parts[0];
+            } else {
                 global $wpdb;
-                $sql = "SELECT ID FROM $wpdb->posts WHERE post_status = 'publish' && post_type = '".SECTION_POST_TYPE."' && post_name = '".$first_segment."'";
+                $sql = "SELECT ID FROM $wpdb->posts WHERE post_status = 'publish' && post_type = '".SECTION_POST_TYPE."' && post_name = '".$last_uri_segment."'";
                 $section_id = $wpdb->get_var($sql);	
                 if ($section_id > 0) {
                     return $section_id;

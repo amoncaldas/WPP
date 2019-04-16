@@ -27,8 +27,7 @@
         </div>
       </v-flex>
     </v-layout>
-    <div v-if="mode === 'bio'">
-      {{bio}}
+    <div v-if="mode === 'bio'" v-html="bio">
     </div>
   </div>
 </template>
