@@ -351,9 +351,9 @@
      * @return void
      */
     public function getSection() {
-        $REQUEST_URI = strtok($_SERVER["REQUEST_URI"],'?');
+        $REQUEST_URI = trim(strtok($_SERVER["REQUEST_URI"],'?'), "/");
         $uri_parts = explode("/",  $REQUEST_URI);
-        $sections = get_posts( array( 'post_type' => 'section', 'post_name'  => $uri_parts[0]));		
+        $sections = get_posts( array( 'post_type' => SECTION_POST_TYPE, 'post_name'  => $uri_parts[0]));		
         if (count($sections) > 0) {
             return $sections[0];
         }
@@ -365,18 +365,21 @@
      * @return Integer
      */
     public function getPostId() {
-        $REQUEST_URI = strtok($_SERVER["REQUEST_URI"],'?');
+        $REQUEST_URI = trim(strtok($_SERVER["REQUEST_URI"],'?'), "/");
         if ($REQUEST_URI !== "/") {
             $uri_parts = explode("/", $REQUEST_URI);
-            $last_url_segment = $uri_parts[count($uri_parts) -1];
+            $last_uri_segment = $uri_parts[count($uri_parts) -1];
             if(is_numeric($last_url_segment)) {
-                return $last_url_segment;
-            } else {
-                $sections = get_posts( array( 'post_type' => 'section', 'post_name'  => $uri_parts[0]));		
-                if (count($sections) > 0) {
-                    return $sections[0]->ID;
+                return $last_uri_segment;
+            } else {	
+                $first_segment = $uri_parts[0];
+                global $wpdb;
+                $sql = "SELECT ID FROM $wpdb->posts WHERE post_status = 'publish' && post_type = '".SECTION_POST_TYPE."' && post_name = '".$first_segment."'";
+                $section_id = $wpdb->get_var($sql);	
+                if ($section_id > 0) {
+                    return $section_id;
                 } else {
-                    $page = get_page_by_path( $uri_parts[0]);		
+                    $page = get_page_by_path( $last_uri_segment);		
                     if ($page !== null) {
                         return $page->ID;
                     }
