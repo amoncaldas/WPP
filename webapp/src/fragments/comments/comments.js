@@ -137,7 +137,7 @@ export default {
         post: this.postId,
         page: this.currentPage,
         per_page: this.max,
-        order: + 'asc'
+        order: this.$store.getters.options.comment_order || 'asc'
       }
       commentService.query(filters).then((response) => {
         context.comments = response
