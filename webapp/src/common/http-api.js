@@ -33,6 +33,13 @@ const requestInterceptors = (config) => {
   }
 
   config.headers.common['locale'] = store.getters.locale
+  if (config.method === 'get' && config.url.indexOf('l=') === -1) {
+    if (config.url.indexOf('?') > -1) {
+      config.url += `&l=${store.getters.locale}`
+    } else {
+      config.url += `?l=${store.getters.locale}`
+    }
+  }
   return config // you have to return the config, otherwise the request wil be blocked
 }
 

@@ -40,7 +40,7 @@
 		add_filter('preview_page_link', array($this, 'set_page_preview_permalink'), 10, 2);
 		add_action("pre_post_update", array($this, 'before_update_draft_post'), 9, 2);
 		add_action( 'admin_enqueue_scripts', array($this, 'may_disable_autosave'));
-		
+		add_filter( 'rest_prepare_comment', array($this, 'filter_rest_prepare_comment'), 10, 3 );		
 	}
 
 	/**
@@ -230,6 +230,14 @@
 		}
 	}
 
+	// define the rest_prepare_comment callback 
+	public function filter_rest_prepare_comment( $response, $comment, $request ) { 
+		if (!isset($response->data["author_member"])) {
+			$response->data["author_member"] = $this->get_author_member($comment->comment_post_ID);
+		}
+		return $response; 
+	}
+
 
 	/**
 	 * Attach post locale slug to post object
@@ -354,7 +362,18 @@
 	 * @return Array
 	 */
 	public function resolve_author_member($post_arr, $field_name, $request) {
-		$author_id = get_post_field( 'post_author', $post_arr["id"]);
+		$data = $this->get_author_member($post_arr["id"]);
+		return $data;
+	}	
+
+	/**
+	 * Resolve the author linked member
+	 *
+	 * @param Array $post_id
+	 * @return Array
+	 */
+	public function get_author_member($post_id) {
+		$author_id = get_post_field( 'post_author', $post_id);
 		$linked_member_id = get_user_meta($author_id, "linked_member", true);
 
 		if (is_array($linked_member_id) && count($linked_member_id) === 0) {
@@ -624,10 +643,10 @@
 
 
 	/**
-	 * Set the permalink for post preview
+	 * Set the permalink for a page
 	 *
-	 * @param string $preview_link
-	 * @param WP_Post $post
+	 * @param string $permalink
+	 * @param Integer $page_id
 	 * @return string
 	 */
 	public function set_page_permalink($permalink, $page_id ) {
@@ -692,9 +711,9 @@
 	/**
 	 * Mke sure that the page has a valid post url/slug that does not conflicts with other custom post types having similar permalink structure 
 	 *
+	 * @param Integer $page_id
 	 * @param WP_Post $page
-	 * @param string $permalink
-	 * @return WP_Post
+	 * @return WP_Post page
 	 */
 	public function after_save_page( $page_id, $page) {		
 		$get_valid_name = function($name, $post_types) use (&$get_valid_name)  {

@@ -37,8 +37,37 @@ class WppUser {
      */
     public function set_jwt_user_data( $data, $user) {
         $data["avatar_url"] = get_avatar_url($data["user_email"], array("size"=>48));
+        $data["author_member"] = $this->get_author_member($user->ID);
         return $data;
     }
+
+    /**
+	 * Resolve the author linked member
+	 *
+	 * @param Array $post_id
+	 * @return Array
+	 */
+	public function get_author_member($author_id) {
+		$linked_member_id = get_user_meta($author_id, "linked_member", true);
+
+		if (is_array($linked_member_id) && count($linked_member_id) === 0) {
+			return;
+		}
+		$linked_member_id = is_array($linked_member_id) ? $linked_member_id[0] : $linked_member_id;
+		
+		if (isset($linked_member_id) && $linked_member_id > 0) {			
+			$author_member = get_post($linked_member_id);
+			if ($author_member) {
+				$data = [
+					"title" => $author_member->post_title,
+					"content" => strip_tags(apply_filters('the_content', $author_member->post_content)),
+					"featured_thumb_url" => get_the_post_thumbnail_url($author_member->ID, "thumbnail"),
+					"link" => get_the_permalink($author_member->ID)
+				];
+				return $data;
+			}
+		} 
+	}	
 
     /**
      * Creates a new wordpress user using the data provided in the request

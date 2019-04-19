@@ -1,6 +1,6 @@
 export default {
   loginOrRegister: {
-    registration: 'Registro',
+    registration: 'Registro (30 seg)',
     Login: 'Login',
     authentication: 'Autenticação'
   }

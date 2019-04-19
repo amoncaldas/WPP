@@ -35,8 +35,15 @@ export default {
   computed: {
     boxTitle () {
       return this.title || this.$t('sections.title')
+    },
+    total () {
+      let total = this.lodash.filter(this.$store.getters.sections, (s) => {
+        return s.path !== '/'
+      })
+      return total
     }
   },
+
   methods: {
     loadSections () {
       let sections = this.lodash.filter(this.$store.getters.sections, (s) => {

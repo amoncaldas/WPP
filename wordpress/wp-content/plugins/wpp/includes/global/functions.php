@@ -151,6 +151,10 @@
 		);
 		$context  = stream_context_create($opts);
 		$response = file_get_contents($recaptchaValidationUrl, false, $context);
+		// $error = error_get_last();
+		if (!$response) {
+			return false;
+		}
 		$result = json_decode($response);
 		return $result->success;		
 	}
