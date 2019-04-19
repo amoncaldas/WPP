@@ -9,8 +9,7 @@
         <v-form ref="form" v-if="open">
           <v-layout row wrap class="comment-box">
             <v-flex xs2 sm1>
-              <img class="max-100" v-if="$store.getters.isAuthenticated" :src="commenterAvatar" :alt="$store.getters.user.displayName" :title="$store.getters.user.displayName">
-              <img class="max-100" v-else src="https://www.gravatar.com/avatar/HASH">
+              <img class="max-100" :src="commenterAvatar" :alt="commenterName" :title="commenterName">
             </v-flex>
             <v-flex xs10 sm11 class="comment-input">
               <v-textarea class="" type="text" autofocus hide-details auto-grow counter
@@ -25,7 +24,7 @@
             <v-btn color="secondary" left v-if="$store.getters.isAuthenticated" @click.native="submit">{{$t('global.send')}}</v-btn>
             <v-btn color="secondary" v-else @click.native="openAuthentication()">{{$t('comments.autneticateAndSend')}}</v-btn>
           </div>
-          <vue-recaptcha :sitekey="$store.getters.options.recaptcha_site_key"
+          <vue-recaptcha v-if="$store.getters.options.recaptcha_site_key" :sitekey="$store.getters.options.recaptcha_site_key"
             ref="recaptcha"
             size="invisible"
             @verify="onCaptchaVerified"
@@ -44,11 +43,11 @@
           <div :key="comment.id">
             <v-layout row wrap>
               <v-flex xs2 sm1>
-                <img class="max-100" :src="comment.author_avatar_urls[48]" :alt="comment.author_name" :title="comment.author_name">
+                <img class="max-100" :src="commentAvatar(comment)" :alt="commentName(comment)" :title="commentName(comment)">
               </v-flex>
               <v-flex xs10 sm11>
                 <div>
-                  <span class="author-name" :style="{color: $vuetify.theme.dark}">{{comment.author_name}}</span>
+                  <span class="author-name" :style="{color: $vuetify.theme.dark}">{{commentName(comment)}}</span>
                 </div>
                 <div v-html="getContent(comment)"></div>
                 <div class="comment-date">

@@ -70,6 +70,14 @@ export default {
       } else {
         return 'https://www.gravatar.com/avatar/HASH'
       }
+    },
+
+    commenterName () {
+      if (this.$store.getters.user && this.$store.getters.user.displayName) {
+        return this.$store.getters.user.displayName
+      } else {
+        return ''
+      }
     }
   },
 
@@ -141,6 +149,18 @@ export default {
         console.log(error)
         context.showError(this.$t('comments.theCommentsCouldNotBeLoaded'))
       })
+    },
+    commentAvatar (comment) {
+      if (comment.author_member) {
+        return comment.author_member.featured_thumb_url
+      }
+      return comment.author_avatar_urls[48]
+    },
+    commentName (comment) {
+      if (comment.author_member) {
+        return comment.author_member.title
+      }
+      return comment.author_name
     }
   },
   mounted () {

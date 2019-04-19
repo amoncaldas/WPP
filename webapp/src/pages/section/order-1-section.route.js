@@ -13,7 +13,6 @@ const routes = {
       routes.push(
         {
           path: `/${sectionEndPoint}`,
-          name: `${sectionEndPoint}-Section`,
           component: Section,
           beforeEnter: (to, from, next) => {
             store.commit('currentSection', section)

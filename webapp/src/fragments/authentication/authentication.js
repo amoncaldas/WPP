@@ -77,8 +77,5 @@ export default {
     socialAuth.checkAndProceedOAuth((userData) => {
       auth.setUserAndRedirect(this, userData)
     })
-    // emit the an event catch by root App component
-    // telling it to update the page title
-    this.eventBus.$emit('titleChanged', this.$t('authentication.pageTitle'))
   }
 }

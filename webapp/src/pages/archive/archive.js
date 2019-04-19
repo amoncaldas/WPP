@@ -1,4 +1,5 @@
 import Posts from '@/fragments/posts/Posts'
+import Sections from '@/fragments/sections/Sections'
 
 export default {
   data: () => ({
@@ -9,7 +10,8 @@ export default {
     page: 1
   }),
   components: {
-    Posts
+    Posts,
+    Sections
   },
   created () {
     this.loadData()

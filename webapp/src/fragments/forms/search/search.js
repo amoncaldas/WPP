@@ -70,10 +70,6 @@ export default {
     }
   },
   created () {
-    // Emit the an event catch by root App component
-    // telling it to update the page title
-    this.eventBus.$emit('titleChanged', this.$t('search.pageTitle'))
-
     this.loadData()
   }
 }

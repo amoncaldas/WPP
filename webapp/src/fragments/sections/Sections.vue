@@ -16,6 +16,10 @@
     <div v-else-if="loaded">
       <h3>{{$t('sections.noContent')}}</h3>
     </div>
+    <div v-if="total > max">
+      <a style="float:right" :title="$t('sections.seeAll')" :href="buildLink('/sections')" >{{ $t('sections.seeAll')}}</a>
+      <br><br>
+    </div>
   </box>
 </template>
 <script src="./sections.js"></script>
