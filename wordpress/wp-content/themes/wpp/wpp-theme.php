@@ -233,7 +233,7 @@
 	// define the rest_prepare_comment callback 
 	public function filter_rest_prepare_comment( $response, $comment, $request ) { 
 		if (!isset($response->data["author_member"])) {
-			$response->data["author_member"] = $this->get_author_member($comment->comment_post_ID);
+			$response->data["author_member"] = $this->get_author_member($comment->user_id);
 		}
 		return $response; 
 	}
@@ -361,8 +361,9 @@
 	 * @param Object $request
 	 * @return Array
 	 */
-	public function resolve_author_member($post_arr, $field_name, $request) {
-		$data = $this->get_author_member($post_arr["id"]);
+	public function resolve_author_member($post_arr, $field_name, $request) {		
+		$author_id = get_post_field( 'post_author', $post_arr["id"]);
+		$data = $this->get_author_member($author_id);
 		return $data;
 	}	
 
@@ -372,8 +373,7 @@
 	 * @param Array $post_id
 	 * @return Array
 	 */
-	public function get_author_member($post_id) {
-		$author_id = get_post_field( 'post_author', $post_id);
+	public function get_author_member($author_id) {
 		$linked_member_id = get_user_meta($author_id, "linked_member", true);
 
 		if (is_array($linked_member_id) && count($linked_member_id) === 0) {
