@@ -83,7 +83,7 @@ export default {
 
   methods: {
     sendComment () {
-      let endPoint = this.baseEndpoint + '?post=' + this.postId
+      let endPoint = this.baseEndpoint + '?post=' + this.postId + '&order=asc'
       this.resource.$setEndpoint(endPoint)
       let content = this
       this.save().then(() => {
