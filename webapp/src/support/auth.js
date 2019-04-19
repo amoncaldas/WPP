@@ -21,8 +21,11 @@ const setUserAndRedirect = (context, userData, onAuthenticate) => {
  * @param {*} userData
  */
 const parseUserData = (userData) => {
+  // set user avatar
+  userData.avatar_url = userData.author_member && userData.author_member.featured_thumb_url ? userData.author_member.featured_thumb_url : userData.avatar_url
+
   // set the default display name
-  userData.displayName = userData.user_display_name
+  userData.displayName = userData.author_member && userData.author_member.title ? userData.author_member.title : userData.user_display_name
 
   // if display name is empty, tries to get from user nice name
   if (!userData.displayName) {
