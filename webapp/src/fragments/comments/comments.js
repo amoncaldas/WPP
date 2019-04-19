@@ -83,7 +83,7 @@ export default {
 
   methods: {
     sendComment () {
-      let endPoint = this.baseEndpoint + '?post=' + this.postId + '&order=asc'
+      let endPoint = this.baseEndpoint + '?post=' + this.postId
       this.resource.$setEndpoint(endPoint)
       let content = this
       this.save().then(() => {
@@ -136,7 +136,8 @@ export default {
       let filters = {
         post: this.postId,
         page: this.currentPage,
-        per_page: this.max
+        per_page: this.max,
+        order: + 'asc'
       }
       commentService.query(filters).then((response) => {
         context.comments = response
