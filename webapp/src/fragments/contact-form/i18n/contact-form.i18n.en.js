@@ -5,6 +5,9 @@ export default {
     processingYourMsg: 'Processing your message...',
     subject: 'Subject',
     yourMsg: 'Your message',
-    sendErrorMsg: 'An error has occurred while trying to send your message'
+    sendErrorMsg: 'An error has occurred while trying to send your message',
+    email: 'Your email',
+    name: 'Your name',
+    pleaseTypeAValidEmail: 'Plese type a valid email'
   }
 }

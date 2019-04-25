@@ -7,6 +7,21 @@
       <div slot="content">
         <v-form ref="form">
           <v-text-field :label="$t('contactForm.subject')" v-model="resource.subject" autofocus required></v-text-field>
+          <v-text-field
+            :label="$t('contactForm.name')"
+            ref="name"
+            class="name"
+            v-model="resource.name"
+            :counter="20">
+          </v-text-field>
+          <v-text-field
+            ref="email"
+            :label="$t('contactForm.email')"
+            class="user-email"
+            v-model="resource.email"
+            :rules="emailRules"
+            required>
+          </v-text-field>
           <v-textarea auto-grow class="contact-message" :height="$vuetify.breakpoint.mdAndUp ? 300 : 150" type="text" hide-details counter
             :label="$t('contactForm.yourMsg')" box
             :title="$t('contactForm.yourMsg')"
@@ -16,7 +31,7 @@
           <div class="contact-btn-container" v-if="ready">
             <v-btn color="secondary" left @click.native="submit">{{$t('global.send')}}</v-btn>
           </div>
-          <vue-recaptcha :sitekey="$store.getters.options.recaptcha_site_key"
+          <vue-recaptcha v-if="$store.getters.options.recaptcha_site_key" :sitekey="$store.getters.options.recaptcha_site_key"
             ref="recaptcha"
             size="invisible"
             @verify="onCaptchaVerified"

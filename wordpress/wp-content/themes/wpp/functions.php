@@ -49,16 +49,24 @@ function update_site_url() {
  */
 function get_request_locale() {
 	$locale = get_theme_default_locale();
-	if (isset($_GET["locale"])) {
-		$locale = $_GET["locale"];
-	} elseif (isset($_GET["l"])) {
-		$locale = $_GET["l"];
-	} elseif (isset($_SERVER["HTTP_LOCALE"])) {
-		$locale = $_SERVER["HTTP_LOCALE"];
+	$post_id = get_request_post_id();
+	if ($post_id) {
+		$content_lang_taxonomies = wp_get_post_terms($post_id, LOCALE_TAXONOMY_SLUG);
+		if( is_array($content_lang_taxonomies) && count($content_lang_taxonomies) > 0) {
+			$locale = $content_lang_taxonomies[0]->slug;
+		}
 	} else {
-		$browser_locale = get_browser_locale();
-		if (isset($browser_locale)) {
-			$locale = $browser_locale;
+		if (isset($_GET["locale"])) {
+			$locale = $_GET["locale"];
+		} elseif (isset($_GET["l"])) {
+			$locale = $_GET["l"];
+		} elseif (isset($_SERVER["HTTP_LOCALE"])) {
+			$locale = $_SERVER["HTTP_LOCALE"];
+		} else {
+			$browser_locale = get_browser_locale();
+			if (isset($browser_locale)) {
+				$locale = $browser_locale;
+			}
 		}
 	}
 	
@@ -516,6 +524,35 @@ function get_home_section($locale = null) {
 		return $home_sections[0];
 	} 
 	return $home_sections;
+}
+
+
+/**
+ * Get the post id of the request
+ *
+ * @return Integer|null
+ */
+function get_request_post_id() {
+	$REQUEST_URI = trim(strtok($_SERVER["REQUEST_URI"],'?'), "/");
+	if ($REQUEST_URI !== "/") {
+			$uri_parts = explode("/", $REQUEST_URI);
+			$last_uri_segment = $uri_parts[count($uri_parts) -1];
+			if(is_numeric($last_uri_segment)) {
+					return $last_uri_segment;
+			} else {
+					global $wpdb;
+					$sql = "SELECT ID FROM $wpdb->posts WHERE post_status = 'publish' && post_type = '".SECTION_POST_TYPE."' && post_name = '".$last_uri_segment."'";
+					$section_id = $wpdb->get_var($sql);	
+					if ($section_id > 0) {
+							return $section_id;
+					} else {
+							$page = get_page_by_path( $last_uri_segment);		
+							if ($page !== null) {
+									return $page->ID;
+							}
+					}
+			}
+	}
 }
 
 
