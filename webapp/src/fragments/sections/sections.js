@@ -27,7 +27,6 @@ export default {
   data () {
     return {
       sections: [],
-      total: null,
       totalPages: null,
       loaded: false
     }
