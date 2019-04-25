@@ -1,6 +1,7 @@
 import contactService from './contact-form-service'
 import VueRecaptcha from 'vue-recaptcha'
 import {CRUD, CRUDData} from '@/core/crud'
+import pattern from '@/support/pattern'
 
 export default {
   name: 'contact-form',
@@ -23,7 +24,11 @@ export default {
       ready: true
     }
   },
-
+  computed: {
+    emailRules () {
+      return [ !!this.resource.email && pattern.email.test(this.resource.email) || this.$t('contactForm.pleaseTypeAValidEmail') ]
+    },
+  },
   methods: {
     sendMsg () {
       this.save()

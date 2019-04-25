@@ -224,7 +224,7 @@ class WppNotifier  {
 
 
 	/**
-	 * Subscribe to notification list
+	 * Send a message to site admin
 	 *
 	 * @param Object $request
 	 * @return WP_REST_Response
@@ -236,7 +236,12 @@ class WppNotifier  {
 		if ($validCaptcha === true) {
 			$subject = $request->get_param('subject');
 			$message = $request->get_param('message');
-			if (isset($subject) && isset($message)) {
+			$email = $request->get_param('email');
+			$name = $request->get_param('name');			
+			
+			if (isset($subject) && isset($message) && isset($email)) {
+				$message .= "<br/>Name: $name";
+				$message .= "<br/>Email: $email";
 				WppMailer::notify_admin($subject, $message, get_default_locale());
 				return new WP_REST_Response(null, 204); // ACCEPTED/UPDATED, NO CONTENT TO RETURN
 			}

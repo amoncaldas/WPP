@@ -88,7 +88,7 @@
         $skeleton = str_replace("</head>", $head_inject, $skeleton);
         $title = get_bloginfo("name");
         $locale = get_request_locale();
-        $description = get_bloginfo("description");
+        $description = $this->get_site_description();
         $ext = "";
 
         $main_image_url = get_option("wpp_site_relative_logo_url");
@@ -97,13 +97,20 @@
             $ext = pathinfo($og_image_url, PATHINFO_EXTENSION);
         }
         
-        $post_id = $this->getPostId();
+        $post_id = get_request_post_id();
         if ($post_id) {
             $post = get_post($post_id);
             if ($post) {
                 $title = $post->post_title. " | ". $title;
                 $main_image_url = get_the_post_thumbnail_url($post_id);
-                $description = get_sub_content($post->post_content, 200);
+                $content = $post->post_content;
+                if (!$post->post_content || strlen($post->post_content) === 0) {
+                    $content = get_post_meta($post_id, "html_content", true);
+                }
+                $content = strip_tags(apply_filters('the_content', $content));
+                if ($content && strlen($content) > 0) {
+                    $description = get_sub_content($content, 160);
+                }
             }
         }
         $header_injection = "<title>$title</title>";  
@@ -126,6 +133,24 @@
 
         $skeleton = preg_replace("/<title[^>]*>.*?<\/title>/i", $header_injection, $skeleton);
         return $skeleton;
+    }
+
+    public function get_site_description () {
+        $description = get_bloginfo("description");
+        $locale = get_request_locale();
+
+        $dictionary = get_option("wpp_site_description_translations", "{}");
+        $dictionary = str_replace("\\", "", $dictionary);
+        $dictionary = json_decode($dictionary, true);
+    
+        if (!isset($dictionary[$locale])) {
+            return $description;
+        }
+        else {
+            return $dictionary[$locale];
+        }
+
+        return $description;
     }
 
     /**
@@ -356,34 +381,6 @@
         $sections = get_posts( array( 'post_type' => SECTION_POST_TYPE, 'post_name'  => $uri_parts[0]));		
         if (count($sections) > 0) {
             return $sections[0];
-        }
-    }
-
-    /**
-     * Get current url post ID
-     *
-     * @return Integer
-     */
-    public function getPostId() {
-        $REQUEST_URI = trim(strtok($_SERVER["REQUEST_URI"],'?'), "/");
-        if ($REQUEST_URI !== "/") {
-            $uri_parts = explode("/", $REQUEST_URI);
-            $last_uri_segment = $uri_parts[count($uri_parts) -1];
-            if(is_numeric($last_url_segment)) {
-                return $last_uri_segment;
-            } else {
-                global $wpdb;
-                $sql = "SELECT ID FROM $wpdb->posts WHERE post_status = 'publish' && post_type = '".SECTION_POST_TYPE."' && post_name = '".$last_uri_segment."'";
-                $section_id = $wpdb->get_var($sql);	
-                if ($section_id > 0) {
-                    return $section_id;
-                } else {
-                    $page = get_page_by_path( $last_uri_segment);		
-                    if ($page !== null) {
-                        return $page->ID;
-                    }
-                }
-            }
         }
     }
 }
