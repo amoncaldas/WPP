@@ -18,7 +18,7 @@
   <meta property="og:title" content="<?php echo WPP_TITLE; ?>"" />
   <meta property="og:image" content="<?php echo WPP_OG_URL; ?>" />
   <meta property="og:locale" content="<?php echo get_request_locale(); ?>" />
-  <meta property="og:description" content="<?php echo WPP_OG_URL; ?>" />
+  <meta property="og:description" content="<?php echo WPP_OG_DESCRIPTION; ?>" />
 	<link rel="image_src" type="image/<?php echo WPP_OG_IMAGE_EXT ?>" href="<?php echo WPP_OG_URL; ?>" />
 
 	<?php foreach (get_wpp_metas() as $key => $value) {
@@ -49,7 +49,7 @@
 					<?php else : ?>
 						<p ><a href="/?l=<?php echo get_request_locale() ?>" rel="home"><?php echo WPP_TITLE ?></a></p>
 					<?php endif;
-					?><p><?php bloginfo( 'description', 'display' ); ?></p>
+					?><p><?php echo WPP_OG_DESCRIPTION ?></p>
 				</div><!-- .site-branding -->			
 					<div>						
 						<nav role="navigation">
