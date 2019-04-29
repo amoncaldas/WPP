@@ -1,5 +1,9 @@
 <?php
- class AppRender {
+
+// Make sure that file.php is already included, because get_home_path dependes on it
+require_once(ABSPATH . 'wp-admin/includes/file.php');
+
+class AppRender {
     
     /**
      * render te html content according the audience
@@ -93,19 +97,29 @@
         $locale = get_request_locale();
         $description = $this->get_site_description();
         $ext = "";
-
-        $main_image_url = get_option("wpp_site_relative_logo_url");
-        if ($main_image_url && strlen($main_image_url) > 5) {
-            $main_image_url = network_site_url(trim($main_image_url));
-            $ext = pathinfo($og_image_url, PATHINFO_EXTENSION);
-        }
+        $main_img_width = "";
+        $main_img_height = "";
+        $main_image_url = "";
         
         $post_id = get_request_post_id();
         if ($post_id) {
             $post = get_post($post_id);
             if ($post) {
                 $title = $post->post_title. " | ". $title;
-                $main_image_url = get_the_post_thumbnail_url($post_id);
+
+                if (has_post_thumbnail($post_id)) {
+                    $image = wp_get_attachment_image_src( get_post_thumbnail_id($post_id),'medium');
+                    if ( is_array($image) && count($image) >= 3) {
+                        $main_image_url = $image[0];
+                        $main_img_width = $image[1];
+                        $main_img_height = $image[2];
+                    }
+
+                    if ($main_image_url && strlen($main_image_url) > 5) {
+                        $ext = pathinfo($main_image_url, PATHINFO_EXTENSION);
+                    }
+                }
+
                 $content = $post->post_content;
                 if (!$post->post_content || strlen($post->post_content) === 0) {
                     $content = get_post_meta($post_id, "html_content", true);
@@ -115,12 +129,22 @@
                     $description = get_sub_content($content, 160);
                 }
             }
+        } else {
+            $main_image_url = get_option("wpp_site_relative_logo_url");
+            if ($main_image_url && strlen($main_image_url) > 5) {
+                $full_img_path = "/".trim(get_home_path(), "/").$main_image_url;
+                list($main_img_width, $main_img_height) = getimagesize($full_img_path);
+                $main_image_url = network_site_url(trim($main_image_url));
+                $ext = pathinfo($main_image_url, PATHINFO_EXTENSION);
+            }
         }
         $header_injection = "<title>$title</title>";  
         $header_injection = "<link rel='manifest' href='/manifest.json'>";        
         $header_injection .= "<link rel='image_src' type='image/$ext' href='$main_image_url' />";
         $header_injection .= "<meta property='og:title' content='$title' />";        
         $header_injection .= "<meta property='og:image' content='$main_image_url' />";
+        $header_injection .= "<meta property='og:image:width' content='$main_img_width' />";
+        $header_injection .= "<meta property='og:image:height' content='$main_img_height' />";
         $header_injection .= "<meta property='og:locale' content='$locale' />";
         $header_injection .= "<meta property='og:description' content='$description' />";
 
@@ -138,6 +162,11 @@
         return $skeleton;
     }
 
+    /**
+     * Retrieve the site description considering the current request locale
+     *
+     * @return String $description
+     */
     public function get_site_description () {
         $description = get_bloginfo("description");
         $locale = get_request_locale();

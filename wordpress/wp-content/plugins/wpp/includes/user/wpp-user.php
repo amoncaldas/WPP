@@ -21,9 +21,11 @@ class WppUser {
      * @return WP_User|false
      */
     public function after_determine_user($wp_user, $username, $password) {        
-        $status = get_user_meta($wp_user->ID, "status", true);
-        if ($status === "pending") {
-            return false;
+        if (!is_wp_error($wp_user) ) {
+            $status = get_user_meta($wp_user->ID, "status", true);
+            if ($status === "pending") {
+                return false;
+            }
         }
         return $wp_user;
     }
