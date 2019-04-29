@@ -11,6 +11,7 @@
               v-model="term"
               @keyup="search"
               hide-details
+              @click:append="search"
               append-icon="search">
             </v-text-field>
         </v-flex>

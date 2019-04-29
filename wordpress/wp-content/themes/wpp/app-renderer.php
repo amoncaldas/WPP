@@ -77,6 +77,9 @@
         $skeleton = str_replace("=static/", "=/static/", $skeleton);
         $all_options = wp_load_alloptions();
 
+        $locale = get_request_locale();
+        $skeleton = str_replace("<html>", "<html lang='$locale'>", $skeleton);
+
         $head_inject = "";
         foreach ($all_options as $key => $value) {
             if ( strpos($key, "wpp_meta_") === 0) {
@@ -220,7 +223,7 @@
         } else { // if not, or we are in an archive or it is 404
             if (defined('RENDER_ARCHIVE_POST_TYPE')){
                 $this->set_default_og_image_constants();
-                define('WPP_OG_DESCRIPTION', get_bloginfo("description"));
+                define('WPP_OG_DESCRIPTION', $this->get_site_description());
                 require_once("archive.php");
             } else {
                 require_once("404.php");
@@ -281,11 +284,11 @@
             $description = get_sub_content($content, 200);
             define('WPP_OG_DESCRIPTION', $description);     
         } else {
-            define('WPP_OG_DESCRIPTION', get_bloginfo("description"));
+            define('WPP_OG_DESCRIPTION', $this->get_site_description());
         }  
 
         $featured_image_url = get_the_post_thumbnail_url($post->ID);
-        if ($featured_image)  {
+        if ($featured_image_url)  {
             define('WPP_OG_URL', $featured_image_url);
         } else {
             $this->set_default_og_image_constants();
