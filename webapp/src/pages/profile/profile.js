@@ -14,6 +14,6 @@ export default {
     }
     // emit the an event catch by root App component
     // telling it to update the page title
-    this.eventBus.$emit('titleChanged', this.$t('profile.pageTitle'))
+    this.eventBus.$emit('titleChanged', this.$t('myAccount.pageTitle'))
   }
 }

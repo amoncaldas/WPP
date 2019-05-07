@@ -6,7 +6,10 @@
  *
  */
 
- class WpWebAppTheme {
+// Require WP_Rest_Cache_Plugin caching class
+use \WP_Rest_Cache_Plugin\Includes\Caching\Caching;
+
+class WpWebAppTheme {
 	public $section_type_field_slug = "section_type";
 	public $section_type_home_field_value = "home";
 	public $WPP_SKIP_AFTER_SAVE = false;
@@ -26,6 +29,7 @@
 	 */
 	public function register_hooks() {
 		add_action('wp_insert_post', array($this,'after_save_content'), 10, 2 );
+		add_action('save_post', array($this,'wpp_clear_listing_wp_rest_cache'), 10, 2 );
 		add_filter('request', array($this, 'set_feed_types'));
 		add_action('init', array($this, 'make_sure_locale_exists'), 11);
 		add_action('init', array($this, 'make_sure_home_section_exists'), 12);
@@ -39,8 +43,27 @@
 		add_filter('page_link', array($this, 'set_page_permalink'), 10, 2);
 		add_filter('preview_page_link', array($this, 'set_page_preview_permalink'), 10, 2);
 		add_action("pre_post_update", array($this, 'before_update_draft_post'), 9, 2);
-		add_action( 'admin_enqueue_scripts', array($this, 'may_disable_autosave'));
-		add_filter( 'rest_prepare_comment', array($this, 'filter_rest_prepare_comment'), 10, 3 );		
+		add_action('admin_enqueue_scripts', array($this, 'may_disable_autosave'));
+		add_filter('rest_prepare_comment', array($this, 'filter_rest_prepare_comment'), 10, 3 );		
+	}
+
+	/**
+	 * Try to remove listing post type endpoint cache on save post
+	 *
+	 * @param [type] $post_id
+	 * @param [type] $post
+	 * @return void
+	 */
+	public function wpp_clear_listing_wp_rest_cache ($post_id, $post) {
+		if (is_plugin_active("wp-rest-cache/wp-rest-cache.php")) {			
+			$post_type_object = get_post_type_object($post->post_type);
+			$rest_base = $post_type_object->rest_base;
+			$locale = $this->get_post_locale($post->to_array());
+			$endpoint = "/wp-json/wp/v2/$rest_base?_embed=&l=$locale";
+
+			$cachingPlugin = Caching::get_instance();
+			$cachingPlugin->delete_cache_by_endpoint($endpoint, $cachingPlugin::FLUSH_PARAMS, false); // FLUSH_PARAMS or FLUSH_LOOSE
+		}
 	}
 
 	/**

@@ -36,8 +36,9 @@ export default {
       return this.title || this.$t('sections.title')
     },
     total () {
+      let currentLocale = this.$store.getters.locale
       let total = this.lodash.filter(this.$store.getters.sections, (s) => {
-        return s.path !== '/'
+        return s.path !== '/' && s.locale === currentLocale && !s.extra.not_listed
       })
       return total
     }
@@ -45,8 +46,9 @@ export default {
 
   methods: {
     loadSections () {
+      let currentLocale = this.$store.getters.locale
       let sections = this.lodash.filter(this.$store.getters.sections, (s) => {
-        return s.path !== '/'
+        return s.path !== '/' && s.locale === currentLocale && !s.extra.not_listed
       })
       if (this.max !== -1) {
         sections = sections.slice(0, this.max)
