@@ -303,6 +303,7 @@ Possible section extras:
 - places (array of posts)
 - has_section_map (boolean)
 - max_listing_posts (integer)
+- not_listed (boolean)
 
 Attachment extras:
 

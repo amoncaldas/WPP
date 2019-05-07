@@ -4,11 +4,11 @@
       <v-layout child-flex>
         <v-flex xs12>
           <box>
-            <h1 slot="header">{{ $t('profile.title') }}</h1>
+            <h1 slot="header">{{ $t('myAccount.pageTitle') }}</h1>
             <div slot="content">
               <v-tabs class="tab app-tab" v-model="activeTab" slider-color="secondary">
                 <v-tab ripple :key="0" >
-                  {{$t('profile.profile')}}
+                  {{$t('myAccount.profile')}}
                 </v-tab>
                 <v-tab-item :key="0">
                   <user-profile></user-profile>
