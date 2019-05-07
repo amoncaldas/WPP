@@ -1,7 +1,6 @@
 export default {
-  profile: {
-    title: 'Perfil',
-    pageTitle: 'Perfil',
-    profile: 'Perfil'
+  myAccount: {
+    profile: 'Perfil',
+    pageTitle: 'Minha conta'
   }
 }

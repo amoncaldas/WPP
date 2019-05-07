@@ -1,5 +1,8 @@
 <?php
 
+  // Require WP_Rest_Cache_Plugin caching class
+  use \WP_Rest_Cache_Plugin\Includes\Caching\Caching;
+
 	class WppServicesApi {
 		
 		function __construct() {
@@ -48,9 +51,27 @@
       $validCaptcha = validate_captcha($recaptchaToken);
       
       if ($validCaptcha === true) {
+        $this->clear_comments_wp_rest_cache($prepared_comment);
         return $prepared_comment;
       }
       return new WP_Error( 'invalid_captcha', "invalid_captcha" );  
+    }
+
+    /**
+     * Remove comments wp rest cache
+     *
+     * @param [type] $prepared_comment
+     * @return void
+     */
+    public function clear_comments_wp_rest_cache ($prepared_comment) {
+      if (class_exists("\WP_Rest_Cache_Plugin\Includes\Caching\Caching")) {			
+        $locale = get_request_locale(); // wpp theme function
+        $post_id = $prepared_comment["comment_post_ID"];    
+        $endpoint = "/wp-json/wp/v2/comments?l=$locale&order=asc&page=1&per_page=10&post=$post_id";
+  
+        $cachingPlugin = Caching::get_instance();
+        $cachingPlugin->delete_cache_by_endpoint($endpoint, $cachingPlugin::FLUSH_PARAMS, false); // FLUSH_PARAMS or FLUSH_LOOSE
+      }
     }
 
     /**

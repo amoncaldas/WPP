@@ -5,7 +5,7 @@
      <contact-form></contact-form>
     </v-flex>
     <v-flex md3 >
-      <sections :random="true"></sections>
+      <sections></sections>
     </v-flex>
   </v-layout>
 </v-container>
