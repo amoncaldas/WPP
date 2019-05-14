@@ -928,7 +928,7 @@ class WpWebAppTheme {
 		
 		$insert_image_as_base64_in_editor = get_option("wpp_insert_image_as_base64_in_editor", "no");
 
-		if(is_array($src_data) && $insert_image_as_base64_in_editor) {
+		if(is_array($src_data) && $insert_image_as_base64_in_editor === "yes") {
 			$src_url =  $src_data[0];
 			$relative_src = str_replace(network_home_url(), "", $src_url);
 			$local_path = $_SERVER["DOCUMENT_ROOT"].$relative_src;			
