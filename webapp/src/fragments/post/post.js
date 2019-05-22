@@ -135,7 +135,7 @@ export default {
       return this.formatDateTime(postDate)
     },
     commentsTabTitle () {
-      let title = this.post.comments_count > 0 ? `${this.$t('post.comments')} (${this.post.comments_count})` : $t('post.comments')
+      let title = this.post.comments_count > 0 ? `${this.$t('post.comments')} (${this.post.comments_count})` : this.$t('post.comments')
       return title
     }
   },
