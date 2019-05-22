@@ -66,7 +66,6 @@
         <br><br>
         <sharer :title="title" :path="post.path" ></sharer>
         <br>
-        <author-and-place mode="bio" v-if="showSingleBottomAuthor" :post="post"> </author-and-place>
       </template>
       <template v-else>
         <div v-if="post.locale !== 'neutral' && post.locale !== $store.getters.locale" class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': $vuetify.theme.accent}"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>
@@ -106,13 +105,13 @@
         {{ $t('post.related') }}
       </v-tab>
       <v-tab ripple>
-        {{$t('post.comments')}}
+        {{commentsTabTitle}}
       </v-tab>
       <v-tab-item v-if="!renderAsPage">
         <related :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :content-id="post.id" :max="6"> </related>
       </v-tab-item>
       <v-tab-item>
-        <comments :open="post.comment_status === 'open'" :post-id="post.id"></comments>
+        <comments @commentsCountUpdated="commentsCountUpdated" :open="post.comment_status === 'open'" :post-id="post.id"></comments>
       </v-tab-item>
     </v-tabs>
   </template>

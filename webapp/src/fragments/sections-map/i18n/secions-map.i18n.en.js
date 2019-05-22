@@ -1,6 +1,6 @@
 export default {
   sectionsMap: {
-    title: 'Destinations',
+    title: 'Places',
     duration: 'Duration: ',
     distance: 'Distance: ',
     days: 'd',

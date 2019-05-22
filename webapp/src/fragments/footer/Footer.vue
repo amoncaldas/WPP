@@ -9,7 +9,7 @@
        <v-flex xs12>
           <p>
             <span>&nbsp;© {{currentYear}} <strong>{{footerMainSiteName}}</strong></span>
-            <span class="hidden-sm-and-down"> | {{ $t('global.developedByIntro') }}
+            <span v-if="!$store.getters.options.hide_developedby" class="hidden-sm-and-down"> | {{ $t('global.developedByIntro') }}
               <strong>
                 <a class="hidden-sm-and-down" target="_blank" :href="developedByLink">{{ $t('global.developedBy') }}</a>
               </strong>

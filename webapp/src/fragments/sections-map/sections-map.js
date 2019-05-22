@@ -9,7 +9,12 @@ import { LMap, LTileLayer, LMarker, LTooltip, LPopup, LControlZoom, LControlAttr
 import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
 
-import theme from '@/common/theme'
+import * as L from 'leaflet'
+import { GestureHandling } from "leaflet-gesture-handling";
+import "leaflet/dist/leaflet.css";
+import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
+
+L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
 
 const tileProviders = [
   {
@@ -78,6 +83,12 @@ export default {
     boxCreated (guid) {
       this.boxGuid = guid
     },
+    sectionFeaturedImage (marker) {
+      let sectionFeaturedImage = this.lodash.get(marker, 'data._embedded.wp:featuredmedia[0].media_details.sizes.thumbnail.source_url')
+      if (sectionFeaturedImage) {
+        return sectionFeaturedImage
+      }
+    },
     loadMapData () {
       this.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
       this.mapData = { markers: GeoUtils.buildMarkers(this.getMarkersData(), false, {mapIconUrl: this.$store.getters.options.map_icon_url}) }
@@ -97,9 +108,10 @@ export default {
         this.$store.getters.sections.forEach(section => {
           for (let placeKey in section.places) {
             let place = section.places[placeKey]
-            if (place.markers.length > 0) {
+            if (place.markers && place.markers.length > 0) {
               let location = place.markers[0]
-              markersData.push([location.lng, location.lat, section.title.rendered, section])
+              let sectionTitle = `${section.title.rendered} (${section.locale})`
+              markersData.push([location.lng, location.lat, sectionTitle, section])
             }
           }
         })
@@ -120,29 +132,19 @@ export default {
         }, 10)
       })
     },
-    fitFeaturesBounds (enableScrollWheelZoom = false) {
+    fitFeaturesBounds () {
       let context = this
       return new Promise((resolve, reject) => {
         // If te map object is already defined
         // then we can directly access it
         if (context.map) {
           context.map.fitBounds(context.dataBounds, {padding: [20, 20]})
-          if (!enableScrollWheelZoom) {
-            context.map.scrollWheelZoom.disable()
-          } else {
-            context.map.scrollWheelZoom.enable()
-          }
         } else {
           // If not, it wil be available only in the next tick
           this.$nextTick(() => {
             if (context.$refs.map) {
               context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
               context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
-              if (!enableScrollWheelZoom) {
-                context.map.scrollWheelZoom.disable()
-              } else {
-                context.map.scrollWheelZoom.enable()
-              }
             }
             resolve()
           })
@@ -172,7 +174,7 @@ export default {
             setTimeout(() => {
               // After redrawing and waiting
               // fit the bounds
-              this.fitFeaturesBounds(data.maximized)
+              this.fitFeaturesBounds()
             }, 500)
           })
         }, 500)
