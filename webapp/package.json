@@ -18,6 +18,7 @@
     "babel-plugin-prismjs": "^1.0.2",
     "chart.js": "^2.7.2",
     "html-colors": "0.0.4",
+    "leaflet-gesture-handling": "^1.1.8",
     "prismjs": "^1.15.0",
     "vee-validate": "^2.0.6",
     "vue": "^2.5.21",

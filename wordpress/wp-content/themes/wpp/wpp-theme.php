@@ -249,7 +249,7 @@ class WpWebAppTheme {
 					},
 					'schema' => null,
 				)
-			);
+			);		
 		}
 	}
 
