@@ -8,7 +8,13 @@
 import { LMap, LPolyline, LTileLayer, LMarker, LTooltip, LPopup, LControlZoom, LControlAttribution, LControlScale, LControlLayers, LLayerGroup } from 'vue2-leaflet'
 import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
-import theme from '@/common/theme'
+
+import * as L from 'leaflet'
+import { GestureHandling } from "leaflet-gesture-handling";
+import "leaflet/dist/leaflet.css";
+import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
+
+L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
 
 const tileProviders = [
   {
@@ -148,31 +154,20 @@ export default {
     },
     /**
      * Fit on the map elements in the current map view/zool
-     * @param {*} enableScrollWheelZoom
      */
-    fitFeaturesBounds (enableScrollWheelZoom = false) {
+    fitFeaturesBounds () {
       let context = this
       return new Promise((resolve, reject) => {
         // If te map object is already defined
         // then we can directly access it
         if (context.map) {
           context.map.fitBounds(context.dataBounds, {padding: [20, 20]})
-          if (!enableScrollWheelZoom) {
-            context.map.scrollWheelZoom.disable()
-          } else {
-            context.map.scrollWheelZoom.enable()
-          }
         } else {
           // If not, it wil be available only in the next tick
           this.$nextTick(() => {
             if (context.$refs.map) {
               context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
               context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
-              if (!enableScrollWheelZoom) {
-                context.map.scrollWheelZoom.disable()
-              } else {
-                context.map.scrollWheelZoom.enable()
-              }
             }
             resolve()
           })
@@ -206,7 +201,7 @@ export default {
             setTimeout(() => {
               // After redrawing and waiting
               // fit the bounds
-              this.fitFeaturesBounds(data.maximized) // if is maximized, we can leve the scroll enable
+              this.fitFeaturesBounds()
             }, 500)
           })
         }, 500)

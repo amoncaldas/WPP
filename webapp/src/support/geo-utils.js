@@ -74,7 +74,7 @@ const geoUtils = {
         marker.label = `${wayPoint[0]}, ${wayPoint[1]}`
       }
       // if the way point array has the fourth parameter, it is its way point json data
-      if (wayPoint[3]) { marker.json = wayPoint[3] }
+      if (wayPoint[3]) { marker.data = wayPoint[3] }
 
       // Add the markers to the returning array
       markers.push(marker)

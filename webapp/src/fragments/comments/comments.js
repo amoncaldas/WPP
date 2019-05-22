@@ -145,6 +145,7 @@ export default {
           context.comments = response.data
           context.total = Number(response.headers['x-wp-total'])
           context.totalPages = Number(response.headers['x-wp-totalpages'])
+          this.$emit('commentsCountUpdated', context.total)
         }
       }).catch(error => {
         console.log(error)

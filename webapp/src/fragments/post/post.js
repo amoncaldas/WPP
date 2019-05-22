@@ -19,6 +19,7 @@ export default {
       this.renderAsPage = true
     }
     this.post = this.postData
+    this.comments_count = 0
 
     this.loadAddings()
   },
@@ -129,12 +130,13 @@ export default {
       }
       return this.post.type
     },
-    showSingleBottomAuthor () {
-      return !this.renderAsPage && !this.post.extra.hide_author_bio
-    },
     postDate () {
       let postDate = this.post.extra.custom_post_date || this.post.date
       return this.formatDateTime(postDate)
+    },
+    commentsTabTitle () {
+      let title = this.post.comments_count > 0 ? `${this.$t('post.comments')} (${this.post.comments_count})` : $t('post.comments')
+      return title
     }
   },
   methods: {
@@ -143,6 +145,9 @@ export default {
     },
     formatDateTime (date) {
       return utils.getFormattedDateTime(date)
+    },
+    commentsCountUpdated (amount) {
+      this.post.comments_count = amount
     },
     placeClicked (place) {
       if (place && place.link) {
