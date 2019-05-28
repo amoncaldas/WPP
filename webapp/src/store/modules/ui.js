@@ -80,9 +80,18 @@ const actions = {
   autoSetLocale ({commit}) {
     return new Promise((resolve) => {
       let locale = localStorage.getItem('locale') || window.navigator.language || window.navigator.userLanguage
-      let validLocale = locale && appConfig.validLocales.includes(locale)
-      if (!validLocale) {
-        locale = appConfig.defaultLocale
+      if (locale) {
+        locale = locale.toLowerCase()
+      }
+      let isLocaleValid = locale && appConfig.validLocales.includes(locale)
+      if (!isLocaleValid) {
+        // Check if the browser supports the app default locale
+        // If supports, define it as the locale
+        if (window.navigator.languages.includes(appConfig.defaultLocale)) {
+          locale = appConfig.defaultLocale
+        } else { // If not, try to use the english (if supported) or fall back to the default
+          locale = appConfig.validLocales.includes('en-us') ? 'en-us' : appConfig.defaultLocale
+        }
       }
       localStorage.setItem('locale', locale)
       commit('locale', locale)

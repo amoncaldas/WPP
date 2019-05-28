@@ -179,7 +179,7 @@ function register_custom_types () {
 		'show_ui' => true,
 		'show_in_nav_menus' => true,
 		'show_in_rest' => true,
-		'rest_base' => 'sections',
+		'rest_base' => strtolower(SECTION_POST_TYPE)."s",
 		'map_meta_cap' => true,
 		'has_archive' => false,
 		'exclude_from_search' => false,

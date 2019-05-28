@@ -53,30 +53,32 @@ const routes = {
       let sectionEndPoints = wppRouter.getSectionEndpoints()
       sectionEndPoints.forEach(sectionEndPoint => {
         sectionEndPoint = sectionEndPoint.replace(regex, '')
-        routes.push(
-          {
-            path: `/${sectionEndPoint}/:postName`,
-            component: Page,
-            beforeEnter: (to, from, next) => {
-              let currentSection = Section.getCurrentSection()
-              store.commit('currentSection', currentSection)
-              store.commit('postTypeEndpoint', 'pages')
-              next()
+        if (sectionEndPoint && sectionEndPoint !== '') {
+          routes.push(
+            {
+              path: `/${sectionEndPoint}/:postName`,
+              component: Page,
+              beforeEnter: (to, from, next) => {
+                let currentSection = Section.getCurrentSection()
+                store.commit('currentSection', currentSection)
+                store.commit('postTypeEndpoint', 'pages')
+                next()
+              }
             }
-          }
-        )
-        routes.push(
-          {
-            path: `/${sectionEndPoint}/:parentPage/:postName`,
-            component: Page,
-            beforeEnter: (to, from, next) => {
-              let currentSection = Section.getCurrentSection()
-              store.commit('currentSection', currentSection)
-              store.commit('postTypeEndpoint', 'pages')
-              next()
+          )
+          routes.push(
+            {
+              path: `/${sectionEndPoint}/:parentPage/:postName`,
+              component: Page,
+              beforeEnter: (to, from, next) => {
+                let currentSection = Section.getCurrentSection()
+                store.commit('currentSection', currentSection)
+                store.commit('postTypeEndpoint', 'pages')
+                next()
+              }
             }
-          }
-        )
+          )
+        }
       })
     }
 
