@@ -12,37 +12,54 @@ const routes = {
 
     postTypeEndpoints.forEach(postTypeEndpoint => {
       let postTypeEndpointUrl = postTypeEndpoint.path.replace(regex, '')
-      routes.push(
-        {
-          path: `/${postTypeEndpointUrl}`,
-          component: Archive,
-          beforeEnter: (to, from, next) => {
-            let currentSection = Section.getCurrentSection()
-            store.commit('currentSection', currentSection)
-            store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
-            next()
-          }
-        }
-      )
-      let sections = wppRouter.getSections(false)
-
-      sections.forEach(section => {
-        let sectionEndPoint = section.path.replace(regex, '')
+      let archiveHasASection = isArchiveOverwrittenBySectionSingle(postTypeEndpointUrl)
+      if (!archiveHasASection) {
         routes.push(
           {
-            path: `/${sectionEndPoint}/${postTypeEndpointUrl}`,
+            path: `/${postTypeEndpointUrl}`,
             component: Archive,
             beforeEnter: (to, from, next) => {
-              store.commit('currentSection', section)
+              let currentSection = Section.getCurrentSection()
+              store.commit('currentSection', currentSection)
               store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
               next()
             }
           }
         )
-      })
+        let sections = wppRouter.getSections(false)
+
+        sections.forEach(section => {
+          let sectionEndPoint = section.path.replace(regex, '')
+          if (sectionEndPoint && sectionEndPoint !== '') {
+            routes.push(
+              {
+                path: `/${sectionEndPoint}/${postTypeEndpointUrl}`,
+                component: Archive,
+                beforeEnter: (to, from, next) => {
+                  store.commit('currentSection', section)
+                  store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
+                  next()
+                }
+              }
+            )
+          }
+        })
+      }
     })
     return routes
   }
+}
+
+const isArchiveOverwrittenBySectionSingle = (endpoint) => {
+  var regex = new RegExp('/', 'g')
+  for (let key in store.getters.sections) {
+    let section = store.getters.sections[key]
+    let sectionEndPoint = section.path.replace(regex, '')
+    if (sectionEndPoint === endpoint) {
+      return true
+    }
+  }
+  return false
 }
 
 const archiveRoutes = routes.get()

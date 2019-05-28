@@ -24,7 +24,7 @@
           <br :key="postType.endpoint + 'br'">
         </template>
         <template v-else>
-          <posts :max="max" :parent-id="currentSection.id" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" :endpoint="postType.endpoint" :title="postType.title"></posts>
+          <posts :max="max" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" :endpoint="postType.endpoint" :title="postType.title"></posts>
         </template>
       </template>
     </template>

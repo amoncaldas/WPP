@@ -1,7 +1,7 @@
 <template>
 <v-container grid-list-lg fluid class="page-root single" >
   <v-layout row wrap>
-    <v-flex md9 v-bind="{[ hasSidebar? 'md9' : 'md12']: true }" >
+    <v-flex v-bind="{[ hasSidebar? 'md9' : 'md12']: true }" >
       <not-found-component v-if="notFound"></not-found-component>
       <post v-else-if="loaded" :post-data="post" mode="single"></post>
     </v-flex>

@@ -34,7 +34,9 @@ export default {
       this.$store.commit('currentSection', this.currentSection)
       this.listingPosts = Section.getListingPosts()
       this.compactListingPosts = Section.getCompactListingPosts()
-      this.eventBus.$emit('setLocaleFromContentLocale', this.currentSection.locale)
+      if (this.currentSection.locale !== 'neutral') {
+        this.eventBus.$emit('setLocaleFromContentLocale', this.currentSection.locale)
+      }
     },
     placeClicked (place) {
       if (place && place.link) {

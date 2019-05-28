@@ -259,6 +259,8 @@ All WPP Options starts with `wpp_` prefix, except:
 Options with `wpp_` prefix that is not present by default:
 
 - wpp_signup_with_github
+- archive_sections_sidebar
+- hide_developedby
 
 ## ACF extras ##
 
