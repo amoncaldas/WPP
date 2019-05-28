@@ -292,16 +292,18 @@ class WpWebAppTheme {
 		$post_type = $query->query["post_type"];
 
 		if ($post_type !== SECTION_POST_TYPE) {
-			// Pages are found without id, quering by slug. In this case, we 
+			
 			if (in_array($post_type, $public_post_types)) {
 				$request_locale = get_request_locale();
 				$tax_query = [];
-				if ($post_type !== "page" || !isset($_GET["slug"])) {
+				
+				// Does not apply locale filter for pages and if the locale is neutral
+				if ($request_locale !== "neutral" && $post_type !== "page" || !isset($_GET["slug"])) {
 					$locale_query = array (
 						array(
 							'taxonomy' => LOCALE_TAXONOMY_SLUG,
 							'field' => 'slug',
-							'terms' => [$request_locale, "neutral"]
+							'terms' => [$request_locale, "neutral"] // bring the content that has the same locale or are neutral
 						)
 					);
 					$tax_query[] = $locale_query;
