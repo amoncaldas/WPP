@@ -5,7 +5,7 @@ import Vue from '@/common/vue-with-vuetify.js'
 import App from '@/App'
 import routerBuilder from '@/router'
 import store from '@/store/store'
-import i18n from '@/i18n/locale'
+import locale from '@/i18n/locale'
 import topBorder from '@/directives/top-border'
 import title from '@/directives/title'
 import lang from '@/directives/lang'
@@ -86,6 +86,7 @@ Vue.filter('capitalize', capitalize)
 let VueInstance = null
 
 wppRouter.resolveDependencies().then(() => {
+  let i18n = locale.get()
   let router = routerBuilder.getRouter()
   router.loadRoutes()
 

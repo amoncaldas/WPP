@@ -4,9 +4,7 @@ const config = {
   baseWpApiPath: 'wp/v2/',
   mainMenuSlug: 'primary_menu_',
   secondaryMenu: 'secondary_menu_',
-  setCustomMenuIcons: true,
-  defaultLocale: 'pt-br',
-  validLocales: ['en-us', 'pt-br']
+  setCustomMenuIcons: true
 }
 
 config.getBaseUrl = () => {
