@@ -53,7 +53,6 @@ export default {
       }
       if (this.locales.length === 1) {
         this.currentLocale = this.locales[0]
-        this.afterLocaleUpdate()
       }
     },
     setFromUrl () {
