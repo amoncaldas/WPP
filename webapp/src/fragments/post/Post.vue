@@ -89,12 +89,18 @@
             <author-and-place v-if="!renderAsPage" :post="post"> </author-and-place>
           </div>
         </template>
-        <span v-if="showType">
-          <v-chip :title="$t('post.contentType')" >{{type | capitalize}}</v-chip>
-        </span>
-        <div style="text-align:right" v-if="!post.extra.no_link" :style="{float:showType ? 'right' : 'none'}">
-          <v-btn style="margin-left:0px" :href="buildLink(link)" :target="post.extra.target_blank ? '_blank' : '_self'" :title="$t('post.readMore')" flat ><b>{{ $t('post.readMore')}}</b></v-btn>
-        </div>
+        <v-layout row wrap>
+          <template>
+            <v-flex v-if="showType">
+              <v-chip :title="$t('post.contentType')" >{{type | capitalize}}</v-chip>
+            </v-flex>
+            <v-flex>
+              <div style="text-align:right" v-if="!post.extra.no_link" :style="{float:showType ? 'right' : 'none'}">
+                <v-btn style="margin-left:0px" :href="buildLink(link)" :target="post.extra.target_blank ? '_blank' : '_self'" :title="$t('post.readMore')" flat ><b>{{ $t('post.readMore')}}</b></v-btn>
+              </div>
+            </v-flex>
+          </template>
+        </v-layout>
       </template>
     </div>
   </box>

@@ -7,7 +7,7 @@ const section = {
     let currentSection = section.getCurrentSection()
     let VueInstance = Main.getInstance()
 
-    if (Array.isArray(currentSection.extra.list_post_endpoints)) {
+    if (currentSection && Array.isArray(currentSection.extra.list_post_endpoints)) {
       let translations = store.getters.options.post_type_translations
 
       currentSection.extra.list_post_endpoints.forEach(endpoint => {
@@ -31,7 +31,7 @@ const section = {
     let currentSection = section.getCurrentSection()
     let VueInstance = Main.getInstance()
 
-    if (Array.isArray(currentSection.extra.compact_list_post_endpoints)) {
+    if (currentSection && Array.isArray(currentSection.extra.compact_list_post_endpoints)) {
       let translations = store.getters.options.post_type_translations
 
       currentSection.extra.compact_list_post_endpoints.forEach(endpoint => {

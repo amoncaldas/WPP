@@ -1,4 +1,5 @@
 import store from '@/store/store'
+import appConfig from '@/config'
 
 const wppRouter = {
   getSectionEndpoints: () => {
@@ -69,10 +70,14 @@ const wppRouter = {
   resolveDependencies: () => {
     return new Promise((resolve) => {
       let promise1 = store.dispatch('fetchSections')
-      let promise2 = store.dispatch('fetchOptions')
-      let promise3 = store.dispatch('autoSetLocale')
-      Promise.all([promise1, promise2, promise3]).then((data) => {
-        resolve(data)
+      let promise2 = null
+      store.dispatch('fetchOptions').then(() => {
+        appConfig.defaultLocale = store.getters.options.defaultLocale
+        appConfig.validLocales = store.getters.options.locales
+        promise2 = store.dispatch('autoSetLocale')
+        Promise.all([promise1, promise2]).then((data) => {
+          resolve(data)
+        })
       })
     })
   }
