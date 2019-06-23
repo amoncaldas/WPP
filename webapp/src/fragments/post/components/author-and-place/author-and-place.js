@@ -47,7 +47,7 @@ export default {
       }
     },
     place () {
-      if (typeof this.post.extra.has_places && Object.keys(this.post.places).length > 0) {
+      if (this.post.extra.has_places && Object.keys(this.post.places).length > 0) {
         let placeKeys = Object.keys(this.post.places)
         let lastKey = placeKeys[placeKeys.length -1]
         let lastPlace = this.post.places[lastKey]
