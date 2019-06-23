@@ -233,15 +233,16 @@ class WpWebAppTheme {
 					'schema' => null,
 				)
 			);
-			register_rest_field($post_type, 'places',
-				array(
-					'get_callback'  => function ($post, $field_name, $request) {
-						return $this->resolve_places($post, $field_name, $request);
-					},
-					'schema' => null,
-				)
-			);
-
+			if (post_type_exists("place") === true && $post_type !== "place") {
+				register_rest_field($post_type, 'places',
+					array(
+						'get_callback'  => function ($post, $field_name, $request) {
+							return $this->resolve_places($post, $field_name, $request);
+						},
+						'schema' => null,
+					)
+				);
+			}
 			register_rest_field($post_type, 'author_member',
 				array(
 					'get_callback'  => function ($post, $field_name, $request) {

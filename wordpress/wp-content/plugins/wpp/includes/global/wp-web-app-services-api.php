@@ -111,8 +111,10 @@
       }
       $wpp_options["site_title"] = get_bloginfo("name");
       $wpp_options["comment_order"] = get_option("comment_order");
-      
-      $wpp_options["locales"] = get_terms( array('taxonomy' => LOCALE_TAXONOMY_SLUG, 'hide_empty' => false, 'orderby' => 'id', 'order' => 'ASC'));
+
+      // Add locale options
+      $wpp_options["defaultLocale"] = get_theme_default_locale(); // wpp theme public function
+      $wpp_options["locales"] = get_wpp_locales(); // wpp theme public function
       return new WP_REST_Response($wpp_options, 200); // OK
     }
 
