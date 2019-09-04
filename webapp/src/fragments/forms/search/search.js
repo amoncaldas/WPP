@@ -50,6 +50,9 @@ export default {
       if (this.section) {
         query.section = this.section
       }
+      if (this.$route.query.l) {
+        query.l = this.$route.query.l
+      }
       this.$router.push({name: 'HomeOrSearch', query: query})
     },
     loadData () {
@@ -62,6 +65,7 @@ export default {
         if (this.$route.query.section) {
           filters.section = this.$route.query.section
         }
+        this.searched = false
         searchService.query(filters).then((response) => {
           this.results = response
           this.searched = true
@@ -78,6 +82,7 @@ export default {
     }
   },
   created () {
+    this.currentPage = this.$route.query.page || this.currentPage
     this.loadData()
   }
 }
