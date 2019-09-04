@@ -3,7 +3,7 @@
     <v-list>
       <v-list-tile @click="right = !right">
         <v-list-tile-action>
-          <v-icon>compare_arrows</v-icon>
+          <v-icon class="notranslate">compare_arrows</v-icon>
         </v-list-tile-action>
         <v-list-tile-title>{{ $t('sidebar.switchSide') }}</v-list-tile-title>
       </v-list-tile>

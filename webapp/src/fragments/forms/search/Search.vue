@@ -16,13 +16,13 @@
             </v-text-field>
         </v-flex>
         <v-flex xs12 sm4>
-          <v-select height="60" clearable box
+          <v-select height="60" clearable box class="notranslate"
             v-model="section"
             @change="search"
             item-text="title.rendered"
             item-value="id"
             hide-details
-            :items="$store.getters.sections"
+            :items="searchableSections"
             :label="$t('searchComponent.section')">
           </v-select>
         </v-flex>

@@ -29,11 +29,11 @@
                 <v-layout row wrap>
                   <v-spacer class="hidden-xs-and-down"></v-spacer>
                   <v-flex xs12 sm4 :class="{'mr-2': $vuetify.breakpoint.smAndUp, 'mb-2': $vuetify.breakpoint.smAndDown}" >
-                    <v-btn dark block large color="secondary" @click="goToLogin"><v-icon class="hidden-sm-and-down" left>chevron_left</v-icon>{{ $t('changePassword.login') }} </v-btn>
+                    <v-btn dark block large color="secondary" @click="goToLogin"><v-icon class="notranslate hidden-sm-and-down" left>chevron_left</v-icon>{{ $t('changePassword.login') }} </v-btn>
                   </v-flex>
                   <v-flex xs12 sm4>
-                    <v-btn dark block large color="secondary" v-if="resetIsValid" @click="update">{{ $t('changePassword.changePassword') }} <v-icon class="hidden-sm-and-down" right>send</v-icon> </v-btn>
-                    <v-btn dark block large color="secondary" v-else  @click="goToRequest">{{ $t('changePassword.restartReset') }} <v-icon class="hidden-sm-and-down" right>send</v-icon> </v-btn>
+                    <v-btn dark block large color="secondary" v-if="resetIsValid" @click="update">{{ $t('changePassword.changePassword') }} <v-icon class="notranslate hidden-sm-and-down" right>send</v-icon> </v-btn>
+                    <v-btn dark block large color="secondary" v-else  @click="goToRequest">{{ $t('changePassword.restartReset') }} <v-icon class="notranslate hidden-sm-and-down" right>send</v-icon> </v-btn>
                   </v-flex>
                 </v-layout>
               </div>

@@ -1,6 +1,6 @@
 import menuManager from '@/support/menu-manager'
 import LocaleChanger from '@/fragments/locale/Locale'
-import Section from '@/support/section'
+import utils from '@/support/utils'
 
 export default {
   data () {
@@ -22,8 +22,8 @@ export default {
       })
     }
   },
-  computed : {
-    logoUrl ()  {
+  computed: {
+    logoUrl () {
       let url = this.$store.getters.options.site_relative_logo_url.trim()
 
       if (this.$store.getters.currentSection && this.$store.getters.currentSection.extra.logo_url) {
@@ -31,19 +31,32 @@ export default {
       }
       return url
     },
-    appTitle ()  {
+    appTitle () {
       let title = this.$store.getters.options.site_title.trim()
       return title
     },
     menuItems () {
       return this.menuData
+    },
+    searchUrl () {
+      let searchUrl = '/'
+      let queryParams = utils.getUrlParams()
+      if (queryParams.l) {
+        searchUrl = `?l=${queryParams.l}`
+      }
+      if (searchUrl.indexOf('?') > -1) {
+        searchUrl += '&'
+      } else {
+        searchUrl += '?'
+      }
+      searchUrl += 's='
+      return searchUrl
     }
   },
   components: {
     LocaleChanger
   },
   created () {
-
     this.loadData()
 
     this.eventBus.$on('localeChanged', () => {

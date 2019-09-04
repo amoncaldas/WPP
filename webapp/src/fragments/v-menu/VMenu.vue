@@ -2,7 +2,7 @@
   <v-list-group v-model="item.startOpen" v-if='item.items && showMenuItem(item)' :key="item.href" v-bind:group='item.group'>
     <v-list-tile @click.stop="nav(item)" :href="item.href" class="v-menu-item" :class="itemClass" slot='activator' :title="item.title">
       <v-list-tile-action>
-        <v-icon> {{ item.icon }}</v-icon>
+        <v-icon class="notranslate"> {{ item.icon }}</v-icon>
       </v-list-tile-action>
       <v-list-tile-content>
         <v-list-tile-title> {{ item.title }}</v-list-tile-title>
@@ -19,13 +19,13 @@
   <v-list-tile :key="item.href" v-else-if="showMenuItem(item)" class="v-menu-item" :class="itemClass" :href="item.href" @click.stop="nav(item)" ripple v-bind:disabled="item.disabled"
     :title="item.title">
     <v-list-tile-action>
-      <v-icon> {{ item.icon }} </v-icon>
+      <v-icon class="notranslate"> {{ item.icon }} </v-icon>
     </v-list-tile-action>
     <v-list-tile-content>
       <v-list-tile-title> {{ item.title}} </v-list-tile-title>
     </v-list-tile-content>
     <v-list-tile-action v-if='item.subAction'>
-      <v-icon class="success--text"> {{ item.subAction }}</v-icon>
+      <v-icon class="notranslate success--text"> {{ item.subAction }}</v-icon>
     </v-list-tile-action>
   </v-list-tile>
 </template>

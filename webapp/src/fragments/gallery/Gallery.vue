@@ -5,7 +5,7 @@
       :index="galleryMediaIndex"
       :options="options"
       @close="galleryMediaIndex = null">
-      <v-icon color="primary" large :title="$t('gallery.close')" slot="close">close</v-icon>
+      <v-icon class="notranslate" color="primary" large :title="$t('gallery.close')" slot="close">close</v-icon>
     </vue-gallery>
     <v-container style="padding:5px" grid-list-lg fluid >
       <v-layout row wrap>

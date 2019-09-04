@@ -35,7 +35,7 @@
             <v-btn dark block large color="secondary" @click="goToReset">{{ $t('authentication.resetPass') }} </v-btn>
           </v-flex>
           <v-flex xs12 sm4>
-          <v-btn dark block large color="secondary" @click="submit">{{ $t('authentication.login') }} <v-icon right>send</v-icon> </v-btn>
+          <v-btn dark block large color="secondary" @click="submit">{{ $t('authentication.login') }} <v-icon class="notranslate" right>send</v-icon> </v-btn>
         </v-flex>
       </v-layout>
     </div>

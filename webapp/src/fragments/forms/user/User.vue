@@ -58,7 +58,7 @@
     <v-layout row wrap>
       <v-spacer></v-spacer>
       <v-btn dark large color="secondary" v-if="crudReady" @click="submit">{{ $t('global.send') }}
-        <v-icon right>send</v-icon>
+        <v-icon class="notranslate" right>send</v-icon>
       </v-btn>
     </v-layout>
   </v-form>
