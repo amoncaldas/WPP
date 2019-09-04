@@ -34,7 +34,9 @@
         <br>
       </template>
     </v-form>
-    <post v-for="post in results" mode="list" class="search-result" :show-type="true" :key="post.id" :no-top-border="true" :post-data="post"></post>
+    <template v-if="searched">
+      <post v-for="post in results" mode="list" class="search-result" :show-type="true" :key="post.id" :no-top-border="true" :post-data="post"></post>
+    </template>
     <br>
     <div class="text-xs-left" v-if="totalPages > 1">
         <v-pagination
