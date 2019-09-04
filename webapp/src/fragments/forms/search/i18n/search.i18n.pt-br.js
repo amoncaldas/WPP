@@ -3,6 +3,8 @@ export default {
     placeholder: 'Digite sua busca',
     section: 'Filtrar seção',
     results: 'Resultados',
-    noResult: 'Nenhum resultado'
+    noResult: 'Nenhum resultado',
+    search: 'Buscar',
+    clear: 'Limpar'
   }
 }

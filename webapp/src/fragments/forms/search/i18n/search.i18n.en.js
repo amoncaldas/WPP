@@ -3,6 +3,8 @@ export default {
     placeholder: 'Type your search',
     section: 'Filter section',
     results: 'Results',
-    noResult: 'Nothing found'
+    noResult: 'Nothing found',
+    search: 'Search',
+    clear: 'Clear'
   }
 }

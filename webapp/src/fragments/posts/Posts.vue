@@ -29,7 +29,7 @@
       </div>
       <div slot="footer">
         <div class="text-xs-left" v-if="totalPages >  1 && pagination">
-            <v-pagination
+            <v-pagination class="notranslate"
               v-model="currentPage"
               :length="totalPages">
             </v-pagination>

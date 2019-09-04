@@ -8,7 +8,7 @@
       </v-flex>
       <v-flex xs9 sm10 md11>
         <div>
-          <template v-if="authorLink">
+          <template v-if="authorLink" class="notranslate">
             <span> {{$t('author.by')}}</span> <a :title="authorName" :href="authorLink"><b>{{authorName}}</b></a>
           </template>
           <span v-else> {{$t('author.by')}} <b>{{authorName}}</b></span>
