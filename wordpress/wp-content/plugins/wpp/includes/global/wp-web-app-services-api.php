@@ -260,7 +260,7 @@
       } 
       
       // TODO: not working when passing ptype!
-      // I a post type was specified, search 
+      // When a post type was specified, search 
       // only posts of the passed post type
       $p_type = $request->get_param('ptype');
       if (isset($p_type)) {

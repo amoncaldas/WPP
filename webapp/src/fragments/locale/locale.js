@@ -13,7 +13,7 @@ export default {
 
     let context = this
     this.eventBus.$on('setLocaleFromContentLocale', (locale) => {
-      if (locale != context.currentLocale) {
+      if (locale !== context.currentLocale) {
         context.$i18n.locale = context.currentLocale = locale
         context.$store.commit('locale', context.currentLocale)
       }
@@ -25,7 +25,7 @@ export default {
   watch: {
     '$store.getters.locale': function () {
       this.eventBus.$emit('localeChanged', this.currentLocale)
-    },
+    }
   },
   methods: {
     selectChanged (newLocale) {
@@ -37,7 +37,7 @@ export default {
       this.$i18n.locale = this.currentLocale
       // Store the new locale and reload going to home
       this.$store.commit('locale', this.currentLocale)
-      window.location.href = '/'
+      window.location.href = `/?l=${this.currentLocale}`
     },
     supportedLocales () {
       return Object.keys(this.$i18n.messages)

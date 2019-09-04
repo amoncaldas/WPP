@@ -24,8 +24,7 @@ class Plugin extends PluginComponent {
 	private $plugin_meta;
 
 	/** @var string plugin components which might need upgrade */
-	private static $components = array(
-	);
+	private static $components = array();
 
 	/**
 	 *	@inheritdoc
@@ -112,14 +111,14 @@ class Plugin extends PluginComponent {
 	public function maybe_upgrade() {
 		// trigger upgrade
 		$new_version = $this->get_version();
-		$old_version = get_site_option( 'acf-field-openstreetmap_version' );
+		$old_version = get_site_option( 'acf-openstreetmap-field_version' );
 
 		// call upgrade
 		if ( version_compare($new_version, $old_version, '>' ) ) {
 
 			$this->upgrade( $new_version, $old_version );
 
-			update_site_option( 'acf-field-openstreetmap_version', $new_version );
+			update_site_option( 'acf-openstreetmap-field_version', $new_version );
 
 		}
 
@@ -132,7 +131,7 @@ class Plugin extends PluginComponent {
 	 */
 	public function load_textdomain() {
 		$path = pathinfo( $this->get_wp_plugin(), PATHINFO_DIRNAME );
-		load_plugin_textdomain( 'acf-field-openstreetmap', false, $path . '/languages' );
+		load_plugin_textdomain( 'acf-openstreetmap-field', false, $path . '/languages' );
 	}
 
 

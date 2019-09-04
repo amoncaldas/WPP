@@ -14,19 +14,16 @@ class Core extends Plugin {
 	/**
 	 *	@inheritdoc
 	 */
-	protected function __construct($file) {
+	protected function __construct( $file ) {
 
-
-
-		add_action( 'plugins_loaded' , array( $this , 'load_textdomain' ) );
-
-		add_action( 'acf/include_field_types' , array( $this , 'init' ), 0 );
+		add_action( 'acf/include_field_types' , array( '\ACFFieldOpenstreetmap\Compat\ACF' , 'instance' ), 0 );
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
 
 		if ( is_admin() ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'register_assets' ) );
 		}
+
 		$args = func_get_args();
 		parent::__construct( ...$args );
 	}
@@ -50,6 +47,7 @@ class Core extends Plugin {
 		}
 
 		wp_register_script( 'acf-osm-frontend', $this->get_asset_url( 'assets/js/acf-osm-frontend.js' ), array( 'jquery' ), $this->get_version(), true );
+
 		wp_localize_script('acf-osm-frontend','acf_osm',array(
 			'options'	=> array(
 				'layer_config'	=> get_option( 'acf_osm_provider_tokens', array() ),
@@ -95,72 +93,98 @@ class Core extends Plugin {
 		/* backend */
 
 		// field js
-		wp_register_script( 'acf-input-osm', $this->get_asset_url('assets/js/acf-input-osm.js'), array('acf-input','backbone'), $this->get_version(), true );
+		wp_register_script( 'acf-input-osm', $this->get_asset_url('assets/js/acf-input-osm.js'), array('acf-input','wp-backbone'), $this->get_version(), true );
 		wp_localize_script( 'acf-input-osm', 'acf_osm_admin', array(
 			'options'	=> array(
 				'osm_layers'		=> $this->get_osm_layers(),
 				'leaflet_layers'	=> $this->get_leaflet_layers(),
+				'accuracy'			=> 7,
+			),
+			'i18n'	=> array(
+				'search'		=> __('Search...','acf-openstreetmap-field'),
+				'nothing_found'	=> __('Nothing found...','acf-openstreetmap-field'),
 			),
 		));
+		wp_register_script( 'acf-field-group-osm', $this->get_asset_url('assets/js/acf-field-group-osm.js'), array('acf-field-group','acf-input-osm'), $this->get_version(), true );
+
+		// compat duplicate repeater
+		wp_register_script( 'acf-osm-compat-duplicate-repeater', $this->get_asset_url( 'assets/js/compat/acf-duplicate-repeater.js' ), array( 'acf-duplicate-repeater' ), $this->get_version() );
+
 
 		// field css
-		wp_register_style( 'acf-input-osm', $this->get_asset_url( 'assets/css/acf-input-osm.css' ), array('acf-input'), $this->get_version() );
+		wp_register_style( 'acf-input-osm', $this->get_asset_url( 'assets/css/acf-input-osm.css' ), array('acf-input','dashicons'), $this->get_version() );
 
+
+
+		/*
+		Deps:
+			acf-osm-compat-duplicate-repeater
+				acf-duplicate-repeater (3rd party)
+			acf-field-group-osm
+				acf-field-group
+				acf-input-osm
+					acf-input
+					wp-backbone
+			acf-osm-frontend
+				jquery
+		*/
 
 	}
 
 	/**
-	 *	Load frontend styles and scripts
-	 *
-	 *	@action wp_enqueue_scripts
-	 */
-	public function wp_enqueue_style() {
-	}
-
-
-	/**
-	 *	Load text domain
-	 *
-	 *  @action plugins_loaded
-	 */
-	public function load_textdomain() {
-		$path = pathinfo( dirname( ACF_FIELD_OPENSTREETMAP_FILE ), PATHINFO_FILENAME );
-		load_plugin_textdomain( 'acf-field-openstreetmap', false, $path . '/languages' );
-	}
-
-	/**
-	 *	Init hook.
-	 *
-	 *  @action init
-	 */
-	public function init() {
-		Compat\ACF::instance();
-
-	}
-
-
-	/**
-	 *	get default OPenStreetMap Layers
+	 *	get default OpenStreetMap Layers
 	 *
 	 *	@return array(
-	 *		'layer_id' => 'Layer Label'
+	 *		'layer_id' => 'Layer Label',
+	 *		...
 	 *	)
 	 */
-	public function get_osm_layers( ) {
+	public function get_osm_layers( $context = 'iframe' ) {
 		/*
 		mapnik
 		cyclemap C 	Cycle
 		transportmap T	Transport
 		hot H	Humantarian
 		*/
-		return array(
-			'mapnik'		=> 'OpenStreetMap',
-			'cyclemap'		=> 'Thunderforest.OpenCycleMap',
-			'transportmap'	=> 'Thunderforest.Transport',
-			'hot'			=> 'OpenStreetMap.HOT',
-		);
+		if ( 'iframe' === $context ) {
+			return array(
+				'mapnik'		=> 'OpenStreetMap',
+				'cyclemap'		=> 'Thunderforest.OpenCycleMap',
+				'transportmap'	=> 'Thunderforest.Transport',
+				'hot'			=> 'OpenStreetMap.HOT',
+			);			
+		} else if ( 'link' === $context ) {
+			return array(
+				'H' => 'OpenStreetMap.HOT',
+				'T' => 'Thunderforest.Transport',
+				'C' => 'Thunderforest.OpenCycleMap',
+			);
+		}
 	}
 
+
+	public function map_osm_layer( $layers, $context = 'iframe' ) {
+
+		$mapping = $this->get_osm_layers( $context );
+
+		foreach ( (array) $layers as $layer ) {
+			$mapped = array_search( $layer, $mapping );
+			if ( $mapped !== false ) {
+				return $mapped;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 *	Get layer data from leaflet providers
+	 *
+	 *	@return array [
+	 *		'provider_key' 			=> 'provider',
+	 *		'provider_key.variant'	=> 'provider.variant',
+	 *		...
+	 * ]
+	 */
 	public function get_leaflet_layers() {
 		$providers = array();
 
@@ -189,8 +213,8 @@ class Core extends Plugin {
 	}
 
 	/**
-	 *	get providers and variants
-	 *	omits proviers with unconfigured api credentials as well as map data having a bounding box
+	 *	Get providers and variants
+	 *	Omits proviers with unconfigured api credentials
 	 *
 	 *	@return array
 	 */
@@ -276,7 +300,7 @@ class Core extends Plugin {
 	 */
 	public function get_leaflet_providers( ) {
 
-		$leaflet_providers	= json_decode( file_get_contents( ACF_FIELD_OPENSTREETMAP_DIRECTORY . '/etc/leaflet-providers.json'), true );
+		$leaflet_providers	= json_decode( file_get_contents( $this->get_plugin_dir() . '/etc/leaflet-providers.json'), true );
 
 		return $leaflet_providers;
 
@@ -288,7 +312,7 @@ class Core extends Plugin {
 	 */
 	public function get_provider_token_options( ) {
 
-		$providers		= json_decode( file_get_contents( ACF_FIELD_OPENSTREETMAP_DIRECTORY . '/etc/leaflet-providers.json'), true );
+		$providers		= json_decode( file_get_contents( $this->get_plugin_dir() . '/etc/leaflet-providers.json'), true );
 
 		$token_options	= array();
 
@@ -315,7 +339,12 @@ class Core extends Plugin {
 	 *	@return wp_enqueue_editor
 	 */
 	public function get_asset_url( $asset ) {
-		return plugins_url( $asset, ACF_FIELD_OPENSTREETMAP_FILE );
+
+		if ( ! defined('SCRIPT_DEBUG') || ! SCRIPT_DEBUG ) {
+			$pi = pathinfo($asset);
+			$asset = $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename'] . '.min.' . $pi['extension'];
+		}
+		return plugins_url( $asset, $this->get_plugin_file() );
 	}
 
 

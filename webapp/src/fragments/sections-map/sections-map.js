@@ -10,11 +10,11 @@ import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
 
 import * as L from 'leaflet'
-import { GestureHandling } from "leaflet-gesture-handling";
-import "leaflet/dist/leaflet.css";
-import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
+import { GestureHandling } from 'leaflet-gesture-handling'
+import 'leaflet/dist/leaflet.css'
+import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css'
 
-L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
+L.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling)
 
 const tileProviders = [
   {
@@ -61,6 +61,10 @@ export default {
     }
   },
   computed: {
+    gestureHandlingtTexts () {
+      let translations = this.$t('sectionsMap.gestureHandlingTexts')
+      return translations
+    },
     options () {
       let tooltip = this.routeToolTip
       return {

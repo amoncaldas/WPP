@@ -48,6 +48,9 @@ wordpress/wp-content/plugins/*
 !wordpress/wp-content/plugins/user-role-editor
 !wordpress/wp-content/plugins/wp-rest-cache
 !wordpress/wp-content/plugins/imsanity
+!wordpress/wp-content/plugins/code-snippets
+!wordpress/wp-content/plugins/wp-rollback
+
 
 
 ## Do not ignore wpp plugin

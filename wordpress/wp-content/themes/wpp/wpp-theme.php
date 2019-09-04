@@ -233,7 +233,7 @@ class WpWebAppTheme {
 					'schema' => null,
 				)
 			);
-			if (post_type_exists("place") === true && $post_type !== "place") {
+			if (post_type_exists("place") === true) {
 				register_rest_field($post_type, 'places',
 					array(
 						'get_callback'  => function ($post, $field_name, $request) {
@@ -290,16 +290,18 @@ class WpWebAppTheme {
 		$public_post_types = get_post_types(array("public"=>true));
 		unset($public_post_types["attachment"]);
 
-		$post_type = $query->query["post_type"];
+		$query_post_type = $query->query["post_type"];
 
-		if ($post_type !== SECTION_POST_TYPE) {
+		if ($query_post_type !== SECTION_POST_TYPE) {
+
+			$post_type_is_public = $this->query_post_type_is_public($query_post_type);
 			
-			if (in_array($post_type, $public_post_types)) {
+			if ($post_type_is_public === true) {
 				$request_locale = get_request_locale();
 				$tax_query = [];
 				
 				// Does not apply locale filter for pages and if the locale is neutral
-				if ($request_locale !== "neutral" && $post_type !== "page" || !isset($_GET["slug"])) {
+				if ($request_locale !== "neutral" && $query_post_type !== "page" || !isset($_GET["slug"])) {
 					$locale_query = array (
 						array(
 							'taxonomy' => LOCALE_TAXONOMY_SLUG,
@@ -337,10 +339,35 @@ class WpWebAppTheme {
 			
 	
 			$post_types_with_section = get_post_types_by_support("parent_section");
-			if (in_array($post_type, $post_types_with_section) && $_GET["parent_id"]) {
+			if ($post_type_is_public === true && $_GET["parent_id"]) {
 				$query->set('post_parent', $_GET["parent_id"]);				
 			}
 		}
+	}
+
+	/**
+		* Check if query post type is part of public post types
+		*
+		* @param [type] $query_post_type
+		* @param [type] $public_post_types
+		* @return void
+		*/
+	public function query_post_type_is_public ($query_post_type) {
+
+		//TODO: Change to: select post type by locale taxonomy support!
+		$public_post_types = get_post_types(array("public"=>true));
+		unset($public_post_types["attachment"]);
+
+		$containsAllValues = false;
+		if (is_array($query_post_type)) {
+			$containsAllValues = !array_diff($query_post_type, $public_post_types);
+		}
+
+		if ($containsAllValues || in_array($query_post_type, $public_post_types)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

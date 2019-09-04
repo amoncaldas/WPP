@@ -1,5 +1,6 @@
 import store from '@/store/store'
 import appConfig from '@/config'
+import utils from '@/support/utils'
 
 const wppRouter = {
   getSectionEndpoints: () => {
@@ -76,6 +77,14 @@ const wppRouter = {
         appConfig.validLocales = store.getters.options.locales
         promise2 = store.dispatch('autoSetLocale')
         Promise.all([promise1, promise2]).then((data) => {
+          // Redirect to the correct locale url if
+          // the autoLocale is different from the one in the html
+          // and the url is '/'
+          let queryParams = utils.getUrlParams()
+          let autoLoadedLocale = data[1]
+          if (!queryParams.l && autoLoadedLocale !== appConfig.defaultLocale && window.location.pathname === '/') {
+            window.location.href = `/?l=${autoLoadedLocale}`
+          }
           resolve(data)
         })
       })
