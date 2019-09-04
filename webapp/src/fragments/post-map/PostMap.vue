@@ -9,7 +9,7 @@
         <l-popup v-if="marker.label">
             <div >
               {{marker.label}}
-              <v-icon v-if="marker.data" @click="markerInfoClick(marker)" color="info" class="right-btn-icon pointer">launch</v-icon>
+              <v-icon v-if="marker.data" @click="markerInfoClick(marker)" color="info" class="notranslate right-btn-icon pointer">launch</v-icon>
             </div>
           </l-popup>
       </l-marker>

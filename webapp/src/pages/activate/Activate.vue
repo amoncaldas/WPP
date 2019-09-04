@@ -16,10 +16,10 @@
               <v-layout row wrap v-if="loaded">
                 <v-spacer class="hidden-xs-and-down"></v-spacer>
                 <v-flex xs12 sm4 :class="{'mr-2': $vuetify.breakpoint.smAndUp, 'mb-2': $vuetify.breakpoint.smAndDown}">
-                  <v-btn dark block large color="secondary"  @click="resendEmail">{{ $t('activate.resendEmail') }} <v-icon class="hidden-sm-and-down" right>send</v-icon> </v-btn>
+                  <v-btn dark block large color="secondary"  @click="resendEmail">{{ $t('activate.resendEmail') }} <v-icon class="notranslate hidden-sm-and-down" right>send</v-icon> </v-btn>
                 </v-flex>
                 <v-flex xs12 sm4>
-                  <v-btn dark block large color="secondary"  @click="goToSignup">{{ $t('activate.signup') }} <v-icon class="hidden-sm-and-down" right>send</v-icon> </v-btn>
+                  <v-btn dark block large color="secondary"  @click="goToSignup">{{ $t('activate.signup') }} <v-icon class="notranslate hidden-sm-and-down" right>send</v-icon> </v-btn>
                 </v-flex>
               </v-layout>
             </div>

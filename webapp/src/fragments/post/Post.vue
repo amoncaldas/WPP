@@ -50,7 +50,7 @@
             <v-btn v-for="(tag) in tags" :key="tag.id" round depressed :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
           </template>
         </div>
-        <v-btn @click.native="showReportError = true" style="margin-left:0px" > <v-icon color="error">report_problem</v-icon> &nbsp;{{$t('post.reportError')}}</v-btn>
+        <v-btn @click.native="showReportError = true" style="margin-left:0px" > <v-icon class="notranslate" color="error">report_problem</v-icon> &nbsp;{{$t('post.reportError')}}</v-btn>
         <report-error @closed="showReportError = false" :persistent="false" v-if="showReportError"></report-error>
         <template v-if="hasPlaces">
           <post-map @placeClicked="placeClicked" :post="post"></post-map>
@@ -68,7 +68,7 @@
         <br>
       </template>
       <template v-else>
-        <div v-if="post.locale !== 'neutral' && post.locale !== $store.getters.locale" class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': $vuetify.theme.accent}"> <v-icon>language</v-icon><span> {{post.locale | uppercase}}</span></div>
+        <div v-if="post.locale !== 'neutral' && post.locale !== $store.getters.locale" class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': $vuetify.theme.accent}"> <v-icon class="notranslate">language</v-icon><span> {{post.locale | uppercase}}</span></div>
         <div v-if="post.extra.sponsored" class="post-sponsored" :title="$t('post.sponsored')" :style="{'border-bottom-color': $vuetify.theme.accent}">
            <span :style="{color: $vuetify.theme.accent}"><i>{{$t('post.sponsored')}}</i></span>
           <br><br>

@@ -29,6 +29,14 @@ export default {
   components: {
     Post
   },
+  computed: {
+    searchableSections () {
+      let searchable = this.lodash.filter(this.$store.getters.sections, (s) => {
+        return s.path !== '/' && !s.extra.not_listed
+      })
+      return searchable
+    }
+  },
   methods: {
     search () {
       let context = this

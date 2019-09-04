@@ -15,7 +15,7 @@
                 <v-flex xs8 >
                   <div>
                     {{marker.label}}
-                    <v-icon v-if="marker.data" @click="markerInfoClick(marker)" color="info" class="right-btn-icon pointer" :title="$t('sectionsMap.section')">launch</v-icon>
+                    <v-icon v-if="marker.data" @click="markerInfoClick(marker)" color="info" class="notranslate right-btn-icon pointer" :title="$t('sectionsMap.section')">launch</v-icon>
                   </div>
                 </v-flex>
               </v-layout>
