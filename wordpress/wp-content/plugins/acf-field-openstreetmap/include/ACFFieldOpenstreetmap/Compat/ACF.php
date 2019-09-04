@@ -11,7 +11,7 @@ use ACFFieldOpenstreetmap\Core;
 use ACFFieldOpenstreetmap\Field;
 
 
-class ACF extends Core\PluginComponent {
+class ACF extends Core\Singleton {
 
 	/**
 	 *	@inheritdoc
@@ -26,8 +26,27 @@ class ACF extends Core\PluginComponent {
 		add_action( 'acf/render_field/type=leaflet_map', array( $this, 'render_map_input' ) );
 
 		// Compat with https://github.com/mcguffin/polylang-sync
-		add_filter('polylang_acf_sync_supported_fields', array( $this, 'add_pll_sync_field_type') );
+		add_filter( 'polylang_acf_sync_supported_fields', array( $this, 'add_pll_sync_field_type') );
 
+		// Compat with https://wordpress.org/plugins/acf-openstreetmap-field/
+		add_action( 'acf/input/admin_enqueue_scripts', array( $this, 'acf_admin_enqueue_scripts' ) );
+		add_action( 'acf/field_group/admin_enqueue_scripts', array( $this, 'acf_field_group_dequeue_scripts' ) );
+
+	}
+
+
+	/**
+	 *	@action acf/input/admin_enqueue_scripts
+	 */
+	public function acf_admin_enqueue_scripts() {
+		wp_enqueue_media();
+		wp_enqueue_script( 'acf-osm-compat-duplicate-repeater' );
+	}
+	/**
+	 *	@action acf/input/admin_enqueue_scripts
+	 */
+	public function acf_field_group_dequeue_scripts() {
+		wp_dequeue_script( 'acf-osm-compat-duplicate-repeater' );
 	}
 
 	/**
@@ -58,7 +77,7 @@ class ACF extends Core\PluginComponent {
 	}
 
 	/**
-	 *  include_field_types
+	 *  @action acf/include_field_types
 	 *
 	 *  This function will include the field type class
 	 *
@@ -71,40 +90,10 @@ class ACF extends Core\PluginComponent {
 	 */
 	function include_field_types( $version = false ) {
 
-		// array(
-		// 	'version'	=> '0.0.1',
-		// 	'url'		=> plugin_dir_url( __FILE__ ),
-		// 	'path'		=> plugin_dir_path( __FILE__ )
-		// );
+		if ( version_compare( acf_get_setting('version'), '5.7', '>=' ) ) {
+			Field\OpenStreetMap::get_instance();
+		}
 
-		Field\OpenStreetMap::get_instance();
-	}
-
-	/**
-	 *	@inheritdoc
-	 */
-	public function activate(){
-
-	}
-
-	/**
-	 *	@inheritdoc
-	 */
-	public function deactivate(){
-
-	}
-
-	/**
-	 *	@inheritdoc
-	 */
-	public static function uninstall() {
-	 // remove content and settings
-	}
-
-	/**
- 	 *	@inheritdoc
-	 */
-	public function upgrade( $new_version, $old_version ) {
 	}
 
 }

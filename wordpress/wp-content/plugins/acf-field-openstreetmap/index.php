@@ -2,16 +2,13 @@
 
 /*
 Plugin Name: ACF OpenStreetMap Field
-Plugin URI: https://github.com/mcguffin/acf-field-openstreetmap
-Description: Adds a configrable OpenStreetMap Field to ACF.
+Plugin URI: https://wordpress.org/plugins/acf-openstreetmap-field
+Description: A configurable OpenStreetMap Field for ACF.
 Author: Jörn Lund
-Version: 0.1.10
+Version: 1.1.1
 Author URI: https://github.com/mcguffin
 License: GPL3
-Github Repository: mcguffin/acf-field-openstreetmap
-GitHub Plugin URI: mcguffin/acf-field-openstreetmap
-Release Asset: false
-Text Domain: acf-field-openstreetmap
+Text Domain: acf-openstreetmap-field
 Domain Path: /languages/
 */
 
@@ -44,41 +41,12 @@ if ( ! defined('ABSPATH') ) {
 	die('FU!');
 }
 
-
-define( 'ACF_FIELD_OPENSTREETMAP_FILE', __FILE__ );
-define( 'ACF_FIELD_OPENSTREETMAP_DIRECTORY', plugin_dir_path(__FILE__) );
-define( 'ACF_FIELD_OPENSTREETMAP_PLUGIN', pathinfo( ACF_FIELD_OPENSTREETMAP_DIRECTORY, PATHINFO_FILENAME ) . '/' . pathinfo( __FILE__, PATHINFO_BASENAME ) );
-
-require_once ACF_FIELD_OPENSTREETMAP_DIRECTORY . 'include/autoload.php';
+require_once dirname(__FILE__) . '/include/autoload.php';
 
 Core\Core::instance( __FILE__ );
 
 
-
-
-
-
-
-
 if ( is_admin() || defined( 'DOING_AJAX' ) ) {
-
-	// don't WP-Update actual repos!
-	if ( ! file_exists( ACF_FIELD_OPENSTREETMAP_DIRECTORY . '/.git/' ) ) {
-
-		// Check if https://github.com/afragen/github-updater is active
-		$active_plugins = get_option('active_plugins');
-
-		if ( $sitewide_plugins = get_site_option('active_sitewide_plugins') ) {
-			$active_plugins = array_merge( $active_plugins, array_keys( $sitewide_plugins ) );
-		}
-
-		if ( ! in_array( 'github-updater/github-updater.php', $active_plugins ) ) {
-
-			AutoUpdate\AutoUpdateGithub::instance()->init( __FILE__ );
-		}
-	}
-
-
 
 	Settings\SettingsOpenStreetMap::instance();
 

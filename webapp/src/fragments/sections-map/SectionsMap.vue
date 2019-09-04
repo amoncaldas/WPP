@@ -1,8 +1,8 @@
 <template>
   <box tag="section" resizable background="white" @boxCreated="boxCreated" @resized="adjustMap" v-if="loaded && markers.length > 0">
     <div slot="header">
-          <h2>{{$t('sectionsMap.title')}}</h2>
-        </div>
+      <h2>{{$t('sectionsMap.title')}}</h2>
+    </div>
     <v-alert :value="info" outline type="info" style="color:white" >{{ info }}</v-alert>
     <l-map ref="map" :max-zoom="maxZoom" :options="{gestureHandling:true}" style="z-index:3" :zoom="zoom" class="section-map" :style="{height: mapHeight + 'px'}">
       <l-marker v-for="(marker, index) in markers" :lat-lng="marker.position" :key="index+'-marker'" :icon="marker.icon">
