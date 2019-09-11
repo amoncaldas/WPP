@@ -1,6 +1,6 @@
 export default {
   reportError: {
-    title: 'Report error',
+    title: 'Found an error? Tell us',
     msgSent: 'Error reported, thanks!',
     processingYourMsg: 'Processing your message...',
     url: 'URL',

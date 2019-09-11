@@ -12,6 +12,7 @@
         </a>
       </template>
     </div>
+
     <div slot="content">
       <template v-if="mode !== 'compact' && mode !== 'list'">
         <media :mode="mode" v-if="post._embedded" :media="featuredMedia" :max-height="mode === 'single'? 500 : 200"></media>
@@ -24,11 +25,14 @@
           <br>
         </template>
         <sharer :title="title" :path="post.path" ></sharer>
+        <highlighted class="my-hi" v-if="renderAsPage && post.extra.has_highlighted_top" position="top" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :content-id="post.id"> </highlighted>
+        <br>
         <div class="html-prepend" v-if="prepend" v-html="prepend"></div>
         <div class="html-content" v-html="content"></div>
         <div class="html-append" v-if="append" v-html="append"></div>
 
-        <v-alert v-if="renderAsPage" :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
+
+        <v-alert v-if="renderAsPage && mode === 'single'" :color="$vuetify.theme.dark" :value="true" icon="edit" outline type="info" >
           {{$t('post.lastUpdate') | capitalize}} <time :datetime="post.date">{{postDate}}</time>
         </v-alert>
 
@@ -39,6 +43,7 @@
             <v-chip color="secondary" dark :title="$t('post.available_at')" >{{formatDate(post.extra.available_at)}}</v-chip>
           </span>
         </div>
+
         <div class="cat-and-tgs" v-if="categories.length > 0 || tags.length > 0">
           <br>
           <template v-if="categories.length > 0">
@@ -50,8 +55,8 @@
             <v-btn v-for="(tag) in tags" :key="tag.id" round depressed :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
           </template>
         </div>
-        <v-btn @click.native="showReportError = true" style="margin-left:0px" > <v-icon class="notranslate" color="error">report_problem</v-icon> &nbsp;{{$t('post.reportError')}}</v-btn>
-        <report-error @closed="showReportError = false" :persistent="false" v-if="showReportError"></report-error>
+        <highlighted v-if="renderAsPage && post.extra.has_highlighted_bottom" position="bottom" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :content-id="post.id"> </highlighted>
+
         <template v-if="hasPlaces">
           <post-map @placeClicked="placeClicked" :post="post"></post-map>
           <br>
@@ -66,6 +71,8 @@
         <br><br>
         <sharer :title="title" :path="post.path" ></sharer>
         <br>
+        <v-btn @click.native="showReportError = true" style="margin-left:0px" > <v-icon class="notranslate" color="error">report_problem</v-icon> &nbsp;{{$t('post.reportError')}}</v-btn>
+        <report-error @closed="showReportError = false" :persistent="false" v-if="showReportError"></report-error>
       </template>
       <template v-else>
         <div v-if="post.locale !== 'neutral' && post.locale !== $store.getters.locale" class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': $vuetify.theme.accent}"> <v-icon class="notranslate">language</v-icon><span> {{post.locale | uppercase}}</span></div>

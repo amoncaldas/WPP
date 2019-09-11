@@ -330,6 +330,9 @@ function allow_cors() {
 			if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 				$result->header('Access-Control-Allow-Headers', 'Authorization, Content-Type, locale', true);
 			}
+			if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+				$result->header('Access-Control-Expose-Headers', 'Content-Type, locale, X-WPP-Title', true);				
+			}
 			return $result;
 		});
 	}

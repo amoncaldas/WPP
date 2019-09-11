@@ -1,4 +1,4 @@
-import { VueFlux, FluxPagination, Transitions, FluxCaption, FluxControls, FluxIndex } from 'vue-flux';
+import { VueFlux, FluxPagination, Transitions, FluxCaption, FluxControls, FluxIndex } from 'vue-flux'
 export default {
   props: {
     title: {
@@ -24,6 +24,12 @@ export default {
     fluxImages () {
       let urls = this.lodash.map(this.contents, 'url')
       return urls
+    },
+    transition () {
+      if (this.$store.getters.options.slider_transition) {
+        return Transitions[this.$store.getters.options.slider_transition]
+      }
+      return Transitions.transitionKenburn
     }
   },
 
@@ -34,7 +40,7 @@ export default {
       fullscreen: false
     },
     fluxTransitions: {
-      transitionBook: Transitions.transitionKenburn
+      transitionBook: this.transition
       // Transition options: @see: https://deulos.github.io/vue-flux/
     }
   })
