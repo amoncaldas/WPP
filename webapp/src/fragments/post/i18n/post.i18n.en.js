@@ -13,6 +13,6 @@ export default {
     available: 'Available',
     availableAt: 'Available at',
     lastUpdate: 'Last update',
-    reportError: 'Report error'
+    reportError: 'Found an error? Tell us!'
   }
 }

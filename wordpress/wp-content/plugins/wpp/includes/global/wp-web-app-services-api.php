@@ -36,6 +36,26 @@
         )
       ));
 
+      register_rest_route(WPP_API_NAMESPACE."/content", '/(?P<contentId>[0-9]+)/highlighted/top', array(
+        array(
+          'methods'  => "GET",
+          'callback' => array($this, 'get_highlighted_top'),
+        )
+      ));
+      register_rest_route(WPP_API_NAMESPACE."/content", '/(?P<contentId>[0-9]+)/highlighted/middle', array(
+        array(
+          'methods'  => "GET",
+          'callback' => array($this, 'get_highlighted_middle' ),
+        )
+      ));
+
+      register_rest_route(WPP_API_NAMESPACE."/content", '/(?P<contentId>[0-9]+)/highlighted/bottom', array(
+        array(
+          'methods'  => "GET",
+          'callback' => array($this, 'get_highlighted_bottom'),
+        )
+      ));
+
       add_filter( 'rest_pre_insert_comment', array($this, 'wpp_pre_insert_comment'), 10, 2 );
     }
 
@@ -119,7 +139,7 @@
     }
 
     /**
-     * Get the posts from all post ypes
+     * Get the related posts of a given post
      *
      * @param [type] $request
      * @return WP_REST_Response
@@ -152,6 +172,75 @@
       $response = $this->prepareRestResponseWithPagination($posts, $args);
       return $response;		
     } 
+
+
+    /**
+     * Get the highlighted posts of a given post
+     *
+     * @param Object $request
+     * @param String $position
+     * @return WP_REST_Response
+     */
+    public function get_highlighted( $request, $position ) {
+      $public_post_types = get_post_types(array("public"=>true));
+      unset($public_post_types["attachment"]);
+      unset($public_post_types["adding"]);      
+
+      $content_id = $request->get_param('contentId');
+      $title = "";
+      // Get the include aprameters from the content related saved in meta
+      $include = get_post_meta($content_id, "highlighted_$position", true);
+
+      // Check if there is highlighted posts
+      if (isset($include) && $include !== "") {
+        $args = array(          
+          'post_type' => $public_post_types,
+          "post__in" => $include
+        );
+        $posts = get_posts($args); 
+        $highlighted_title_key = "highlighted_$position"."_title";
+        $title = get_post_meta($content_id, $highlighted_title_key, true);
+        
+      } else {
+        $posts = [];      
+      }
+
+      $posts = $this->prepareRestData($posts, true);
+      $wp_rest_response = rest_ensure_response($posts);
+      $wp_rest_response->header("X-WPP-Title", $title);
+      return $wp_rest_response;		
+    } 
+
+    /** 
+     * Get the middle highlighted posts of a given post
+     * 
+     * @param Object $request
+     * @return WP_REST_Response
+     */
+    public function get_highlighted_middle( $request ) {
+     return $this->get_highlighted($request, "middle");	
+    } 
+
+     /** 
+     * Get the bottom highlighted posts of a given post
+     * 
+     * @param Object $request
+     * @return WP_REST_Response
+     */
+    public function get_highlighted_bottom( $request ) {
+      return $this->get_highlighted($request, "bottom");	
+    } 
+
+     /** 
+     * Get the top highlighted posts of a given post
+     * 
+     * @param Object $request
+     * @return WP_REST_Response
+     */
+    public function get_highlighted_top( $request ) {
+      return $this->get_highlighted($request, "top");	
+    } 
+   
     
     /**
      * Get the posts from all post ypes

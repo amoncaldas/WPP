@@ -19,8 +19,8 @@ nano /etc/apache2/sites-enabled/000-default.conf
 ```conf
 <VirtualHost *:80>
     ServerAdmin webmaster@drypack.com
-	  ServerName drypack.com
-	  ServerAlias www.drypack.com
+	ServerName wpp.com
+	ServerAlias www.wpp.com
 
     ProxyPreserveHost On
 

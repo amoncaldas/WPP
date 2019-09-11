@@ -261,6 +261,7 @@ Options with `wpp_` prefix that is not present by default:
 - wpp_signup_with_github
 - archive_sections_sidebar
 - hide_developedby
+- wpp_slider_transition - for transition options see: https://deulos.github.io/vue-flux/
 
 ## ACF extras ##
 
@@ -288,6 +289,17 @@ Possible post extras:
 - prepend (integer, adding prepend post id)
 - append (integer, adding append post id)
 
+Only for pages:
+- has_top_highlighted
+- has_middle_highlighted
+- has_bottom_highlighted
+- highlighted_top_title
+- highlighted_middle
+- highlighted_bottom
+- highlighted_top
+- highlighted_middle_title
+- highlighted_bottom_title
+
 Possible section extras:
 
 - has_image_slides (boolean)
@@ -306,6 +318,15 @@ Possible section extras:
 - has_section_map (boolean)
 - max_listing_posts (integer)
 - not_listed (boolean)
+- has_top_highlighted
+- has_middle_highlighted
+- has_bottom_highlighted
+- highlighted_top_title
+- highlighted_middle
+- highlighted_bottom
+- highlighted_top
+- highlighted_middle_title
+- highlighted_bottom_title
 
 Attachment extras:
 

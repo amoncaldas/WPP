@@ -4,6 +4,7 @@ import Posts from '@/fragments/posts/Posts'
 import Slider from '@/fragments/slider/Slider'
 import Sections from '@/fragments/sections/Sections'
 import Section from '@/support/section'
+import Highlighted from '@/fragments/highlighted/Highlighted.vue'
 
 export default {
   data: () => ({
@@ -17,7 +18,8 @@ export default {
     Posts,
     Slider,
     PostMap,
-    Sections
+    Sections,
+    Highlighted
   },
   created () {
     // emit the an event catch by root App component

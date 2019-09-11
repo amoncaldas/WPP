@@ -110,7 +110,10 @@ export default {
         content = this.post.extra.html_content
       }
       if (!content && this.post.excerpt) {
-        content = this.post.excerpt.rendered || this.post.excerpt
+        if (this.post.excerpt.rendered !== undefined) {
+          return this.post.excerpt.rendered
+        }
+        return this.post.excerpt
       }
       return content
     },
@@ -203,5 +206,6 @@ export default {
   },
   beforeCreate: function () {
     this.$options.components.Related = require('@/fragments/related/Related.vue').default
+    this.$options.components.Highlighted = require('@/fragments/highlighted/Highlighted.vue').default
   }
 }

@@ -3,6 +3,7 @@ import Posts from '@/fragments/posts/Posts'
 import Slider from '@/fragments/slider/Slider'
 import Section from '@/support/section'
 import Sections from '@/fragments/sections/Sections'
+import Highlighted from '@/fragments/highlighted/Highlighted.vue'
 
 export default {
   data: () => ({
@@ -15,7 +16,8 @@ export default {
     PostMap,
     Posts,
     Slider,
-    Sections
+    Sections,
+    Highlighted
   },
   created () {
     this.currentSection = this.$store.getters.currentSection
@@ -37,7 +39,7 @@ export default {
         parser.href = place.link
         this.$router.push(parser.pathname)
       }
-    },
+    }
   },
   computed: {
     max () {

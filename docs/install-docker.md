@@ -1,4 +1,4 @@
-# Script to isntall Docker #
+# Script to install Docker #
 
 ```sh
 #!/bin/bash

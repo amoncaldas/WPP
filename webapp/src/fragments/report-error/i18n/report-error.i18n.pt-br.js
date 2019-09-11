@@ -1,6 +1,6 @@
 export default {
   reportError: {
-    title: 'Informar erro',
+    title: 'Encontrou um erro? Nos informe',
     msgSent: 'Erro informado, obrigado!',
     processingYourMsg: 'Processando sua mensagem...',
     url: 'URL',
