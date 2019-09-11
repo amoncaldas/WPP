@@ -41,6 +41,16 @@ export default {
   computed: {
     boxTitle () {
       return this.hightlightTitle || this.title || this.$t('highlighted.title')
+    },
+    columns () {
+      let items = this.posts.length
+      if (items === 0) {
+        return this.columnsPerPost
+      }
+      if (items === 4 || items === 2) {
+        return 6
+      }
+      return 4
     }
   },
   methods: {

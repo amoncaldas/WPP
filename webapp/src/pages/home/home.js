@@ -46,7 +46,7 @@ export default {
         parser.href = place.link
         this.$router.push(parser.pathname)
       }
-    },
+    }
   },
   computed: {
     max () {
