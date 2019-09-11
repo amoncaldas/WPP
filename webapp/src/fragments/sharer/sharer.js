@@ -10,7 +10,7 @@ export default {
     }
   },
   computed: {
-    link() {
+    link () {
       let link = this.buildLink(this.path)
       link = location.origin + link
       return link

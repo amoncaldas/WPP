@@ -7,7 +7,7 @@
       <v-container style="padding:5px" grid-list-lg fluid >
         <v-layout row wrap>
           <template v-for="(post) in posts">
-            <v-flex v-bind="{['xs'+columnsPerPost]: true}"  :key="post.id">
+            <v-flex v-bind="{['sm'+columns]: true}"  :key="post.id">
               <post :key="post.id" :no-top-border="true" :show-type="true" :post-data="post"></post>
             </v-flex>
           </template>
