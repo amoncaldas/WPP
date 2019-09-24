@@ -71,7 +71,7 @@
         <br><br>
         <sharer :title="title" :path="post.path" ></sharer>
         <br>
-        <v-btn @click.native="showReportError = true" style="margin-left:0px" > <v-icon class="notranslate" color="error">report_problem</v-icon> &nbsp;{{$t('post.reportError')}}</v-btn>
+        <v-btn @click.native="showReportError = true" class="report-error" > <v-icon class="notranslate" color="error">report_problem</v-icon> &nbsp;{{$t('post.reportError')}}</v-btn>
         <report-error @closed="showReportError = false" :persistent="false" v-if="showReportError"></report-error>
       </template>
       <template v-else>
