@@ -24,7 +24,7 @@ const oAuthConfig = {
     github: {
       clientId: null, // to be set on authenticate, retrieving from bak-end
       redirectUri: getRedirectUri(),
-      url: '/ors-oauth/github', // the back-end api endpoint where send to  the `code` and get the authentication result and data
+      url: '/wpp/v1/oauth/github', // the back-end api endpoint where send to  the `code` and get the authentication result and data
       optionalUrlParams: ['scope'],
       scope: ['user:email'], // we need to the user email
       oauthBaseUrl: 'https://github.com/login/oauth/authorize',
@@ -50,7 +50,7 @@ const oAuthConfig = {
  *    to retrieve the provider `clientId` and set it to the corresponding @/common/social-auth.js provider `clientId` property.
  * 3 - We call $auth.authenticate, that is a VueAuthenticate accessor. It opens the corresponding social provider login      *    pop-up, using the `clientId` defined in the previous step and allows the user to authenticate.
  *    When it is finished, the component will resolves the promise and brings back a temporary `code`.
- *    We send this `code` to the back-end and there, the `ors-oauth` plugin, using this code we will get a token and then we *    use this token to get the user data, including the user email registered on the provider.
+ *    We send this `code` to the back-end and there, the `wpp oauth` plugin, using this code we will get a token and then we *    use this token to get the user data, including the user email registered on the provider.
  * 4 - Still on the back-end, having the user's email, we locate the user account on wordpress and generate a standard JWT token.
  * 5 - In the response, we give back the provider token (expected in the response by the vue-authenticate) and
  *    an additional property named `user`, where we put the JWT token and other user`s data. These data are passed
@@ -58,7 +58,7 @@ const oAuthConfig = {
  */
 const oauthViaPopUp = (context, provider) => {
   return new Promise((resolve, reject) => {
-    // get the social oauth config data from back-end, provided by the `ors-oauth` plugin
+    // get the social oauth config data from back-end, provided by the `wpp-oauth` plugin
     socialOauthData.query().then((response) => {
       if (response.raw && response.data) {
         response = response.data
@@ -87,7 +87,7 @@ const oauthViaRedirect = (provider, action) => {
   // to make sure that we are not using old data
   localStorage.clear()
 
-  // get the social oauth config data from back-end, provided by the `ors-oauth` plugin
+  // get the social oauth config data from back-end, provided by the `wpp` plugin
   socialOauthData.query().then((response) => {
     if (response.raw) {
       response = response.data

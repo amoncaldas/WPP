@@ -4,6 +4,6 @@ let options = {
   raw: true
 }
 
-const socialOauthData = new ModelService('ors-oauth/social-client-data', 'Social oauth', options)
+const socialOauthData = new ModelService('wpp/v1/oauth/social-client-data', 'Social oauth', options)
 
 export default socialOauthData

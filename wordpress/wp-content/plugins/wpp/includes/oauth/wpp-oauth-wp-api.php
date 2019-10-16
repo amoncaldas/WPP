@@ -4,9 +4,9 @@
 use \Firebase\JWT\JWT;
 
 /**
- * ORS OAUTH routes
+ * WPP OAUTH routes
  *
- * @package ORS_OAUTH
+ * @package WPP_OAUTH
  */
 
 class WppOauthApi {
@@ -30,7 +30,7 @@ class WppOauthApi {
 	protected $githubOAuthAccessTokenUrl = "https://github.com/login/oauth/access_token";
 
     /**
-     * Get ORS oauth api namespace.
+     * Get WPP oauth api namespace.
      *
      * @since 1.2.1
      * @return string
@@ -40,7 +40,7 @@ class WppOauthApi {
 	}
 	
 	/**
-	 * Register ORS oauth routes for WP API v2.
+	 * Register WPP oauth routes for WP API v2.
 	 *
 	 * @since  1.2.0
 	 */

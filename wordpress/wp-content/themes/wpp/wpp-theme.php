@@ -286,7 +286,7 @@ class WpWebAppTheme {
 	 */
 	public function apply_wpp_filters_pre_get_posts($query) {		
 
-		//TODO: Change to: select post type by locale taxonomy support!
+		//TODO: Change to select post type by locale taxonomy support!
 		$public_post_types = get_post_types(array("public"=>true));
 		unset($public_post_types["attachment"]);
 

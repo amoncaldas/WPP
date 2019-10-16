@@ -1,6 +1,6 @@
 /**
- * OrsMap component.
- * Renders an leaflet map using the ors api response
+ * SectionsMap component.
+ * Renders an leaflet map using post map data
  * passed via props
  * @listens redrawAndFitMap [via eventBus] - event that will trigger an map redraw and refit bounds - expects {isMaximized: Boolean, guid: String}
  */
