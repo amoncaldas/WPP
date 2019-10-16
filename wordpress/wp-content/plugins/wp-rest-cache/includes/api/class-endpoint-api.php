@@ -84,7 +84,8 @@ class Endpoint_Api {
 	 * @return string The request URI.
 	 */
 	private function build_request_uri() {
-		$request_uri = filter_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
+		// No filter_input, see https://stackoverflow.com/questions/25232975/php-filter-inputinput-server-request-method-returns-null/36205923.
+		$request_uri = filter_var( $_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL );
 		// Remove home_url from request_uri for uri's with WordPress in a subdir (like /wp).
 		$request_uri  = str_replace( get_home_url(), '', $request_uri );
 		$uri_parts    = wp_parse_url( $request_uri );
@@ -207,6 +208,11 @@ class Endpoint_Api {
 			return $result;
 		}
 
+		// Do not cache if empty result set.
+		if ( empty( $result ) ) {
+			return $result;
+		}
+
 		$data = array(
 			'data'    => $result,
 			'headers' => $this->response_headers,
@@ -223,7 +229,8 @@ class Endpoint_Api {
 	 */
 	public function skip_caching() {
 		// Only cache GET-requests.
-		if ( 'GET' !== filter_input( INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_STRING ) ) {
+		// No filter_input, see https://stackoverflow.com/questions/25232975/php-filter-inputinput-server-request-method-returns-null/36205923.
+		if ( 'GET' !== filter_var( $_SERVER['REQUEST_METHOD'], FILTER_SANITIZE_STRING ) ) {
 			return true;
 		}
 
@@ -281,7 +288,7 @@ class Endpoint_Api {
 					$header = sprintf( '%s: %s', $key, $value );
 					header( $header );
 				}
-				rest_send_cors_headers( '' );
+				$this->rest_send_cors_headers( '' );
 
 				echo $data; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				exit;
@@ -293,6 +300,31 @@ class Endpoint_Api {
 
 		// Catch the result after serving.
 		add_filter( 'rest_pre_echo_response', [ $this, 'save_cache' ], 1000, 3 );
+	}
+
+	/**
+	 * Sends Cross-Origin Resource Sharing headers with API requests.
+	 *
+	 * @param mixed $value Response data.
+	 * @return mixed Response data.
+	 */
+	private function rest_send_cors_headers( $value ) {
+		$origin = get_http_origin();
+
+		if ( $origin ) {
+			// Requests from file:// and data: URLs send "Origin: null".
+			if ( 'null' !== $origin ) {
+				$origin = esc_url_raw( $origin );
+			}
+			header( 'Access-Control-Allow-Origin: ' . $origin );
+			header( 'Access-Control-Allow-Methods: OPTIONS, GET, POST, PUT, PATCH, DELETE' );
+			header( 'Access-Control-Allow-Credentials: true' );
+			header( 'Vary: Origin', false );
+		} elseif ( ! headers_sent() && 'GET' === $_SERVER['REQUEST_METHOD'] ) {
+			header( 'Vary: Origin' );
+		}
+
+		return $value;
 	}
 
 	/**

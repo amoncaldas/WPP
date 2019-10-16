@@ -1,6 +1,6 @@
 /**
- * OrsMap component.
- * Renders an leaflet map using the ors api response
+ * PostMap component.
+ * Renders an leaflet map using the post map data
  * passed via props
  * @listens redrawAndFitMap [via eventBus] - event that will trigger an map redraw and refit bounds - expects {isMaximized: Boolean, guid: String}
  */
@@ -10,11 +10,11 @@ import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
 
 import * as L from 'leaflet'
-import { GestureHandling } from "leaflet-gesture-handling";
-import "leaflet/dist/leaflet.css";
-import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
+import { GestureHandling } from 'leaflet-gesture-handling'
+import 'leaflet/dist/leaflet.css'
+import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css'
 
-L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
+L.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling)
 
 const tileProviders = [
   {

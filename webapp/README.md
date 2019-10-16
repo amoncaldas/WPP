@@ -1,9 +1,8 @@
-# Developer´s Dashboard #
+# WPP Front-end #
 
 This application encompasses two main needs:
 
-- Creation of a base Vue SPA with common features/components to be used in multiple front-end apps (dashboard, APIs interactive examples)
-- Implement an easy to use and maintain ORS developer´s dashboard
+- Creation of a base Vue SPA with common features/components to be used in multiple front-end apps
 
 The base application is built using VueJS, vuetify and a set of custom components, directives and services. The created structure allows the creation of specific needs to be contained in a feature folder, following a feature-by-folder
 approach. So, all the business specific logic for the developer's dashboard are contained in the src/page's folder.
@@ -332,7 +331,7 @@ The flow works as following:
 
 1. the user clicks on github button on the login page. The `socialAuth.oauthViaRedirect` method is fired, passing the provider to be used and the `action` desired. In this case the action is `login`.
 1. we clear the local storage and save the desired action in our vuex store with the key `socialOauthAction`.
-1. a request is made to the back-end passing the `provider` and the `action` to retrieve the oauth provider `clientId` and set it to the corresponding provider `clientId` and get the oauth redirect url from the providerConf via the `getOauthUrl` method. The provider id is also stored in our vuex store with the key `socialOauthProvider`.  The above mentioned request and all others oauth authenticate requests are taken on the back-end by the custom `ors-oauth` plugin that we have created.
+1. a request is made to the back-end passing the `provider` and the `action` to retrieve the oauth provider `clientId` and set it to the corresponding provider `clientId` and get the oauth redirect url from the providerConf via the `getOauthUrl` method. The provider id is also stored in our vuex store with the key `socialOauthProvider`.  The above mentioned request and all others oauth authenticate requests are taken on the back-end by the custom `wpp` plugin that we have created.
 1. the user is redirected to the corresponding social oauth provider and when s/he finishes the authentication there s/he is redirected back to our app root route with the `code` query string value. (eg.: `/?code=xyz12345`).
 1. In the router a `beforeEnter` function is attached to the `/` route. So, the `socialAuth.runOauthCallBackCheck` is run to handle the redirection from a oauth provider.
 1. the `socialAuth.runOauthCallBackCheck` method checks if the `code` query string is present. If it is,it saves it in the vuex store with the key `socialOauthCode` and redirects the user to the route/component linked to the action. For example, the route to the `login` action will load the `Auth.vue` component.
@@ -340,7 +339,7 @@ The flow works as following:
 
 **Important:** the `socialOauthProvider`, `socialOauthProvider` and `socialOauthCode` are stored using a defined vuex store in the @/pages/auth/auth.store.js and internally this storage is saved in the browser local storage, so it is kept across requests/redirections and it is intentional because this oauth is based in a redirection flow and if we didn't do that that current state of the authentication would be lost.
 
-**Important:** on the step 6, the method `runOauthCallBackCheck`, using the `socialOauthAction` stored in the step `2` defined the target endpoint to the request to be used. For `login` action is `/wp-json/ors-oauth/github/login` and for `signup` action is `/wp-json/ors-oauth/github/signup`.
+**Important:** on the step 6, the method `runOauthCallBackCheck`, using the `socialOauthAction` stored in the step `2` defined the target endpoint to the request to be used. For `login` action is `/wp-json/wpp/v1/oauth/github/login` and for `signup` action is `/wp-json/wpp/v1/oauth/github/signup`.
 
 ### Registration ###
 
@@ -359,7 +358,7 @@ The app also includes an registration via github, using the oauth github service
 
 - 1. the user must click on the "Sign up with GitHub" button on the `/#/signup` page and the action passed is `signup`, instead of `login`.
 - 6. the the component where the application will be routed to is the `Signup.vue`
-- 7. the `Signup.vue` component is loaded and on the `created` event it runs the the `socialAuth.checkAndProceedOAuth`. Internally, using the `socialOauthAction` stored in the step `2` a different endpoint receives the request (in this case `/wp-json/ors-oauth/github/signup`) and the back-end will register a new user. At this point two ways are possible:
+- 7. the `Signup.vue` component is loaded and on the `created` event it runs the the `socialAuth.checkAndProceedOAuth`. Internally, using the `socialOauthAction` stored in the step `2` a different endpoint receives the request (in this case `/wp-json/wpp/v1/oauth/github/signup`) and the back-end will register a new user. At this point two ways are possible:
   - if the user already exists (checked by the e-mail), the user will be logged in and redirected to the `home` component.
   - if it does not exists it will be registered and the request will return the user data, the vuex store `login` event will be dispatch and finally the application will be routed to the `home` component with the profile tab active.
 
@@ -382,8 +381,6 @@ The app scaffold has the following structure:
   - Inside the fragments folder there is a sub-folder called `forms` where form components must be stored.
   - **highlighted components**:
     - `user` is a form component that is used in user registration and user profile update.
-    - `ors-map` - a map component using vue-leaflet that renders a map based on a `ORS API response data`. Each API endpoint supported must have a corresponding data extractor in *fragments/ors-map/services/map-data-extractor/`{version}`/extractor-file-name.js* and must be referred in *fragments/ors-map/services/map-builder.js*. There is an dictionary in *fragments/ors-map/services/map-builder.js:getMapDataExtractor* that is responsible for mapping the API version to ors map extractor version. Currently the ors map extractor `V1` supports API versions `4.5` and `4.7`.
-    - `ors-table` - a table component using vuetify v-data-table that renders a table based on a `ORS API response data`. Each API endpoint supported must have a corresponding data extractor in *fragments/ors-table/services/table-data-extractor/`{version}`/extractor-file-name.js* and must be referred in *fragments/ors-map/services/table-builder.js*. There is an dictionary in *fragments/ors-map/services/map-builder.js:getTableDataExtractor* that is responsible for mapping the API version to ors map extractor version. Currently the ors map extractor `V1` supports API versions `4.5` and `4.7`.
 - `i18n` - where the lang/culture resources and the lang loader resides (each page or fragment can have its own  i18n files)
 - `pages` - where the app pages that are rendered based in a route should be put. The structure and files of a page inside the pages folder is:
   - my-page-name (folder)

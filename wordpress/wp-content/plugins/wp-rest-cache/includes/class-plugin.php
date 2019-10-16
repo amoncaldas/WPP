@@ -55,7 +55,7 @@ class Plugin {
 	 */
 	public function __construct() {
 		$this->plugin_name = 'wp-rest-cache';
-		$this->version     = '2019.4.0';
+		$this->version     = '2019.4.2';
 
 		$this->set_locale();
 		$this->define_admin_hooks();
@@ -85,6 +85,7 @@ class Plugin {
 		$plugin_admin = new \WP_Rest_Cache_Plugin\Admin\Admin( $this->get_plugin_name(), $this->get_version() );
 
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_scripts' ) );
 		// Create custom plugin settings menu.
 		add_action( 'admin_menu', [ $plugin_admin, 'create_menu' ] );
 		add_action( 'admin_init', [ $plugin_admin, 'register_settings' ] );
@@ -111,6 +112,7 @@ class Plugin {
 			10,
 			3
 		);
+		add_action( 'wp_ajax_flush_caches', [ $plugin_admin, 'flush_caches' ], 10, 1 );
 	}
 
 	/**

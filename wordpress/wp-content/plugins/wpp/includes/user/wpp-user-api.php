@@ -13,7 +13,7 @@ class WppUserApi {
   public function __construct() {
     $this->baseNamespace = WPP_API_NAMESPACE;
 
-    // Load ors api routes/endpoints
+    // Load WPP api routes/endpoints
     if (!defined( 'JSON_API_VERSION' ) && ! in_array( 'json-rest-api/plugin.php', get_option( 'active_plugins' ) ) ) {
       add_action('rest_api_init', array($this, 'extend_wp_api'));
       add_filter('jwt_auth_token_before_dispatch', array( $this, 'jwt_rest_auth_user_data'), 10, 2);
@@ -32,7 +32,7 @@ class WppUserApi {
   
 
   /**
-   * Register ors tyke api routes for WP API v2.
+   * Register WPP user api routes for WP API v2.
    *
    * @since  1.0.0
    */
