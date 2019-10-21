@@ -1,0 +1,24 @@
+.v-menu-item {
+  max-width: 100%;
+}
+
+.no-shadow{
+  box-shadow: none;
+}
+
+.v-menu-expansion-panel {
+  padding-left: 0px;
+  box-shadow: none;
+}
+
+.v-menu-expansion-panel .v-expansion-panel__header {
+  padding-left: 17px;
+}
+
+.v-menu-expansion-panel.level-2 {
+  padding-left: 10px;
+}
+
+.v-menu-expansion-panel.level-2 .v-menu-item {
+  padding-left: 15px;
+}

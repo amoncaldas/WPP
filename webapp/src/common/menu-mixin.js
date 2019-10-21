@@ -26,7 +26,7 @@ const getHref = (to) => {
   return to.href
 }
 
-const isActive = (item) => {
+const isItemActive = (item) => {
   item.active = false
   let activeRoute = location.hash.replace('#', '')
   let itemRoute = item.href.replace('/dev/#', '')
@@ -38,5 +38,5 @@ const isActive = (item) => {
 
 export {showMenuItem}
 export {navigate}
-export {isActive}
+export {isItemActive}
 export {getHref}

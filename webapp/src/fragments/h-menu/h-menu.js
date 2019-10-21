@@ -1,5 +1,4 @@
 import * as menuMixin from '@/common/menu-mixin'
-
 export default {
   props: {
     item:
