@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel v-if='item.items && showMenuItem(item)' class="no-shadow" :value="item.href === $store.getters.currentSection.path ? 0 : null">
+  <v-expansion-panel v-if='item.items && showMenuItem(item)' class="no-shadow" :value="null">
     <v-expansion-panel-content class="v-menu-expansion-panel">
       <div @click.stop="nav(item)" slot="header"><h4 >{{ item.title }}</h4></div>
       <template v-if="!item.items">
