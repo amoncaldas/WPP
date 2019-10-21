@@ -1,5 +1,5 @@
 <template>
-<v-container grid-list-lg fluid class="page" >
+<v-container grid-list-lg fluid class="page-root page" >
   <v-layout row wrap>
     <v-flex md9 >
       <not-found-component v-if="notFound"></not-found-component>
