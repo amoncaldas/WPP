@@ -7,7 +7,7 @@ import store from '@/store/store'
  * from remote server and then run the local customization over it
  */
 const loadItems = (menuSlugPrefix) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let menuSlug = menuSlugPrefix + store.getters.locale
     menuManager.getMenu(menuSlug).then((menu) => {
       runCustomization(menu)
@@ -21,12 +21,12 @@ const loadItems = (menuSlugPrefix) => {
 }
 
 /**
- * Ruj the local customizations over the menu loaded
+ * Run the local customizations over the menu loaded
  *
  * @param {*} menu
  */
 const runCustomization = (menu) => {
-  menuManager.injectAt(menu, 0, { 'header': 'Links' })
+  menuManager.injectAt(menu, 0, { 'header': 'Menu' })
 
   // we can control if the custom icons are applied in the app config
   if (appConfig.setCustomMenuIcons === true) {
