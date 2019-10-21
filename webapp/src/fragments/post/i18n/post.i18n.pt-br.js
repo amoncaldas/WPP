@@ -13,6 +13,7 @@ export default {
     available: 'Disponível',
     availableAt: 'Disponível a partir de',
     lastUpdate: 'Última atualização',
-    reportError: 'Encontrou um erro? Conte-nos!'
+    reportError: 'Encontrou um erro? Conte-nos!',
+    in: 'Em'
   }
 }

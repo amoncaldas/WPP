@@ -3,7 +3,12 @@
   <box :tag="mode === 'single' ? 'main' : 'article'" :resizable="post.extra.resizable" class="post" background="white" :no-top-border="noTopBorder" v-if="post">
     <div slot="header">
       <template v-if="mode === 'single'">
-        <h1 v-if="mode === 'single'">{{title}}</h1>
+        <h1>{{title}}</h1>
+        <span> {{$t('post.in')}}
+          <a target="_blank" v-if="$store.getters.currentSection.path !== '/'" :href="buildLink($store.getters.currentSection.path)">
+          {{$store.getters.currentSection.title.rendered || $store.getters.currentSection.title}}
+          </a>
+        </span>
       </template>
       <h3 v-else-if="post.extra.no_link">{{title}}</h3>
       <template v-else>
