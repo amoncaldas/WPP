@@ -4,9 +4,9 @@
     <div slot="header">
       <template v-if="mode === 'single'">
         <h1>{{title}}</h1>
-        <span> {{$t('post.in')}}
-          <a target="_blank" v-if="$store.getters.currentSection.path !== '/'" :href="buildLink($store.getters.currentSection.path)">
-          {{$store.getters.currentSection.title.rendered || $store.getters.currentSection.title}}
+        <span v-if="$store.getters.currentSection.path !== '/'"> {{$t('post.in')}}
+          <a target="_blank" :href="buildLink($store.getters.currentSection.path)">
+            {{$store.getters.currentSection.title.rendered || $store.getters.currentSection.title}}
           </a>
         </span>
       </template>
@@ -30,7 +30,7 @@
           <br>
         </template>
         <sharer :title="title" :path="post.path" ></sharer>
-        <highlighted class="my-hi" v-if="renderAsPage && post.extra.has_highlighted_top" position="top" :columns-per-post="6" :content-id="post.id"> </highlighted>
+        <highlighted class="hilighted-top" v-if="renderAsPage && post.extra.has_highlighted_top" position="top" :columns-per-post="6" :content-id="post.id"> </highlighted>
         <br>
         <div class="html-prepend" v-if="prepend" v-html="prepend"></div>
         <div class="html-content" v-html="content"></div>

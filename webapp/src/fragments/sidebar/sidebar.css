@@ -1,3 +1,24 @@
-.switch-side {
-  background: #C62828
+.sidebar-top {
+  height: 100%;
+}
+
+.sidebar-top-title-container {
+  height: 100%;
+}
+
+.sidebar-top-title-text {
+  padding-top: 10px;
+  padding-left: 10px;
+}
+
+.sidebar-top-logo {
+  padding-top: 0px;
+}
+
+.sidebar-logo {
+  height: 100%;
+  display: block;
+  background-size: contain;
+  margin-top: 5px;
+  text-indent: -9000px;
 }
