@@ -175,6 +175,15 @@ class AppRender {
         $header_injection .= "<meta property='og:locale' content='$locale' />";
         $header_injection .= "<meta property='og:description' content='$description' />";
 
+
+        // Inject apple touch icon
+        $defaul_image = $this->get_default_image();
+        $defaul_image_url = $defaul_image[0];
+        $header_injection .= "<link rel='apple-touch-icon' sizes='57x57' href='$defaul_image_url' />";
+        $header_injection .= "<link rel='apple-touch-icon' sizes='72x72' href='$defaul_image_url' />";
+        $header_injection .= "<link rel='apple-touch-icon' sizes='114x114' href='$defaul_image_url' />";
+        $header_injection .= "<link rel='apple-touch-icon' sizes='144x144' href='$defaul_image_url' />";
+
         $faveico_path = get_option("wpp_faveico");
         if ($faveico_path) {
             $faveico_full_url = network_site_url($faveico_path);
