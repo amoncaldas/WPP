@@ -259,6 +259,8 @@ All WPP Options starts with `wpp_` prefix, except:
 Options with `wpp_` prefix that is not present by default:
 
 - wpp_signup_with_github
+- wpp_meta_*
+- wpp_meta_name_*
 - archive_sections_sidebar
 - hide_developedby
 - wpp_slider_transition - for transition options see: https://deulos.github.io/vue-flux/
