@@ -44,6 +44,9 @@ class AppRender {
         $title = get_bloginfo("name");
         $home_section = get_home_section();
         $bg_color = get_post_meta($home_section->ID, "bg_color", true);
+        if (!$bg_color || $bg_color === "") {
+            $bg_color = "#33691e"; // default color
+        }
 
         $manifest = new stdClass();
         $manifest->short_name = $short_name;
@@ -60,6 +63,24 @@ class AppRender {
         $icon512->type = "image/$ext";
         $icon512->sizes = "512x512";
         $icons[] = $icon512;
+
+        $icon144 = new stdClass();
+        $icon144->src = $main_image_url;
+        $icon144->type = "image/$ext";
+        $icon144->sizes = "144x144";
+        $icons[] = $icon144;
+
+        $icon96 = new stdClass();
+        $icon96->src = $main_image_url;
+        $icon96->type = "image/$ext";
+        $icon96->sizes = "96x96";
+        $icons[] = $icon96;
+
+        $icon48 = new stdClass();
+        $icon48->src = $main_image_url;
+        $icon48->type = "image/$ext";
+        $icon48->sizes = "48x48";
+        $icons[] = $icon48;
 
         $manifest->icons = $icons;
         $manifest->start_url = "/?l=$locale";
@@ -144,7 +165,8 @@ class AppRender {
             }
         }
         $header_injection = "<title>$title</title>";  
-        $header_injection = "<link rel='manifest' href='/manifest.json'>";        
+        $header_injection = "<link rel='manifest' href='/manifest.json'>"; 
+        $header_injection = "<link rel='manifest' href='/manifest.webmanifest'>";    
         $header_injection .= "<link rel='image_src' type='image/$ext' href='$main_image_url' />";
         $header_injection .= "<meta property='og:title' content='$title' />";        
         $header_injection .= "<meta property='og:image' content='$main_image_url' />";
