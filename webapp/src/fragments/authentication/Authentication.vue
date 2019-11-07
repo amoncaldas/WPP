@@ -31,10 +31,10 @@
     <div slot="footer">
       <v-layout row wrap>
         <v-spacer class="hidden-xs-and-down"></v-spacer>
-          <v-flex xs12 sm4 :class="{'mr-2': $vuetify.breakpoint.smAndUp, 'mb-2': $vuetify.breakpoint.smAndDown}" >
-            <v-btn dark block large color="secondary" @click="goToReset">{{ $t('authentication.resetPass') }} </v-btn>
-          </v-flex>
-          <v-flex xs12 sm4>
+        <v-flex xs12 sm4 :class="{'mr-2': $vuetify.breakpoint.smAndUp, 'mb-2': $vuetify.breakpoint.smAndDown}" >
+          <v-btn dark block large color="secondary" @click="goToReset">{{ $t('authentication.resetPass') }} </v-btn>
+        </v-flex>
+        <v-flex xs12 sm4>
           <v-btn dark block large color="secondary" @click="submit">{{ $t('authentication.login') }} <v-icon class="notranslate" right>send</v-icon> </v-btn>
         </v-flex>
       </v-layout>

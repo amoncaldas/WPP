@@ -188,7 +188,7 @@ export default {
         })
       }
       if (this.post.extra.append) {
-        let id = Array.isArray(this.post.extra.prepend) && this.post.extra.prepend.length > 0 ? this.post.extra.prepend[0] : this.post.extra.prepend
+        let id = Array.isArray(this.post.extra.append) && this.post.extra.append.length > 0 ? this.post.extra.append[0] : this.post.extra.append
         postService.get(`addings/${id}`).then((append) => {
           this.append = append.content.rendered
         })

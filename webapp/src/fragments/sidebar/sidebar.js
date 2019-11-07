@@ -1,3 +1,5 @@
+import wpp from '@/support/wpp'
+
 export default {
   data () {
     return {
@@ -28,6 +30,9 @@ export default {
     },
     menuItems () {
       return this.menuData
+    },
+    logoUrl () {
+      return wpp.logoUrl()
     }
   },
   created () {
