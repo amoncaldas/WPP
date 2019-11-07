@@ -12,7 +12,7 @@
     $highlighted_top = get_highlighted($post->ID, "top");
 
     // Check if there is highlighted posts
-    if (isset($highlighted_top) is_array($highlighted_top)) {
+    if (isset($highlighted_top) && is_array($highlighted_top)) {
       echo "<section><h1>".$highlighted_top["title"]."</h1>";
       foreach ($highlighted_top["posts"] as $highlighted_post) {
         ?>  
@@ -59,7 +59,7 @@
       $prepend_id = get_post_meta($post->ID, "prepend", true);
       $prepend_id = is_array($prepend_id)? $prepend_id[0] : $prepend_id;
       if ($prepend_id) {
-        $prepend_post = get_post($prepend_id)
+        $prepend_post = get_post($prepend_id);
         echo apply_filters('the_content', $prepend_post->post_content); 
       }
       // print the post content
@@ -71,7 +71,7 @@
       $append_id = get_post_meta($post->ID, "append", true);
       $append_id = is_array($append_id)? $append_id[0] : $append_id;
       if ($append_id) {
-        $append_post = get_post($append_id)
+        $append_post = get_post($append_id);
         echo apply_filters('the_content', $append_post->post_content); 
       }
     ?>  
@@ -81,7 +81,7 @@
     $highlighted_top = get_highlighted($post->ID, "bottom");
 
     // Check if there is highlighted posts
-    if (isset($highlighted_top) is_array($highlighted_top)) {
+    if (isset($highlighted_top) && is_array($highlighted_top)) {
       echo "<section><h1>".$highlighted_top["title"]."</h1>";
       foreach ($highlighted_top["posts"] as $highlighted_post) {
         ?>  
@@ -92,7 +92,7 @@
               $permalink = get_the_permalink($highlighted_post->ID);
             }
           ?>
-      <a href="<?php echo $permalink?>"><?php echo "<h1>".$highlighted_post->post_title."</h1>";?></a>
+          <a href="<?php echo $permalink?>"><?php echo "<h1>".$highlighted_post->post_title."</h1>";?></a>
           <time datetime="<?php echo $pohighlighted_postst->post_date;?>"><?php echo get_the_date("", $highlighted_post);?></time><br/>
           <br/>
           <div> <?php echo get_the_post_thumbnail($highlighted_post->ID); ?></div>
