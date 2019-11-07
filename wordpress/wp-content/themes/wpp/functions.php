@@ -319,13 +319,13 @@ function wpp_get_post_type_pages($post_type, $posts_per_page) {
  * @return void
  */
 function set_output () {
-	if ($_SERVER["REQUEST_URI"] === "/manifest.json") {
+	if ($_SERVER["REQUEST_URI"] === "/manifest.json" || $_SERVER["REQUEST_URI"] === "/manifest.webmanifest") {
 		define('RENDER_AUDIENCE', 'MANIFEST');
 		require_once("app-renderer.php");
 	} elseif (is_front_end()) {
 		if (is_crawler_request()) {
-      define('RENDER_AUDIENCE', 'CRAWLER_BROWSER');
-      add_filter('nav_menu_link_attributes','add_crawler_menu_iems_locale', 10, 3);
+   define('RENDER_AUDIENCE', 'CRAWLER_BROWSER');
+   add_filter('nav_menu_link_attributes','add_crawler_menu_iems_locale', 10, 3);
 		} else {
 			define('RENDER_AUDIENCE', 'USER_BROWSER');
 		}
