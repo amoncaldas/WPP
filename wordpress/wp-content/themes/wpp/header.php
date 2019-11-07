@@ -15,15 +15,20 @@
 	<title><?php echo WPP_TITLE ?></title>
 	<meta charset="<?php bloginfo('charset'); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta property="og:title" content="<?php echo WPP_TITLE; ?>"" />
-  <meta property="og:image" content="<?php echo WPP_OG_URL; ?>" />
-  <meta property="og:locale" content="<?php echo get_request_locale(); ?>" />
-  <meta property="og:description" content="<?php echo WPP_OG_DESCRIPTION; ?>" />
+ <meta property="og:title" content="<?php echo WPP_TITLE; ?>"" />
+ <meta property="og:image" content="<?php echo WPP_OG_URL; ?>" />
+ <meta property="og:locale" content="<?php echo get_request_locale(); ?>" />
+ <meta property="og:description" content="<?php echo WPP_OG_DESCRIPTION; ?>" />
 	<link rel="image_src" type="image/<?php echo WPP_OG_IMAGE_EXT ?>" href="<?php echo WPP_OG_URL; ?>" />
 
-	<?php foreach (get_wpp_metas() as $key => $value) {
+	<?php 
+	foreach (get_wpp_metas() as $key => $value) {
+		echo "<meta property='$key' content='$value'>";
+	} 
+	foreach (get_wpp_metas("name_") as $key => $value) {
 		echo "<meta name='$key' content='$value'>";
-	} ?>
+	} 
+	?>
 
 	<link rel="profile" href="http://gmpg.org/xfn/11">
 	<?php if ( is_singular() && pings_open( get_queried_object() ) ) : ?>

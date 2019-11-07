@@ -89,6 +89,9 @@ class AppRender {
             if ( strpos($key, "wpp_meta_") === 0) {
                 $meta_property_name = str_replace("wpp_meta_", "", $key);
                 $head_inject .= "<meta property='$meta_property_name' content='$value'>";
+            } else if ( strpos($key, "wpp_meta_name_") === 0) {
+                $meta_name = str_replace("wpp_meta_name_", "", $key);
+                $head_inject .= "<meta name='$meta_name' content='$value'>";
             }
         }
         $head_inject .= "</head>";
@@ -129,13 +132,15 @@ class AppRender {
                     $description = get_sub_content($content, 160);
                 }
             }
-        } else {
-            $main_image_url = get_option("wpp_site_relative_logo_url");
-            if ($main_image_url && strlen($main_image_url) > 5) {
-                $full_img_path = "/".trim(get_home_path(), "/").$main_image_url;
-                list($main_img_width, $main_img_height) = getimagesize($full_img_path);
-                $main_image_url = network_site_url(trim($main_image_url));
-                $ext = pathinfo($main_image_url, PATHINFO_EXTENSION);
+        } 
+
+        if ($main_image_url === "") {
+            $defaul_image = $this->get_default_image();
+            if ($defaul_image && is_array($defaul_image)) {
+                $main_image_url = $defaul_image[0];
+                $main_img_width = $defaul_image[1];
+                $main_img_height = $defaul_image[2];
+                $ext = $defaul_image[3];
             }
         }
         $header_injection = "<title>$title</title>";  
@@ -160,6 +165,28 @@ class AppRender {
 
         $skeleton = preg_replace("/<title[^>]*>.*?<\/title>/i", $header_injection, $skeleton);
         return $skeleton;
+    }
+
+    /**
+     * Get website main image data
+     *
+     * @return Array - [url, width, height, ext]
+     */
+    public function get_default_image() {
+        $main_image_url = get_option("wpp_site_relative_logo_url");
+        if ($main_image_url && strlen($main_image_url) > 5) {
+            $full_img_path = "/".trim(get_home_path(), "/").$main_image_url;
+            list($main_img_width, $main_img_height) = getimagesize($full_img_path);
+            $main_image_url = network_site_url(trim($main_image_url));
+            $ext = pathinfo($main_image_url, PATHINFO_EXTENSION);
+
+            return [
+                $main_image_url,
+                $main_img_width,
+                $main_img_height,
+                $ext
+            ];
+        }
     }
 
     /**
