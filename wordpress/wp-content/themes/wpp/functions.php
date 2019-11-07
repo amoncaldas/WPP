@@ -101,6 +101,39 @@ function get_related ($content_id) {
 }
 
 /**
+	* Get highligh posts
+	*
+	* @param [type] $post_id
+	* @param [type] $position
+	* @return Array
+	*/
+function get_highlighted ($content_id, $position) {
+	// Get the highlighted ids from the content highlighted_<position> saved in post meta
+	$highlighted = get_post_meta($content_id, "highlighted_$position", true);
+
+	$public_post_types = get_post_types(array("public"=>true));
+ unset($public_post_types["attachment"]);
+ unset($public_post_types[SECTION_POST_TYPE]);
+
+	// Check if there is highlighted posts
+	if ($highlighted && $highlighted !== "") {
+			$args = array(          
+					'post_type' => $public_post_types,
+					"post__in" => $highlighted,
+					'numberposts' => -1
+			);
+			$posts = get_posts($args); 
+			$highlighted_title_key = "highlighted_$position"."_title";
+			$title = get_post_meta($content_id, $highlighted_title_key, true); 
+			return [
+				"posts"=> $posts,
+				"title"=> $title,
+			];
+	}
+}
+
+
+/**
  * Get all wpp supported locales
  *
  * @return void

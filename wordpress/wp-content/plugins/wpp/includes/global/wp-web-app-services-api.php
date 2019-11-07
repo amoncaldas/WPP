@@ -188,14 +188,15 @@
 
       $content_id = $request->get_param('contentId');
       $title = "";
-      // Get the include aprameters from the content related saved in meta
-      $include = get_post_meta($content_id, "highlighted_$position", true);
+      // Get the highlighted ids from the content highlighted_<position> saved in post meta
+      $highlighted = get_post_meta($content_id, "highlighted_$position", true);
 
       // Check if there is highlighted posts
-      if (isset($include) && $include !== "") {
+      if (isset($highlighted) && $highlighted !== "") {
         $args = array(          
           'post_type' => $public_post_types,
-          "post__in" => $include
+          "post__in" => $highlighted,
+          'numberposts' => -1
         );
         $posts = get_posts($args); 
         $highlighted_title_key = "highlighted_$position"."_title";

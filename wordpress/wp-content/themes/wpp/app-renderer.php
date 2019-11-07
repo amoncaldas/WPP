@@ -213,7 +213,7 @@ class AppRender {
             if($home_section) {
                 $post_or_page_object = $home_section;
                 define('IS_SECTION', TRUE);
-                define('WPP_TITLE', bloginfo('name'));          
+                define('WPP_TITLE', get_bloginfo('name'));          
             } 
         } else { // Define the single page or post
             $uri = trim($REQUEST_URI, '/');

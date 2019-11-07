@@ -55,11 +55,22 @@
 						<nav role="navigation">
 							<?php
 								$locale = get_request_locale();
-								wp_nav_menu( array(
-									'theme_location' => "primary-menu-$locale",
-									'menu_class'     => "primary-menu-$locale",
-									"depth"=> 3
-									) );
+								$menus = get_terms( 'nav_menu' );
+								$menus = array_combine( wp_list_pluck( $menus, 'name' ), wp_list_pluck( $menus, 'term_id' ) );								
+								$primary_menu_id = $menus["primary_menu_$locale"];
+
+								$menu_items = wp_get_nav_menu_items($primary_menu_id);
+
+								if ($menu_items !== false) {
+									wp_nav_menu( 
+										array(
+										'menu' => $primary_menu_id,
+										'menu_class'     => "primary-menu-$locale",
+										"depth"=> 3,
+										'fallback_cb' => false
+										)
+									);
+								}
 							?>
 						</nav><!-- .main-navigation -->					
 					</div><!-- .site-header-menu -->
