@@ -37,10 +37,10 @@ if ( $the_query->have_posts() ) {
 		?>
 		<article>
 			<h2><a href="<?php echo $permalink; ?>"><?php the_title()?></a></h2>
-			<time :datetime="<?php echo $raw_date;?>"><?php echo $formatted_date;?></time><br/><br/>
+			<time datetime="<?php echo $raw_date;?>"><?php echo $formatted_date;?></time><br/><br/>
 			<div> <?php echo get_the_post_thumbnail(get_the_ID()); ?></div><br/>
 			<div><?php echo $excerpt; ?></div><br/>
-			<a href="<?php the_permalink()?>"><?php the_title()?></a>
+			<a href="<?php echo $permalink?>"><?php the_title()?></a>
 		</article>        
 	<?php endwhile; ?>
 	<?php wp_reset_postdata();

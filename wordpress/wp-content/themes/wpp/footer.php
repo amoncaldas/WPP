@@ -11,12 +11,22 @@
 		<footer>
 			<nav>
 				<?php
-					$locale = get_request_locale();
-					wp_nav_menu( array(
-						'theme_location' => "secondary-menu-$locale",
-						'menu_class'     => "secondary-menu-$locale",
-						"depth"=> 3
-					));
+					$menus = get_terms( 'nav_menu' );
+					$menus = array_combine( wp_list_pluck( $menus, 'name' ), wp_list_pluck( $menus, 'term_id' ) );								
+					$secondary_menu_id = $menus["secondary_menu_$locale"];
+
+					$menu_items = wp_get_nav_menu_items($secondary_menu_id);
+
+					if ($menu_items !== false) {
+						wp_nav_menu( 
+							array(
+								'menu' => $secondary_menu_id,
+								'menu_class'     => "secondary-menu-$locale",
+								'fallback_cb' => false,
+								"depth"=> 3
+							)
+						);
+					}
 				?>
 			</nav>
 		</footer><!-- .site-footer -->
