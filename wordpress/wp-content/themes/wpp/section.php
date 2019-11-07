@@ -39,12 +39,12 @@ if (isset($highlighted_top) && is_array($highlighted_top)) {
  // Slides
  $has_slider = get_post_meta($section->ID, "has_image_slides", true);
  if ($has_slider) {
-  $slider_images = get_post_meta( $section->ID, "slide_images", true); 
-  foreach ($slider_images as $image) {
-    $url = $image["url"];
-    $title = $image["title"];
-    echo "<img title='$title' src='$title'/><br/>";
-  }
+  echo "<section>";
+    $slider_images = get_post_meta( $section->ID, "slide_images", true); 
+    foreach ($slider_images as $image_id) {
+      echo wp_get_attachment_image($image_id, "full");
+    }
+  echo "</section>";
  }
 
 // Get the highlighted ids from the content highlighted_top saved in post meta
