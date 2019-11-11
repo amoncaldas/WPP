@@ -49,7 +49,7 @@
 					?>
 				</div>
 				<div>
-					<?php if ( defined("IS_SECTION") || defined("RENDER_ARCHIVE_POST_TYPE")) : ?>
+					<?php if ( defined("IS_SECTION") || defined("IS_SEARCH") || defined("RENDER_ARCHIVE_POST_TYPE")) : ?>
 						<h1 ><?php echo WPP_TITLE?></h1>
 					<?php else : ?>
 						<p ><a href="/?l=<?php echo get_request_locale() ?>" rel="home"><?php echo WPP_TITLE ?></a></p>

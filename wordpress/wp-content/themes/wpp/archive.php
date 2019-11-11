@@ -49,16 +49,17 @@ if ( $the_query->have_posts() ) {
  	// Prepare pagination
 	$pages = wpp_get_post_type_pages(RENDER_ARCHIVE_POST_TYPE, $posts_per_page);
 
+	// Print pagination
 	if ($pages > 1) {
-		echo "<div>";
+		echo "<nav>";
 		for ($i=1; $i <= $pages; $i++) { 
 			$REQUEST_URI = strtok($_SERVER["REQUEST_URI"],'?');
 			$query = array("page"=>$i, "l"=> get_request_locale());
 			$page_uri = $REQUEST_URI."?".http_build_query($query);
 			$page_link = network_site_url($page_uri);
-			echo "<a href='$page_link'>$i</a>";
+			echo "<a href='$page_link'>$i</a>&nbsp;";
 		}
-		echo "</div>";
+		echo "</nav>";
 	}
 }
 

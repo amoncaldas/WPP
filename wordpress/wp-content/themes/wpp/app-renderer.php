@@ -18,7 +18,7 @@ class AppRender {
                 exit;                 
             }
             elseif (RENDER_AUDIENCE === 'CRAWLER_BROWSER') {
-                $this->renderNoJSHtml();
+                $this->render_no_js_html();
             } elseif (RENDER_AUDIENCE === "MANIFEST") {
                 $manifest = $this->getManifest();
                 header('Content-Type: application/json');
@@ -45,7 +45,10 @@ class AppRender {
         $home_section = get_home_section();
         $bg_color = get_post_meta($home_section->ID, "bg_color", true);
         if (!$bg_color || $bg_color === "") {
-            $bg_color = "#33691e"; // default color
+            $bg_color = get_option("wpp_meta_theme-color");
+            if (!$bg_color || $bg_color === "") {
+                $bg_color = "#33691e"; // default color
+            }            
         }
 
         $manifest = new stdClass();
@@ -244,6 +247,29 @@ class AppRender {
     }
 
     /**
+     * Retrieve the search title considering the current request locale
+     *
+     * @return String $title
+     */
+    public function get_search_title () {
+        $title = "Search";
+        $locale = get_request_locale();
+
+        $dictionary = get_option("wpp_search_title_translation", "{}");
+        $dictionary = str_replace("\\", "", $dictionary);
+        $dictionary = json_decode($dictionary, true);
+    
+        if (!isset($dictionary[$locale])) {
+            return $title;
+        }
+        else {
+            return $dictionary[$locale];
+        }
+
+        return $title;
+    }
+
+    /**
      * Get the webapp html
      *
      * @return string
@@ -259,60 +285,85 @@ class AppRender {
     }
 
     /**
+     * Define rendering constants and get content object, if available
+     *
+     * @return Object|null
+     */
+    public function define_rendering_type_and_get_content_object () {
+        $post_or_page_object = null;
+        $REQUEST_URI = strtok($_SERVER["REQUEST_URI"],'?');
+
+        // render the search template
+        if ($REQUEST_URI === "/" && isset($_GET["s"])) {
+            define('IS_SEARCH', true);
+        } else {
+            // render the section that is the some page for the request locale
+            if ($REQUEST_URI === "/") {
+                $home_section = $this->get_home_section_post();
+                if($home_section) {
+                    $post_or_page_object = $home_section;
+                    define('IS_SECTION', TRUE);     
+                } 
+            } else { // Render the single page or post
+                $uri = trim($REQUEST_URI, '/');
+                $uri_segments = explode("/", $uri);
+                $uri_segments = array_map('trim', $uri_segments);
+                $last_segment = $uri_segments[count($uri_segments) - 1 ];
+    
+                if (isset($last_segment) && $last_segment !== "") {
+                    $post_or_page_object = $this->get_single($last_segment);
+                    if (!$post_or_page_object) {
+                        $this->set_archive_rendering_data($last_segment, $uri_segments);
+                    } else {
+                        if ($post_or_page_object->post_type === SECTION_POST_TYPE) {
+                            define('IS_SECTION', true);
+                        }
+                    }
+                }
+            }            
+        }
+        return $post_or_page_object;
+    }
+
+    /**
      * Render crawler html
      *
      * @return void
      */
-    public function renderNoJSHtml () {
-        $REQUEST_URI = strtok($_SERVER["REQUEST_URI"],'?');
-        // render the section that is the some page for the request locale
-        if ($REQUEST_URI === "/") {
-            $home_section = $this->get_home_section_post();
-            if($home_section) {
-                $post_or_page_object = $home_section;
-                define('IS_SECTION', TRUE);
-                define('WPP_TITLE', get_bloginfo('name'));          
-            } 
-        } else { // Define the single page or post
-            $uri = trim($REQUEST_URI, '/');
-            $uri_segments = explode("/", $uri);
-            $uri_segments = array_map('trim', $uri_segments);
-            $last_segment = $uri_segments[count($uri_segments) - 1 ];
-
-            if (isset($last_segment) && $last_segment !== "") {
-                $post_or_page_object = $this->get_single($last_segment);
-                if (!$post_or_page_object) {
-                    $this->set_archive_rendering_data($last_segment, $uri_segments);
-                } else {
-                    define('WPP_TITLE', ucfirst($post_or_page_object->post_title) . " | ". get_bloginfo('name'));
-                    if ($post_or_page_object->post_type === SECTION_POST_TYPE) {
-                        define('IS_SECTION', true);
-                    }
-                }
-            }
-        }
+    public function render_no_js_html () {
+        
+        $post_or_page_object = $this->define_rendering_type_and_get_content_object();
+        define('WPP_OG_DESCRIPTION', $this->get_site_description());
 
         // If a page or post is defined, set it as global object
         if(isset($post_or_page_object)) {
+            define('WPP_TITLE', ucfirst($post_or_page_object->post_title) . " | ". get_bloginfo('name'));
             // Define OG:DECRIPTION
             $this->set_content_wpp_og_constans($post_or_page_object);
             
             // Define the template
             if(defined("IS_SECTION")) {
                 global $section;
-                $section = $post_or_page_object;                
+                $section = $post_or_page_object;  
                 require_once("section.php");
             } else {   
                 global $post;
                 $post = $post_or_page_object;
                 require_once("single.php");
             }
-        } else { // if not, or we are in an archive or it is 404
-            if (defined('RENDER_ARCHIVE_POST_TYPE')){
-                $this->set_default_og_image_constants();
-                define('WPP_OG_DESCRIPTION', $this->get_site_description());
+        } else { // if not, or we are in an archive, search 404
+            $this->set_default_og_image_constants();
+            if (defined('IS_SEARCH')) {
+                $search_title = $this->get_search_title();
+                define('WPP_TITLE', $search_title . " | ". get_bloginfo('name'));               
+                require_once("search.php");
+            } elseif (defined('RENDER_ARCHIVE_POST_TYPE')){
+                $locale = get_request_locale();
+                $listing_title = get_post_type_title_translation(RENDER_ARCHIVE_POST_TYPE, $locale);
+                define('WPP_TITLE', $listing_title . " | ". get_bloginfo('name'));
                 require_once("archive.php");
             } else {
+                define('WPP_TITLE', "404" . " | ". get_bloginfo('name')); 
                 require_once("404.php");
             }
         }   
