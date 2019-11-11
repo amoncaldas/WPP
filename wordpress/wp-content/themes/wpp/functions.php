@@ -343,13 +343,13 @@ function set_output () {
  *
  * @return void
  */
-function get_wpp_metas($append = "") {
+function get_wpp_metas() {
 	$all_options = wp_load_alloptions();
 
 	$wpp_metas = [];
 	foreach ($all_options as $key => $value) {
-		if ( strpos($key, "wpp_meta_$appen") === 0) {
-			$clean_key =  $meta_property_name = str_replace("wpp_meta_$appen", "", $key);
+		if ( strpos($key, "wpp_meta_") === 0) {
+			$clean_key =  $meta_property_name = str_replace("wpp_meta_", "", $key);
 			$wpp_metas[$clean_key] = $value;
 		}
 	}
