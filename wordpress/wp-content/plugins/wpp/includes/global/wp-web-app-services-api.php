@@ -256,7 +256,6 @@
     public function get_search( $request ) {
       $public_post_types = get_post_types(array("public"=>true));
       unset($public_post_types["attachment"]);
-      unset($public_post_types["member"]);
       unset($public_post_types["adding"]);
 
 	    $args = $this->prepareSearchArgs($request, $public_post_types);

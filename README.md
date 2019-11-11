@@ -262,6 +262,8 @@ Options with `wpp_` prefix that is not present by default:
 - wpp_meta_*
 - wpp_meta_name_*
 - archive_sections_sidebar
+- wpp_meta_theme-color
+- wpp_search_title_translation
 - hide_developedby
 - wpp_slider_transition - for transition options see: https://deulos.github.io/vue-flux/
 

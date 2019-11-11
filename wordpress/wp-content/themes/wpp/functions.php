@@ -22,7 +22,12 @@ define('SECTION_POST_HOME_FIELD_VALUE', "home");
  */
 function is_front_end() {
 	$uri = $_SERVER["REQUEST_URI"];
-	return $uri !== "" && !is_admin() && strrpos($uri, "wp-json") === false && strrpos($uri, "/feed") === false && strrpos($uri, "wp-login.php") === false && strrpos($uri, "/admin") === false;
+	return $uri !== "" 
+		&& !is_admin() 
+		&& strrpos($uri, "wp-json") === false 
+		&& strrpos($uri, "/feed") === false 
+		&& strrpos($uri, "wp-login.php") === false 
+		&& strrpos($uri, "/admin") === false;
 }
 
 	/**
