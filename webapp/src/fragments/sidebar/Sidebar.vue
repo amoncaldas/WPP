@@ -19,6 +19,7 @@
                 {{$store.getters.options.site_title}}
               </a>
             </v-flex>
+            <v-icon @click.stop="isSideBarOpen = false" class="notranslate right-btn-icon" :title="$t('global.close')">close</v-icon>
           </v-layout>
         </v-list-tile-title>
       </v-list-tile>
@@ -31,6 +32,9 @@
         </template>
       </v-list>
     </v-list>
+    <!-- <v-footer class="sidebar-footer" :dark="$store.getters.isDark" color="accent" :height="40">
+      <p style="margin:auto"><span>&nbsp;© {{currentYear}} <strong>{{$store.getters.options.site_title}}</strong></span></p>
+    </v-footer> -->
   </v-navigation-drawer>
 </template>
 <script src="./sidebar.js"></script>

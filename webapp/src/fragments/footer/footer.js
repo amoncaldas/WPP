@@ -5,7 +5,7 @@ export default {
       footerMainSiteName: null,
       menuData: [],
       drawer: true,
-      clipped: false,
+      clipped: false
     }
   },
   computed: {
@@ -31,17 +31,11 @@ export default {
     }
   },
   created () {
-
     this.loadData()
     this.footerMainSiteName = this.$store.getters.options.site_title
 
     this.eventBus.$on('localeChanged', () => {
       this.loadData()
-    })
-    this.eventBus.$on('routeChanged', (routeParams) => {
-      if (this.menuItems.length > 0) {
-        menuManager.setMenuActiveStatus(this.menuItems, routeParams.to)
-      }
     })
   }
 }
