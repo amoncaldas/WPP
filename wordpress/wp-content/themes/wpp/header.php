@@ -23,10 +23,11 @@
 
 	<?php 
 	foreach (get_wpp_metas() as $key => $value) {
-		echo "<meta property='$key' content='$value'>";
-	} 
-	foreach (get_wpp_metas("name_") as $key => $value) {
-		echo "<meta name='$key' content='$value'>";
+		if ( strpos($key, "name_") === 0) {
+			echo "<meta name='$key' content='$value'>";
+		} else {
+			echo "<meta property='$key' content='$value'>";
+		}
 	} 
 	?>
 

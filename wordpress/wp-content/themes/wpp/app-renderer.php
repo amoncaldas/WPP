@@ -110,12 +110,12 @@ class AppRender {
 
         $head_inject = "";
         foreach ($all_options as $key => $value) {
-            if ( strpos($key, "wpp_meta_") === 0) {
-                $meta_property_name = str_replace("wpp_meta_", "", $key);
-                $head_inject .= "<meta property='$meta_property_name' content='$value'>";
-            } else if ( strpos($key, "wpp_meta_name_") === 0) {
+            if ( strpos($key, "wpp_meta_name_") === 0) {
                 $meta_name = str_replace("wpp_meta_name_", "", $key);
                 $head_inject .= "<meta name='$meta_name' content='$value'>";
+            } elseif ( strpos($key, "wpp_meta_") === 0) {
+                $meta_property_name = str_replace("wpp_meta_", "", $key);
+                $head_inject .= "<meta property='$meta_property_name' content='$value'>";
             }
         }
         $head_inject .= "</head>";
