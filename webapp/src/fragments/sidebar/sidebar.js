@@ -33,6 +33,9 @@ export default {
     },
     logoUrl () {
       return wpp.logoUrl()
+    },
+    currentYear () {
+      return (new Date()).getFullYear()
     }
   },
   created () {
