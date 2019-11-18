@@ -129,6 +129,8 @@ class AppRender {
         $main_image_url = "";
         
         $post_id = get_request_post_id();
+
+        // If there is a post id for the current request
         if ($post_id) {
             $post = get_post($post_id);
             if ($post) {
