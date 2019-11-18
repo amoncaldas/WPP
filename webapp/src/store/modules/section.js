@@ -37,7 +37,7 @@ const actions = {
       if (getters.sections.length > 0) {
         resolve(getters.sections)
       }
-      httpApi.get(appConfig.baseWpApiPath + 'sections?_embed').then((response) => {
+      httpApi.get(appConfig.baseWpApiPath + 'sections?_embed&per_page=100').then((response) => {
         var parser = document.createElement('a')
         let sections = response.data
         var regex = new RegExp('/', 'g')
