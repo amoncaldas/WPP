@@ -579,20 +579,23 @@ function get_request_post_id() {
 	if ($REQUEST_URI !== "/") {
 			$uri_parts = explode("/", $REQUEST_URI);
 			$last_uri_segment = $uri_parts[count($uri_parts) -1];
-			if(is_numeric($last_uri_segment)) {
-					return $last_uri_segment;
-			} else {
-					global $wpdb;
-					$sql = "SELECT ID FROM $wpdb->posts WHERE post_status = 'publish' && post_type = '".SECTION_POST_TYPE."' && post_name = '".$last_uri_segment."'";
-					$section_id = $wpdb->get_var($sql);	
-					if ($section_id > 0) {
-							return $section_id;
-					} else {
-							$page = get_page_by_path( $last_uri_segment);		
-							if ($page !== null) {
-									return $page->ID;
-							}
-					}
+
+			if ($last_uri_segment !== "") {
+				if(is_numeric($last_uri_segment)) {
+						return $last_uri_segment;
+				} else {
+						global $wpdb;
+						$sql = "SELECT ID FROM $wpdb->posts WHERE post_status = 'publish' && post_type = '".SECTION_POST_TYPE."' && post_name = '".$last_uri_segment."'";
+						$section_id = $wpdb->get_var($sql);	
+						if ($section_id > 0) {
+								return $section_id;
+						} else {
+								$page = get_page_by_path( $last_uri_segment);		
+								if ($page !== null) {
+										return $page->ID;
+								}
+						}
+				}
 			}
 	}
 }
