@@ -82,7 +82,8 @@ export default {
       this.showLoading = value
     })
     this.eventBus.$on('titleChanged', (title) => {
-      this.title = `${title} | ${this.$store.getters.options.site_title}`
+      title = title.indexOf(this.$store.getters.options.site_title) === -1 ? `${title} | ${this.$store.getters.options.site_title}` : title
+      this.title = title
     })
 
     this.eventBus.$on('langChanged', (lang) => {
