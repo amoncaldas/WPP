@@ -99,11 +99,11 @@
 	}
 
 	/**
-   * Get the google recaptcha secret
-   *
-   * @var string
-   */
-  function get_recaptcha_secret (){
+		* Get the google recaptcha secret
+		*
+		* @var string
+		*/
+	function get_recaptcha_secret (){
 		$secret = get_option("recaptcha_secret", "6LcOa2MUAAAAAMjC-Nqnxcs1u4mX62PSrXeixDeI");
 		return $secret;
 	}

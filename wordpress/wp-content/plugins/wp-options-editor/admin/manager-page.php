@@ -2,14 +2,14 @@
 defined( 'ABSPATH' ) OR exit;
 
 /**
- * Options Manager Settings Page
+ * WPP Options Manager Settings Page
  *
  * This class declares & creates the settings page that runs the manager. All
  * PHP work including AJAX callbacks, page display, and various functionality
  * are currently housed in this class.
  *
  * @category   WordPress
- * @author     Mike Selander
+ * @author     Amon Caldas
  * @since      Class available since Release 1.0
  */
 class OptionsManagerSettingsPage {
@@ -271,8 +271,8 @@ class OptionsManagerSettingsPage {
 
 		$page = add_submenu_page(
 			'tools.php',
-			__( 'Manage WP Options Table', 'options_editor' ),
-			__( 'Manage wp_options', 'options_editor' ),
+			__( 'Manage WPP Options Table', 'options_editor' ),
+			__( 'Manage WPP options', 'options_editor' ),
 			'manage_options',
 			'options_editor',
 			array( $this, 'settings_page' )
@@ -485,12 +485,11 @@ class OptionsManagerSettingsPage {
 			return;
 		}
 
-		$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->options" );
+		$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->options where option_name like 'wpp_%' or option_name = 'git_hub_client_secret' or option_name = 'recaptcha_secret'" );
 
 		if ( $count ){
-			return "<h3>$count total options in the ".$wpdb->prefix."options table</h3>";
+			return "<h3>$count total WPP theme options</h3>";
 		}
-
 	}
 
 
@@ -537,7 +536,7 @@ class OptionsManagerSettingsPage {
 	public function get_all_options_cacheless(){
 		global $wpdb;
 
-		$alloptions_db = $wpdb->get_results( "SELECT option_name, option_value FROM $wpdb->options" );
+		$alloptions_db = $wpdb->get_results( "SELECT option_name, option_value FROM $wpdb->options where option_name like 'wpp_%'" );
 
 		foreach ( (array) $alloptions_db as $o ) {
             $alloptions[$o->option_name] = $o->option_value;
@@ -561,7 +560,7 @@ class OptionsManagerSettingsPage {
 
 		// Build page HTML
 		$html .= '<div class="wrap" id="options_editor">';
-			$html .= '<h2>' . __( 'Manage Options' , 'options_editor' ) . '</h2>';
+			$html .= '<h2>' . __( 'Manage WPP Options' , 'options_editor' ) . '</h2>';
 
 				$all_options = $this->get_all_options_cacheless();
 

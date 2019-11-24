@@ -193,6 +193,11 @@ export default {
           this.append = append.content.rendered
         })
       }
+    },
+    navigateToSingle () {
+      if (this.mode !== 'single') {
+        this.$router.push({ path: this.link })
+      }
     }
   },
   components: {

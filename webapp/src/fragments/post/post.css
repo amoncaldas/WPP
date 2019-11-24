@@ -53,6 +53,10 @@
   height: auto;
 }
 
+.html-content >>> a {
+  font-weight: 600;
+}
+
 .report-error {
   margin-left:0px;
   text-transform: none !important;

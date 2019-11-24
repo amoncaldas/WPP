@@ -31,8 +31,6 @@ class WpWebAppTheme {
 		add_action('wp_insert_post', array($this,'after_save_content'), 10, 2 );
 		add_action('save_post', array($this,'wpp_clear_listing_wp_rest_cache'), 10, 2 );
 		add_filter('request', array($this, 'set_feed_types'));
-		add_action('init', array($this, 'make_sure_locale_exists'), 11);
-		add_action('init', array($this, 'make_sure_home_section_exists'), 12);
 		add_action('rest_api_init', array($this, 'on_rest_api_init'));
 		add_filter('image_send_to_editor', array($this, 'set_image_before_send_to_editor'), 10, 6 );		
 
@@ -152,65 +150,7 @@ class WpWebAppTheme {
 
 		return $data;
 	}
-
-	/**
-	 * Make sure the mandatory locales exists exists. If any one required does not exist, create it
-	 *
-	 * @return void
-	 */
-	public function make_sure_locale_exists() {
-		if (is_admin()) {
-			$locale_terms = get_terms( array('taxonomy' => LOCALE_TAXONOMY_SLUG, 'hide_empty' => false, 'orderby' => 'id', 'order' => 'ASC'));
-			if (!$locale_terms || count($locale_terms) === 0) {
-				wp_insert_term("en-us", LOCALE_TAXONOMY_SLUG, array("description"=> "English", "slug"=> "en-us"));
-			}
-			$neutral_locale = get_term_by('slug', 'neutral', LOCALE_TAXONOMY_SLUG);	
-			if (!$neutral_locale) {
-				wp_insert_term("neutral", LOCALE_TAXONOMY_SLUG, array("description"=> "Neutral", "slug"=> "neutral"));
-			}
-		}
-	}
-
-	/**
-	 * Check if home section exists. If does not exist, create it
-	 *
-	 * @return void
-	 */
-	public function make_sure_home_section_exists() {
-		if (is_admin()) {
-			// Get all available terms, and select the first one as default
-			$available_locale_terms = get_terms( array('taxonomy' => LOCALE_TAXONOMY_SLUG, 'hide_empty' => false, 'orderby' => 'id', 'order' => 'ASC'));
 	
-			if (is_array($available_locale_terms)) {
-				foreach ($available_locale_terms as $lang_term) {
-					if ($lang_term->slug === "neutral") {
-						continue;
-					}
-	
-					// Get the home for a given language. If it does not exist, create it
-					$home_sections = $this->get_home_sections($lang_term->term_id);
-	
-					if (count($home_sections) === 0) {
-						$section_title = "Home | ". $lang_term->name;
-						$home_section_id = wp_insert_post(
-							array(
-								"post_type"=> SECTION_POST_TYPE, 
-								"post_status"=> "publish",
-								"post_author"=> 1, // 1 is always the admin, the first user created
-								"post_title"=> $section_title,
-								"meta_input"=> array(
-									SECTION_TYPE_FIELD_SLUG => SECTION_POST_HOME_FIELD_VALUE
-								)
-							)
-						);
-						// Assign the default (the first one available)
-						wp_set_post_terms($home_section_id, [$lang_term->term_id], LOCALE_TAXONOMY_SLUG);
-					}
-				}				
-			}
-		}
-	}
-
 	/**
 	 * Register rest api hooks to treat locale and resolve custom data
 	 *
@@ -491,69 +431,13 @@ class WpWebAppTheme {
 	 */
 	public function after_save_post( $post_id, $post ) {
 		if ($this->WPP_SKIP_AFTER_SAVE === false) {
-			$this->set_default_taxonomy($post, LOCALE_TAXONOMY_SLUG);
-			$this->set_section($post);	
+			$this->set_post_default_taxonomy ($post, LOCALE_TAXONOMY_SLUG);
+			$this->set_post_section($post);	
 			$this->set_valid_post_name($post);
-			$this->set_unique_section_home($post);
 			return $post;
 		}
 	}
 
-	/**
-	 * Get home sections with a given language term id
-	 *
-	 * @param Integer $lang_term_id
-	 * @return Array
-	 */
-	public function get_home_sections($lang_term_id) {
-		// Set the get posts args to retrieve the home section
-		$home_section_args = array(
-			"post_type"=> SECTION_POST_TYPE, 
-			"post_status"=> "publish", 
-			'meta_query' => array(
-				array(
-					'key'=> SECTION_TYPE_FIELD_SLUG,
-					'value'=> SECTION_POST_HOME_FIELD_VALUE
-				)
-			),
-			'tax_query' => array (
-				array(
-					'taxonomy' => LOCALE_TAXONOMY_SLUG,
-					'field' => 'term_id',
-					'terms' => $lang_term_id
-				)
-			)
-		);
-		$home_sections = get_posts($home_section_args);	
-		return $home_sections;
-	}
-
-	/**
-	 * Guarantee that only one section is defined as home
-	 *
-	 * @param object $post
-	 * @return void
-	 */
-	public function set_unique_section_home ($post) {
-		if (SECTION_POST_TYPE === $post->post_type) {
-			$section_type = get_post_meta($post->ID, SECTION_TYPE_FIELD_SLUG, true);	
-
-			$post_langs_terms = wp_get_post_terms($post->ID, LOCALE_TAXONOMY_SLUG);
-
-			if (is_array($post_langs_terms)) {
-				$home_sections = $this->get_home_sections($post_langs_terms[0]->term_id);
-				
-				if ($section_type === SECTION_POST_HOME_FIELD_VALUE && count($home_sections) > 1) {
-					$this->WPP_SKIP_AFTER_SAVE = true;
-					foreach ($home_sections as $home_section) {
-						wp_update_post(array('ID' => $home_section->ID, 'meta_query' => array(array('key'=> SECTION_TYPE_FIELD_SLUG,'value'=> SECTION_POST_HOME_FIELD_VALUE))));
-					}
-					wp_update_post( array('ID' => $post->ID, 'meta_query' => array(array('key'=> SECTION_TYPE_FIELD_SLUG,'value'=> SECTION_POST_HOME_FIELD_VALUE))));
-					$this->WPP_SKIP_AFTER_SAVE = false;
-				}
-			}
-		}
-	}
 
 	/**
 	 * Make sure that the post has not a name/slug conflicting with an existing page
@@ -639,7 +523,7 @@ class WpWebAppTheme {
 
 			// We only set the custom permalink when the the parent is already defined
 			// In the normal wordpress post save flow this hook is fired twice, and in the second time
-			// have the parent already defined, after running the `set_section` as a trigger for `wp_insert_post`
+			// have the parent already defined, after running the `set_post_section ` as a trigger for `wp_insert_post`
 			if($parent) {
 				// Some post type may support translations in url: /stories/my-conteudo/123 => /relatos/meu-conteudo/123
 				$post_slug_translation = $this->get_post_url_slug($post);
@@ -729,7 +613,7 @@ class WpWebAppTheme {
 
 		// We only set the custom permalink when the the parent is already defined
 		// In the normal wordpress post save flow this hook is fired twice, and in the second time
-		// have the parent already defined, after running the `set_section` as a trigger for `wp_insert_post`
+		// have the parent already defined, after running the `set_post_section ` as a trigger for `wp_insert_post`
 		
 		if (isset($_POST['new_title']) && $_POST['new_title'] !== "") {
 			$page_name = sanitize_title($_POST['new_title']);
@@ -856,13 +740,13 @@ class WpWebAppTheme {
 		return $post_slug;
 	}
 
-	/**
-	 * Set post section, if it supports section
-	 *
-	 * @param WP_Post $post
-	 * @return void
-	 */
-	public function set_section($post) {
+/**
+	* Set post section, if it supports section
+	*
+	* @param WP_Post $post
+	* @return void
+	*/
+	public function set_post_section ($post) {
 		$post_types_with_section = get_post_types_by_support("parent_section");
 
 		// Built in `post` also supports parent_section
@@ -888,8 +772,8 @@ class WpWebAppTheme {
 			}
 		}
 	}
-
-	/**
+	
+/**
 	 * Get parent section id
 	 *
 	 * @param Integer $post_id
@@ -914,7 +798,7 @@ class WpWebAppTheme {
 	 * @param string $taxonomy_slug
 	 * @return void
 	 */
-	public function set_default_taxonomy($post_or_id, $taxonomy_slug) {
+	public function set_post_default_taxonomy ($post_or_id, $taxonomy_slug) {
 		$post_id = is_integer($post_or_id) ? $post_or_id : $post_or_id->ID;
 
 		$post = get_post($post_id);
@@ -985,10 +869,10 @@ class WpWebAppTheme {
 
 		return $html;
 	}
- }
+}
 
 // Start theme functions class
- $wpWebAppTheme = new WpWebAppTheme();
+$wpWebAppTheme = new WpWebAppTheme();
  
 
 

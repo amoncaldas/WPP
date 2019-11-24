@@ -1,18 +1,10 @@
 <?php
 /**
- * Theme: WPP
- * Author: Amon Caldas
- * Author URI:  https://github.com/amoncaldas
- *
+ * WPP functions
  */
 
-if ( ! defined('LOCALE_TAXONOMY_SLUG') ) {
-	define('LOCALE_TAXONOMY_SLUG', "locale");
-}
-
-define('SECTION_POST_TYPE', "section");
-define('SECTION_TYPE_FIELD_SLUG', "section_type");
-define('SECTION_POST_HOME_FIELD_VALUE', "home");
+require_once("includes/wpp-locale.php");
+require_once("includes/wpp-section.php");
 
 
 /**
@@ -203,60 +195,23 @@ function add_language_admin_menu(){
 }
 
 /**
- * Register custom types section and lang
- *
- * @return void
- */
-function register_custom_types () {
-	$section_args = array (
-		'name' => SECTION_POST_TYPE,
-		'label' => ucfirst(SECTION_POST_TYPE)."s",
-		'singular_label' => ucfirst(SECTION_POST_TYPE),
-		'public' => true,
-		'publicly_queryable' => true,
-		'show_ui' => true,
-		'show_in_nav_menus' => true,
-		'show_in_rest' => true,
-		'rest_base' => strtolower(SECTION_POST_TYPE)."s",
-		'map_meta_cap' => true,
-		'has_archive' => false,
-		'exclude_from_search' => false,
-		'capability_type' => array(SECTION_POST_TYPE, SECTION_POST_TYPE."s"),
-		'hierarchical' => false,
-		'rewrite' => true,
-		'rewrite_withfront' => true,	
-		'show_in_menu' => true,
-		'supports' => 
-		array (
-			0 => 'title',
-			2 => 'thumbnail',
-			3 => 'revisions',
-		),
-	);
-
-	register_post_type( SECTION_POST_TYPE , $section_args );
-
-	$lang_tax_args = array (
-		'name' => LOCALE_TAXONOMY_SLUG."s",
-		'label' => ucfirst(LOCALE_TAXONOMY_SLUG),
-		'singular_label' => ucfirst(LOCALE_TAXONOMY_SLUG),
-		'public' => true,
-		'publicly_queryable' => true,
-		'hierarchical' => false,
-		'show_ui' => true,
-		'show_in_menu' => true,
-		'show_in_nav_menus' => true,
-		'query_var' => true,
-		'rewrite' => true,
-		'rewrite_withfront' => '1',
-		'rewrite_hierarchical' => '0',
-		'show_admin_column' => true,
-		'show_in_rest' => true,
-		'rest_base' => 'langs',
-	);
-	register_taxonomy( LOCALE_TAXONOMY_SLUG, null, $lang_tax_args );
+* Get current post type
+*
+* @return String || null
+*/
+function wpp_get_current_post_type() {	
+ global $post, $typenow, $current_screen;
+ 
+ if ($post && $post->post_type) return $post->post_type;
+ 
+ elseif($typenow) return $typenow;
+ 
+ elseif($current_screen && $current_screen->post_type) return $current_screen->post_type;
+ 
+ elseif(isset($_REQUEST['post_type'])) return sanitize_key($_REQUEST['post_type']);
+ 
+ return null;	
 }
-
 
 /**
  * Determine if the request is being made by a crawler
@@ -306,14 +261,15 @@ function add_crawler_menu_iems_locale ($atts, $item, $args) {
 function wpp_get_post_type_pages($post_type, $posts_per_page) {
   // Prepare pagination
   $posts_to_count = new WP_Query(array( "post_type"=> $post_type,  "post_status"=> "publish"));
-	$total = $posts_to_count->post_count;
-	$pages = 1;
-	if ($total > $posts_per_page) {
-		$pages = $total / $posts_per_page;
-		$rest = $total % $posts_per_page;
-		if ($rest > 0) {
-			$pages++;
-		}
+		$total = $posts_to_count->post_count;
+		$pages = 1;
+
+		if ($total > $posts_per_page) {
+			$pages = $total / $posts_per_page;
+			$rest = $total % $posts_per_page;
+			if ($rest > 0) {
+				$pages++;
+			}
   }
   return $pages;
 }
@@ -608,7 +564,6 @@ function get_request_post_id() {
  */
 function after_init() {
 	allow_cors();
-	register_custom_types();
 	set_output();
 	register_wpp_menus();
 	add_language_admin_menu();

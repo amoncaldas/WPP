@@ -20,8 +20,10 @@
 
     <div slot="content">
       <template v-if="mode !== 'compact' && mode !== 'list'">
-        <media :mode="mode" v-if="post._embedded" :media="featuredMedia" :max-height="mode === 'single'? 500 : 200"></media>
-        <media :mode="mode" v-else-if="post.featured_media" :media-id="post.featured_media" :max-height="mode === 'single'? 500 : 200"></media>
+        <div style="cursor: pointer" @click="navigateToSingle()">
+          <media :mode="mode" v-if="post._embedded" :media="featuredMedia" :max-height="mode === 'single'? 500 : 200"></media>
+          <media :mode="mode" @click="navigateToSingle()" v-else-if="post.featured_media" :media-id="post.featured_media" :max-height="mode === 'single'? 500 : 200"></media>
+        </div>
         <br>
       </template>
       <template v-if="mode === 'single'">
@@ -91,7 +93,7 @@
             <media :mode="mode" v-else-if="post.featured_media" :media-id="post.featured_media" :max-height="200"></media>
           </v-flex>
           <v-flex sm9 >
-            <div v-if="excerpt && excerpt.length > 0">{{excerpt}}</div>
+            <div v-if="excerpt && excerpt.length > 0" v-html="excerpt"></div>
           </v-flex>
         </v-layout>
         <template v-else>

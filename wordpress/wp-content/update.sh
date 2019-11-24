@@ -24,7 +24,7 @@ wp plugin install wp-rollback --allow-root
 
 
 # Install wpp plugin
-wp plugin install wp-web-app --allow-root --activate
+wp plugin install wpp --allow-root --activate
 
 # Set htacess modifiable
 chmod 777 /var/www/html/.htaccess 
