@@ -32,7 +32,9 @@
           <br>
         </template>
         <sharer :title="title" :path="post.path" ></sharer>
-        <highlighted class="hilighted-top" v-if="renderAsPage && post.extra.has_highlighted_top" position="top" :columns-per-post="6" :content-id="post.id"> </highlighted>
+        <template v-if="renderAsPage && post.extra.has_highlighted_top">
+          <highlighted class="hilighted-top" position="top" :columns-per-post="6" :content-id="post.id"> </highlighted>
+        </template>
         <br>
         <div class="html-prepend" v-if="prepend" v-html="prepend"></div>
         <div class="html-content" v-html="content"></div>
@@ -62,11 +64,14 @@
             <v-btn v-for="(tag) in tags" :key="tag.id" round depressed :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
           </template>
         </div>
-        <highlighted v-if="renderAsPage && post.extra.has_highlighted_bottom" position="bottom" :columns-per-post="6" :content-id="post.id"> </highlighted>
+        <template v-if="renderAsPage && post.extra.has_highlighted_bottom">
+          <br/>
+          <highlighted position="bottom" :columns-per-post="6" :content-id="post.id"> </highlighted>
+        </template>
 
         <template v-if="hasPlaces">
           <post-map @placeClicked="placeClicked" :post="post"></post-map>
-          <br>
+          <br/>
         </template>
         <box v-if="post.extra.medias" background="white" :no-top-border="noTopBorder">
           <div slot="header">{{$t('post.gallery')}}</div>
