@@ -26,10 +26,11 @@ export default {
       return urls
     },
     transition () {
-      if (this.$store.getters.options.slider_transition) {
+      if (this.$store.getters.options.slider_transition && Transitions[this.$store.getters.options.slider_transition]) {
         return Transitions[this.$store.getters.options.slider_transition]
       }
-      return Transitions.transitionKenburn
+      let transitions = Transitions
+      return transitions.transitionKenburn
     }
   },
 
@@ -40,7 +41,7 @@ export default {
       fullscreen: false
     },
     fluxTransitions: {
-      transitionBook: this.transition
+      transitionBook: Transitions.transitionKenburn
       // Transition options: @see: https://deulos.github.io/vue-flux/
     }
   })

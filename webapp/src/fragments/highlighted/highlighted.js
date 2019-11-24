@@ -58,6 +58,9 @@ export default {
       // @see http://v2.wp-api.org/reference/posts/
       let service = highlightedtService
       let endpoint = service.getEndPoint().replace('<contentId>', this.contentId)
+      // Remove any position previously set
+      endpoint = endpoint.replace('/top', '').replace('/middle', '').replace('/bottom', '')
+      // Build  a new endpoint
       endpoint = `${endpoint}/${this.position}`
       service.setEndPoint(endpoint)
       service.query({}).then((response) => {

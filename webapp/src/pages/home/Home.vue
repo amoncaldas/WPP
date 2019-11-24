@@ -1,8 +1,13 @@
 <template>
   <v-container v-if="currentSection" fluid class="page-root home">
-    <highlighted v-if="currentSection.extra.has_highlighted_top" position="top" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
+    <template v-if="currentSection.extra.has_highlighted_top">
+      <highlighted position="top" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
+    </template>
     <slider v-if="currentSection.extra.has_image_slides" :contents="currentSection.extra.slide_images"></slider>
-    <highlighted v-if="currentSection.extra.has_highlighted_middle" position="middle" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
+    <template v-if="currentSection.extra.has_highlighted_middle">
+      <br/>
+      <highlighted position="middle" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
+    </template>
     <div class="content" v-if="currentSection.extra.has_content" v-html="currentSection.extra.html_content"></div>
     <template>
       <br>
@@ -30,7 +35,10 @@
         </template>
       </template>
     </template>
-    <highlighted v-if="currentSection.extra.has_highlighted_bottom" position="bottom" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
+    <template v-if="currentSection.extra.has_highlighted_bottom">
+      <br/>
+      <highlighted position="bottom" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
+    </template>
   </v-container>
 </template>
 

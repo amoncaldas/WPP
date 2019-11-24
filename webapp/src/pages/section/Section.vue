@@ -2,9 +2,9 @@
   <v-container fluid class="page-root section">
     <highlighted v-if="currentSection.extra.has_highlighted_top" position="top" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
     <slider v-if="currentSection.extra.has_image_slides" :contents="currentSection.extra.slide_images"></slider>
-    <br>
+    <br/>
     <template v-if="currentSection.extra.has_highlighted_middle">
-      <br>
+      <br/>
       <highlighted position="middle" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
     </template>
     <template  v-if="currentSection.extra.has_content">
@@ -30,7 +30,7 @@
       </template>
     </div>
     <template v-if="currentSection.extra.has_highlighted_bottom">
-      <br>
+      <br/>
       <highlighted position="bottom" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
     </template>
   </v-container>
