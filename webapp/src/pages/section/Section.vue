@@ -3,7 +3,10 @@
     <highlighted v-if="currentSection.extra.has_highlighted_top" position="top" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
     <slider v-if="currentSection.extra.has_image_slides" :contents="currentSection.extra.slide_images"></slider>
     <br>
-    <highlighted v-if="currentSection.extra.has_highlighted_middle" position="middle" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
+    <template v-if="currentSection.extra.has_highlighted_middle">
+      <br>
+      <highlighted position="middle" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
+    </template>
     <template  v-if="currentSection.extra.has_content">
       <div class="content" v-html="currentSection.extra.html_content"></div>
       <br>
@@ -26,7 +29,10 @@
         </template>
       </template>
     </div>
-    <highlighted v-if="currentSection.extra.has_highlighted_bottom" position="bottom" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
+    <template v-if="currentSection.extra.has_highlighted_bottom">
+      <br>
+      <highlighted position="bottom" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
+    </template>
   </v-container>
 </template>
 

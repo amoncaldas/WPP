@@ -11,7 +11,7 @@ class AppRender {
     function __construct () {
 		if (defined('RENDER_AUDIENCE')) {
             if (RENDER_AUDIENCE === 'USER_BROWSER') {
-                $webapp = $this->getWebAppHtml();
+                $webapp = $this->get_web_app_html ();
                 // Output the basic html app here
                 // the content will be rendered via javascript
                 echo $webapp;
@@ -100,7 +100,7 @@ class AppRender {
      *
      * @return string
      */
-    public function getHTMLSkeleton () {
+    public function get_html_skeleton  () {
         $skeleton = file_get_contents("/var/www/webapp/index.html");
         $skeleton = str_replace("=static/", "=/static/", $skeleton);
         $all_options = wp_load_alloptions();
@@ -276,14 +276,14 @@ class AppRender {
      *
      * @return string
      */
-    public function getWebAppHtml () {
+    public function get_web_app_html  () {
         $router_mode = get_option("wpp_router_mode");
         $REQUEST_URI = strtok($_SERVER["REQUEST_URI"],'?');
         if ( $REQUEST_URI !== "/" && $router_mode === "hash") {
             $uri = $_SERVER["REQUEST_URI"];
             return "<html><title>".get_bloginfo("name")."</title><script> window.location = '/#$uri' </script></html>";
         }
-        return $this->getHTMLSkeleton();
+        return $this->get_html_skeleton ();
     }
 
     /**
@@ -333,13 +333,20 @@ class AppRender {
      * @return void
      */
     public function render_no_js_html () {
-        
         $post_or_page_object = $this->define_rendering_type_and_get_content_object();
         define('WPP_OG_DESCRIPTION', $this->get_site_description());
 
         // If a page or post is defined, set it as global object
         if(isset($post_or_page_object)) {
-            define('WPP_TITLE', ucfirst($post_or_page_object->post_title) . " | ". get_bloginfo('name'));
+
+            // Title for home sections have a different strategy
+            // use the blog name instead of the section title
+            $section_type = get_post_meta($post_or_page_object->ID, SECTION_TYPE_FIELD_SLUG, true);
+            if ($section_type && $section_type === SECTION_POST_HOME_FIELD_VALUE) {
+                define('WPP_TITLE', get_bloginfo('name'));
+            } else {
+                define('WPP_TITLE', ucfirst($post_or_page_object->post_title) . " | ". get_bloginfo('name'));
+            }
             // Define OG:DECRIPTION
             $this->set_content_wpp_og_constans($post_or_page_object);
             
