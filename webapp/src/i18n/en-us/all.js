@@ -38,7 +38,9 @@ export default {
       october: 'Oct',
       november: 'Nov',
       december: 'Dec'
-    }
+    },
+    acceptDataAndPrivacyAndDaPolicy: 'By continue navigating in this website you agree to the <link>',
+    dataAndPrivacyPolicy: 'data and privacy policy'
   },
   auth: {
     yourGithubAccountIsNotLinkedYet: 'Your GitHub account is not linked yet with this website. Please make sure that you have already signed up with this GitHub account on this website',

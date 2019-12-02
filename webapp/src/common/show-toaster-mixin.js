@@ -2,7 +2,10 @@ import main from '@/main'
 
 const showMessage = (msg, theme, options) => {
   options = options || {}
-  main.getInstance().eventBus.$emit('showSnack', {message: msg, theme: theme, options: options})
+  let VueInstance = main.getInstance()
+  if (VueInstance) {
+    VueInstance.eventBus.$emit('showSnack', {message: msg, theme: theme, options: options})
+  }
 }
 
 const showError = (msg, options) => {

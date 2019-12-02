@@ -66,7 +66,7 @@ export default {
         context.post = post
         context.loaded = true
         let postTitle = context.post.title.rendered || context.post.title
-        context.eventBus.$emit('titleChanged', `${postTitle} | ${context.$store.getters.options.site_title}`)
+        context.eventBus.$emit('titleChanged', postTitle)
         context.eventBus.$emit('setLocaleFromContentLocale', context.post.locale)
       }).catch(error => {
         console.log(error)

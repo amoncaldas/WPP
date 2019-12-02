@@ -4,13 +4,15 @@ import Footer from '@/fragments/footer/Footer'
 import Toaster from '@/fragments/toaster/Toaster'
 import Confirm from '@/fragments/dialogs/confirm/Confirm'
 import Info from '@/fragments/dialogs/info/Info'
+import wpp from '@/support/wpp'
 
 export default {
   data () {
     return {
       title: null,
       lang: null,
-      showLoading: false
+      showLoading: false,
+      dataAndPrivacyPolicyAccepted: false
     }
   },
   name: 'App',
@@ -74,6 +76,32 @@ export default {
         let defaultTheme = Object.assign({}, this.theme)
         this.$store.commit('defaultTheme', defaultTheme)
       }
+    },
+    acceptDataAndPrivacyPolicy () {
+      this.dataAndPrivacyPolicyAccepted = true
+      localStorage.setItem('dataAndPrivacyPolicyAccepted', true)
+    },
+    getDataAndPrivacyUrl () {
+      let url = this.$store.getters.options['data_and_privacy_url_' + this.$store.getters.locale]
+      return url
+    }
+  },
+  computed: {
+    dataAndPrivacyPolicyHtml () {
+      if (this.showDataAndPrivacyPolicy) {
+        let content = `<span class='data-and-privacy-text'>${this.$t('global.acceptDataAndPrivacyAndDaPolicy')}</span>`
+
+        let linkText = this.$t('global.dataAndPrivacyPolicy')
+        let link = `<a target="_blank" class='data-and-privacy-link' href='${this.getDataAndPrivacyUrl()}'>${linkText}</a>`
+        content = content.replace('<link>', link)
+        return content
+      }
+    },
+    showDataAndPrivacyPolicy () {
+      this.dataAndPrivacyPolicyAccepted = localStorage.getItem('dataAndPrivacyPolicyAccepted')
+      let url = this.getDataAndPrivacyUrl()
+      let show = !this.dataAndPrivacyPolicyAccepted && url !== undefined && url !== null
+      return show
     }
   },
   created () {
@@ -82,16 +110,21 @@ export default {
       this.showLoading = value
     })
     this.eventBus.$on('titleChanged', (title) => {
-      title = title.indexOf(this.$store.getters.options.site_title) === -1 ? `${title} | ${this.$store.getters.options.site_title}` : title
-      this.title = title
+      if (this.$route.name !== 'Archive' && this.$store.getters.postTypeEndpoint) {
+        let archiveTitle = wpp.getArchiveTranslated()
+        title = `${title} | ${archiveTitle}`
+      }
+      if (this.$store.getters.currentSection && this.$store.getters.currentSection.path !== '/') {
+        let sectionTitle = this.$store.getters.currentSection.title.rendered || this.$store.getters.currentSection.title
+        title = `${title} | ${sectionTitle}`
+      }
+      this.title = `${title} | ${this.$store.getters.options.short_name}`
     })
 
     this.eventBus.$on('langChanged', (lang) => {
       this.lang = lang
     })
     this.lang = this.$store.getters.locale
-
-
     this.backupDefaultAppearance()
   }
 }

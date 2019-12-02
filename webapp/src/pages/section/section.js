@@ -26,10 +26,10 @@ export default {
 
     // Emit the an event catch by root App component
     // telling it to update the page title
-    let title = `${this.currentSection.title.rendered} | ${this.$store.getters.options.site_title}`
     if (this.currentSection.locale !== 'neutral') {
       this.eventBus.$emit('setLocaleFromContentLocale', this.currentSection.locale)
     }
+    let title = this.currentSection.title.rendered
     this.eventBus.$emit('titleChanged', title)
   },
   methods: {

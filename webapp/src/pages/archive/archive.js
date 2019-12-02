@@ -1,5 +1,6 @@
 import Posts from '@/fragments/posts/Posts'
 import Sections from '@/fragments/sections/Sections'
+import wpp from '@/support/wpp'
 
 export default {
   data: () => ({
@@ -27,25 +28,10 @@ export default {
       if (this.$store.getters.currentSection && this.$store.getters.currentSection.path !== '/') {
         this.parentSectionId = this.$store.getters.currentSection.id
       }
-      let translation = this.getArchiveTranslated()
+      let translation = wpp.getArchiveTranslated()
       this.postType = this.$store.getters.postTypeEndpoint
       this.title = translation
-      this.eventBus.$emit('titleChanged', `${translation} | ${this.$store.getters.options.site_title}`)
-    },
-    getArchiveTranslated () {
-      let translations = this.$store.getters.options.post_type_translations
-      let context = this
-      let translation = this.$store.getters.postTypeEndpoint
-      let localesTranslation = context.lodash.find(translations, (locales) => {
-        return context.lodash.find(locales, locale => {
-          return locale.path === this.$store.getters.postTypeEndpoint
-        })
-      })
-      if (localesTranslation) {
-        let matchTranslation = localesTranslation[context.$store.getters.locale]
-        translation = matchTranslation.title
-      }
-      return translation
+      this.eventBus.$emit('titleChanged', translation)
     }
   }
 }

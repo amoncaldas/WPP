@@ -5,14 +5,14 @@
       <template v-if="mode === 'single'">
         <h1>{{title}}</h1>
         <span v-if="$store.getters.currentSection.path !== '/'"> {{$t('post.in')}}
-          <a target="_blank" :href="buildLink($store.getters.currentSection.path)">
+          <a target="_blank" @click.prevent="navigateToSingle()" :href="buildLink($store.getters.currentSection.path)">
             {{$store.getters.currentSection.title.rendered || $store.getters.currentSection.title}}
           </a>
         </span>
       </template>
       <h3 v-else-if="post.extra.no_link">{{title}}</h3>
       <template v-else>
-        <a v-bind:href="buildLink(link)" :target="post.extra.target_blank ? '_blank' : '_self'" :title="title" :style="{color:$vuetify.theme.dark}" style="margin-left:0px; text-decoration:none" >
+        <a @click.prevent="navigateToSingle()" v-bind:href="buildLink(link)" :target="post.extra.target_blank ? '_blank' : '_self'" :title="title" :style="{color:$vuetify.theme.dark}" style="margin-left:0px; text-decoration:none" >
           <h3>{{title}}</h3>
         </a>
       </template>
@@ -57,11 +57,11 @@
           <br>
           <template v-if="categories.length > 0">
             <h4>{{$t('post.categories') | capitalize}}</h4>
-            <v-btn v-for="(category) in categories" :key="category.id" round depressed :href="getTermUri(category, 'cats')" color="secondary" dark :title="category.name"  >{{category.name}}</v-btn>
+            <v-btn v-for="(category) in categories" :key="category.id" round depressed @click.prevent="$router.push({ path: getTermUri(category, 'cats') })" :href="getTermUri(category, 'cats')" color="secondary" dark :title="category.name"  >{{category.name}}</v-btn>
           </template>
           <template v-if="tags.length > 0">
             <h4>{{$t('post.tags') | capitalize}}</h4>
-            <v-btn v-for="(tag) in tags" :key="tag.id" round depressed :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
+            <v-btn v-for="(tag) in tags" :key="tag.id" round depressed @click.prevent="$router.push({ path: getTermUri(tag, 'p_tags') })" :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
           </template>
         </div>
         <template v-if="renderAsPage && post.extra.has_highlighted_bottom">
@@ -115,7 +115,7 @@
             </v-flex>
             <v-flex>
               <div style="text-align:right" v-if="!post.extra.no_link" :style="{float:showType ? 'right' : 'none'}">
-                <v-btn style="margin-left:0px" :href="buildLink(link)" :target="post.extra.target_blank ? '_blank' : '_self'" :title="$t('post.readMore')" flat ><b>{{ $t('post.readMore')}}</b></v-btn>
+                <v-btn style="margin-left:0px" @click.prevent="navigateToSingle()" :href="buildLink(link)" :target="post.extra.target_blank ? '_blank' : '_self'" :title="$t('post.readMore')" flat ><b>{{ $t('post.readMore')}}</b></v-btn>
               </div>
             </v-flex>
           </template>

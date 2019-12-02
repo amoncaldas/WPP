@@ -5,7 +5,7 @@
         <v-icon class="notranslate">menu</v-icon>
       </v-btn>
       <h1 class='site-title'>
-			  <a :href="buildLink('/')" class="logo"
+			  <a @click.prevent="$router.push({ path: buildLink('/') })" :href="buildLink('/')" class="logo"
           :title="$store.getters.options.site_title"
           :alt="$store.getters.options.site_title"
           :style="{ backgroundImage: 'url(' + logoUrl + ')' }">
