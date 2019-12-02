@@ -47,13 +47,18 @@ export default {
       this.renderAsPage = true
     }
     this.loadData()
+    this.ready = true
   },
   watch: {
-    $route: function () {
-      this.post = null
-      setTimeout(() => {
-        this.loadData()
-      }, 100)
+    $route: {
+      handler: function () {
+        this.loaded = false
+        this.post = null
+        setTimeout(() => {
+          this.loadData()
+        }, 100)
+      },
+      deep: true
     }
   },
   methods: {

@@ -5,6 +5,7 @@ import wpp from '@/support/wpp'
 export default {
   data: () => ({
     postType: null,
+    loaded: false,
     currentSection: null,
     title: null,
     parentSectionId: null,
@@ -14,7 +15,20 @@ export default {
     Posts,
     Sections
   },
+  watch: {
+    $route: {
+      handler: function () {
+        this.loaded = false
+        this.postType = null
+        setTimeout(() => {
+          this.loadData()
+        }, 100)
+      },
+      deep: true
+    }
+  },
   created () {
+    this.loaded = true
     this.loadData()
     this.eventBus.$on('localeChanged', () => {
       this.loadData()
@@ -31,6 +45,7 @@ export default {
       let translation = wpp.getArchiveTranslated()
       this.postType = this.$store.getters.postTypeEndpoint
       this.title = translation
+      this.loaded = true
       this.eventBus.$emit('titleChanged', translation)
     }
   }
