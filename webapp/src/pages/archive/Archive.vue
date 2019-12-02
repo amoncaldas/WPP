@@ -4,7 +4,7 @@
     <v-slide-y-transition mode="out-in">
       <v-layout row wrap>
         <v-flex v-bind="{[ $store.getters.options.archive_sections_sidebar ? 'md9' : 'md12']: true }">
-          <posts :page="page" :max="12" :parent-id="parentSectionId" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 6: 12" :endpoint="postType"
+          <posts v-if="loaded" :page="page" :max="12" :parent-id="parentSectionId" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 6: 12" :endpoint="postType"
             :title="title"></posts>
         </v-flex>
         <v-flex md3 v-if="$store.getters.options.archive_sections_sidebar">
