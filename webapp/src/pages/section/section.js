@@ -7,7 +7,7 @@ import Highlighted from '@/fragments/highlighted/Highlighted.vue'
 
 export default {
   data: () => ({
-    valid: false,
+    ready: false,
     listingPosts: [],
     compactListingPosts: [],
     currentSection: null
@@ -20,17 +20,18 @@ export default {
     Highlighted
   },
   created () {
-    this.currentSection = this.$store.getters.currentSection
-    this.listingPosts = Section.getListingPosts()
-    this.compactListingPosts = Section.getCompactListingPosts()
-
-    // Emit the an event catch by root App component
-    // telling it to update the page title
-    if (this.currentSection.locale !== 'neutral') {
-      this.eventBus.$emit('setLocaleFromContentLocale', this.currentSection.locale)
+    this.ready = true
+    this.loadData()
+  },
+  watch: {
+    '$store.getters.currentSection': {
+      handler: function () {
+        this.ready = false
+        this.loadData()
+        this.ready = true
+      },
+      deep: true
     }
-    let title = this.currentSection.title.rendered
-    this.eventBus.$emit('titleChanged', title)
   },
   methods: {
     placeClicked (place) {
@@ -39,6 +40,19 @@ export default {
         parser.href = place.link
         this.$router.push(parser.pathname)
       }
+    },
+    loadData () {
+      this.currentSection = this.$store.getters.currentSection
+      this.listingPosts = Section.getListingPosts()
+      this.compactListingPosts = Section.getCompactListingPosts()
+
+      // Emit the an event catch by root App component
+      // telling it to update the page title
+      if (this.currentSection.locale !== 'neutral') {
+        this.eventBus.$emit('setLocaleFromContentLocale', this.currentSection.locale)
+      }
+      let title = this.currentSection.title.rendered
+      this.eventBus.$emit('titleChanged', title)
     }
   },
   computed: {

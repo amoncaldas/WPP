@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="page-root section">
+<v-container v-if="ready" fluid class="page-root section">
     <highlighted v-if="currentSection.extra.has_highlighted_top" position="top" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
     <slider v-if="currentSection.extra.has_image_slides" :contents="currentSection.extra.slide_images"></slider>
     <br/>
