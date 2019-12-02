@@ -196,7 +196,12 @@ export default {
     },
     navigateToSingle () {
       if (this.mode !== 'single') {
-        this.$router.push({ path: this.link })
+        // if the target post has the same locale, do a soft redirect
+        if (this.post.locale === 'neutral' || this.post.locale === this.$store.getters.locale) {
+          this.$router.push({path: this.buildLink(this.link)})
+        } else { // if not reload the page
+          window.location.href = this.link
+        }
       }
     }
   },

@@ -1,5 +1,5 @@
 import store from '@/store/store'
-import router from '@/router/index'
+import main from '@/main'
 
 const showMenuItem = (item) => {
   // a custom show menu item function can be passed
@@ -18,7 +18,8 @@ const navigate = (to) => {
   if (to.external) {
     window.location = to.href
   } else {
-    router.push(to.href)
+    let VueInstance = main.getInstance()
+    VueInstance.$router.push({path: to.href})
   }
 }
 

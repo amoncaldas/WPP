@@ -3,6 +3,10 @@
     <v-progress-linear color="neutral" class="progress-linear" :indeterminate="true" :class="{'progress-linear-disabled': !showLoading}"></v-progress-linear>
     <app-toaster></app-toaster>
     <app-header></app-header>
+    <v-alert class="data-and-privacy" v-if="showDataAndPrivacyPolicy" :value="true" type="info" >
+      <span v-html="dataAndPrivacyPolicyHtml"></span>
+      <v-btn small @click="acceptDataAndPrivacyPolicy()" class="data-and-privacy-btn" >{{$t('global.ok')}}</v-btn>
+    </v-alert>
     <v-content class="main-container">
       <app-confirm></app-confirm>
       <app-info></app-info>
@@ -11,6 +15,7 @@
       </transition>
     </v-content>
     <app-sidebar></app-sidebar>
+
     <app-footer></app-footer>
   </v-app>
 </template>

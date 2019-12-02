@@ -38,7 +38,9 @@ export default {
       october: 'Out',
       november: 'Nov',
       december: 'Dez'
-    }
+    },
+    acceptDataAndPrivacyAndDaPolicy: 'Ao continuar a navegar neste site você aceita a <link>',
+    dataAndPrivacyPolicy: 'política de dados e privacidade'
   },
   auth: {
     yourGithubAccountIsNotLinkedYet: 'A sua conta GitHub não está vinculada ainda com este site. Por favor verifique se você se registrou no nosso site co essa mesm conta',

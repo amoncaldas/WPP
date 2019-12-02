@@ -92,7 +92,6 @@ wppRouter.resolveDependencies().then(() => {
 
   // Set locale from store/local storage
   i18n.locale = store.getters.locale
-  console.log('Locale:', i18n.locale)
 
   if (store.getters.options.google_analytics_ua) {
     Vue.use(VueAnalytics, {

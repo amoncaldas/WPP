@@ -134,7 +134,12 @@ class AppRender {
         if ($post_id) {
             $post = get_post($post_id);
             if ($post) {
-                $title = $post->post_title. " | ". $title;
+                if ($post->post_parent) {
+                    $parent = get_post($post->post_parent);
+                    $title = $post->post_title." | ". $parent->post_title. " | ". $title;
+                } else {
+                    $title = $post->post_title. " | ". $title;
+                }
 
                 if (has_post_thumbnail($post_id)) {
                     $image = wp_get_attachment_image_src( get_post_thumbnail_id($post_id),'medium');
@@ -335,18 +340,11 @@ class AppRender {
     public function render_no_js_html () {
         $post_or_page_object = $this->define_rendering_type_and_get_content_object();
         define('WPP_OG_DESCRIPTION', $this->get_site_description());
+        $short_name = get_option("wpp_short_name");
+        $locale = get_request_locale();
 
         // If a page or post is defined, set it as global object
         if(isset($post_or_page_object)) {
-
-            // Title for home sections have a different strategy
-            // use the blog name instead of the section title
-            $section_type = get_post_meta($post_or_page_object->ID, SECTION_TYPE_FIELD_SLUG, true);
-            if ($section_type && $section_type === SECTION_POST_HOME_FIELD_VALUE) {
-                define('WPP_TITLE', get_bloginfo('name'));
-            } else {
-                define('WPP_TITLE', ucfirst($post_or_page_object->post_title) . " | ". get_bloginfo('name'));
-            }
             // Define OG:DECRIPTION
             $this->set_content_wpp_og_constans($post_or_page_object);
             
@@ -354,25 +352,42 @@ class AppRender {
             if(defined("IS_SECTION")) {
                 global $section;
                 $section = $post_or_page_object;  
+
+                // Title for home sections have a different strategy
+                // use the blog name instead of the section title
+                $section_type = get_post_meta($section->ID, SECTION_TYPE_FIELD_SLUG, true);
+                if ($section_type && $section_type === SECTION_POST_HOME_FIELD_VALUE) {
+                    define('WPP_TITLE', get_bloginfo('name'));
+                } else {
+                    define('WPP_TITLE', ucfirst($post_or_page_object->post_title) . " | ". $short_name);
+                }
                 require_once("section.php");
             } else {   
                 global $post;
                 $post = $post_or_page_object;
+                $type_title = get_post_type_title_translation($post->post_type, $locale);
+                $title = $post->post_title." | ".ucfirst($type_title)." | ". $short_name;
+                if ($post->post_parent) {
+                    $parent = get_post($post->post_parent);
+                    if ($parent->guid !== "/") {
+                        $title = ucfirst($post->post_title)." | ".ucfirst($type_title). " | ". ucfirst($parent->post_title). " | ". $short_name;
+                    }
+                }
+                define('WPP_TITLE', $title);
                 require_once("single.php");
             }
         } else { // if not, or we are in an archive, search 404
             $this->set_default_og_image_constants();
             if (defined('IS_SEARCH')) {
                 $search_title = $this->get_search_title();
-                define('WPP_TITLE', $search_title . " | ". get_bloginfo('name'));               
+                define('WPP_TITLE', $search_title . " | ". $short_name);               
                 require_once("search.php");
             } elseif (defined('RENDER_ARCHIVE_POST_TYPE')){
-                $locale = get_request_locale();
                 $listing_title = get_post_type_title_translation(RENDER_ARCHIVE_POST_TYPE, $locale);
-                define('WPP_TITLE', $listing_title . " | ". get_bloginfo('name'));
+                define('WPP_TITLE', $listing_title . " | ". $short_name);
                 require_once("archive.php");
             } else {
-                define('WPP_TITLE', "404" . " | ". get_bloginfo('name')); 
+                define('WPP_TITLE', "404" . " | ". $short_name); 
                 require_once("404.php");
             }
         }   

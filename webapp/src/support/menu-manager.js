@@ -63,7 +63,7 @@ const parseItem = (item) => {
 
   let parsedItem = {
     href: item.url,
-    external: true,
+    external: isExternalLink(item.url),
     title: item.title,
     icon: 'link',
     notInHeader: false,
@@ -139,6 +139,20 @@ const replaceItemEndingWith = (menu, itemEnding, replacement) => {
   } else {
     menu.push(replacement)
   }
+}
+
+/**
+ * Checks if a given url points to an external website
+ */
+const isExternalLink = (url) => {
+  if (url.startsWith('/') || url.startsWith('#')) {
+    return false
+  }
+  let withouProtocol = url.replace('https://').replace('http://')
+  if (withouProtocol.startsWith(location.hostname)) {
+    return false
+  }
+  return true
 }
 
 /**
