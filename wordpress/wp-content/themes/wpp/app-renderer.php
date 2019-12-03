@@ -283,6 +283,7 @@ class AppRender {
             return $this->get_site_title();
         } else {
             $locale = get_request_locale();
+            $short_name = get_option("wpp_short_name");
             $type_title = get_post_type_title_translation($post->post_type, $locale);
             $title = $post->post_title." | ".ucfirst($type_title)." | ". $short_name;
     
