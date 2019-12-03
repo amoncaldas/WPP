@@ -12,6 +12,9 @@ const storeBuilder = {
   state: {
   },
   getters: {
+    fixedPages: () => {
+      return ['/contact', '/contato', '/register', '/registro', '/perfil', 'profile', '/login', '/password/request', '/password/reset/', '/unsubscribe']
+    }
   },
   mutations: {
 

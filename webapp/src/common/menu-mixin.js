@@ -15,7 +15,10 @@ const showMenuItem = (item) => {
   }
 }
 const navigate = (to) => {
-  let locationParts = to.href.split('/')
+  var regex = new RegExp('/', 'g')
+  let cleanHref = to.href.replace(regex, '')
+  let locationParts = cleanHref.split('/')
+
   let lastPathPart = locationParts[locationParts.length - 1]
   let sectionsRoutes = store.getters.sectionsRoutes
 

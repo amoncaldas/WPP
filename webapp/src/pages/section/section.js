@@ -20,7 +20,6 @@ export default {
     Highlighted
   },
   created () {
-    this.ready = true
     this.loadData()
   },
   watch: {
@@ -28,7 +27,6 @@ export default {
       handler: function () {
         this.ready = false
         this.loadData()
-        this.ready = true
       },
       deep: true
     }
@@ -53,6 +51,7 @@ export default {
       }
       let title = this.currentSection.title.rendered
       this.eventBus.$emit('titleChanged', title)
+      this.ready = true
     }
   },
   computed: {
