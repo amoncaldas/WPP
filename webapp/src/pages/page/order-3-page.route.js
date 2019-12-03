@@ -21,7 +21,8 @@ const routes = {
     let locationParts = location.pathname.split('/')
     let lastPathPart = locationParts[locationParts.length - 1]
 
-    //  Page routes never ends with a last path parameter being a numbers
+    // Page routes are added only when the url follows a page pattern
+    // Page routes never ends with a last path parameter being a numbers
     if (isNaN(lastPathPart)) {
       if (!isInSection) {
         routes.push(
