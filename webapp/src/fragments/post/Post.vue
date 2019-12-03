@@ -5,7 +5,7 @@
       <template v-if="mode === 'single'">
         <h1>{{title}}</h1>
         <span v-if="$store.getters.currentSection.path !== '/'"> {{$t('post.in')}}
-          <a target="_blank" @click.prevent="navigateToSingle()" :href="buildLink($store.getters.currentSection.path)">
+          <a target="_blank" @click.prevent="$router.push({ path: $store.getters.currentSection.path})"  :href="buildLink($store.getters.currentSection.path)">
             {{$store.getters.currentSection.title.rendered || $store.getters.currentSection.title}}
           </a>
         </span>

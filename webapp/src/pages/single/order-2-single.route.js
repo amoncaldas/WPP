@@ -15,6 +15,7 @@ const routes = {
         {
           path: `/${postTypeEndpointUrl}/:postName/(.*-)?:postId(\\d+)`,
           component: Single,
+          meta: {single: true},
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
             store.commit('currentSection', currentSection)
@@ -27,6 +28,7 @@ const routes = {
         {
           path: `/${postTypeEndpointUrl}/:postParent1/(.*-)?:postId(\\d+)`,
           component: Single,
+          meta: {single: true},
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
             store.commit('currentSection', currentSection)
@@ -39,6 +41,7 @@ const routes = {
         {
           path: `/${postTypeEndpointUrl}/:postParent1/:postName/:postId(\\d+)`,
           component: Single,
+          meta: {single: true},
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
             store.commit('currentSection', currentSection)
@@ -51,6 +54,7 @@ const routes = {
         {
           path: `/${postTypeEndpointUrl}/:postParent1/:postParent2/:postName/:postId(\\d+)`,
           component: Single,
+          meta: {single: true},
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
             store.commit('currentSection', currentSection)
@@ -63,6 +67,7 @@ const routes = {
         {
           path: `/${postTypeEndpointUrl}/:postId(\\d+)`,
           component: Single,
+          meta: {single: true},
           beforeEnter: (to, from, next) => {
             let currentSection = Section.getCurrentSection()
             store.commit('currentSection', currentSection)
@@ -78,6 +83,7 @@ const routes = {
           {
             path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postName/:postId(\\d+)`,
             component: Single,
+            meta: {single: true},
             beforeEnter: (to, from, next) => {
               store.commit('currentSection', section)
               store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
@@ -89,6 +95,7 @@ const routes = {
           {
             path: `/${sectionEndPoint}/${postTypeEndpointUrl}/:postId(\\d+)`,
             component: Single,
+            meta: {single: true},
             beforeEnter: (to, from, next) => {
               store.commit('currentSection', section)
               store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
@@ -100,6 +107,7 @@ const routes = {
           {
             path: `/${sectionEndPoint}/:postName/:postId(\\d+)`,
             component: Single,
+            meta: {single: true},
             beforeEnter: (to, from, next) => {
               store.commit('currentSection', section)
               store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
@@ -111,6 +119,7 @@ const routes = {
           {
             path: `/${sectionEndPoint}/:postId(\\d+)`,
             component: Single,
+            meta: {single: true},
             beforeEnter: (to, from, next) => {
               store.commit('currentSection', section)
               store.commit('postTypeEndpoint', postTypeEndpoint.endpoint)
