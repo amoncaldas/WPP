@@ -8,8 +8,14 @@ const routes = {
     let routes = []
     var regex = new RegExp('/', 'g')
 
-    let isInSection = false
+    for (let key in store.getters.fixedPages) {
+      let pagePath = store.getters.fixedPages[key]
+      if (location.pathname.startsWith(pagePath)) {
+        return routes
+      }
+    }
 
+    let isInSection = false
     for (let key in store.getters.sections) {
       let section = store.getters.sections[key]
       if (section.path !== '/' && location.pathname.startsWith(section.path)) {
