@@ -256,7 +256,7 @@ All WPP Options starts with `wpp_` prefix, except:
 - git_hub_client_secret
 - recaptcha_secret
 
-Options with `wpp_` prefix that is not present by default:
+Options with `wpp_` prefix that are not present by default:
 
 - wpp_signup_with_github
 - wpp_meta_*
@@ -266,6 +266,9 @@ Options with `wpp_` prefix that is not present by default:
 - wpp_search_title_translation
 - hide_developedby
 - wpp_slider_transition - for transition options see: https://deulos.github.io/vue-flux/
+- wpp_site_title_translations
+- wpp_site_description_translations
+- wpp_search_title_translation
 
 ## ACF extras ##
 

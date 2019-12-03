@@ -14,6 +14,7 @@ const routes = {
         {
           path: `/${sectionEndPoint}`,
           component: Section,
+          meta: {section: true},
           beforeEnter: (to, from, next) => {
             store.commit('currentSection', section)
             next()

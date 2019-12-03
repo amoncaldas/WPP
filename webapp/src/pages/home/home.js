@@ -8,7 +8,7 @@ import Highlighted from '@/fragments/highlighted/Highlighted.vue'
 
 export default {
   data: () => ({
-    valid: false,
+    loaded: false,
     listingPosts: [],
     compactListingPosts: [],
     currentSection: null
@@ -30,6 +30,17 @@ export default {
       this.loadData()
     })
   },
+  watch: {
+    $route: {
+      handler: function () {
+        this.loaded = false
+        setTimeout(() => {
+          this.loadData()
+        }, 100)
+      },
+      deep: true
+    }
+  },
   methods: {
     loadData () {
       this.currentSection = Section.getCurrentHomeSection()
@@ -39,6 +50,7 @@ export default {
       if (this.currentSection.locale !== 'neutral') {
         this.eventBus.$emit('setLocaleFromContentLocale', this.currentSection.locale)
       }
+      this.loaded = true
     },
     placeClicked (place) {
       if (place && place.link) {

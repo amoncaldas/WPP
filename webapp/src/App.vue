@@ -4,7 +4,11 @@
     <app-toaster></app-toaster>
     <app-header></app-header>
     <v-alert class="data-and-privacy" v-if="showDataAndPrivacyPolicy" :value="true" type="info" >
-      <span v-html="dataAndPrivacyPolicyHtml"></span>
+      <span>
+        <span class='data-and-privacy-text'>{{$t('global.acceptDataAndPrivacyAndDaPolicy')}}
+          <a target="_blank" class='data-and-privacy-link' v-bind:href="getDataAndPrivacyUrl()">{{$t('global.dataAndPrivacyPolicy')}}</a>
+        </span>
+      </span>
       <v-btn small @click="acceptDataAndPrivacyPolicy()" class="data-and-privacy-btn" >{{$t('global.ok')}}</v-btn>
     </v-alert>
     <v-content class="main-container">

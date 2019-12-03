@@ -83,20 +83,23 @@ export default {
     },
     getDataAndPrivacyUrl () {
       let url = this.$store.getters.options['data_and_privacy_url_' + this.$store.getters.locale]
-      return url
+      return this.buildLink(url)
+    },
+    setTitle (title) {
+      title = this.$options.filters.capitalize(title)
+
+      if (this.$route.meta.single || this.$route.meta.page) {
+        let archiveTitle = wpp.getArchiveTranslated()
+        title = `${title} | ${this.$options.filters.capitalize(archiveTitle)}`
+      }
+      if (this.$store.getters.currentSection && this.$store.getters.currentSection.path !== '/') {
+        let sectionTitle = this.$store.getters.currentSection.title.rendered || this.$store.getters.currentSection.title
+        title = `${title} | ${sectionTitle}`
+      }
+      this.title = `${title} | ${this.$store.getters.options.short_name}`
     }
   },
   computed: {
-    dataAndPrivacyPolicyHtml () {
-      if (this.showDataAndPrivacyPolicy) {
-        let content = `<span class='data-and-privacy-text'>${this.$t('global.acceptDataAndPrivacyAndDaPolicy')}</span>`
-
-        let linkText = this.$t('global.dataAndPrivacyPolicy')
-        let link = `<a target="_blank" class='data-and-privacy-link' href='${this.getDataAndPrivacyUrl()}'>${linkText}</a>`
-        content = content.replace('<link>', link)
-        return content
-      }
-    },
     showDataAndPrivacyPolicy () {
       this.dataAndPrivacyPolicyAccepted = localStorage.getItem('dataAndPrivacyPolicyAccepted')
       let url = this.getDataAndPrivacyUrl()
@@ -106,19 +109,13 @@ export default {
   },
   created () {
     this.title = this.$store.getters.options.site_title
+    let context = this
+
     this.eventBus.$on('showLoading', (value) => {
-      this.showLoading = value
+      context.showLoading = value
     })
     this.eventBus.$on('titleChanged', (title) => {
-      if (this.$route.name !== 'Archive' && this.$store.getters.postTypeEndpoint) {
-        let archiveTitle = wpp.getArchiveTranslated()
-        title = `${title} | ${archiveTitle}`
-      }
-      if (this.$store.getters.currentSection && this.$store.getters.currentSection.path !== '/') {
-        let sectionTitle = this.$store.getters.currentSection.title.rendered || this.$store.getters.currentSection.title
-        title = `${title} | ${sectionTitle}`
-      }
-      this.title = `${title} | ${this.$store.getters.options.short_name}`
+      context.setTitle(title)
     })
 
     this.eventBus.$on('langChanged', (lang) => {

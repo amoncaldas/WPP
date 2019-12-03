@@ -20,7 +20,7 @@ class AppRender {
             elseif (RENDER_AUDIENCE === 'CRAWLER_BROWSER') {
                 $this->render_no_js_html();
             } elseif (RENDER_AUDIENCE === "MANIFEST") {
-                $manifest = $this->getManifest();
+                $manifest = $this->get_manifest();
                 header('Content-Type: application/json');
                 echo $manifest;
                 exit;
@@ -33,7 +33,7 @@ class AppRender {
      *
      * @return String
      */
-    public function getManifest() {
+    public function get_manifest() {
         $main_image_url = get_option("wpp_site_relative_logo_url");
         $ext = "";
         if ($main_image_url && strlen($main_image_url) > 5) {
@@ -120,7 +120,7 @@ class AppRender {
         }
         $head_inject .= "</head>";
         $skeleton = str_replace("</head>", $head_inject, $skeleton);
-        $title = get_bloginfo("name");
+        $title = $this->get_site_title();
         $locale = get_request_locale();
         $description = $this->get_site_description();
         $ext = "";
@@ -134,12 +134,7 @@ class AppRender {
         if ($post_id) {
             $post = get_post($post_id);
             if ($post) {
-                if ($post->post_parent) {
-                    $parent = get_post($post->post_parent);
-                    $title = $post->post_title." | ". $parent->post_title. " | ". $title;
-                } else {
-                    $title = $post->post_title. " | ". $title;
-                }
+                $title = $this->get_post_title($post);
 
                 if (has_post_thumbnail($post_id)) {
                     $image = wp_get_attachment_image_src( get_post_thumbnail_id($post_id),'medium');
@@ -254,6 +249,54 @@ class AppRender {
     }
 
     /**
+     * Retrieve the site description considering the current request locale
+     *
+     * @return String $description
+     */
+    public function get_site_title () {
+        $title = get_bloginfo('name');
+        $locale = get_request_locale();
+
+        $dictionary = get_option("wpp_site_title_translations", "{}");
+        $dictionary = str_replace("\\", "", $dictionary);
+        $dictionary = json_decode($dictionary, true);
+    
+        if (!isset($dictionary[$locale])) {
+            return $title;
+        }
+        else {
+            return $dictionary[$locale];
+        }
+
+        return $title;
+    }
+
+    /**
+     * Get post page title
+     *
+     * @param WP_Post $post
+     * @return String $title
+     */
+    public function get_post_title ($post) {
+        $section_type = get_post_meta($post->ID, SECTION_TYPE_FIELD_SLUG, true);
+        if ($section_type && $section_type === SECTION_POST_HOME_FIELD_VALUE) {
+            return $this->get_site_title();
+        } else {
+            $locale = get_request_locale();
+            $type_title = get_post_type_title_translation($post->post_type, $locale);
+            $title = $post->post_title." | ".ucfirst($type_title)." | ". $short_name;
+    
+            if ($post->post_parent) {
+                $parent = get_post($post->post_parent);
+                if ($parent->guid !== "/") {
+                    $title = ucfirst($post->post_title)." | ".ucfirst($type_title). " | ". ucfirst($parent->post_title). " | ". $short_name;
+                }
+            }
+            return $title;           
+        }
+    }
+
+    /**
      * Retrieve the search title considering the current request locale
      *
      * @return String $title
@@ -340,47 +383,29 @@ class AppRender {
     public function render_no_js_html () {
         $post_or_page_object = $this->define_rendering_type_and_get_content_object();
         define('WPP_OG_DESCRIPTION', $this->get_site_description());
-        $short_name = get_option("wpp_short_name");
         $locale = get_request_locale();
 
         // If a page or post is defined, set it as global object
         if(isset($post_or_page_object)) {
             // Define OG:DECRIPTION
             $this->set_content_wpp_og_constans($post_or_page_object);
+            define('WPP_TITLE', $this->get_post_title($post_or_page_object));            
             
             // Define the template
             if(defined("IS_SECTION")) {
                 global $section;
                 $section = $post_or_page_object;  
-
-                // Title for home sections have a different strategy
-                // use the blog name instead of the section title
-                $section_type = get_post_meta($section->ID, SECTION_TYPE_FIELD_SLUG, true);
-                if ($section_type && $section_type === SECTION_POST_HOME_FIELD_VALUE) {
-                    define('WPP_TITLE', get_bloginfo('name'));
-                } else {
-                    define('WPP_TITLE', ucfirst($post_or_page_object->post_title) . " | ". $short_name);
-                }
                 require_once("section.php");
             } else {   
                 global $post;
                 $post = $post_or_page_object;
-                $type_title = get_post_type_title_translation($post->post_type, $locale);
-                $title = $post->post_title." | ".ucfirst($type_title)." | ". $short_name;
-                if ($post->post_parent) {
-                    $parent = get_post($post->post_parent);
-                    if ($parent->guid !== "/") {
-                        $title = ucfirst($post->post_title)." | ".ucfirst($type_title). " | ". ucfirst($parent->post_title). " | ". $short_name;
-                    }
-                }
-                define('WPP_TITLE', $title);
                 require_once("single.php");
             }
         } else { // if not, or we are in an archive, search 404
             $this->set_default_og_image_constants();
+            $short_name = get_option("wpp_short_name");
             if (defined('IS_SEARCH')) {
-                $search_title = $this->get_search_title();
-                define('WPP_TITLE', $search_title . " | ". $short_name);               
+                define('WPP_TITLE', $this->get_search_title() . " | ". $short_name);               
                 require_once("search.php");
             } elseif (defined('RENDER_ARCHIVE_POST_TYPE')){
                 $listing_title = get_post_type_title_translation(RENDER_ARCHIVE_POST_TYPE, $locale);

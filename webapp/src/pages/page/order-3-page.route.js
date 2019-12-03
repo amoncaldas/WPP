@@ -28,6 +28,7 @@ const routes = {
           {
             path: `/:postName/`,
             component: Page,
+            meta: {page: true},
             beforeEnter: (to, from, next) => {
               let currentSection = Section.getCurrentHomeSection()
               store.commit('currentSection', currentSection)
@@ -40,6 +41,7 @@ const routes = {
           {
             path: `/:parentPage/:postName/`,
             component: Page,
+            meta: {page: true},
             beforeEnter: (to, from, next) => {
               let currentSection = Section.getCurrentHomeSection()
               store.commit('currentSection', currentSection)
@@ -58,6 +60,7 @@ const routes = {
             {
               path: `/${sectionEndPoint}/:postName`,
               component: Page,
+              meta: {page: true},
               beforeEnter: (to, from, next) => {
                 let currentSection = Section.getCurrentSection()
                 store.commit('currentSection', currentSection)
@@ -70,6 +73,7 @@ const routes = {
             {
               path: `/${sectionEndPoint}/:parentPage/:postName`,
               component: Page,
+              meta: {page: true},
               beforeEnter: (to, from, next) => {
                 let currentSection = Section.getCurrentSection()
                 store.commit('currentSection', currentSection)

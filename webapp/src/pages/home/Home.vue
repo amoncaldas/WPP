@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="currentSection" fluid class="page-root home">
+  <v-container v-if="currentSection && loaded" fluid class="page-root home">
     <template v-if="currentSection.extra.has_highlighted_top">
       <highlighted position="top" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
     </template>

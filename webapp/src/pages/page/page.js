@@ -19,6 +19,18 @@ export default {
   created () {
     this.loadData()
   },
+  watch: {
+    $route: {
+      handler: function () {
+        this.loaded = false
+        this.post = null
+        setTimeout(() => {
+          this.loadData()
+        }, 100)
+      },
+      deep: true
+    }
+  },
   methods: {
     loadData () {
       let context = this
