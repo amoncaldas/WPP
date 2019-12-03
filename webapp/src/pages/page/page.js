@@ -59,5 +59,11 @@ export default {
         context.showError(this.$t('post.thePostCouldNotBeLoaded'))
       })
     }
+  },
+  beforeRouteLeave (to, from, next) {
+    window.location.href = to.fullPath
+  },
+  beforeRouteUpdate (to, from, next) {
+    window.location.href = to.fullPath
   }
 }
