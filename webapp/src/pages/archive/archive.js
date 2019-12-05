@@ -1,6 +1,7 @@
 import Posts from '@/fragments/posts/Posts'
 import Sections from '@/fragments/sections/Sections'
 import wpp from '@/support/wpp'
+import Section from '@/support/section'
 
 export default {
   data: () => ({
@@ -38,8 +39,11 @@ export default {
       this.postType = null
       let context = this
       setTimeout(() => {
-        if (context.$store.getters.currentSection && context.$store.getters.currentSection.path !== '/') {
-          context.parentSectionId = context.$store.getters.currentSection.id
+        let currentSection = Section.getCurrentSection()
+        this.$store.commit('currentSection', currentSection)
+
+        if (currentSection && currentSection.path !== '/') {
+          context.parentSectionId = currentSection.id
         }
         let translation = wpp.getArchiveTranslated()
         context.postType = context.$store.getters.postTypeEndpoint
