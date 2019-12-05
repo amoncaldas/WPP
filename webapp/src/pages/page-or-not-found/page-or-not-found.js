@@ -34,12 +34,17 @@ export default {
   methods: {
     loadData () {
       let context = this
-      let endpoint = this.$store.getters.postTypeEndpoint
-      let endpointAppend = `${endpoint}?slug=${this.$route.params.postName}&_embed`
+      let uriParts = location.href.trim('/').split('/')
+      let postName = ''
+      if (uriParts.length > 0) {
+        postName = uriParts[uriParts.length - 1]
+      }
+      let endpointAppend = `pages?slug=${postName}&_embed`
       postService.get(endpointAppend).then((post) => {
         if (Array.isArray(post)) {
           if (post.length === 0) {
             context.notFound = true
+            this.eventBus.$emit('titleChanged', this.$t('pageOrNotFound.notFound'))
           } else {
             context.post = post[0]
           }
@@ -47,23 +52,19 @@ export default {
           context.post = post
         }
         if (context.post) {
-          // If in single mdoe, set the site title
+          // If in single mode, set the site title
           let pageTitle = this.post.title.rendered || context.post.title
-          context.eventBus.$emit('titleChanged', `${pageTitle} | ${context.$store.getters.options.site_title}`)
+          context.eventBus.$emit('titleChanged', pageTitle)
           context.eventBus.$emit('setLocaleFromContentLocale', context.post.locale)
         }
         context.loaded = true
       }).catch(error => {
         console.log(error)
         context.loaded = true
-        context.showError(this.$t('post.thePostCouldNotBeLoaded'))
+        context.notFound = true
+        // Set the not found page title
+        this.eventBus.$emit('titleChanged', this.$t('pageOrNotFound.notFound'))
       })
     }
-  },
-  beforeRouteLeave (to, from, next) {
-    window.location.href = to.fullPath
-  },
-  beforeRouteUpdate (to, from, next) {
-    window.location.href = to.fullPath
   }
 }

@@ -15,16 +15,9 @@ const showMenuItem = (item) => {
   }
 }
 const navigate = (to) => {
-  var regex = new RegExp('/', 'g')
-  let cleanHref = to.href.replace(regex, '')
-  let locationParts = cleanHref.split('/')
-
-  let lastPathPart = locationParts[locationParts.length - 1]
-  let sectionsRoutes = store.getters.sectionsRoutes
-
   //  Pages must be opened in a way that the whole app is reloaded
   // we identify a page yrl by checking if does not end with number and is not a section path
-  if (to.external || (isNaN(lastPathPart) && !sectionsRoutes.includes(to.href))) {
+  if (to.external) {
     window.location = to.href
   } else {
     let VueInstance = main.getInstance()

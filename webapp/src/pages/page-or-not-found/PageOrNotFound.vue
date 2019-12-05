@@ -11,4 +11,4 @@
   </v-layout>
 </v-container>
 </template>
-<script src="./page.js"></script>
+<script src="./page-or-not-found.js"></script>

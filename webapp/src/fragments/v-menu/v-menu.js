@@ -28,6 +28,7 @@ export default {
   methods: {
     ...menuMixin,
     nav (to) {
+      this.$store.commit('setLeftSideBarIsOpen', false)
       if (this.navigateFn) {
         this.navigateFn(to)
       } else {
