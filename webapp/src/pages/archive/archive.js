@@ -18,11 +18,7 @@ export default {
   watch: {
     $route: {
       handler: function () {
-        this.loaded = false
-        this.postType = null
-        setTimeout(() => {
-          this.loadData()
-        }, 100)
+        this.loadData()
       },
       deep: true
     }
@@ -38,14 +34,19 @@ export default {
   },
   methods: {
     loadData () {
-      if (this.$store.getters.currentSection && this.$store.getters.currentSection.path !== '/') {
-        this.parentSectionId = this.$store.getters.currentSection.id
-      }
-      let translation = wpp.getArchiveTranslated()
-      this.postType = this.$store.getters.postTypeEndpoint
-      this.title = translation
-      this.loaded = true
-      this.eventBus.$emit('titleChanged', translation)
+      this.loaded = false
+      this.postType = null
+      let context = this
+      setTimeout(() => {
+        if (context.$store.getters.currentSection && context.$store.getters.currentSection.path !== '/') {
+          context.parentSectionId = context.$store.getters.currentSection.id
+        }
+        let translation = wpp.getArchiveTranslated()
+        context.postType = context.$store.getters.postTypeEndpoint
+        context.title = translation
+        context.eventBus.$emit('titleChanged', translation)
+        context.loaded = true
+      }, 100)
     }
   }
 }
