@@ -28,7 +28,6 @@ export default {
     }
   },
   created () {
-    this.loaded = true
     this.loadData()
     this.eventBus.$on('localeChanged', () => {
       this.loadData()
