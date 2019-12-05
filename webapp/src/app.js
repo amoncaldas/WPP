@@ -5,6 +5,7 @@ import Toaster from '@/fragments/toaster/Toaster'
 import Confirm from '@/fragments/dialogs/confirm/Confirm'
 import Info from '@/fragments/dialogs/info/Info'
 import wpp from '@/support/wpp'
+import VueScrollTo from 'vue-scrollto'
 
 export default {
   data () {
@@ -116,6 +117,7 @@ export default {
     })
     this.eventBus.$on('titleChanged', (title) => {
       context.setTitle(title)
+      VueScrollTo.scrollTo('body', 1000, {})
     })
 
     this.eventBus.$on('langChanged', (lang) => {

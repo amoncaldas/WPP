@@ -52,10 +52,20 @@ export default {
           context.post = post
         }
         if (context.post) {
-          // If in single mode, set the site title
-          let pageTitle = this.post.title.rendered || context.post.title
-          context.eventBus.$emit('titleChanged', pageTitle)
-          context.eventBus.$emit('setLocaleFromContentLocale', context.post.locale)
+          // if the parent section of the post is not the section in url,
+          // then is a not found,becaseu the url is wrong (the page does not belong to the section in the url)
+          if (context.post.parent) {
+            let parentSection = Sections.getSectionById(context.post.parent)
+
+            if (parentSection && context.$store.getters.currentSection.id !== parentSection) {
+              context.notFound = true
+            }
+          } else {
+            // If in single mode, set the site title
+            let pageTitle = this.post.title.rendered || context.post.title
+            context.eventBus.$emit('titleChanged', pageTitle)
+            context.eventBus.$emit('setLocaleFromContentLocale', context.post.locale)
+          }
         }
         context.loaded = true
       }).catch(error => {

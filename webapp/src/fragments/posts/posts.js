@@ -70,6 +70,12 @@ export default {
   watch: {
     currentPage: function () {
       this.loadPosts()
+    },
+    endpoint: function () {
+      this.loadPosts()
+    },
+    parentId: function () {
+      this.loadPosts()
     }
   },
   computed: {
@@ -98,6 +104,7 @@ export default {
   },
   methods: {
     loadPosts () {
+      this.loaded = false
       // @see http://v2.wp-api.org/reference/posts/
       let filters = {
         page: this.currentPage,
@@ -140,10 +147,10 @@ export default {
           this.total = Number(response.headers['x-wp-total'])
           this.totalPages = Number(response.headers['x-wp-totalpages'])
         }
-        this.loaded = true
       }).catch(error => {
         console.log(error)
         this.showError(this.$t('posts.thePostListCouldNotBeLoaded'))
+      }).finally(() => {
         this.loaded = true
       })
     }

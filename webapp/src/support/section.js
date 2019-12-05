@@ -75,6 +75,14 @@ const section = {
       return section.path === '/' && section.locale === store.getters.locale
     })
     return currentHomeSection
+  },
+
+  getSectionById (id) {
+    let VueInstance = Main.getInstance()
+    let section = VueInstance.lodash.find(store.getters.sections, (section) => {
+      return section.id === id
+    })
+    return section
   }
 }
 
