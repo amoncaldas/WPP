@@ -25,6 +25,7 @@ function ModelService (endPoint, resourceName, options) {
   options = options || {}
 
   this.endPoint = endPoint
+  this.endPointTemplate = endPoint
   this.resourceName = resourceName
   this.options = options
 
@@ -49,6 +50,15 @@ function ModelService (endPoint, resourceName, options) {
       baseEndPoint = `${prepend}/${baseEndPoint}`
     }
     return baseEndPoint
+  }
+
+  /**
+   * Provides an accessor to get the endpoint template
+   * @param String append
+   * @param String prepend
+   */
+  this.getEndPointTemplate = () => {
+    return this.endPointTemplate
   }
 
   /**
