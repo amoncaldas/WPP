@@ -5,14 +5,14 @@
       <template v-if="mode === 'single'">
         <h1>{{title}}</h1>
         <span v-if="$store.getters.currentSection.path !== '/'"> {{$t('post.in')}}
-          <a target="_blank" @click.prevent="$router.push({ path: $store.getters.currentSection.path})"  :href="buildLink($store.getters.currentSection.path)">
+          <a target="_blank" @click.prevent="routeToLink($store.getters.currentSection.path)"  :href="buildLink($store.getters.currentSection.path)">
             {{$store.getters.currentSection.title.rendered || $store.getters.currentSection.title}}
           </a>
         </span>
       </template>
       <h3 v-else-if="post.extra.no_link">{{title}}</h3>
       <template v-else>
-        <a @click.prevent="navigateToSingle()" v-bind:href="buildLink(link)" :target="post.extra.target_blank ? '_blank' : '_self'" :title="title" :style="{color:$vuetify.theme.dark}" style="margin-left:0px; text-decoration:none" >
+        <a @click.prevent="navigateToSingle()" :href="buildLink(link)" :target="post.extra.target_blank ? '_blank' : '_self'" :title="title" :style="{color:$vuetify.theme.dark}" style="margin-left:0px; text-decoration:none" >
           <h3>{{title}}</h3>
         </a>
       </template>
@@ -22,7 +22,7 @@
       <template v-if="mode !== 'compact' && mode !== 'list'">
         <div style="cursor: pointer" @click="navigateToSingle()">
           <media :mode="mode" v-if="post._embedded" :media="featuredMedia" :max-height="mode === 'single'? 500 : 200"></media>
-          <media :mode="mode" @click="navigateToSingle()" v-else-if="post.featured_media" :media-id="post.featured_media" :max-height="mode === 'single'? 500 : 200"></media>
+          <media :mode="mode" v-else-if="post.featured_media" :media-id="post.featured_media" :max-height="mode === 'single'? 500 : 200"></media>
         </div>
         <br>
       </template>
@@ -57,11 +57,11 @@
           <br>
           <template v-if="categories.length > 0">
             <h4>{{$t('post.categories') | capitalize}}</h4>
-            <v-btn v-for="(category) in categories" :key="category.id" round depressed @click.prevent="$router.push({ path: getTermUri(category, 'cats') })" :href="getTermUri(category, 'cats')" color="secondary" dark :title="category.name"  >{{category.name}}</v-btn>
+            <v-btn v-for="(category) in categories" :key="category.id" round depressed @click.prevent="routeToLink(getTermUri(category, 'cats'))" :href="getTermUri(category, 'cats')" color="secondary" dark :title="category.name"  >{{category.name}}</v-btn>
           </template>
           <template v-if="tags.length > 0">
             <h4>{{$t('post.tags') | capitalize}}</h4>
-            <v-btn v-for="(tag) in tags" :key="tag.id" round depressed @click.prevent="$router.push({ path: getTermUri(tag, 'p_tags') })" :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
+            <v-btn v-for="(tag) in tags" :key="tag.id" round depressed @click.prevent="routeToLink(getTermUri(tag, 'p_tags'))" :href="getTermUri(tag, 'p_tags')" color="secondary" dark :title="tag.name"  >{{tag.name}}</v-btn>
           </template>
         </div>
         <template v-if="renderAsPage && post.extra.has_highlighted_bottom">

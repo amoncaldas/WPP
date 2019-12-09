@@ -9,7 +9,7 @@
       <v-flex xs9 sm10 md11>
         <div>
           <template v-if="authorLink" class="notranslate">
-            <span> {{$t('author.by')}}</span> <a :title="authorName" :href="authorLink"><b>{{authorName}}</b></a>
+            <span> {{$t('author.by')}}</span> <a :title="authorName" @click.prevent="routeToLink(authorLink)" :href="buildLink(authorLink)"><b>{{authorName}}</b></a>
           </template>
           <span v-else> {{$t('author.by')}} <b>{{authorName}}</b></span>
         </div>

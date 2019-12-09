@@ -131,7 +131,8 @@ class WppNotifier  {
 	 * @return void
 	 */
 	public function unsubscribe_for_notifications($request) {
-		$follower_email = $request["followerEmail"];
+		$follower_email = $request->get_param('email');
+		$follower_id = $request->get_param('key');
 
 		// Get the follower by email
 		$args = (
@@ -149,18 +150,19 @@ class WppNotifier  {
 		$followers = get_posts($args);
 		
 		if ($followers && count($followers) > 0) {
-			$follower_id = $followers[0]->ID;
-			$result = WppFollower::deactivate_follower($follower_id);
-	
-			if ($result === "already_deactivated") {
-				return new WP_REST_Response(null, 400); // INVALID REQUEST
-			} else if ($result === "deactivated") {			
-				return new WP_REST_Response(null, 204); // ACCEPTED, NO CONTENT
+			if ($follower_id == $followers[0]->ID) {
+				$result = WppFollower::deactivate_follower($follower_id);
+		
+				if ($result === "already_deactivated") {
+					return new WP_REST_Response(null, 400); // INVALID REQUEST
+				} else if ($result === "deactivated") {			
+					return new WP_REST_Response(null, 204); // ACCEPTED, NO CONTENT
+				} else {
+					return new WP_REST_Response(null, 404); // NOT FOUND
+				}
 			} else {
 				return new WP_REST_Response(null, 404); // NOT FOUND
 			}
-		} else {
-			return new WP_REST_Response(null, 404); // NOT FOUND
 		}
 
 	}
@@ -196,30 +198,61 @@ class WppNotifier  {
 	 * @return WP_REST_Response
 	 */
 	public function subscribe_for_notifications($request) {
-		$name = $request->get_param('name');
-		$email = $request->get_param(WppFollower::$follower_email);
-
-		if (isset($name) && isset($email)) {
-			$lang = $request->get_param(LOCALE_TAXONOMY_SLUG) ? $request->get_param(LOCALE_TAXONOMY_SLUG) : get_default_locale();
-			$mail_list =  $request->get_param($this->mail_list) ?  $request->get_param($this->mail_list) : $this->default_notification_type;
-			
-			$result = WppFollower::register_follower($name, $email, $mail_list, $lang);
-			if($result === "updated") {
-				return new WP_REST_Response(null, 204); // ACCEPTED/UPDATED, NO CONTENT TO RETURN
-			}
-			elseif  ($result === "already_exists") {
-				return new WP_REST_Response(null, 409); // CONFLICT, ALREADY EXISTS
-			} else { // is created
-				$message = "Name: ". strip_tags($name)."<br/><br/>";
-				$message .= "Email: ". strip_tags($email);
-				WppMailer::notify_admin("New follower registration", $message, get_default_locale());			
+		$recaptchaToken = $request->get_param('recaptchaToken');
+		$validCaptcha = validate_captcha($recaptchaToken);        
 		
-				return new WP_REST_Response(["id" => $follower_id ], 201); // CREATED, NO CONTENT TO RETURN
-			}
+		if ($validCaptcha === true) {
+			$name = $request->get_param('name');
+			$email = $request->get_param(WppFollower::$follower_email);
+	
+			if (isset($name) && isset($email)) {
+				$lang = $request->get_param(LOCALE_TAXONOMY_SLUG) ? $request->get_param(LOCALE_TAXONOMY_SLUG) : get_default_locale();
+				$mail_list =  $request->get_param($this->mail_list) ?  $request->get_param($this->mail_list) : $this->default_notification_type;
+				
+				$result = WppFollower::register_follower($name, $email, $mail_list, $lang);
 
-		} else {
-			return new WP_REST_Response(null, 400); // INVALID REQUEST
+				if($result === "updated") {
+					return new WP_REST_Response(null, 204); // ACCEPTED/UPDATED, NO CONTENT TO RETURN
+				}
+				elseif  ($result === "already_exists") {
+					return new WP_REST_Response(null, 409); // CONFLICT, ALREADY EXISTS
+				} else { // is created
+					
+					$follower_id = $result;
+					$this->send_subscription_notifications($follower_id, $name, $email, $lang);
+					return new WP_REST_Response(["id" => $follower_id ], 201); // CREATED, return id
+				}
+	
+			} else {
+				return new WP_REST_Response(null, 400); // INVALID REQUEST
+			}
 		}
+	}
+
+	/**
+		* Send subscription notifications
+		*
+		* @param Integer $follower_id
+		* @param String $name
+		* @param String $mail
+		* @param String $lang
+		* @return void
+		*/
+	public function send_subscription_notifications ($follower_id, $name, $email, $lang) {
+		$user_msg_title = WppMailer::get_mail_subject_translation("subscription_registered", $request_lang, "Subscription registered");
+		// Build the unsubscribe link
+		$uri = "/unsubscribe/$follower_id/$email";		
+		$router_mode = get_option("wpp_router_mode");
+		if ($router_mode === "hash") {
+			$uri = "/#$uri";
+		}
+		$unsubscribe_link = network_home_url($uri);  
+
+		WppMailer::send_subscription_registered_email($email, $user_msg_title, $unsubscribe_link, $lang);
+		
+		$message = "Name: ". strip_tags($name)."<br/><br/>";
+		$message .= "Email: ". strip_tags($email);
+		WppMailer::notify_admin("New follower registration", $message, get_default_locale());		
 	}
 
 

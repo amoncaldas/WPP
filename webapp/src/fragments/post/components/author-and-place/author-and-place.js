@@ -32,7 +32,7 @@ export default {
       if (this.post.author_member) {
         var parser = document.createElement('a')
         parser.href = this.post.author_member.link
-        return this.buildLink(parser.pathname)
+        return parser.pathname
       }
     },
 

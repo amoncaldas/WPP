@@ -1,5 +1,6 @@
 import postService from '@/shared-services/post-service'
 import Post from '@/fragments/post/Post'
+import VueScrollTo from 'vue-scrollto'
 
 export default {
   name: 'posts',
@@ -64,12 +65,15 @@ export default {
       total: null,
       loaded: false,
       totalPages: null,
-      currentPage: null
+      currentPage: null,
+      pageChanged: false
     }
   },
   watch: {
     currentPage: function () {
-      this.loadPosts()
+      if (this.pageChanged) {
+        this.updateData()
+      }
     },
     endpoint: function () {
       this.loadPosts()
@@ -103,7 +107,10 @@ export default {
     }
   },
   methods: {
-    loadPosts () {
+    updateData () {
+      this.loadPosts(true)
+    },
+    loadPosts (pageChanged = false) {
       this.loaded = false
       // @see http://v2.wp-api.org/reference/posts/
       let filters = {
@@ -152,6 +159,9 @@ export default {
         this.showError(this.$t('posts.thePostListCouldNotBeLoaded'))
       }).finally(() => {
         this.loaded = true
+        if (pageChanged) {
+          VueScrollTo.scrollTo(this.$el, 1000, {})
+        }
       })
     }
   },

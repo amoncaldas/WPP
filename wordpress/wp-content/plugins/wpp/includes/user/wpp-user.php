@@ -134,33 +134,6 @@ class WppUser {
     }
 
     /**
-     * Get mail subject translation
-     *
-     * @param String $key
-     * @param String $request_lang
-     * @param String $fallback
-     * @return String $fallback
-     */
-    public static function get_mail_subject_translation ($key, $request_lang, $fallback) {
-        try {
-            // Get translation definitions and parse it
-            $wpp_email_subject_translations = get_option("wpp_email_subject_translations", "{}");
-            $dictionary = str_replace("\\", "", $wpp_email_subject_translations);
-            $dictionary = json_decode($dictionary, true);
-    
-            // Check if translation key exist
-            if (isset($dictionary[$key]) && isset($dictionary[$key][$request_lang])) {
-                return $dictionary[$key][$request_lang];
-            } else  {
-                return $fallback; // fallback msg title
-            } 
-        }
-        catch (Exception $e) {                
-            return $fallback; // fallback msg title           
-        }       
-    }
-
-    /**
      * Send user activation link email and notification to admin about the new registration
      *
      * @param Integer $user_id
@@ -171,7 +144,7 @@ class WppUser {
         $request_lang = get_request_locale();
 
         // Get subject translation
-        $msg_title = self::get_mail_subject_translation("reset_password", $request_lang, "Password reset");
+        $msg_title = WppMailer::get_mail_subject_translation("reset_password", $request_lang, "Password reset");
 
         // Prepend site name         
         $site_title = get_bloginfo("name");
@@ -205,7 +178,7 @@ class WppUser {
         $site_title = get_bloginfo("name");
 
         // Get admin msg subject translation
-        $admin_msg_title = self::get_mail_subject_translation("new_user", $request_lang, "New user registration");
+        $admin_msg_title = WppMailer::get_mail_subject_translation("new_user", $request_lang, "New user registration");
 
         // Prepend site name
         $admin_msg_title = "[$site_title] $admin_msg_title";
@@ -214,7 +187,7 @@ class WppUser {
         WppMailer::notify_admin($admin_msg_title, $user_email, $request_lang);
 
         // Get user msg subject translation
-        $user_msg_title = self::get_mail_subject_translation("activate_account", $request_lang, "Activate your account");
+        $user_msg_title = WppMailer::get_mail_subject_translation("activate_account", $request_lang, "Activate your account");
 
         // Prepend site name       
         $site_title = get_bloginfo("name");

@@ -43,6 +43,14 @@ const globalMixins = {
       }
       return link
     },
+    routeToLink (target, targetBlank = false) {
+      if (targetBlank) {
+        window.open(target, '_blank')
+      } else {
+        let link = this.buildLink(target)
+        this.$router.push({path: link})
+      }
+    },
     loadRecaptcha () {
       return new Promise((resolve, reject) => {
         let recaptchaScript = document.createElement('script')

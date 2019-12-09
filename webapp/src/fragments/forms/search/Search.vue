@@ -3,7 +3,7 @@
     <br><br>
     <v-form ref="form" @keyup.native.enter="submit">
        <v-layout row wrap>
-        <v-flex xs12 sm8 >
+        <v-flex xs12 v-bind="{['sm'+ searchableSections.length > 0 ? 8 : 12]: true}" >
             <v-text-field height="60" box :style="{paddingRight: $vuetify.breakpoint.smAndDown? '0px': '5px'}"
               :label="$t('searchComponent.placeholder')"
               ref="searchInput"
@@ -17,7 +17,7 @@
               </template>
             </v-text-field>
         </v-flex>
-        <v-flex xs12 sm4>
+        <v-flex xs12 sm4 v-if="searchableSections.length > 0">
           <v-select height="60" clearable box class="notranslate"
             v-model="section"
             @change="search"

@@ -31,8 +31,9 @@ export default {
   },
   computed: {
     searchableSections () {
+      let context = this
       let searchable = this.lodash.filter(this.$store.getters.sections, (s) => {
-        return s.path !== '/' && !s.extra.not_listed
+        return s.path !== '/' && !s.extra.not_listed && s.extra.locale === context.$store.getters.locale
       })
       return searchable
     }
