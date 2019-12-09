@@ -1,6 +1,6 @@
 export default {
   subscribe: {
-    pageTitle: 'Subscribe',
+    pageTitle: 'Subscribe for new content notification',
     name: 'Name',
     email: 'Email',
     nameRequired: 'Name is required',

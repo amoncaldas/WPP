@@ -36,7 +36,7 @@
         </v-flex>
         <v-spacer class="hidden-xs-and-down"></v-spacer>
         <v-flex xs12 sm3>
-          <v-btn dark block large color="secondary" @click="submit">{{ $t('global.send') }} <v-icon class="notranslate" right>send</v-icon> </v-btn>
+          <v-btn v-if="ready" dark block large color="secondary" @click="submit">{{ $t('global.send') }} <v-icon class="notranslate" right>send</v-icon> </v-btn>
         </v-flex>
       </v-layout>
     </div>

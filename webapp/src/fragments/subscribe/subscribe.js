@@ -10,7 +10,7 @@ export default {
     ...CRUDData, // adds: resource, resources, crudReady
     verifiedCaptcha: false,
     resource: {},
-    ready: true,
+    ready: false,
     locale: null
   }),
   created () {
@@ -83,5 +83,13 @@ export default {
   },
   components: {
     VueRecaptcha
+  },
+  mounted () {
+    if (this.$store.getters.options.recaptcha_site_key) {
+      this.ready = false
+      this.loadRecaptcha().then(() => {
+        this.ready = true
+      })
+    }
   }
 }
