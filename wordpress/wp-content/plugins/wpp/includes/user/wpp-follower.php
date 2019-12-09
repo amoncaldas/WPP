@@ -139,7 +139,7 @@ class WppFollower  {
 			wp_set_post_terms($follower_id, $term_arr, self::$lang_tax_slug);
 			return $follower_id;
 		}
-	},
+	}
 
 	/**
 		* Get follower id by email
