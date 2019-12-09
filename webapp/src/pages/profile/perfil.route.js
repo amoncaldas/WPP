@@ -6,6 +6,7 @@ export default {
   name: 'Perfil',
   component: Profile,
   beforeEnter: (to, from, next) => {
+    store.commit('locale', 'pt-br')
     if (store.getters.isAuthenticated) {
       next()
     } else {

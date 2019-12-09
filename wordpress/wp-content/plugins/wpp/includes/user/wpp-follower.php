@@ -139,6 +139,43 @@ class WppFollower  {
 			wp_set_post_terms($follower_id, $term_arr, self::$lang_tax_slug);
 			return $follower_id;
 		}
+	},
+
+	/**
+		* Get follower id by email
+		*
+		* @param String $email
+		* @return Integer $id
+		*/
+	static function get_follower_unsubscribe_link ($email, $follower_id = null) {
+		if (!$follower_id) {
+			// Check if the user is already a subscriber
+			$args = (
+				array(
+					"post_type"=> self::$follower_post_type, 
+					"post_status"=> array("publish", "pending"),
+					'meta_query' => array(
+						array(
+							'key'=> self::$follower_email,
+							'value'=> $email
+						)
+					)
+				)
+			);
+			$existing_followers = get_posts($args);
+			if (count($existing_followers) > 0) {
+				$existing_follower = $existing_followers[0];
+				$follower_id = $existing_follower->ID;
+			}
+		}
+
+		$uri = "/unsubscribe/$follower_id/$email";		
+		$router_mode = get_option("wpp_router_mode");
+		if ($router_mode === "hash") {
+			$uri = "/#$uri";
+		}
+		$unsubscribe_link = network_home_url($uri); 
+		return $unsubscribe_link;		
 	}
 }
 ?>

@@ -22,7 +22,9 @@ export default {
     })
 
     this.populateLocalesFromOptions()
-    this.setFromUrlOrStorage()
+    if (!this.$store.getters.locale) {
+      this.setFromUrlOrStorage()
+    }
   },
   watch: {
     '$store.getters.locale': function () {
@@ -84,7 +86,7 @@ export default {
         // Redirect to the correct locale url if
         // the autoLocale is different from the one in the html
         // and the url is '/'
-        let defaultLocale = appConfig.defaultLocale
+        let defaultLocale = this.$store.getters.options.default_locale
         if (autoSetLocale !== defaultLocale && window.location.pathname === '/') {
           context.currentLocale = context.$i18n.locale = autoSetLocale
           context.afterLocaleUpdate()

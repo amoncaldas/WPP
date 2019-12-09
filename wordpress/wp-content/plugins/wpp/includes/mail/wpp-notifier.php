@@ -76,7 +76,7 @@ class WppNotifier  {
 				'callback' => array($this, 'subscribe_for_notifications' ),
 			)
 		));
-		register_rest_route(WPP_API_NAMESPACE."/notifications", '/unsubscribe/(?P<followerEmail>[a-zA-Z0-9,.@!_-]+)', array(
+		register_rest_route(WPP_API_NAMESPACE."/notifications", '/unsubscribe/(?P<followerId>[0-9]+)', array(
 			array(
 				'methods'  => "PUT",
 				'callback' => array($this, 'unsubscribe_for_notifications' ),
@@ -132,7 +132,7 @@ class WppNotifier  {
 	 */
 	public function unsubscribe_for_notifications($request) {
 		$follower_email = $request->get_param('email');
-		$follower_id = $request->get_param('key');
+		$follower_id = $request->get_param('followerId');
 
 		// Get the follower by email
 		$args = (
@@ -240,14 +240,7 @@ class WppNotifier  {
 		*/
 	public function send_subscription_notifications ($follower_id, $name, $email, $lang) {
 		$user_msg_title = WppMailer::get_mail_subject_translation("subscription_registered", $request_lang, "Subscription registered");
-		// Build the unsubscribe link
-		$uri = "/unsubscribe/$follower_id/$email";		
-		$router_mode = get_option("wpp_router_mode");
-		if ($router_mode === "hash") {
-			$uri = "/#$uri";
-		}
-		$unsubscribe_link = network_home_url($uri);  
-
+		$unsubscribe_link = WppFollower::get_follower_unsubscribe_link($email, $follower_id);
 		WppMailer::send_subscription_registered_email($email, $user_msg_title, $unsubscribe_link, $lang);
 		
 		$message = "Name: ". strip_tags($name)."<br/><br/>";
@@ -555,9 +548,13 @@ class WppNotifier  {
 			if($content_type == "html") {
 				add_filter('wp_mail_content_type', 'set_email_html_content_type');	
 				$counter = 1;	
-				foreach($to as $mail) {
-					$message = str_replace("{target-mail}", $mail, $pending_notification->post_content);
+				foreach($to as $email) {
+					// Individualize content link for unsubscribe
+					$unsubscribe_link = WppFollower::get_follower_unsubscribe_link($email);
+					$message = str_replace("{unsubscribe-link}", $unsubscribe_link, $pending_notification->post_content);
 					$success = wp_mail($mail,$pending_notification->post_title, $message, $headers);
+					
+					// If the message was sent
 					if($success) {
 						$this->debug_output .= "<br/>sent as html->".$mail." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 						if($counter > 1) {

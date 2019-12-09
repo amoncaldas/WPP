@@ -4,6 +4,6 @@ let options = {
   raw: true,
   pk: 'key'
 }
-const optOutService = new ModelService('wpp/v1/notifications/unsubscribe/', 'Usubscribe', options)
+const optOutService = new ModelService('wpp/v1/notifications/unsubscribe', 'Usubscribe', options)
 
 export default optOutService
