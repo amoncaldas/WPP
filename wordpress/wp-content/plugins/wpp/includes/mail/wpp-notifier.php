@@ -160,11 +160,9 @@ class WppNotifier  {
 				} else {
 					return new WP_REST_Response(null, 404); // NOT FOUND
 				}
-			} else {
-				return new WP_REST_Response(null, 404); // NOT FOUND
 			}
 		}
-
+		return new WP_REST_Response(null, 404); // NOT FOUND
 	}
 
 	/**
