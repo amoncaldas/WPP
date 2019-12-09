@@ -83,7 +83,6 @@ const actions = {
       if (locale) {
         locale = locale.toLowerCase()
       }
-      console.log(appConfig.validLocales, appConfig.defaultLocale)
       let isLocaleValid = locale && appConfig.validLocales.includes(locale)
       if (!isLocaleValid) {
         // Check if the browser supports the app default locale

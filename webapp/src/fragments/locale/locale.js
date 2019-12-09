@@ -1,4 +1,6 @@
 import utils from '@/support/utils'
+import Section from '@/support/section'
+import appConfig from '@/config'
 
 export default {
   name: 'locale-changer',
@@ -20,7 +22,7 @@ export default {
     })
 
     this.populateLocalesFromOptions()
-    this.setFromUrl()
+    this.setFromUrlOrStorage()
   },
   watch: {
     '$store.getters.locale': function () {
@@ -35,9 +37,15 @@ export default {
     },
     afterLocaleUpdate () {
       this.$i18n.locale = this.currentLocale
-      // Store the new locale and reload going to home
+      // Store the new locale
       this.$store.commit('locale', this.currentLocale)
-      window.location.href = `/?l=${this.currentLocale}`
+
+      // et the current home based on the locale
+      let currentSection = Section.getCurrentSection()
+      this.$store.commit('currentSection', currentSection)
+
+      // Change the url
+      this.$router.push({path: '/', query: { l: this.currentLocale }})
     },
     supportedLocales () {
       return Object.keys(this.$i18n.messages)
@@ -55,16 +63,33 @@ export default {
         this.currentLocale = this.locales[0]
       }
     },
-    setFromUrl () {
+    setFromUrlOrStorage () {
       let queryParams = utils.getUrlParams()
-      if (queryParams['l']) {
-        let urlLocale = queryParams['l']
+      if (queryParams.l) {
+        let urlLocale = queryParams.l
         let supportedLocales = this.supportedLocales()
-        if (supportedLocales.includes(urlLocale) && urlLocale != this.currentLocale) {
+        if (supportedLocales.includes(urlLocale) && urlLocale !== this.currentLocale) {
           this.currentLocale = this.$i18n.locale = urlLocale
           this.afterLocaleUpdate()
+        } else if (!queryParams.l) {
+          this.setFromStorage()
         }
+      } else {
+        this.setFromStorage()
       }
+    },
+    setFromStorage () {
+      let context = this
+      this.$store.dispatch('autoSetLocale').then((autoSetLocale) => {
+        // Redirect to the correct locale url if
+        // the autoLocale is different from the one in the html
+        // and the url is '/'
+        let defaultLocale = appConfig.defaultLocale
+        if (autoSetLocale !== defaultLocale && window.location.pathname === '/') {
+          context.currentLocale = context.$i18n.locale = autoSetLocale
+          context.afterLocaleUpdate()
+        }
+      })
     }
   }
 }

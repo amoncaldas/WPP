@@ -5,7 +5,7 @@
         <v-icon class="notranslate">menu</v-icon>
       </v-btn>
       <h1 class='site-title'>
-			  <a @click.prevent="$router.push({ path: buildLink('/') })" :href="buildLink('/')" class="logo"
+			  <a @click.prevent="goHome()" :href="buildLink('/')" class="logo"
           :title="$store.getters.options.site_title"
           :alt="$store.getters.options.site_title"
           :style="{ backgroundImage: 'url(' + logoUrl + ')' }">
@@ -18,7 +18,7 @@
           <app-h-menu :item="item" :showIcon="false" :key="index"></app-h-menu>
         </template >
       </v-toolbar-items>
-      <v-btn icon :href="buildLink(searchUrl)" style="padding-right:30px; padding-left:20px">
+      <v-btn icon @click.prevent="routeToSearch()" :href="buildLink(searchUrl)" style="padding-right:30px; padding-left:20px">
         <v-icon class="notranslate" large>search</v-icon>
       </v-btn>
       <template v-if="$store.getters.isAuthenticated">

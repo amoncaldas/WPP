@@ -21,7 +21,7 @@
           v-model="password"
           required
           :append-icon="hidePass ? 'visibility_off' : 'visibility'"
-          :append-icon-cb="() => (hidePass = !hidePass)"
+          @click:append="hidePass = !hidePass"
           :type="hidePass ? 'password' : 'text'"
           counter
           :rules="passwordRules"

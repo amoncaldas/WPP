@@ -21,6 +21,12 @@ export default {
       this.$store.dispatch('fetchMainMenu').then(() => {
         context.menuData = context.$store.getters.mainMenu
       })
+    },
+    routeToSearch () {
+      this.$router.push({path: '/', query: { l: this.$store.getters.locale, s: '' }})
+    },
+    goHome () {
+      this.$router.push({path: '/', query: { l: this.$store.getters.locale }})
     }
   },
   computed: {
@@ -28,25 +34,30 @@ export default {
       return wpp.logoUrl()
     },
     appTitle () {
-      let title = this.$store.getters.options.site_title.trim()
+      let title = `${this.$store.getters.options.site_title.trim()} | ${this.$store.getters.options.short_name}`
       return title
     },
     menuItems () {
       return this.menuData
     },
     searchUrl () {
-      let searchUrl = '/'
+      let query = this.searchQuery
+      let searchUrl = `/${query}`
+      return searchUrl
+    },
+    searchQuery () {
+      let searchQuery = ''
       let queryParams = utils.getUrlParams()
       if (queryParams.l) {
-        searchUrl = `?l=${queryParams.l}`
+        searchQuery = `?l=${queryParams.l}`
       }
-      if (searchUrl.indexOf('?') > -1) {
-        searchUrl += '&'
+      if (searchQuery.indexOf('?') > -1) {
+        searchQuery += '&'
       } else {
-        searchUrl += '?'
+        searchQuery += '?'
       }
-      searchUrl += 's='
-      return searchUrl
+      searchQuery += 's='
+      return searchQuery
     }
   },
   components: {

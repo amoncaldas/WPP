@@ -17,10 +17,10 @@ const showMenuItem = (item) => {
 const navigate = (to) => {
   if (to.href !== '#') {
     if (to.external) {
-      window.location = to.href
+      window.open(to.href, '_blank')
     } else {
       let VueInstance = main.getInstance()
-      VueInstance.$router.push({path: to.href})
+      VueInstance.routeToLink(to.href)
     }
   }
 }

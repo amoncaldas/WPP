@@ -204,19 +204,19 @@ export default {
         this.debounceEmailTimeoutId = setTimeout(function () {
           if (pattern.email.test(this.resource.email)) {
             // this is a custom request, so we need to set the options
-            let options = {verb: 'post', data: { email: this.resource.email }, raw: true}
+            let options = {verb: 'post', data: { email: context.resource.email }, raw: true}
             let endPoint = checkEmailRegisteredEndpoint
 
             // we want to set the username valid attribute as `checking` while the response is not ready
-            this.emailValid = 'checking'
+            context.emailValid = 'checking'
             userService.customQuery(options, endPoint).then(response => {
-              this.emailValid = !response.data.registered
+              context.emailValid = !response.data.registered
 
               // call the username input validator to update the message displayed
-              this.$refs.userEmail.validate()
+              context.$refs.userEmail.validate()
             })
           } else {
-            this.emailValid = false
+            context.emailValid = false
           }
         }, 1000)
       }

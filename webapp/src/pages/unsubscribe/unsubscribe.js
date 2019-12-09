@@ -23,7 +23,7 @@ export default {
     },
     afterError () {
       this.loaded = this.activationError = true
-    },
+    }
   },
   created () {
     // Emit the an event catch by root App component
@@ -40,7 +40,7 @@ export default {
       410: this.$t('newsOptOut.wrongUserEmailOrAlreadyUnsubscribed') // Do not show error message, but run a custom function instead of it
     }
     // Set up the CRUD fr this component
-    CRUD.set(this, optOutService, crudOptions)
+    CRUD.set(this, unsubscribeService, crudOptions)
 
     // Set the properties that are gonna be used by the CRUD to update/activate the user
     this.resource.key = this.$route.params.email

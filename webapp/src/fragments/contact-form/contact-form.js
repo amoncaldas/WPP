@@ -27,7 +27,7 @@ export default {
   computed: {
     emailRules () {
       return [ !!this.resource.email && pattern.email.test(this.resource.email) || this.$t('contactForm.pleaseTypeAValidEmail') ]
-    },
+    }
   },
   methods: {
     sendMsg () {

@@ -453,15 +453,15 @@ class CRUD {
    * @memberof CRUD
    */
   getErrorTreatment (errorResponse, eventMsg, crudErrorMessage) {
-    // the event message is the priority, so if it is defined, use it
-    if (eventMsg !== null && eventMsg !== undefined) {
-      return eventMsg
-    }
-
     // We try to get the error message to the returned http status code
     // If available, use it
     if (errorResponse.status && this.options[errorResponse.status] !== undefined) {
       return this.options[errorResponse.status]
+    }
+
+    // Use the event error message
+    if (eventMsg !== null && eventMsg !== undefined) {
+      return eventMsg
     }
 
     // If none works, use the default crudErrorMessage

@@ -78,6 +78,20 @@ class WppMailer  {
 	}
 
 	/**
+	 * Send subscription registered mail
+	 *
+	 * @param String $to_email
+  * @param String $title
+	 * @param String $link
+	 * @param String $lang
+	 * @return void
+	 */
+	public static function send_subscription_registered_email($to_email, $title, $link, $lang = null) {
+		$html_message = self::get_subscription_registration_template($link, $lang);
+		self::send_email($to_email, $title, $html_message, $lang);
+	}
+
+	/**
 	 * Send registration/activation mail
 	 *
 	 * @param String $to_email
@@ -165,7 +179,7 @@ class WppMailer  {
 		$template = str_replace("{site-logo-url}", $logo_url, $template);			
 		$template = str_replace("{content-title}", $title, $template);
 		$template = str_replace("{content}", $message, $template);
-    	$html_message = str_replace("{current-year}", date('Y'), $template);	
+  $html_message = str_replace("{current-year}", date('Y'), $template);	
     
 		return $html_message;
 	}
@@ -187,7 +201,29 @@ class WppMailer  {
 		$template = str_replace("{site-name}", get_bloginfo("name"), $template);
 		$template = str_replace("{site-domain}", $url_parts[1], $template);
 		$template = str_replace("{site-logo-url}", $logo_url, $template);			
-    	$html_message = str_replace("{current-year}", date('Y'), $template);	
+  $html_message = str_replace("{current-year}", date('Y'), $template);	
+    
+		return $html_message;
+	}
+
+		/**
+	 * Get the subscription registered mail template
+	 * @param String $link
+   * @param String $lang
+	 * @return String html
+	 */
+	public static function get_subscription_registration_template($link, $lang = null) {
+		$lang = $lang ? $lang : get_default_locale();
+		$template = file_get_contents(WPP_PLUGIN_PATH."/includes/mail/templates/$lang/subscription.html");
+		$logo_url = network_home_url(get_option("wpp_site_relative_logo_url"));
+		$url_parts = explode("//", network_home_url());
+    
+		$template = str_replace("{site-url}", network_home_url(), $template);
+		$template = str_replace("{link}", $link, $template);
+		$template = str_replace("{site-name}", get_bloginfo("name"), $template);
+		$template = str_replace("{site-domain}", $url_parts[1], $template);
+		$template = str_replace("{site-logo-url}", $logo_url, $template);			
+  $html_message = str_replace("{current-year}", date('Y'), $template);	
     
 		return $html_message;
 	}
@@ -212,6 +248,33 @@ class WppMailer  {
     	$html_message = str_replace("{current-year}", date('Y'), $template);	
     
 		return $html_message;
+	}
+
+	/**
+	* Get mail subject translation
+	*
+	* @param String $key
+	* @param String $request_lang
+	* @param String $fallback
+	* @return String $fallback
+	*/
+	public static function get_mail_subject_translation ($key, $request_lang, $fallback) {
+		try {
+			// Get translation definitions and parse it
+			$wpp_email_subject_translations = get_option("wpp_email_subject_translations", "{}");
+			$dictionary = str_replace("\\", "", $wpp_email_subject_translations);
+			$dictionary = json_decode($dictionary, true);
+
+			// Check if translation key exist
+			if (isset($dictionary[$key]) && isset($dictionary[$key][$request_lang])) {
+				return $dictionary[$key][$request_lang];
+			} else  {
+				return $fallback; // fallback msg title
+			} 
+		}
+		catch (Exception $e) {                
+			return $fallback; // fallback msg title           
+		}       
 	}
 }
 

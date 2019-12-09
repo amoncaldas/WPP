@@ -137,7 +137,7 @@ class WppFollower  {
 			$term = get_term_by('slug', $lang, self::$lang_tax_slug);
 			$term_arr = [$term->term_id];
 			wp_set_post_terms($follower_id, $term_arr, self::$lang_tax_slug);
-			return "created";
+			return $follower_id;
 		}
 	}
 }
