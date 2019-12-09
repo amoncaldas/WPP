@@ -1,9 +1,9 @@
 export default {
   unsubscribe: {
-    pageTitle: 'Unsubscribe from news',
-    unsubribeFromNews: 'Unsubscribe from news',
+    pageTitle: 'Unsubscribe from newleter',
+    unsubribeFromNews: 'Unsubscribe from newleter',
     unsubscribing: 'Unsubscribing ...',
-    unsubscribed: 'Unsubscribed',
+    unsubscribed: 'Unsubscribed from newsletter',
     wrongUserId: 'Wrong user id or email',
     wrongUserEmailOrAlreadyUnsubscribed: 'The email is already unsubscribed or not valid'
   }

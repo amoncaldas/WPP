@@ -23,7 +23,7 @@
         </div>
         <div v-if="mode === 'author' && place && !this.post.extra.no_authoring_place">
           <v-icon class="notranslate">place</v-icon>
-          <a :href="buildLink(place.path)" :title="place.title" flat ><b>{{place.title}}</b></a>
+          <a :href="buildLink(place.path)" :title="place.title" flat ><b v-html="place.title"></b></a>
         </div>
       </v-flex>
     </v-layout>

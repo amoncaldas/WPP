@@ -14,7 +14,7 @@ export default {
     locale: null
   }),
   created () {
-    this.locale = this.$i18n.locale
+    this.locale = this.$store.getters.locale
     // extend this component, adding CRUD functionalities and load the tokens
     let options = {
       queryOnStartup: false,

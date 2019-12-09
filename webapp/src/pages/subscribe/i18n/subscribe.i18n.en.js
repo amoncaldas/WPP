@@ -1,5 +1,5 @@
 export default {
   subscribe: {
-    pageTitle: 'Sign up'
+    pageTitle: 'Subscribe for newsletter'
   }
 }

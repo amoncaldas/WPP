@@ -2,11 +2,11 @@ import Subscribe from '@/pages/subscribe/Subscribe'
 import store from '@/store/store'
 
 export default {
-  path: '/subscribe',
-  name: 'Subscribe',
+  path: '/assinar-newsletter',
+  name: 'Assinar newsletter',
   component: Subscribe,
   beforeEnter: (to, from, next) => {
-    store.commit('locale', 'en-us')
+    store.commit('locale', 'pt-br')
     next()
   }
 }
