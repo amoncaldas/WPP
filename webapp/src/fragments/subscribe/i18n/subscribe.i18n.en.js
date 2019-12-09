@@ -8,7 +8,7 @@ export default {
     locale: 'Content locale',
     failWhileTryingToSubscribing: 'There was a failure and it was not possible to subscribe you',
     processingSubscription: 'Processing subscription...',
-    subscriptionRegistered: 'Subscription registerd',
+    subscriptionRegistered: 'Subscription registered',
     thisEmailIsAlreadySubscribed: 'This email is already subscribed'
   }
 }
