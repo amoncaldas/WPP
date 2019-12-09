@@ -157,8 +157,6 @@ class WppNotifier  {
 					return new WP_REST_Response(null, 400); // INVALID REQUEST
 				} else if ($result === "deactivated") {			
 					return new WP_REST_Response(null, 204); // ACCEPTED, NO CONTENT
-				} else {
-					return new WP_REST_Response(null, 404); // NOT FOUND
 				}
 			}
 		}
