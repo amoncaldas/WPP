@@ -3,14 +3,14 @@
   <box :tag="mode === 'single' ? 'main' : 'article'" :resizable="post.extra.resizable" class="post" background="white" :no-top-border="noTopBorder" v-if="post">
     <div slot="header">
       <template v-if="mode === 'single'">
-        <h1>{{title}}</h1>
+        <h1 v-html="title"></h1>
         <span v-if="$store.getters.currentSection.path !== '/'"> {{$t('post.in')}}
-          <a target="_blank" @click.prevent="routeToLink($store.getters.currentSection.path)"  :href="buildLink($store.getters.currentSection.path)">
+          <a target="_blank" @click.prevent="routeToLink($store.getters.currentSection.path)" :href="buildLink($store.getters.currentSection.path)">
             {{$store.getters.currentSection.title.rendered || $store.getters.currentSection.title}}
           </a>
         </span>
       </template>
-      <h3 v-else-if="post.extra.no_link">{{title}}</h3>
+      <h3 v-else-if="post.extra.no_link" v-html="title"></h3>
       <template v-else>
         <a @click.prevent="navigateToSingle()" :href="buildLink(link)" :target="post.extra.target_blank ? '_blank' : '_self'" :title="title" :style="{color:$vuetify.theme.dark}" style="margin-left:0px; text-decoration:none" >
           <h3>{{title}}</h3>

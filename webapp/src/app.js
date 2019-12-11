@@ -6,6 +6,7 @@ import Confirm from '@/fragments/dialogs/confirm/Confirm'
 import Info from '@/fragments/dialogs/info/Info'
 import wpp from '@/support/wpp'
 import VueScrollTo from 'vue-scrollto'
+import Section from '@/support/section'
 
 export default {
   data () {
@@ -29,6 +30,13 @@ export default {
     '$store.getters.currentSection': {
       handler: function () {
         this.setAppearance()
+      },
+      deep: true
+    },
+    $route: {
+      handler: function () {
+        let currentSection = Section.getCurrentSection()
+        this.$store.commit('currentSection', currentSection)
       },
       deep: true
     }
