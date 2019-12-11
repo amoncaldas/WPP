@@ -67,7 +67,7 @@ export default {
       loaded: false,
       totalPages: null,
       firstLoad: true,
-      pageChanged: false
+      currentPage: 1
     }
   },
   watch: {
