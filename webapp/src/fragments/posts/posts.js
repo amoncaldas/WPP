@@ -5,6 +5,7 @@ import VueScrollTo from 'vue-scrollto'
 export default {
   name: 'posts',
   created () {
+    this.firstLoad = true
     this.currentPage = this.page
     this.loadPosts()
     this.eventBus.$on('localeChanged', () => {
@@ -65,15 +66,13 @@ export default {
       total: null,
       loaded: false,
       totalPages: null,
-      currentPage: null,
+      firstLoad: true,
       pageChanged: false
     }
   },
   watch: {
     currentPage: function () {
-      if (this.pageChanged) {
-        this.updateData()
-      }
+      this.loadPosts()
     },
     endpoint: function () {
       this.loadPosts()
@@ -107,10 +106,7 @@ export default {
     }
   },
   methods: {
-    updateData () {
-      this.loadPosts(true)
-    },
-    loadPosts (pageChanged = false) {
+    loadPosts () {
       this.loaded = false
       // @see http://v2.wp-api.org/reference/posts/
       let filters = {
@@ -159,9 +155,10 @@ export default {
         this.showError(this.$t('posts.thePostListCouldNotBeLoaded'))
       }).finally(() => {
         this.loaded = true
-        if (pageChanged) {
+        if (!this.firstLoad) {
           VueScrollTo.scrollTo(this.$el, 1000, {})
         }
+        this.firstLoad = false
       })
     }
   },

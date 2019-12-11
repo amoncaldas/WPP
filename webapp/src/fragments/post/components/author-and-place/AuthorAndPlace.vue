@@ -9,9 +9,9 @@
       <v-flex xs9 sm10 md11>
         <div>
           <template v-if="authorLink" class="notranslate">
-            <span> {{$t('author.by')}}</span> <a :title="authorName" @click.prevent="routeToLink(authorLink)" :href="buildLink(authorLink)"><b>{{authorName}}</b></a>
+            <span> {{$t('author.by')}}</span> <a :title="authorName" @click.prevent="routeToLink(authorLink)" :href="buildLink(authorLink)"><b v-html="authorName"></b></a>
           </template>
-          <span v-else> {{$t('author.by')}} <b>{{authorName}}</b></span>
+          <span v-else> {{$t('author.by')}} <b v-html="authorName"></b></span>
         </div>
         <div>
           <span v-if="mode === 'author'">
@@ -23,7 +23,7 @@
         </div>
         <div v-if="mode === 'author' && place && !this.post.extra.no_authoring_place">
           <v-icon class="notranslate">place</v-icon>
-          <a :href="buildLink(place.path)" :title="place.title" flat ><b v-html="place.title"></b></a>
+          <a @click.prevent="routeToLink(place.path)" :href="buildLink(place.path)" :title="place.title" flat ><b v-html="place.title"></b></a>
         </div>
       </v-flex>
     </v-layout>

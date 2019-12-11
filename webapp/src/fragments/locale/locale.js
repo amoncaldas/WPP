@@ -1,6 +1,5 @@
 import utils from '@/support/utils'
 import Section from '@/support/section'
-import appConfig from '@/config'
 
 export default {
   name: 'locale-changer',
