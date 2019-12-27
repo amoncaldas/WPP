@@ -13,8 +13,7 @@ export default {
     return {
       title: null,
       lang: null,
-      showLoading: false,
-      dataAndPrivacyPolicyAccepted: false
+      showLoading: false
     }
   },
   name: 'App',
@@ -39,6 +38,19 @@ export default {
         this.$store.commit('currentSection', currentSection)
       },
       deep: true
+    }
+  },
+  computed: {
+    /**
+     * Defines if the data and privacy policy must be shown
+     */
+    showDataAndPrivacyPolicy () {
+      if (!this.hasDataAndPrivacyPolicyPage) {
+        return false
+      }
+      let dataAndPrivacyPolicyAccepted = localStorage.getItem('dataAndPrivacyPolicyAccepted')
+      let show = !dataAndPrivacyPolicyAccepted
+      return show
     }
   },
   methods: {
@@ -87,7 +99,6 @@ export default {
       }
     },
     acceptDataAndPrivacyPolicy () {
-      this.dataAndPrivacyPolicyAccepted = true
       localStorage.setItem('dataAndPrivacyPolicyAccepted', true)
     },
     getDataAndPrivacyUrl () {
@@ -106,14 +117,6 @@ export default {
         title = `${title} | ${sectionTitle}`
       }
       this.title = `${title} | ${this.$store.getters.options.short_name}`
-    }
-  },
-  computed: {
-    showDataAndPrivacyPolicy () {
-      this.dataAndPrivacyPolicyAccepted = localStorage.getItem('dataAndPrivacyPolicyAccepted')
-      let url = this.getDataAndPrivacyUrl()
-      let show = !this.dataAndPrivacyPolicyAccepted && url !== undefined && url !== null
-      return show
     }
   },
   created () {

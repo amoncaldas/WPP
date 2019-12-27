@@ -1,4 +1,5 @@
 import SiteMenu from '@/common/site-menu'
+import utils from '@/support/utils'
 import appConfig from '@/config'
 
 const state = {
@@ -47,7 +48,7 @@ const mutations = {
   },
   locale: (state, locale) => {
     state.locale = locale
-    localStorage.setItem('locale', locale)
+    localStorage.setItem('locale', state.locale)
   },
   defaultBackground: (state, value) => {
     state.defaultBackground = value
@@ -79,7 +80,8 @@ const actions = {
   },
   autoSetLocale ({commit}) {
     return new Promise((resolve) => {
-      let locale = localStorage.getItem('locale') || window.navigator.language || window.navigator.userLanguage
+      let queryParams = utils.getUrlParams()
+      let locale = queryParams.l || localStorage.getItem('locale') || window.navigator.language || window.navigator.userLanguage
       if (locale) {
         locale = locale.toLowerCase()
       }
@@ -93,7 +95,6 @@ const actions = {
           locale = appConfig.validLocales.includes('en-us') ? 'en-us' : appConfig.defaultLocale
         }
       }
-      localStorage.setItem('locale', locale)
       commit('locale', locale)
       resolve(locale)
     })
