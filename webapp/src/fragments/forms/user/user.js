@@ -73,6 +73,7 @@ export default {
       sectors: [],
       mode: 'create',
       receiveNews: false,
+      dataAndPrivacyPolicyAccepted: false,
       usernameValid: null,
       emailValid: null,
       debounceUsernameTimeoutId: null,
@@ -226,6 +227,10 @@ export default {
      * Handle the form submit
      */
     submit () {
+      if (this.hasDataAndPrivacyPolicyPage && !this.dataAndPrivacyPolicyAccepted) {
+        this.showError(this.$t('user.theDataAndPrivacyPolicyMustBeAccepted'))
+        return
+      }
       // if a custom submit function is defined, run it
       if (this.submitFn) {
         this.submitFn(this)

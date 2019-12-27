@@ -21,7 +21,9 @@ export default {
     alreadyTakenUsername: 'Username not available',
     emailNotValidOrTaken: 'Email already registered or invalid',
     accountCreated: 'Account created successfully. Please check your email and follow the instructions.',
-    profileUpdated: 'Profile updated'
+    profileUpdated: 'Profile updated',
+    theDataAndPrivacyPolicyMustBeAccepted: 'You must accept the data and privacy policy to register',
+    IAccept: 'I accept the'
 
   }
 }

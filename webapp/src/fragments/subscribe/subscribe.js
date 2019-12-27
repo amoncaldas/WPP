@@ -11,7 +11,8 @@ export default {
     verifiedCaptcha: false,
     resource: {},
     ready: false,
-    locale: null
+    locale: null,
+    dataAndPrivacyPolicyAccepted: false
   }),
   created () {
     this.locale = this.$store.getters.locale
@@ -60,6 +61,10 @@ export default {
       this.save()
     },
     submit () {
+      if (this.hasDataAndPrivacyPolicyPage && !this.dataAndPrivacyPolicyAccepted) {
+        this.showError(this.$t('subscribe.theDataAndPrivacyPolicyMustBeAccepted'))
+        return
+      }
       this.resource.locale = this.locale
       this.showInfo(this.$t('subscribe.processingSubscription'), {timeout: 6000})
       if (this.$store.getters.options.recaptcha_site_key) {

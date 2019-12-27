@@ -39,7 +39,7 @@ export default {
       november: 'Nov',
       december: 'Dez'
     },
-    acceptDataAndPrivacyAndDaPolicy: 'Ao continuar a navegar neste site você aceita a ',
+    acceptDataAndPrivacyAndDaPolicy: 'Ao continuar a navegar neste website você aceita a ',
     dataAndPrivacyPolicy: 'política de dados e privacidade'
   },
   auth: {

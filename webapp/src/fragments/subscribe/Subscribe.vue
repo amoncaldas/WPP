@@ -22,7 +22,7 @@
     </v-form>
     <div slot="footer">
       <v-layout row wrap>
-        <v-flex xs12 sm8 :class="{'mb-2': $vuetify.breakpoint.smAndDown}" >
+        <v-flex xs12 sm3 :class="{'mb-2': $vuetify.breakpoint.smAndDown}" >
           <div v-if="locales.length > 1">
             <v-select class="notranslate"
               required
@@ -33,6 +33,16 @@
               :label="$t('subscribe.locale')">
             </v-select>
           </div>
+        </v-flex>
+        <v-spacer v-if="hasDataAndPrivacyPolicyPage" class="hidden-xs-and-down"></v-spacer>
+        <v-flex xs12 sm5 v-if="hasDataAndPrivacyPolicyPage">
+          <v-switch class="notranslate" required v-model="dataAndPrivacyPolicyAccepted"    >
+            <template slot='label'>
+              <span style="display:inline-block">{{$t('user.IAccept')}}
+                <a target="_blank" class='data-and-privacy-link' v-bind:href="dataAndPrivacyUrl">{{$t('global.dataAndPrivacyPolicy')}}</a>
+              </span>
+            </template>
+          </v-switch>
         </v-flex>
         <v-spacer class="hidden-xs-and-down"></v-spacer>
         <v-flex xs12 sm3>

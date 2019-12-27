@@ -21,7 +21,9 @@ export default {
     alreadyTakenUsername: 'Nome de usuário não disponível',
     emailNotValidOrTaken: 'Email já registrado ou inválido',
     accountCreated: 'Conta criada com sucesso. Por favor, verifique seu email e siga as instruções.',
-    profileUpdated: 'Perfil atualizado'
+    profileUpdated: 'Perfil atualizado',
+    theDataAndPrivacyPolicyMustBeAccepted: 'Você deve aceitar a política de dados e privacidade para se cadastrar',
+    IAccept: 'Aceito a'
 
   }
 }

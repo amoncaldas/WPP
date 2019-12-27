@@ -9,6 +9,7 @@ export default {
     failWhileTryingToSubscribing: 'There was a failure and it was not possible to subscribe you',
     processingSubscription: 'Processing subscription...',
     subscriptionRegistered: 'Subscription registered',
-    thisEmailIsAlreadySubscribed: 'This email is already subscribed'
+    thisEmailIsAlreadySubscribed: 'This email is already subscribed',
+    theDataAndPrivacyPolicyMustBeAccepted: 'You must accept the data and privacy policy to subscribe'
   }
 }

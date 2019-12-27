@@ -9,6 +9,7 @@ export default {
     failWhileTryingToSubscribe: 'Houve uma falha e não foi possível registrar sua assinatura. ',
     processingSubscription: 'Processando sua assinatura...',
     subscriptionRegistered: 'Assinatura registrada com sucesso',
-    thisEmailIsAlreadySubscribed: 'Este email já está registrado para receber informativos'
+    thisEmailIsAlreadySubscribed: 'Este email já está registrado para receber informativos',
+    theDataAndPrivacyPolicyMustBeAccepted: 'Você deve aceitar a política de privacidade e dados para se inscrever'
   }
 }

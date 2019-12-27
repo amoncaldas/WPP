@@ -7,6 +7,7 @@ export default {
   component: Profile,
   beforeEnter: (to, from, next) => {
     if (store.getters.isAuthenticated) {
+      store.commit('locale', 'pt-br')
       next({path: '/profile', query: {l: 'pt-br'}})
     } else {
       next('/login')

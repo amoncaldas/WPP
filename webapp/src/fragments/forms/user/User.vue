@@ -43,18 +43,33 @@
     <v-layout row wrap>
       <v-flex sm5 xs12>
           <v-text-field :label="$t('user.newPassword')" v-model="resource.password" :append-icon="passVisibility ? 'visibility_off' : 'visibility'"
-          :append-icon-cb="() => (passVisibility = !passVisibility)" :type="passVisibility ? 'password' : 'text'" counter :required="mode === 'create'"></v-text-field>
+          @click:append="passVisibility = !passVisibility" :type="passVisibility ? 'password' : 'text'" counter :required="mode === 'create'"></v-text-field>
       </v-flex>
       <v-spacer></v-spacer>
       <v-flex sm5 xs12>
           <v-text-field :label="$t('user.confirmNewPassword')" v-model="resource.confirmPassword" :append-icon="passVisibility ? 'visibility_off' : 'visibility'"
-          :append-icon-cb="() => (passVisibility = !passVisibility)" :type="passVisibility ? 'password' : 'text'" counter :required="mode === 'create'"
+          @click:append="passVisibility = !passVisibility" :type="passVisibility ? 'password' : 'text'" counter :required="mode === 'create'"
           :rules="passwordRules"></v-text-field>
       </v-flex>
     </v-layout>
-    <v-switch class="receive-news"
-      :label="$t('user.receiveNews')" @change="newsChanged" v-model="receiveNews"
-    ></v-switch>
+
+    <v-layout row wrap>
+      <v-flex sm5 xs12>
+        <v-switch class="receive-news"
+          :label="$t('user.receiveNews')" @change="newsChanged" v-model="receiveNews"
+        ></v-switch>
+      </v-flex>
+      <v-flex sm5 xs12>
+        <v-switch class="notranslate" v-if="hasDataAndPrivacyPolicyPage" required v-model="dataAndPrivacyPolicyAccepted"    >
+          <template slot='label'>
+            <span style="display:inline-block">{{$t('user.IAccept')}}
+              <a target="_blank" class='data-and-privacy-link' v-bind:href="dataAndPrivacyUrl">{{$t('global.dataAndPrivacyPolicy')}}</a>
+            </span>
+          </template>
+        </v-switch>
+      </v-flex>
+    </v-layout>
+
     <v-layout row wrap>
       <v-spacer></v-spacer>
       <v-btn dark large color="secondary" v-if="crudReady" @click="submit">{{ $t('global.send') }}
