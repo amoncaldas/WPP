@@ -179,7 +179,7 @@ export default {
      * @param {*} marker
      */
     markerInfoClick (marker) {
-      this.$emit('placeClicked', marker.json)
+      this.$emit('placeClicked', marker.data)
     },
     adjustMap (data) {
       if (data.guid === this.boxGuid) {
