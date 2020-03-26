@@ -17,7 +17,6 @@ This app uses single file components and others non native javascript code that 
   - [Authentication and authorization](#authentication-and-authorization)
   - [Registration](#registration)
 - [Architecture and structure](#architecture-and-structure)
-- [Dashboard pages](#dashboard-pages)
 - [Debug](#debug)
 - [Build and deploy](#build-and-deploy)
 
