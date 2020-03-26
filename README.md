@@ -8,7 +8,13 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
 - [Features](#features)
 - [Highlighted features](#highlighted-features)
   - [Auto update WordPress URL](#auto-update-wordpress-url)
-  - [Decoupled front-end dashboard](#decoupled-front-end-dashboard)
+  - [Decoupled front-end](#decoupled-front-end)
+  - [Contact form](#contact-form)
+  - [Visitor dashboard](#visitor-dashboard)
+  - [Map component](#map-component)
+  - [Members](#members)
+  - [Image slider and gallery](#image-slider-and-gallery)
+  - [Site sections](#site-sections)
 - [WPP plugins](#wpp-plugins)
 - [Customization and updates](#customization-and-updates)
 - [Continuous integration](#continuous-integration)
@@ -40,18 +46,15 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
 
 ## Features ##
 
-- Custom docker image based in wordpress:php7.1-apache
+- Custom docker image based in wordpress:5.3-php7.1-apache
 - Custom docker image based in mysql:5.7 with auto dump import
 - wp-config.php mapped to an external file
 - wp-content folder mapped to an external folder
 - Customization and updates via update.sh and wp-cli
 - Mapped /dev url to run /var/www/webapp/index.html
-- Decoupled front-end dashboard with Vuejs
-- Auto fix wordpress url to mach the one defined in the docker-compose yml file
-- Continues integration with GitLab to deploy branches staging and master
+- Decoupled front-end with Vuejs and SPA
+- Auto fix wordpress url to match the one defined in the docker-compose yml file
 - Auto update state via wp-cli
-
- The url /dev will point to a future SPA containing examples and developer dashboard page
 
 ## Highlighted features ##
 
@@ -61,17 +64,42 @@ Some important features are described in this section
 
 WordPress store in db absolute urls and therefore we check if the url defined in the docker-compose yml file matches the one stored by WordPress. If not, we update it automatically. Like this we can run the same project and db in multiples environments, like `local`, `staging` and `production`. See [https://codex.wordpress.org/Changing_The_Site_URL](https://codex.wordpress.org/Changing_The_Site_URL)
 
-### Decoupled front-end dashboard ###
+### Decoupled front-end ###
 
 This solution includes a decoupled front-end dashboard built using VueJS and a custom base front-end application. The front-end communicates with the wordpress rest json api (including the custom endpoints created by the [custom plugins](#custom-plugins)) to get and send data.
 
-See more about it in the [Dashboard app readme](webapp/README.md)
+### Contact form ###
 
-## Wpp plugins ##
+This solution includes a decoupled front-end contact form with captcha and the back-end services to process it
+
+### Visitor dashboard ###
+
+This solution includes a decoupled front-end visitor dashboard and the back-end services to process it
+
+### Map component ###
+
+This solution includes a map component. Several map can be created on the admin to display a place, list of places and static routes. The icon of the place can be customized and each place displayed on the map can be linked to a content and is navigable (clickable)
+
+### Image slider and gallery ###
+
+This solution includes a slider component and a gallery component
+
+### Members ###
+
+This solution includes member component that allows creating members and listing them on any page or post. It is also possible to link a member to a user/author
+
+### Site sections ###
+
+This solution includes a component that allows creating/editing sections. Each section can have its appearance customized and content can be created under it.
+
+
+See more about the front-end on the [Front-end app readme](webapp/README.md)
+
+## Wpp plugin ##
 
 Some custom plugins were created and added to wordpress to achieve the desired functionalities. They are:
 
-1. `wp-web-app` - This plugin is custom wpp solution and is intended to contain customizations to WordPress hooks/events, custom rest-api endpoints as well as customize third parties plugins that are supposed to be installed.
+1. `wpp` - This plugin is custom wpp solution and is intended to contain customizations to WordPress hooks/events, custom rest-api endpoints as well as customize third parties plugins that are supposed to be installed.
     - It registers custom wp api end-points related to user registration and custom wpp data regarding the business logic, like sectors and usernames available (in `wp-api` folder). The **dashboard app uses these endpoints** to communicate with the back-end during user registration and profile update.
     - It also register custom actions for wordpress rest_api_init  to customize the response and return custom user data as well as custom error messages when the user api is called. In addition it also adds a filter to the jwt_auth_token_before_dispatch event thrown by the `jwt-authentication-for-wp-rest-api` plugin (in includes/users.php).
 
@@ -104,24 +132,6 @@ Example to add and activate a plug-in:
 
 **Important:** the auto update does not run locally. See [Running locally](#running-locally)
 
-## Continuous integration ##
-
-The entire solution has a continuous integration setup using the gitlab-ci. The tasks related to the CI are defined in the [.gitlab-ci.yml](#.gitlab-ci.yml). The basic idea is: when a commit to specific branches occur, a set of actions are triggered automatically, including:
-
-- Connect to the target server and run git pull on the linked branch to update the local files on the target server
-- Run the `docker exec <target-container-name> /bin/sh -c 'cd wp-content && sh update.sh'`.
-
-The followings triggers are configured:
-
-- Deploy to **staging** server by committing in the *STAGING* branch (the Gitlab CI will install it on the staging server)
-- Check if everything is as desired accessing the staging instance at [http://129.206.7.40:8081](http://129.206.7.40:8081)
-
-- Deploy to **production** server by committing in the *MASTER* branch (the Gitlab CI will install it on the production server)
-- Check if everything is as desired accessing the production server at [http://openrouteservice.org](http:/openrouteservice.org)
-
-**Important:** as the triggers will run automatically **you have to be sure about what you are committing**, specially to the master branch.
-
-**Important:** if changes in the decoupled front-end are made, you have to build a new version of the front-end and then run git add/commit/push. To make sure that the update of staging/production environment is as fast as possible, it was decided that the front-end builds should be run locally and then pushed. The build output files of the front-end are versioned, so they are part of the repository.
 
 ## Setup environment ##
 
@@ -187,11 +197,6 @@ The followings triggers are configured:
  npm install
  npm run build
  ```
-
-## Auto update theme post meta urls ##
-
-In the Pursuit theme functions.php it was implemented some functions that verifies and updates the theme specific post meta values
-that points to absolute image urls. So, when the SITE_URL is changed on a *docker-compose.yml, the image urls will be updated so they are displayed correctly running the site in any domain/ip/port. This is a Wordpress/Pursuit theme bug and we had to implement this fix to be able to run the same solution in multiple environments (local, staging, production)
 
 ## Auto update state via WP CLI ##
 
