@@ -28,7 +28,9 @@ export default {
   methods: {
     ...menuMixin,
     nav (to) {
-      this.$store.commit('setLeftSideBarIsOpen', false)
+      if (to.href && to.href !== '#') {
+        this.$store.commit('setLeftSideBarIsOpen', false)
+      }
       if (this.navigateFn) {
         this.navigateFn(to)
       } else {
