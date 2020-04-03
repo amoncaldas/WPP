@@ -1,5 +1,5 @@
 <template>
-  <v-menu v-if="item.items  && Array.isArray(item.items) && showMenuItem(item)" :open-on-hover="false" :close-on-content-click="false" nudge-top="10" offset-y :key="item.href" content-class="hm-content">
+  <v-menu :ref="'menuRef'" v-if="item.items && Array.isArray(item.items) && showMenuItem(item)" :open-on-hover="false" :close-on-content-click="false" nudge-top="10" offset-y :key="item.href" content-class="hm-content">
     <v-btn class="app-btn-mh" :class="{'has-icon':item.showIcon, 'active': item.active}" @click.prevent="nav(item)" :href="getHref(item)" :key="item.href" flat slot="activator" :title="item.title">
       <v-icon class="notranslate" v-if="item.showIcon" left>{{item.icon}}</v-icon>
       {{item.title}}
