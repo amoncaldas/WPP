@@ -29,5 +29,15 @@ export default {
         this.navigate(to)
       }
     }
+  },
+  mounted () {
+    let context = this
+    // When the page title change
+    // all the menu must be closed
+    this.eventBus.$on('titleChanged', () => {
+      if (context.$refs.menuRef) {
+        context.$refs.menuRef.isActive = false
+      }
+    })
   }
 }
