@@ -17,7 +17,6 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
   - [Site sections](#site-sections)
 - [WPP plugins](#wpp-plugins)
 - [Customization and updates](#customization-and-updates)
-- [Continuous integration](#continuous-integration)
 - [Setup environment](#setup-environment)
 - [Debug](#debug)
 - [Deploy](#deploy)
@@ -125,12 +124,6 @@ Example to add and activate a plug-in:
     # important: it is necessary to be in the right folder, like wp-content, so the wp-cli can use the right context
     docker exec wpp-website-local /bin/sh -c 'cd wp-content && sh update.sh'
     ```
-
-1. Commit in the **develop** branch (this branch has no deploy CI integration)
-
-**Important:** the updater is automatically ran by the CI integration during the deploy to **staging** and **production** server
-
-**Important:** the auto update does not run locally. See [Running locally](#running-locally)
 
 
 ## Setup environment ##
@@ -244,15 +237,13 @@ docker exec wpp-website-local /bin/sh -c 'cd wp-content && sh update.sh'
 
 ## Debug ##
 
- Check the [how to debug readme](docs/debug.md) to set up the php debug for the php code.
+ Check the [how to debug readme](docs/debug-wordpress.md) to set up the php debug for the php code.
 
 ## Deploy ##
 
-The project deployment is done via continuous integration with Gitlab CI. So, when you push a commit to the `staging` branch the changes in this branch will be deployed to the STAGING server and when you push a commit to the `master` branch the changes in this branch will be deployed to the MASTER server.
+The project deployment can be done via git push/pull or via continuous integration with Gitlab CI (rename the `gitlab-ci-deactiveated.yml` to `gitlabp-ci.yml` and adjust the credentials). In the second case, when you push a commit to the `staging` branch the changes in this branch will be deployed to the STAGING server and when you push a commit to the `master` branch the changes in this branch will be deployed to the MASTER server.
 
 Remember that if you make changed on the dashboard app, if is necessary to build it locally before commit/deploy. Check the [build-and-deploy app section](webapp/README.md#build-and-deploy) to understand more.
-
-Check the [Continuous integration](#continuous-integration) section to see the details.
 
 ## Options ##
 
