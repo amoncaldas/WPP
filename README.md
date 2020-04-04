@@ -214,10 +214,10 @@ Example to add and activate a plug-in:
 1. Commit in the **develop** branch (this branch has no deploy CI integration)
 
 1. Deploy to **staging** server by committing in the *staging* branch (the Gitlab CI will install it on the staging server)
-1. Check if everything is as desired accessing the staging instance at [http://129.206.7.40:8081](http://129.206.7.40:8081)
+1. Check if everything is as desired accessing the staging url
 1. Deploy to **production** server by committing in the *master* branch (the Gitlab CI will install it on the production server)
 
-**Important:** the updater is automatically ran by the CI integration during the deploy to **staging** and **production** server
+**Important:** If CI integration is set up the updater is automatically ran by the CI integration during the deploy to **staging** and **production** server
 
 **Important:** the auto update does not run locally. See [Running locally](#running-locally)
 
