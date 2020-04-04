@@ -50,7 +50,6 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
 - wp-config.php mapped to an external file
 - wp-content folder mapped to an external folder
 - Customization and updates via update.sh and wp-cli
-- Mapped /dev url to run /var/www/webapp/index.html
 - Decoupled front-end with Vuejs and SPA
 - Auto fix wordpress url to match the one defined in the docker-compose yml file
 - Auto update state via wp-cli
