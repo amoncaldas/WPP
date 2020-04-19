@@ -14,7 +14,7 @@ export default {
 
     let context = this
     this.eventBus.$on('setLocaleFromContentLocale', (locale) => {
-      if (locale !== context.currentLocale) {
+      if (locale !== 'neutral' && locale !== context.currentLocale) {
         context.$i18n.locale = context.currentLocale = locale
         context.$store.commit('locale', context.currentLocale)
       }
