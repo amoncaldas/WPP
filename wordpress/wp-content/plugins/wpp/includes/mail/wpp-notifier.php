@@ -679,30 +679,14 @@ class WppNotifier  {
 	 * @return void
 	 */
 	public function debug() {		
-		if(isset($_GET["debug"]) && $_GET["debug"] === "yes")
-		{
+		if(isset($_GET["debug"]) && $_GET["debug"] === "yes") {
 			$content = "<html lang='pt-BR'><head><meta charset='UTF-8'></head><body><h2>debug is on</h2>".$this->debug_output."</body></html>";
 			echo $content;
-		}
-		else
-		{			
+		} else {			
 			wp_redirect( network_home_url()."", 301);
 			exit;
 		}
-  	}
-  	
-	
-	public function insert_fake_test() {
-		if( is_user_logged_in() && in_array(get_user_role(),array('adm_fam_root','administrator')));
-		{			
-		$current_date = date("m/d/Y h:i:s", time());
-		$sql_test_pending = "INSERT INTO wp_fam_pending_notification( subject, content, content_type, mail_list_type, site_id ) VALUES ('auto generated teste',  'auto generated teste -".$current_date."',  'html',  'news', 1)";	
-		$wpdb->query($wpdb->prepare($sql_test_pending));
-		
-		$sql_test_pending = "INSERT INTO wp_fam_pending_notification( subject, content, content_type, mail_list_type, site_id ) VALUES ('auto generated teste 2',  'auto generated teste -".$current_date."',  'html',  'news', 1)";	
-		$wpdb->query($wpdb->prepare($sql_test_pending));
-		}
-	}
+ }
 }
 
 register_activation_hook(__FILE__, array('WppNotifier', 'activate_wpp_plugin'));

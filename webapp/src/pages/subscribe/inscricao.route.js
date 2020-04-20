@@ -7,6 +7,6 @@ export default {
   component: Subscribe,
   beforeEnter: (to, from, next) => {
     store.commit('locale', 'pt-br')
-    next({path: '/subscription', query: {l: 'pt-br'}})
+    next({path: '/subscribe', query: {l: 'pt-br'}})
   }
 }
