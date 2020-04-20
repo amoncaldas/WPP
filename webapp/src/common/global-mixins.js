@@ -70,21 +70,16 @@ const globalMixins = {
     /**
      * Defines if the data and privacy policy must be shown
      */
-    hasDataAndPrivacyPolicyPage () {
-      let VueInstance = main.getInstance()
-      if (!VueInstance) {
-        return false
-      }
-      let url = VueInstance.dataAndPrivacyUrl
+    hasUseAndDataPolicyPage () {
+      let url = this.useAndDataPolicyUrl
       let has = url !== undefined && url !== null
       return has
     },
     /**
      * Gets the data and privacy page policy url
      */
-    dataAndPrivacyUrl () {
-      let VueInstance = main.getInstance()
-      let url = VueInstance.$store.getters.options['data_and_privacy_url_' + VueInstance.$store.getters.locale]
+    useAndDataPolicyUrl () {
+      let url = store.getters.options['use_and_data_policy_url_' + store.getters.locale]
       return this.buildLink(url)
     }
   }

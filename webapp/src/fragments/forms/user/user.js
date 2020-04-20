@@ -227,7 +227,7 @@ export default {
      * Handle the form submit
      */
     submit () {
-      if (this.hasDataAndPrivacyPolicyPage && !this.dataAndPrivacyPolicyAccepted) {
+      if (this.hasUseAndDataPolicyPage && !this.useAndDataPolicyAccepted) {
         this.showError(this.$t('user.theDataAndPrivacyPolicyMustBeAccepted'))
         return
       }

@@ -83,6 +83,8 @@ export default {
       this.loadRecaptcha().then(() => {
         this.ready = true
       })
+    } else {
+      this.ready = true
     }
   },
   components: {

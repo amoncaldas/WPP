@@ -271,8 +271,8 @@ class OptionsManagerSettingsPage {
 
 		$page = add_submenu_page(
 			'tools.php',
-			__( 'Manage WPP Options Table', 'options_editor' ),
-			__( 'Manage WPP options', 'options_editor' ),
+			__( 'WPP Options Table', 'options_editor' ),
+			__( 'WPP options', 'options_editor' ),
 			'manage_options',
 			'options_editor',
 			array( $this, 'settings_page' )
@@ -305,8 +305,7 @@ class OptionsManagerSettingsPage {
         wp_register_style( 'manager-css', $this->assets_url . 'css/manager-css.css', array(), '1', 'all' );
 
 		wp_enqueue_style( 'manager-css' );
-        wp_enqueue_script( 'comment-notifier-js' );
-
+    wp_enqueue_script( 'comment-notifier-js' );
 	}
 
 
@@ -318,7 +317,7 @@ class OptionsManagerSettingsPage {
 	 */
 	public function add_settings_link( $links ) {
 
-		$settings_link = '<a href="options-general.php?page=options_editor">' . __( 'Settings', 'options_editor' ) . '</a>';
+		$settings_link = '<a href="tools.php?page=options_editor">' . __( 'Settings', 'options_editor' ) . '</a>';
   		array_push( $links, $settings_link );
   		return $links;
 

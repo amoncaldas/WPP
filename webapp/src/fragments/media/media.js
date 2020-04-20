@@ -48,10 +48,12 @@ export default {
   computed: {
     url () {
       if (this.mediaPost) {
-        if (this.mediaPost.media_details.sizes[this.size]) {
-          return this.mediaPost.media_details.sizes[this.size].source_url
+        let size = this.lodash.get(this, `mediaPost.media_details.sizes[${this.size}]`)
+        if (size) {
+          return size.source_url
         } else {
-          return this.mediaPost.media_details.sizes.full.source_url
+          let sourceUrl = this.lodash.get(this, `mediaPost.media_details.sizes.full.source_url`)
+          return sourceUrl
         }
       }
       return null

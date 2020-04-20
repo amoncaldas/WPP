@@ -34,12 +34,12 @@
             </v-select>
           </div>
         </v-flex>
-        <v-spacer v-if="hasDataAndPrivacyPolicyPage" class="hidden-xs-and-down"></v-spacer>
-        <v-flex xs12 sm5 v-if="hasDataAndPrivacyPolicyPage">
-          <v-switch class="notranslate" required v-model="dataAndPrivacyPolicyAccepted"    >
+        <v-spacer v-if="hasUseAndDataPolicyPage" class="hidden-xs-and-down"></v-spacer>
+        <v-flex xs12 sm6 v-if="hasUseAndDataPolicyPage">
+          <v-switch class="notranslate" required v-model="useAndDataPolicyAccepted"    >
             <template slot='label'>
               <span style="display:inline-block">{{$t('user.IAccept')}}
-                <a target="_blank" class='data-and-privacy-link' v-bind:href="dataAndPrivacyUrl">{{$t('global.dataAndPrivacyPolicy')}}</a>
+                <a target="_blank" class='data-and-privacy-link' v-bind:href="useAndDataPolicyUrl">{{$t('global.useAndDataPolicy')}}</a>
               </span>
             </template>
           </v-switch>

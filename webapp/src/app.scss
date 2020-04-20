@@ -125,16 +125,23 @@ We define it here because we want this as a default global definition */
   text-align: left;
 }
 
-.data-and-privacy {
+.use-and-data-policy {
   margin-top: 70px;
   width: 100%;
   margin-bottom: -70px;
   z-index: 3;
 }
 
-.v-alert .data-and-privacy-link {
+.v-alert .use-and-data-policy-btn {
   color: white;
   font-weight: 600;
 }
 
+.data-and-privacy-link {
+  color: black;
+}
+
+.use-and-data-policy-btn .v-btn__content {
+  color: black;
+}
 

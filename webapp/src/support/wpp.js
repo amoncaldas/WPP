@@ -1,5 +1,5 @@
 import store from '@/store/store'
-import main from '@/main'
+import lodash from 'lodash'
 
 const logoUrl = () => {
   let url = store.getters.options.site_relative_logo_url.trim()
@@ -9,22 +9,44 @@ const logoUrl = () => {
   }
   return url
 }
+/**
+ * Get the current post type title translated according the current locale
+ * @returns {String} title
+ */
 const getArchiveTranslated = () => {
   let translations = store.getters.options.post_type_translations
-  let context = main.getInstance()
   let translation = store.getters.postTypeEndpoint
-  let localesTranslation = context.lodash.find(translations, (locales) => {
-    return context.lodash.find(locales, locale => {
+  let localesTranslation = lodash.find(translations, (locales) => {
+    return lodash.find(locales, locale => {
       return locale.path === store.getters.postTypeEndpoint
     })
   })
   if (localesTranslation) {
-    let matchTranslation = localesTranslation[context.$store.getters.locale]
+    let matchTranslation = localesTranslation[store.getters.locale]
     translation = matchTranslation.title
+  }
+  return translation
+}
+/**
+ * Get the current endpoint translated according the current locale
+ * @returns {String} path
+ */
+const getCurrentEndpointTranslated = () => {
+  let translations = store.getters.options.post_type_translations
+  let translation = store.getters.postTypeEndpoint
+  let localesTranslation = lodash.find(translations, (locales) => {
+    return lodash.find(locales, locale => {
+      return locale.path === store.getters.postTypeEndpoint
+    })
+  })
+  if (localesTranslation) {
+    let matchTranslation = localesTranslation[store.getters.locale]
+    translation = matchTranslation.path
   }
   return translation
 }
 export default {
   logoUrl,
-  getArchiveTranslated
+  getArchiveTranslated,
+  getCurrentEndpointTranslated
 }

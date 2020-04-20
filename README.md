@@ -264,6 +264,7 @@ Options with `wpp_` prefix that are not present by default:
 - wpp_site_title_translations
 - wpp_site_description_translations
 - wpp_search_title_translation
+- wpp_use_and_data_policy_url_<locale> (like wpp_use_and_data_policy_url_en-us)
 
 ## ACF extras ##
 
