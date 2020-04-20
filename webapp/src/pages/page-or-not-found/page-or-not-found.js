@@ -33,48 +33,60 @@ export default {
   },
   methods: {
     loadData () {
-      let context = this
       let uriParts = location.href.trim('/').split('/')
-      let postName = ''
-      if (uriParts.length > 0) {
+      let postName = null
+      if (uriParts.length > 0 && uriParts[uriParts.length - 1].length > 0) {
         postName = uriParts[uriParts.length - 1]
       }
-      let endpointAppend = `pages?slug=${postName}&_embed`
-      postService.get(endpointAppend).then((post) => {
-        if (Array.isArray(post)) {
-          if (post.length === 0) {
-            context.notFound = true
-            this.eventBus.$emit('titleChanged', this.$t('pageOrNotFound.notFound'))
-          } else {
-            context.post = post[0]
-          }
-        } else {
-          context.post = post
-        }
-        if (context.post) {
-          // if the parent section of the post is not the section in url,
-          // then is a not found,becaseu the url is wrong (the page does not belong to the section in the url)
-          if (context.post.parent) {
-            let parentSection = Sections.getSectionById(context.post.parent)
 
-            if (parentSection && context.$store.getters.currentSection.id !== parentSection) {
-              context.notFound = true
-            }
+      if (!postName) {
+        this.setNotFound()
+      } else {
+        let context = this
+        let endpointAppend = `pages?slug=${postName}&_embed`
+
+        // Get page data
+        postService.get(endpointAppend).then((data) => {
+          let post = context.extractPostFromResponseData(data)
+
+          if (!post || post.path !== context.$route.fullPath) {
+            context.setNotFound()
           } else {
             // If in single mode, set the site title
-            let pageTitle = this.post.title.rendered || context.post.title
+            let pageTitle = context.post.title.rendered || context.post.title
             context.eventBus.$emit('titleChanged', pageTitle)
             context.eventBus.$emit('setLocaleFromContentLocale', context.post.locale)
           }
-        }
-        context.loaded = true
-      }).catch(error => {
+          context.loaded = true
+        }).catch(error => {
+          context.setNotFound(error)
+        })
+      }
+    },
+    /**
+     * Set the component in a not found state
+     * @param {*} error
+     */
+    setNotFound (error = null) {
+      this.loaded = true
+      this.notFound = true
+      this.eventBus.$emit('titleChanged', this.$t('pageOrNotFound.notFound'))
+      if (error) {
         console.log(error)
-        context.loaded = true
-        context.notFound = true
-        // Set the not found page title
-        this.eventBus.$emit('titleChanged', this.$t('pageOrNotFound.notFound'))
-      })
+      }
+    },
+    /**
+     * Extract the post from a response data
+     * @param {*} data
+     */
+    extractPostFromResponseData (data) {
+      let post = null
+      if (Array.isArray(data)) {
+        post = data.length > 0 ? data[0] : null
+      } else {
+        post = data
+      }
+      return post
     }
   }
 }
