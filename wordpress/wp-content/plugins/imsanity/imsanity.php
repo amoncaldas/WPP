@@ -14,7 +14,8 @@ Plugin URI: https://wordpress.org/plugins/imsanity/
 Description: Imsanity stops insanely huge image uploads
 Author: Exactly WWW
 Text Domain: imsanity
-Version: 2.4.3
+Domain Path: /languages
+Version: 2.6.0
 Author URI: https://ewww.io/
 License: GPLv3
 */
@@ -23,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'IMSANITY_VERSION', '2.4.3' );
+define( 'IMSANITY_VERSION', '2.6.0' );
 define( 'IMSANITY_SCHEMA_VERSION', '1.1' );
 
 define( 'IMSANITY_DEFAULT_MAX_WIDTH', 1920 );
@@ -41,6 +42,19 @@ if ( ! defined( 'IMSANITY_AJAX_MAX_RECORDS' ) ) {
 }
 
 /**
+ * The full path of the main plugin file.
+ *
+ * @var string IMSANITY_PLUGIN_FILE
+ */
+define( 'IMSANITY_PLUGIN_FILE', __FILE__ );
+/**
+ * The path of the main plugin file, relative to the plugins/ folder.
+ *
+ * @var string IMSANITY_PLUGIN_FILE_REL
+ */
+define( 'IMSANITY_PLUGIN_FILE_REL', plugin_basename( __FILE__ ) );
+
+/**
  * Load translations for Imsanity.
  */
 function imsanity_init() {
@@ -50,9 +64,33 @@ function imsanity_init() {
 /**
  * Import supporting libraries.
  */
-include_once( plugin_dir_path( __FILE__ ) . 'libs/utils.php' );
-include_once( plugin_dir_path( __FILE__ ) . 'settings.php' );
-include_once( plugin_dir_path( __FILE__ ) . 'ajax.php' );
+require_once( plugin_dir_path( __FILE__ ) . 'libs/utils.php' );
+require_once( plugin_dir_path( __FILE__ ) . 'settings.php' );
+require_once( plugin_dir_path( __FILE__ ) . 'ajax.php' );
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	require_once( plugin_dir_path( __FILE__ ) . 'class-imsanity-cli.php' );
+}
+
+/**
+ * Use the EWWW IO debugging functions.
+ *
+ * @param string $message A message to send to the debugger.
+ */
+function imsanity_debug( $message ) {
+	if ( function_exists( 'ewwwio_debug_message' ) ) {
+		if ( ! is_string( $message ) ) {
+			if ( function_exists( 'print_r' ) ) {
+				$message = print_r( $message, true );
+			} else {
+				$message = 'not a string, print_r disabled';
+			}
+		}
+		ewwwio_debug_message( $message );
+		if ( function_exists( 'ewww_image_optimizer_debug_log' ) ) {
+			ewww_image_optimizer_debug_log();
+		}
+	}
+}
 
 /**
  * Inspects the request and determines where the upload came from.
@@ -60,25 +98,45 @@ include_once( plugin_dir_path( __FILE__ ) . 'ajax.php' );
  * @return IMSANITY_SOURCE_POST | IMSANITY_SOURCE_LIBRARY | IMSANITY_SOURCE_OTHER
  */
 function imsanity_get_source() {
+	imsanity_debug( __FUNCTION__ );
 	$id     = array_key_exists( 'post_id', $_REQUEST ) ? (int) $_REQUEST['post_id'] : '';
 	$action = array_key_exists( 'action', $_REQUEST ) ? $_REQUEST['action'] : '';
+	imsanity_debug( "getting source for id=$id and action=$action" );
 
+	imsanity_debug( $_SERVER );
+	if ( ! empty( $_REQUEST['_wp_http_referer'] ) ) {
+		imsanity_debug( '_wp_http_referer:' );
+		imsanity_debug( $_REQUEST['_wp_http_referer'] );
+	}
+	if ( ! empty( $_SERVER['HTTP_REFERER'] ) ) {
+		imsanity_debug( 'http_referer:' );
+		imsanity_debug( $_SERVER['HTTP_REFERER'] );
+	}
 	// A post_id indicates image is attached to a post.
 	if ( $id > 0 ) {
+		imsanity_debug( 'from a post (id)' );
 		return IMSANITY_SOURCE_POST;
 	}
 
 	// If the referrer is the post editor, that's a good indication the image is attached to a post.
 	if ( ! empty( $_SERVER['HTTP_REFERER'] ) && strpos( $_SERVER['HTTP_REFERER'], '/post.php' ) ) {
+		imsanity_debug( 'from a post.php' );
+		return IMSANITY_SOURCE_POST;
+	}
+	// If the referrer is the (new) post editor, that's a good indication the image is attached to a post.
+	if ( ! empty( $_SERVER['HTTP_REFERER'] ) && strpos( $_SERVER['HTTP_REFERER'], '/post-new.php' ) ) {
+		imsanity_debug( 'from a new post' );
 		return IMSANITY_SOURCE_POST;
 	}
 
 	// Post_id of 0 is 3.x otherwise use the action parameter.
 	if ( 0 === $id || 'upload-attachment' === $action ) {
+		imsanity_debug( 'from the library' );
 		return IMSANITY_SOURCE_LIBRARY;
 	}
 
 	// We don't know where this one came from but $_REQUEST['_wp_http_referer'] may contain info.
+	imsanity_debug( 'unknown source' );
 	return IMSANITY_SOURCE_OTHER;
 }
 
@@ -105,7 +163,8 @@ function imsanity_get_max_width_height( $source ) {
 			break;
 	}
 
-	return array( $w, $h );
+	// NOTE: filters MUST return an array of 2 items, or the defaults will be used.
+	return apply_filters( 'imsanity_get_max_width_height', array( $w, $h ), $source );
 }
 
 /**
@@ -133,12 +192,32 @@ function imsanity_handle_upload( $params ) {
 	// Make sure this is a type of image that we want to convert and that it exists.
 	$oldpath = $params['file'];
 
-	if ( ( ! is_wp_error( $params ) ) && is_file( $oldpath ) && is_readable( $oldpath ) && is_writable( $oldpath ) && filesize( $oldpath ) > 0 && in_array( $params['type'], array( 'image/png', 'image/gif', 'image/jpeg' ), true ) ) {
+	// Let folks filter the allowed mime-types for resizing.
+	$allowed_types = apply_filters( 'imsanity_allowed_mimes', array( 'image/png', 'image/gif', 'image/jpeg' ), $oldpath );
+	if ( is_string( $allowed_types ) ) {
+		$allowed_types = array( $allowed_types );
+	} elseif ( ! is_array( $allowed_types ) ) {
+		$allowed_types = array();
+	}
+
+	if (
+		( ! is_wp_error( $params ) ) &&
+		is_file( $oldpath ) &&
+		is_readable( $oldpath ) &&
+		is_writable( $oldpath ) &&
+		filesize( $oldpath ) > 0 &&
+		in_array( $params['type'], $allowed_types, true )
+	) {
 
 		// figure out where the upload is coming from.
 		$source = imsanity_get_source();
 
-		list( $maxw,$maxh ) = imsanity_get_max_width_height( $source );
+		$maxw             = IMSANITY_DEFAULT_MAX_WIDTH;
+		$maxh             = IMSANITY_DEFAULT_MAX_HEIGHT;
+		$max_width_height = imsanity_get_max_width_height( $source );
+		if ( is_array( $max_width_height ) && 2 === count( $max_width_height ) ) {
+			list( $maxw, $maxh ) = $max_width_height;
+		}
 
 		list( $oldw, $oldh ) = getimagesize( $oldpath );
 
@@ -154,18 +233,21 @@ function imsanity_handle_upload( $params ) {
 				$oldh     = $old_oldw;
 			}
 
-			if ( $oldw > $maxw && $maxw > 0 && $oldh > $maxh && $maxh > 0 && apply_filters( 'imsanity_crop_image', false ) ) {
+			if ( $maxw > 0 && $maxh > 0 && $oldw >= $maxw && $oldh >= $maxh && ( $oldh > $maxh || $oldw > $maxw ) && apply_filters( 'imsanity_crop_image', false ) ) {
 				$neww = $maxw;
 				$newh = $maxh;
 			} else {
 				list( $neww, $newh ) = wp_constrain_dimensions( $oldw, $oldh, $maxw, $maxh );
 			}
 
-			remove_filter( 'wp_image_editors', 'ewww_image_optimizer_load_editor', 60 );
-			$resizeresult = imsanity_image_resize( $oldpath, $neww, $newh, apply_filters( 'imsanity_crop_image', false ), null, null, $quality );
-			if ( function_exists( 'ewww_image_optimizer_load_editor' ) ) {
-				add_filter( 'wp_image_editors', 'ewww_image_optimizer_load_editor', 60 );
+			global $ewww_preempt_editor;
+			if ( ! isset( $ewww_preempt_editor ) ) {
+				$ewww_preempt_editor = false;
 			}
+			$original_preempt    = $ewww_preempt_editor;
+			$ewww_preempt_editor = true;
+			$resizeresult        = imsanity_image_resize( $oldpath, $neww, $newh, apply_filters( 'imsanity_crop_image', false ), null, null, $quality );
+			$ewww_preempt_editor = $original_preempt;
 
 			if ( $resizeresult && ! is_wp_error( $resizeresult ) ) {
 				$newpath = $resizeresult;
@@ -264,6 +346,7 @@ function imsanity_convert_to_jpg( $type, $params ) {
 	return $params;
 }
 
-/* add filters to hook into uploads */
+// Add filter to hook into uploads.
 add_filter( 'wp_handle_upload', 'imsanity_handle_upload' );
+// Run necessary actions on init (loading translations mostly).
 add_action( 'plugins_loaded', 'imsanity_init' );

@@ -10,6 +10,6 @@ export default {
     processingSubscription: 'Processando sua assinatura...',
     subscriptionRegistered: 'Assinatura registrada com sucesso',
     thisEmailIsAlreadySubscribed: 'Este email já está registrado para receber informativos',
-    theDataAndPrivacyPolicyMustBeAccepted: 'Você deve aceitar a política de privacidade e dados para se inscrever'
+    theDataAndPrivacyPolicyMustBeAccepted: 'Você deve aceitar a política de uso e de dados para se inscrever'
   }
 }

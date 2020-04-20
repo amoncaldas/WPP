@@ -60,10 +60,10 @@
         ></v-switch>
       </v-flex>
       <v-flex sm5 xs12>
-        <v-switch class="notranslate" v-if="hasDataAndPrivacyPolicyPage" required v-model="dataAndPrivacyPolicyAccepted"    >
+        <v-switch class="notranslate" v-if="hasUseAndDataPolicyPage" required v-model="dataAndPrivacyPolicyAccepted"    >
           <template slot='label'>
             <span style="display:inline-block">{{$t('user.IAccept')}}
-              <a target="_blank" class='data-and-privacy-link' v-bind:href="dataAndPrivacyUrl">{{$t('global.dataAndPrivacyPolicy')}}</a>
+              <a target="_blank" class='data-and-privacy-link' v-bind:href="useAndDataPolicyUrl">{{$t('global.useAndDataPolicy')}}</a>
             </span>
           </template>
         </v-switch>

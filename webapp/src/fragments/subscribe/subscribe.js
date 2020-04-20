@@ -12,7 +12,7 @@ export default {
     resource: {},
     ready: false,
     locale: null,
-    dataAndPrivacyPolicyAccepted: false
+    useAndDataPolicyAccepted: false
   }),
   created () {
     this.locale = this.$store.getters.locale
@@ -61,7 +61,7 @@ export default {
       this.save()
     },
     submit () {
-      if (this.hasDataAndPrivacyPolicyPage && !this.dataAndPrivacyPolicyAccepted) {
+      if (this.hasUseAndDataPolicyPage && !this.useAndDataPolicyAccepted) {
         this.showError(this.$t('subscribe.theDataAndPrivacyPolicyMustBeAccepted'))
         return
       }
@@ -95,6 +95,8 @@ export default {
       this.loadRecaptcha().then(() => {
         this.ready = true
       })
+    } else {
+      this.ready = true
     }
   }
 }

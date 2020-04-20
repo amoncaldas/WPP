@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class FamMail
+ * Class WppMail
  *
- * Description for class FamMail
+ * Description for class WppMail
  * WordPress options used: email_sender_name, email_sender_email, skip_email_sending_notification, deactivate_news_sending
  *
  * @author: Amon Caldas
@@ -47,9 +47,9 @@ class WppMailer  {
 		$admin_email = get_option("admin_email");
 		wp_mail($admin_email, $title, $template, $headers);			
 		remove_filter('wp_mail_content_type', 'set_email_html_content_type');
-  }
+ }
   
-  /**
+ /**
 	 * Notify admin via email using basic notification template
 	 *
 	 * @param String $to_email

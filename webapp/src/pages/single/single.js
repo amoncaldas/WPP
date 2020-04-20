@@ -4,6 +4,7 @@ import Sections from '@/fragments/sections/Sections'
 import NotFoundComponent from '@/fragments/not-found/NotFound'
 import postService from '@/shared-services/post-service'
 import postSupport from '@/support/post'
+import wpp from '@/support/wpp'
 
 export default {
   components: {
@@ -67,17 +68,28 @@ export default {
       let endpoint = this.$store.getters.postTypeEndpoint
       let endpointAppend = null
       endpointAppend = `${endpoint}/${this.$route.params.postId}?_embed`
+
+      // Get the post data
       postService.get(endpointAppend).then((post) => {
-        context.post = post
+        // build the short post path for comparasion
+        let postShortPath = `/${wpp.getCurrentEndpointTranslated()}/${post.id}`
+
+        // Check if the current url matchs the post path
+        // or the post short url to avoid loading a single
+        // by the id but with wrong title, type or section path
+        if (post.path === context.$route.fullPath || context.$route.fullPath === postShortPath) {
+          context.post = post
+          let postTitle = context.post.title.rendered || context.post.title
+          context.eventBus.$emit('titleChanged', postTitle)
+          context.eventBus.$emit('setLocaleFromContentLocale', context.post.locale)
+        } else {
+          context.notFound = true
+        }
         context.loaded = true
-        let postTitle = context.post.title.rendered || context.post.title
-        context.eventBus.$emit('titleChanged', postTitle)
-        context.eventBus.$emit('setLocaleFromContentLocale', context.post.locale)
       }).catch(error => {
         console.log(error)
-        context.loaded = true
-        context.showError(this.$t('post.thePostCouldNotBeLoaded'))
-        context.notFound = true
+        context.loaded = context.notFound = true
+        context.showError(context.$t('post.thePostCouldNotBeLoaded'))
       })
     }
   }

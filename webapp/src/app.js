@@ -44,8 +44,8 @@ export default {
     /**
      * Defines if the data and privacy policy must be shown
      */
-    showDataAndPrivacyPolicy () {
-      if (!this.hasDataAndPrivacyPolicyPage) {
+    showUseAndDataPolicy () {
+      if (!this.hasUseAndDataPolicyPage) {
         return false
       }
       let dataAndPrivacyPolicyAccepted = localStorage.getItem('dataAndPrivacyPolicyAccepted')
@@ -98,11 +98,11 @@ export default {
         this.$store.commit('defaultTheme', defaultTheme)
       }
     },
-    acceptDataAndPrivacyPolicy () {
+    acceptUseAndDataPolicy () {
       localStorage.setItem('dataAndPrivacyPolicyAccepted', true)
     },
-    getDataAndPrivacyUrl () {
-      let url = this.$store.getters.options['data_and_privacy_url_' + this.$store.getters.locale]
+    getUseAndDataPolicyUrl () {
+      let url = this.$store.getters.options['use_and_data_policy_url_' + this.$store.getters.locale]
       return this.buildLink(url)
     },
     setTitle (title) {

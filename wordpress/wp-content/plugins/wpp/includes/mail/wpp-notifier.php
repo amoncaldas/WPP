@@ -625,7 +625,7 @@ class WppNotifier  {
 		$post_table_name where post_type = '".WppFollower::$follower_post_type."' and (select meta_value from $post_meta_table_name where meta_key = '".WppFollower::$follower_email."' and post_id = ID limit 1) 
 		not in (select wp_mail_sent.email from wp_mail_sent where mail_title = '".$mail_title."')		
 		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = '".WppFollower::$mail_list."' and meta_value = '".$mail_list_type."' )
-		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = '".WppFollower::$activated."' and meta_value = 1 )
+		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and post_status = 'publish' )
 		and ID in (SELECT object_id FROM $term_relationship_table_name where object_id = ID and term_taxonomy_id = $notification_lang_term_id) limit 0,".$this->max_notifications_per_time;
 		
 		$followers = $wpdb->get_results($sql);

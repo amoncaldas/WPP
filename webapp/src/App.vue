@@ -3,13 +3,13 @@
     <v-progress-linear color="neutral" class="progress-linear" :indeterminate="true" :class="{'progress-linear-disabled': !showLoading}"></v-progress-linear>
     <app-toaster></app-toaster>
     <app-header></app-header>
-    <v-alert class="data-and-privacy" v-if="showDataAndPrivacyPolicy" :value="true" type="info" >
+    <v-alert class="use-and-data-policy" v-if="showUseAndDataPolicy" :value="true" type="info" >
       <span>
         <span class='data-and-privacy-text'>{{$t('global.acceptDataAndPrivacyAndDaPolicy')}}
-          <a target="_blank" class='data-and-privacy-link' v-bind:href="dataAndPrivacyUrl">{{$t('global.dataAndPrivacyPolicy')}}</a>
+          <a target="_blank" class='data-and-privacy-link' v-bind:href="useAndDataPolicyUrl">{{$t('global.useAndDataPolicy')}}</a>
         </span>
       </span>
-      <v-btn small @click="acceptDataAndPrivacyPolicy()" class="data-and-privacy-btn" >{{$t('global.ok')}}</v-btn>
+      <v-btn small @click="acceptUseAndDataPolicy()" class="use-and-data-policy-btn" >{{$t('global.ok')}}</v-btn>
     </v-alert>
     <v-content class="main-container">
       <app-confirm></app-confirm>
@@ -19,7 +19,6 @@
       </transition>
     </v-content>
     <app-sidebar></app-sidebar>
-
     <app-footer></app-footer>
   </v-app>
 </template>

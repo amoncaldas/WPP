@@ -1,11 +1,10 @@
 <?php
 /*
-Plugin Name: WP Options Editor
-Plugin URI: http://wordpress.org/plugins/wp-options-editor/
-Description: More easily view, edit, add, and delete all of your WP Options from the dashboard
-Author: Mike Selander
-Version: 1.1
-Author URI: http://www.mikeselander.com/
+Plugin Name: WPP Options
+Description: Manage WPP theme options
+Author: Amon Santana
+Author URI:  https://github.com/amoncaldas
+Version: 1.2
 */
 
 // include the settings page

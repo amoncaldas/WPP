@@ -20,9 +20,7 @@ class WppFollower  {
 	public static $ip = "ip";
 	public static $user_agent = "user_agent";
 	public static $activated = "activated";
-	public static $mail_list = "mail_list";
-	public static $lang_tax_slug = "lang";
-	
+	public static $mail_list = "mail_list";	
 
 	function __construct () {
 		add_action('init', array($this, 'register_custom_types'), 10);
@@ -134,9 +132,11 @@ class WppFollower  {
 					)
 				)
 			);
-			$term = get_term_by('slug', $lang, self::$lang_tax_slug);
-			$term_arr = [$term->term_id];
-			wp_set_post_terms($follower_id, $term_arr, self::$lang_tax_slug);
+			$term = get_term_by('slug', $lang, LOCALE_TAXONOMY_SLUG);
+			if ($term) {
+				$term_arr = [$term->term_id];
+				wp_set_post_terms($follower_id, $term_arr, LOCALE_TAXONOMY_SLUG);
+			}
 			return $follower_id;
 		}
 	}

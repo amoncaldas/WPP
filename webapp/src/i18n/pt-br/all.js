@@ -40,7 +40,7 @@ export default {
       december: 'Dez'
     },
     acceptDataAndPrivacyAndDaPolicy: 'Ao continuar a navegar neste website você aceita a ',
-    dataAndPrivacyPolicy: 'política de dados e privacidade'
+    useAndDataPolicy: 'política de uso e de dados'
   },
   auth: {
     yourGithubAccountIsNotLinkedYet: 'A sua conta GitHub não está vinculada ainda com este site. Por favor verifique se você se registrou no nosso site co essa mesm conta',
