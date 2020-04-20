@@ -57,7 +57,7 @@ class WppNotifier  {
 	 *
 	 * @since  1.2.0
 	 */
-  public function register_routes() {
+ public function register_routes() {
 		register_rest_route(WPP_API_NAMESPACE."/notifications", '/send', array(
 			array(
 				'methods'  => "GET",
