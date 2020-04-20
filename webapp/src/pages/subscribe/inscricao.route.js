@@ -2,7 +2,7 @@ import Subscribe from '@/pages/subscribe/Subscribe'
 import store from '@/store/store'
 
 export default {
-  path: '/incricao',
+  path: '/inscricao',
   name: 'Assinar newsletter',
   component: Subscribe,
   beforeEnter: (to, from, next) => {
