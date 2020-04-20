@@ -44,7 +44,7 @@ export default {
     this.resource.key = this.$route.params.key
     this.resource.email = this.$route.params.email
 
-    // Update the user, activating its account
+    // Update the user deactivating the account
     this.update()
   }
 }

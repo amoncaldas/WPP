@@ -70,11 +70,10 @@ class WppFollower  {
 		$follower = get_post($follower_id);
 
 		if ($follower) {
-			$activated = get_post_meta($follower_id, self::$activated, true);
-			if ($activated === "0") {
+			if ($follower->post_status === "trash") {
 				return "already_deactivated";
 			}
-			update_post_meta($follower_id, self::$activated, 0);
+			wp_trash_post($follower_id);
 			$message = "Name: ". $follower->post_title."<br/><br/>";
 			$message .= "Email: ". get_post_meta($follower_id, self::$follower_email, true);
 			WppMailer::notify_admin("Follower opt out", $message, self::$default_language);
