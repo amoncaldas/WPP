@@ -47,17 +47,17 @@ export default {
 
         // Get page data
         postService.get(endpointAppend).then((data) => {
-          let post = context.extractPostFromResponseData(data)
+          context.post = context.extractPostFromResponseData(data)
 
-          if (!post || post.path !== context.$route.fullPath) {
+          if (!context.post || context.post.path !== context.$route.fullPath) {
             context.setNotFound()
           } else {
             // If in single mode, set the site title
             let pageTitle = context.post.title.rendered || context.post.title
             context.eventBus.$emit('titleChanged', pageTitle)
             context.eventBus.$emit('setLocaleFromContentLocale', context.post.locale)
+            context.loaded = true
           }
-          context.loaded = true
         }).catch(error => {
           context.setNotFound(error)
         })
