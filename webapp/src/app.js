@@ -13,7 +13,8 @@ export default {
     return {
       title: null,
       lang: null,
-      showLoading: false
+      showLoading: false,
+      useAndDataPolicyAccepted: false
     }
   },
   name: 'App',
@@ -45,11 +46,14 @@ export default {
      * Defines if the data and privacy policy must be shown
      */
     showUseAndDataPolicy () {
-      if (!this.hasUseAndDataPolicyPage) {
+      // If there is not policy page or the user has accepted it on this
+      // section then retunn false. If the user has accepted it previously
+      // it is detected via localStorage on first load
+      if (!this.hasUseAndDataPolicyPage || this.useAndDataPolicyAccepted) {
         return false
       }
-      let dataAndPrivacyPolicyAccepted = localStorage.getItem('dataAndPrivacyPolicyAccepted')
-      let show = !dataAndPrivacyPolicyAccepted
+      let useAndDataPolicyAccepted = localStorage.getItem('useAndDataPolicyAccepted')
+      let show = !useAndDataPolicyAccepted
       return show
     }
   },
@@ -99,7 +103,8 @@ export default {
       }
     },
     acceptUseAndDataPolicy () {
-      localStorage.setItem('dataAndPrivacyPolicyAccepted', true)
+      localStorage.setItem('useAndDataPolicyAccepted', true)
+      this.useAndDataPolicyAccepted = true
     },
     getUseAndDataPolicyUrl () {
       let url = this.$store.getters.options['use_and_data_policy_url_' + this.$store.getters.locale]

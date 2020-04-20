@@ -73,7 +73,7 @@ export default {
       sectors: [],
       mode: 'create',
       receiveNews: false,
-      dataAndPrivacyPolicyAccepted: false,
+      useAndDataPolicyAccepted: false,
       usernameValid: null,
       emailValid: null,
       debounceUsernameTimeoutId: null,
