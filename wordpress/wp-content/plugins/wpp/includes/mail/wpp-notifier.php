@@ -131,34 +131,28 @@ class WppNotifier  {
 	 * @return void
 	 */
 	public function unsubscribe_for_notifications($request) {
-		$follower_email = $request->get_param('email');
-		$follower_id = $request->get_param('followerId');
+		$code = $request->get_param('code');
+		$follower_email = WppFollower::get_follower_email_from_unsubscribe_code($code);
 
 		// Get the follower by email
 		$args = (
 			array(
 				"post_type"=> WppFollower::$follower_post_type, 
-				'meta_query' => array(
-					array(
-						'key'=> WppFollower::$follower_email,
-						'value'=> $follower_email
-					)
-				)
+				'meta_query' => array( array( 'key'=> WppFollower::$follower_email, 'value'=> $follower_email ) )
 			)
 		);
 
 		$followers = get_posts($args);
 		
 		if ($followers && count($followers) > 0) {
-			if ($follower_id == $followers[0]->ID) {
-				$result = WppFollower::deactivate_follower($follower_id);
-		
-				if ($result === "already_deactivated") {
-					return new WP_REST_Response(null, 400); // INVALID REQUEST
-				} else if ($result === "deactivated") {			
-					return new WP_REST_Response(null, 204); // ACCEPTED, NO CONTENT
-				}
-			}
+			$follower_id == $followers[0]->ID;
+			$result = WppFollower::deactivate_follower($follower_id);
+	
+			if ($result === "already_deactivated") {
+				return new WP_REST_Response(null, 400); // INVALID REQUEST
+			} else if ($result === "deactivated") {			
+				return new WP_REST_Response(null, 204); // ACCEPTED, NO CONTENT
+			}			
 		}
 		return new WP_REST_Response(null, 404); // NOT FOUND
 	}
@@ -213,7 +207,6 @@ class WppNotifier  {
 				elseif  ($result === "already_exists") {
 					return new WP_REST_Response(null, 409); // CONFLICT, ALREADY EXISTS
 				} else { // is created
-					
 					$follower_id = $result;
 					$this->send_subscription_notifications($follower_id, $name, $email, $lang);
 					return new WP_REST_Response(["id" => $follower_id ], 201); // CREATED, return id
@@ -236,7 +229,7 @@ class WppNotifier  {
 		*/
 	public function send_subscription_notifications ($follower_id, $name, $email, $lang) {
 		$user_msg_title = WppMailer::get_mail_subject_translation("subscription_registered", $request_lang, "Subscription registered");
-		$unsubscribe_link = WppFollower::get_follower_unsubscribe_link($email, $follower_id);
+		$unsubscribe_link = WppFollower::get_follower_unsubscribe_link($email);
 		WppMailer::send_subscription_registered_email($email, $user_msg_title, $unsubscribe_link, $lang);
 		
 		$message = "Name: ". strip_tags($name)."<br/><br/>";
@@ -573,6 +566,7 @@ class WppNotifier  {
 				$counter = 1;	
 				foreach($to as $mail) {
 					$success = wp_mail($mail, $pending_notification->post_title, $pending_notification->post_content, $headers);
+					error_log( print_r( $mail, true ) );
 					if($success) {
 						$this->debug_output .= "<br/>sent -> ".$to." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 						if($counter > 1) {
@@ -680,7 +674,9 @@ class WppNotifier  {
 	 */
 	public function debug() {		
 		if(isset($_GET["debug"]) && $_GET["debug"] === "yes") {
-			$content = "<html lang='pt-BR'><head><meta charset='UTF-8'></head><body><h2>debug is on</h2>".$this->debug_output."</body></html>";
+			// $content = "<html lang='pt-BR'><head><meta charset='UTF-8'></head><body><h2>debug is on</h2>".$this->debug_output."</body></html>";
+			$breaks = array("<br />","<br>","<br/>");  
+    	$content = str_ireplace($breaks, "\r\n",  $this->debug_output); 
 			echo $content;
 		} else {			
 			wp_redirect( network_home_url()."", 301);

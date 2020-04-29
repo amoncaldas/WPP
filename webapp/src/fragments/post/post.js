@@ -15,7 +15,7 @@ export default {
     let pageTypes = this.$store.getters.options.page_like_types
     pageTypes = Array.isArray(pageTypes) ? pageTypes : [pageTypes]
 
-    if (pageTypes.includes(this.$store.getters.postTypeEndpoint)) {
+    if (pageTypes.indexOf(this.$store.getters.postTypeEndpoint) > -1) {
       this.renderAsPage = true
     }
     this.post = this.postData

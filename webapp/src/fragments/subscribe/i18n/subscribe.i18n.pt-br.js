@@ -1,6 +1,6 @@
 export default {
   subscribe: {
-    pageTitle: 'Assinar newsletter',
+    pageTitle: 'Assinar informativo',
     name: 'Nome',
     email: 'Email',
     nameRequired: 'Nome é obrigtório',

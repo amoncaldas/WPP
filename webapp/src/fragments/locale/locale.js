@@ -55,7 +55,7 @@ export default {
       let locales = this.$store.getters.options.locales
       let supportedLocales = this.supportedLocales()
       for (let key in locales) {
-        if (locales[key].slug !== 'neutral' && supportedLocales.includes(locales[key])) {
+        if (locales[key].slug !== 'neutral' && supportedLocales.indexOf(locales[key]) > -1) {
           let title = locales[key].split('-')[0].toUpperCase()
           this.locales.push({title: title, value: locales[key]})
         }
@@ -69,7 +69,7 @@ export default {
       if (queryParams.l) {
         let urlLocale = queryParams.l
         let supportedLocales = this.supportedLocales()
-        if (supportedLocales.includes(urlLocale) && urlLocale !== this.currentLocale) {
+        if (supportedLocales.indexOf(urlLocale) > -1 && urlLocale !== this.currentLocale) {
           this.currentLocale = this.$i18n.locale = urlLocale
           this.afterLocaleUpdate()
         } else if (!queryParams.l) {

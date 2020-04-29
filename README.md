@@ -291,6 +291,7 @@ Possible post extras:
 - custom_post_date (date, format `Ymd`)
 - prepend (integer, adding prepend post id)
 - append (integer, adding append post id)
+- hide_newsletter_sidebar (boolean)
 
 Only for pages:
 - has_top_highlighted

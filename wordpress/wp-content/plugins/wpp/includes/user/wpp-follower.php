@@ -21,6 +21,7 @@ class WppFollower  {
 	public static $user_agent = "user_agent";
 	public static $activated = "activated";
 	public static $mail_list = "mail_list";	
+	private static $encode_key = "wexrh!laoqpyTvA";
 
 	function __construct () {
 		add_action('init', array($this, 'register_custom_types'), 10);
@@ -110,10 +111,10 @@ class WppFollower  {
 		if (count($existing_followers) > 0) {
 			$existing_follower = $existing_followers[0];
 			if ($existing_follower->post_status === "publish") {
-				update_post_meta($existing_follower->ID, self::$activated, 1);
-				return "updated";
-			} else {
 				return "already_exists";
+			} else {				
+				wp_publish_post($existing_follower->ID);
+				return "updated";
 			}
 		} else {
 			$follower_id = wp_insert_post(
@@ -144,37 +145,31 @@ class WppFollower  {
 		* Get follower id by email
 		*
 		* @param String $email
-		* @return Integer $id
 		*/
-	static function get_follower_unsubscribe_link ($email, $follower_id = null) {
-		if (!$follower_id) {
-			// Check if the user is already a subscriber
-			$args = (
-				array(
-					"post_type"=> self::$follower_post_type, 
-					"post_status"=> array("publish", "pending"),
-					'meta_query' => array(
-						array(
-							'key'=> self::$follower_email,
-							'value'=> $email
-						)
-					)
-				)
-			);
-			$existing_followers = get_posts($args);
-			if (count($existing_followers) > 0) {
-				$existing_follower = $existing_followers[0];
-				$follower_id = $existing_follower->ID;
-			}
-		}
+	static function get_follower_unsubscribe_link ($email) {
+		$email_encoded = base64_encode($email.self::$encode_key);
+		$email_encoded = str_replace('=', '', $email_encoded);
+		
 
-		$uri = "/unsubscribe/$follower_id/$email";		
+		$uri = "/unsubscribe/$email_encoded";		
 		$router_mode = get_option("wpp_router_mode");
 		if ($router_mode === "hash") {
 			$uri = "/#$uri";
 		}
 		$unsubscribe_link = network_home_url($uri); 
 		return $unsubscribe_link;		
+	}
+
+
+	/**
+		* Get follower email from unsubscribe code
+		*
+		* @param String $email
+		*/
+	static function get_follower_email_from_unsubscribe_code ($code) {
+		$decoded = base64_decode($code."=");
+		$email = str_replace(self::$encode_key, '');
+		return $email;		
 	}
 }
 ?>

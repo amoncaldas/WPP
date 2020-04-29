@@ -1,7 +1,7 @@
 import Unsubscribe from '@/pages/unsubscribe/Unsubscribe'
 
 export default {
-  path: '/unsubscribe/:key/:email',
+  path: '/unsubscribe/:code',
   name: 'Unsubscribe',
   component: Unsubscribe,
   beforeEnter: (to, from, next) => {

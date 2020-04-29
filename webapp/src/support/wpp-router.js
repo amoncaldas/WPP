@@ -45,7 +45,7 @@ const wppRouter = {
         if (hasTranslation) {
           for (let key in translation) {
             let locale = translation[key]
-            let includes = endpoints.includes(locale.path)
+            let includes = endpoints.indexOf(locale.path) > -1
             if (!includes) {
               endpoints.push({endpoint: endpoint, path: locale.path})
             }

@@ -30,6 +30,10 @@ export default {
     topBorder: {
       default: true,
       type: Boolean
+    },
+    small: {
+      default: false,
+      type: Boolean
     }
   },
   computed: {
@@ -48,7 +52,7 @@ export default {
       let supportedLocales = Object.keys(this.$i18n.messages)
       let availableLocales = []
       for (let key in locales) {
-        if (locales[key].slug !== 'neutral' && supportedLocales.includes(locales[key])) {
+        if (locales[key].slug !== 'neutral' && supportedLocales.indexOf(locales[key]) > -1) {
           let title = locales[key].split('-')[0].toUpperCase()
           availableLocales.push({title: title, value: locales[key]})
         }
