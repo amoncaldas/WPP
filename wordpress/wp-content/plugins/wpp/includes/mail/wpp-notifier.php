@@ -18,7 +18,7 @@ class WppNotifier  {
 
 	// Defining values and keys to generate the notification
 	public $notification_post_type = "notification";
-	public $notification_initial_post_status = "pending";
+	public $follower_initial_post_status = "pending";
 	public $notification_content_type = "html";
 	public $generated_post_id_meta_key = "generated_from_post_id";
 	public $default_notification_type = "news";
@@ -138,7 +138,7 @@ class WppNotifier  {
 		$args = (
 			array(
 				"post_type"=> WppFollower::$follower_post_type, 
-				"post_status"=> array("publish", "pending"),
+				"post_status"=> array("publish", $this->follower_initial_post_status),
 				'meta_query' => array( array( 'key'=> WppFollower::$follower_email, 'value'=> $follower_email ) )
 			)
 		);
@@ -146,7 +146,7 @@ class WppNotifier  {
 		$followers = get_posts($args);
 		
 		if ($followers && count($followers) > 0) {
-			$follower_id == $followers[0]->ID;
+			$follower_id = $followers[0]->ID;
 			$result = WppFollower::deactivate_follower($follower_id);
 	
 			if ($result === "already_deactivated") {
@@ -339,7 +339,7 @@ class WppNotifier  {
 		$args = (
 			array(
 				"post_type"=> $this->notification_post_type, 
-				"post_status"=> $this->notification_initial_post_status,
+				"post_status"=> $this->follower_initial_post_status,
 				'meta_query' => array(
 					array(
 						'key'=> $this->generated_post_id_meta_key,
@@ -405,7 +405,7 @@ class WppNotifier  {
 			$notification_id = wp_insert_post(
 				array(
 					"post_type"=> $this->notification_post_type, 
-					"post_status"=> $this->notification_initial_post_status,
+					"post_status"=> $this->follower_initial_post_status,
 					"post_author"=> get_current_user_id(),
 					"post_title"=> $post->post_title, 
 					"post_content"=> $message, 
