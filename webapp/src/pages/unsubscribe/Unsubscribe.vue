@@ -4,7 +4,7 @@
       <v-layout row wrap>
         <v-flex xs12 xl6 sm12 md8 lg8 md10 offset-md2>
           <box >
-            <h1 slot="header" class="headline">{{ $t('unsubscribe.unsubribeFromNews') | uppercase }}</h1>
+            <h1 slot="header" class="headline">{{ $t('unsubscribe.unsubribeFromNews') }}</h1>
             <div slot="content">
               <v-layout row wrap>
                 <v-flex sm12 xs12>
