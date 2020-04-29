@@ -168,7 +168,7 @@ class WppFollower  {
 		*/
 	static function get_follower_email_from_unsubscribe_code ($code) {
 		$decoded = base64_decode($code."=");
-		$email = str_replace(self::$encode_key, '');
+		$email = str_replace(self::$encode_key, '', $decoded);
 		return $email;		
 	}
 }
