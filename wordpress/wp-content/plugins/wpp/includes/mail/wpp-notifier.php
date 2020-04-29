@@ -485,7 +485,7 @@ class WppNotifier  {
 	public function process_pending_notifications() {			
 		$pending_notifications = get_posts( array( 'post_type' => 'notification', 'orderby'  => 'id', 'order' => 'ASC', 'post_status' => 'publish'));
 
-		$to = array();	
+		$recipients = array();	
 				
 		if (is_array($pending_notifications) && count($pending_notifications) > 0 ) { 
 			
@@ -493,15 +493,15 @@ class WppNotifier  {
 			$this->debug_output .= "<br/>Logging mails sent to email as html | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 			$this->debug_output .=" <br/> Returned pending mail ID ".$pending_notification->ID." <br/>";
 					
-			$to = $this->get_mails_to($pending_notification);	
-			$this->debug_output .=" <br/> Returned mail subscribers to send amount: ".count($to)." <br/>";	
-			if(!is_array($to) || count($to) == 0) {
+			$recipients = $this->get_mails_to($pending_notification);	
+			$this->debug_output .=" <br/> Returned mail subscribers to send amount: ".count($recipients)." <br/>";	
+			if(!is_array($recipients) || count($recipients) == 0) {
 				// Delete pending mail
 				$this->debug_output .= "<br/>No more mail to send, deleting pending mail sending mail ".$pending_notification->ID."...";
 				wp_delete_post($pending_notification->ID)					;		
-			} elseif(is_array($to) && count($to) > 0) {				
+			} elseif(is_array($recipients) && count($recipients) > 0) {	
 				$this->debug_output .= "<br/>start sending mail... ";					
-				$this->send_pending_notifications($to,$pending_notification);		
+				$this->send_pending_notifications($recipients,$pending_notification);		
 				$this->notify_mail_sent();		
 			}						
 		} else {		
@@ -512,13 +512,13 @@ class WppNotifier  {
 	/**
 	 * Send pending email
 	 *
-	 * @param String $to
+	 * @param String $recipients
 	 * @param WP_Post $pending_notification
 	 * @return void
 	 */
-	public function send_pending_notifications($to, $pending_notification) {	
+	public function send_pending_notifications($recipients, $pending_notification) {	
 		$insert_sent_sql = $this->base_insert_sent_sql;	
-		if(is_array($to) && count($to) > 0) {
+		if(is_array($recipients) && count($recipients) > 0) {
 			$sender_name = get_option("wpp_email_sender_name");
 			$sender_email = get_option("wpp_email_sender_email");
 			$force_sender_email = get_option("wpp_force_sender_email");	
@@ -539,26 +539,28 @@ class WppNotifier  {
 			if($content_type == "html") {
 				add_filter('wp_mail_content_type', 'set_email_html_content_type');	
 				$counter = 1;	
-				foreach($to as $email) {
+				foreach($recipients as $to_email) {
 					// Individualize content link for unsubscribe
-					$unsubscribe_link = WppFollower::get_follower_unsubscribe_link($email);
+					$unsubscribe_link = WppFollower::get_follower_unsubscribe_link($to_email);
 					$message = str_replace("{unsubscribe-link}", $unsubscribe_link, $pending_notification->post_content);
-					$result = wp_mail($mail,$pending_notification->post_title, $message, $headers);
+
+					// Send the email
+					$result = wp_mail($to_email,$pending_notification->post_title, $message, $headers);
 					
 					// If the message was sent
 					if($result) {
-						$this->debug_output .= "<br/>sent as html->".$mail." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>sent as html->".$to_email." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 						if($counter > 1) {
 							$insert_sent_sql.= ", ";
 						}
-						$insert_sent_sql .= " ('".$mail."', ".$pending_notification->ID. ", '".$mail_list_type."', '".$pending_notification->post_title."') ";						
+						$insert_sent_sql .= " ('".$to_email."', ".$pending_notification->ID. ", '".$mail_list_type."', '".$pending_notification->post_title."') ";						
 						$sent_mail = new stdClass();
-						$sent_mail->mail = $mail;
+						$sent_mail->mail = $to_email;
 						$sent_mail->mail_title = $pending_notification->post_title;						
 						$this->sent_mails[] = $sent_mail;
 						$counter++;
 					} else {
-						$this->debug_output .= "<br/>Failed to send as html-> $sender_email,".$mail." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>Failed to send as html-> $sender_email,".$to_email." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 						$result_info = json_decode($result);
 						$this->debug_output .= "<br/>Result-> $result_info";
 					}
@@ -568,18 +570,18 @@ class WppNotifier  {
 				$wpdb->query($insert_sent_sql);
 			} else {
 				$counter = 1;	
-				foreach($to as $mail) {
-					$result = wp_mail($mail, $pending_notification->post_title, $pending_notification->post_content, $headers);
-					error_log( print_r( $mail, true ) );
+				foreach($recipients as $to_email) {
+					$result = wp_mail($to_email, $pending_notification->post_title, $pending_notification->post_content, $headers);
+
 					if($result) {
-						$this->debug_output .= "<br/>sent -> ".$to." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>sent -> ".$to_email." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 						if($counter > 1) {
 							$insert_sent_sql.= ", ";
 						}
-						$insert_sent_sql .= " ('".$mail."', ".$pending_notification->ID. ", '".$mail_list_type."', '".$pending_notification->post_title."') ";						
+						$insert_sent_sql .= " ('".$to_email."', ".$pending_notification->ID. ", '".$mail_list_type."', '".$pending_notification->post_title."') ";						
 						$counter++;
 					} else {
-						$this->debug_output .= "<br/>Failed to send-> $sender_email,".$to." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>Failed to send-> $sender_email,".$to_email." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 						$result_info = json_decode($result);
 						$this->debug_output .= "<br/>Result-> $result_info";
 					}
@@ -598,9 +600,9 @@ class WppNotifier  {
 	 */
 	public function get_mails_to($pending_notification) {
 		$mail_list_type = get_post_meta($pending_notification->ID, "mail_list_type", true);					
-		$to = $this->get_mail_list($pending_notification->ID, $pending_notification->post_title, $mail_list_type);
+		$recipients = $this->get_mail_list($pending_notification->ID, $pending_notification->post_title, $mail_list_type);
 		$this->debug_output .="<br/> working on $mail_list_type mail...<br/>";
-		return $to;
+		return $recipients;
 	}
 	
 	/**
