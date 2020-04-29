@@ -97,7 +97,7 @@ class WppFollower  {
 		$args = (
 			array(
 				"post_type"=> self::$follower_post_type, 
-				"post_status"=> array("publish", "pending"),
+				"post_status"=> array("publish", $this->follower_initial_post_status),
 				'meta_query' => array(
 					array(
 						'key'=> self::$follower_email,
