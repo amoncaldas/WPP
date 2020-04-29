@@ -76,7 +76,7 @@ class WppNotifier  {
 				'callback' => array($this, 'subscribe_for_notifications' ),
 			)
 		));
-		register_rest_route(WPP_API_NAMESPACE."/notifications", '/unsubscribe/(?P<followerId>[0-9]+)', array(
+		register_rest_route(WPP_API_NAMESPACE."/notifications", '/unsubscribe/(?P<code>[a-zA-Z0-9_.-]+)', array(
 			array(
 				'methods'  => "PUT",
 				'callback' => array($this, 'unsubscribe_for_notifications' ),
