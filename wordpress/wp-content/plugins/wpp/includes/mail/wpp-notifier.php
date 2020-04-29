@@ -15,6 +15,7 @@ class WppNotifier  {
 	public $debug_output = "";
 	public $max_notifications_per_time = 50;
 	public $sent_mails = array();
+	public $mail_list_field = "mail_list";
 
 	// Defining values and keys to generate the notification
 	public $notification_post_type = "notification";
@@ -132,14 +133,14 @@ class WppNotifier  {
 	 */
 	public function unsubscribe_for_notifications($request) {
 		$code = $request->get_param('code');
-		$follower_email = WppFollower::get_follower_email_from_unsubscribe_code($code);
+		$follower_email_field = WppFollower::get_follower_email_from_unsubscribe_code($code);
 
 		// Get the follower by email
 		$args = (
 			array(
 				"post_type"=> WppFollower::$follower_post_type, 
 				"post_status"=> array("publish", $this->follower_initial_post_status),
-				'meta_query' => array( array( 'key'=> WppFollower::$follower_email, 'value'=> $follower_email ) )
+				'meta_query' => array( array( 'key'=> WppFollower::$follower_email_field, 'value'=> $follower_email_field ) )
 			)
 		);
 
@@ -159,9 +160,9 @@ class WppNotifier  {
 	}
 
 	/**
-	 * Unsubscribe a follower to the notification
+	 * Report error to admin
 	 *
-	 * @return void
+	 * @return WP_REST_Response
 	 */
 	public function report_error($request) {
 		$recaptchaToken = $request->get_param('recaptchaToken');
@@ -194,11 +195,11 @@ class WppNotifier  {
 		
 		if ($validCaptcha === true) {
 			$name = $request->get_param('name');
-			$email = $request->get_param(WppFollower::$follower_email);
+			$email = $request->get_param(WppFollower::$follower_email_field);
 	
 			if (isset($name) && isset($email)) {
 				$lang = $request->get_param(LOCALE_TAXONOMY_SLUG) ? $request->get_param(LOCALE_TAXONOMY_SLUG) : get_default_locale();
-				$mail_list =  $request->get_param($this->mail_list) ?  $request->get_param($this->mail_list) : $this->default_notification_type;
+				$mail_list =  $request->get_param($this->mail_list_field) ?  $request->get_param($this->mail_list_field) : $this->default_notification_type;
 				
 				$result = WppFollower::register_follower($name, $email, $mail_list, $lang);
 
@@ -616,8 +617,8 @@ class WppNotifier  {
 		$post_meta_table_name = $prefix."postmeta";
 		$term_relationship_table_name = $prefix."term_relationships";
 
-		$sql = "select ID, (select meta_value from $post_meta_table_name where meta_key = '".WppFollower::$follower_email."' and post_id = ID limit 1) as email from 
-		$post_table_name where post_type = '".WppFollower::$follower_post_type."' and (select meta_value from $post_meta_table_name where meta_key = '".WppFollower::$follower_email."' and post_id = ID limit 1) 
+		$sql = "select ID, (select meta_value from $post_meta_table_name where meta_key = '".WppFollower::$follower_email_field."' and post_id = ID limit 1) as email from 
+		$post_table_name where post_type = '".WppFollower::$follower_post_type."' and (select meta_value from $post_meta_table_name where meta_key = '".WppFollower::$follower_email_field."' and post_id = ID limit 1) 
 		not in (select wp_mail_sent.email from wp_mail_sent where mail_title = '".$mail_title."')		
 		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and meta_key = '".WppFollower::$mail_list."' and meta_value = '".$mail_list_type."' )
 		and ID in (SELECT post_id FROM $post_meta_table_name where post_id = ID and post_status = 'publish' )
