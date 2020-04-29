@@ -117,7 +117,7 @@ class WppMailer  {
 	public static function send_email($to_email, $title, $html_message, $lang = null) {		
 		$sender_name = get_option("wpp_email_sender_name");
 		$sender_email = get_option("wpp_email_sender_email");
-		$force_sender_email = get_option("wpp_force_sender_email");	
+		$force_email_sender = get_option("wpp_force_sender_email");	
 
 		$site_title = get_bloginfo("name");
 		$title = "[$site_title] $title";
@@ -125,7 +125,7 @@ class WppMailer  {
 		$headers = [];
 		
 		if ($sender_email && $sender_name) {
-			if(!is_localhost() && $force_sender_email === "yes") {
+			if(!is_localhost() && $force_email_sender === "yes") {
 				$headers[] = "From: $sender_email <$sender_name>";
 				$headers[] = "Reply-To: <$sender_email>";
 			}

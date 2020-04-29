@@ -3,6 +3,7 @@ import Posts from '@/fragments/posts/Posts'
 import Sections from '@/fragments/sections/Sections'
 import NotFoundComponent from '@/fragments/not-found/NotFound'
 import postService from '@/shared-services/post-service'
+import Subscribe from '@/fragments/subscribe/Subscribe'
 import postSupport from '@/support/post'
 import wpp from '@/support/wpp'
 
@@ -11,7 +12,8 @@ export default {
     Post,
     Posts,
     Sections,
-    NotFoundComponent
+    NotFoundComponent,
+    Subscribe
   },
   data () {
     return {
@@ -34,6 +36,13 @@ export default {
         return this.currentSection.id
       }
     },
+    showNewsletterForm () {
+      let show = true
+      if (this.post && this.post.extra.hide_newsletter_sidebar === true) {
+        show = false
+      }
+      return show
+    },
     maxInSidebar () {
       let max = this.post.extra.max_in_side_bar !== undefined ? this.post.extra.max_in_side_bar : 3
       return Number(max)
@@ -44,7 +53,7 @@ export default {
     let pageTypes = this.$store.getters.options.page_like_types
     pageTypes = Array.isArray(pageTypes) ? pageTypes : [pageTypes]
 
-    if (pageTypes.includes(this.$store.getters.postTypeEndpoint)) {
+    if (pageTypes.indexOf(this.$store.getters.postTypeEndpoint) > -1) {
       this.renderAsPage = true
     }
     this.loadData()

@@ -41,8 +41,7 @@ export default {
     CRUD.set(this, unsubscribeService, crudOptions)
 
     // Set the properties that are gonna be used by the CRUD to update/activate the user
-    this.resource.key = this.$route.params.key
-    this.resource.email = this.$route.params.email
+    this.resource.code = this.$route.params.code
 
     // Update the user deactivating the account
     this.update()

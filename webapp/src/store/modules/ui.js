@@ -85,14 +85,14 @@ const actions = {
       if (locale) {
         locale = locale.toLowerCase()
       }
-      let isLocaleValid = locale && appConfig.validLocales.includes(locale)
+      let isLocaleValid = locale && appConfig.validLocales.indexOf(locale) > -1
       if (!isLocaleValid) {
         // Check if the browser supports the app default locale
         // If supports, define it as the locale
-        if (window.navigator.languages.includes(appConfig.defaultLocale)) {
+        if (window.navigator.languages.indexOf(appConfig.defaultLocale) > -1) {
           locale = appConfig.defaultLocale
         } else { // If not, try to use the english (if supported) or fall back to the default
-          locale = appConfig.validLocales.includes('en-us') ? 'en-us' : appConfig.defaultLocale
+          locale = appConfig.validLocales.indexOf('en-us') > -1 ? 'en-us' : appConfig.defaultLocale
         }
       }
       commit('locale', locale)

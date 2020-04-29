@@ -2,12 +2,14 @@ import Post from '@/fragments/post/Post'
 import Sections from '@/fragments/sections/Sections'
 import NotFoundComponent from '@/fragments/not-found/NotFound'
 import postService from '@/shared-services/post-service'
+import Subscribe from '@/fragments/subscribe/Subscribe'
 
 export default {
   components: {
     Post,
     Sections,
-    NotFoundComponent
+    NotFoundComponent,
+    Subscribe
   },
   data () {
     return {
@@ -18,6 +20,18 @@ export default {
   },
   created () {
     this.loadData()
+  },
+  computed: {
+    showNewsletterForm () {
+      let show = true
+      if (this.loaded && this.post && this.post.extra.hide_newsletter_sidebar === true) {
+        show = false
+      }
+      return show
+    },
+    hasSidebar () {
+      return this.loaded && this.post && this.post.extra.show_sidebar
+    }
   },
   watch: {
     $route: {

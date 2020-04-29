@@ -6,6 +6,10 @@
       <post v-else-if="loaded" :post-data="post" mode="single"></post>
     </v-flex>
     <v-flex md3 v-if="hasSidebar">
+      <template v-if="showNewsletterForm">
+        <subscribe small :topBorder="true"></subscribe>
+        <br><br>
+      </template>
       <template v-for="postType in sidebarPostTypes">
         <template v-if="postType.endpoint === 'sections'">
           <sections :key="postType.endpoint" :max="maxInSidebar"></sections>
