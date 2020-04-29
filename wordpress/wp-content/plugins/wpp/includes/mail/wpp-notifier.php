@@ -138,6 +138,7 @@ class WppNotifier  {
 		$args = (
 			array(
 				"post_type"=> WppFollower::$follower_post_type, 
+				"post_status"=> array("publish", "pending"),
 				'meta_query' => array( array( 'key'=> WppFollower::$follower_email, 'value'=> $follower_email ) )
 			)
 		);
