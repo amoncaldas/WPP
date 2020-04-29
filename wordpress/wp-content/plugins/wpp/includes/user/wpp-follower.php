@@ -16,7 +16,7 @@ class WppFollower  {
 	// Defining follower values and keys
 	public static $follower_post_type = "follower";
 	public static $follower_initial_post_status = "pending";
-	public static $follower_email = "email";
+	public static $follower_email_field = "email";
 	public static $ip = "ip";
 	public static $user_agent = "user_agent";
 	public static $activated = "activated";
@@ -76,7 +76,7 @@ class WppFollower  {
 			}
 			wp_trash_post($follower_id);
 			$message = "Name: ". $follower->post_title."<br/><br/>";
-			$message .= "Email: ". get_post_meta($follower_id, self::$follower_email, true);
+			$message .= "Email: ". get_post_meta($follower_id, self::$follower_email_field, true);
 			WppMailer::notify_admin("Follower opt out", $message, self::$default_language);
 			return "deactivated";
 		}
@@ -97,10 +97,10 @@ class WppFollower  {
 		$args = (
 			array(
 				"post_type"=> self::$follower_post_type, 
-				"post_status"=> array("publish", $this->follower_initial_post_status),
+				"post_status"=> array("publish", self::$follower_initial_post_status),
 				'meta_query' => array(
 					array(
-						'key'=> self::$follower_email,
+						'key'=> self::$follower_email_field,
 						'value'=> $email
 					)
 				)
@@ -109,13 +109,7 @@ class WppFollower  {
 		$existing_followers = get_posts($args);
 
 		if (count($existing_followers) > 0) {
-			$existing_follower = $existing_followers[0];
-			if ($existing_follower->post_status === "publish") {
-				return "already_exists";
-			} else {				
-				wp_publish_post($existing_follower->ID);
-				return "updated";
-			}
+			return "already_exists";
 		} else {
 			$follower_id = wp_insert_post(
 				array(
@@ -125,7 +119,7 @@ class WppFollower  {
 					"post_title"=> strip_tags($name), 
 					"meta_input"=> array(
 						self::$ip => get_request_ip(),
-						self::$follower_email => strip_tags($email),
+						self::$follower_email_field => strip_tags($email),
 						self::$user_agent => $_SERVER['HTTP_USER_AGENT'],
 						self::$activated => 0,
 						self::$mail_list => $mail_list
