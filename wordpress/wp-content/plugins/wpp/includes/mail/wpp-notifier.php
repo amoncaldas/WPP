@@ -543,10 +543,10 @@ class WppNotifier  {
 					// Individualize content link for unsubscribe
 					$unsubscribe_link = WppFollower::get_follower_unsubscribe_link($email);
 					$message = str_replace("{unsubscribe-link}", $unsubscribe_link, $pending_notification->post_content);
-					$success = wp_mail($mail,$pending_notification->post_title, $message, $headers);
+					$result = wp_mail($mail,$pending_notification->post_title, $message, $headers);
 					
 					// If the message was sent
-					if($success) {
+					if($result) {
 						$this->debug_output .= "<br/>sent as html->".$mail." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 						if($counter > 1) {
 							$insert_sent_sql.= ", ";
@@ -559,6 +559,8 @@ class WppNotifier  {
 						$counter++;
 					} else {
 						$this->debug_output .= "<br/>Failed to send as html-> $sender_email,".$mail." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
+						$result_info = json_decode($result);
+						$this->debug_output .= "<br/>Result-> $result_info";
 					}
 				}
 				remove_filter('wp_mail_content_type', 'set_email_html_content_type');
@@ -567,9 +569,9 @@ class WppNotifier  {
 			} else {
 				$counter = 1;	
 				foreach($to as $mail) {
-					$success = wp_mail($mail, $pending_notification->post_title, $pending_notification->post_content, $headers);
+					$result = wp_mail($mail, $pending_notification->post_title, $pending_notification->post_content, $headers);
 					error_log( print_r( $mail, true ) );
-					if($success) {
+					if($result) {
 						$this->debug_output .= "<br/>sent -> ".$to." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
 						if($counter > 1) {
 							$insert_sent_sql.= ", ";
@@ -577,7 +579,9 @@ class WppNotifier  {
 						$insert_sent_sql .= " ('".$mail."', ".$pending_notification->ID. ", '".$mail_list_type."', '".$pending_notification->post_title."') ";						
 						$counter++;
 					} else {
-						$this->debug_output .= "<br/>fail to send-> $sender_email,".$to." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
+						$this->debug_output .= "<br/>Failed to send-> $sender_email,".$to." | ".$pending_notification->post_title." on - ".date('m/d/Y h:i:s', time());
+						$result_info = json_decode($result);
+						$this->debug_output .= "<br/>Result-> $result_info";
 					}
 				}
 				global $wpdb;
@@ -595,7 +599,7 @@ class WppNotifier  {
 	public function get_mails_to($pending_notification) {
 		$mail_list_type = get_post_meta($pending_notification->ID, "mail_list_type", true);					
 		$to = $this->get_mail_list($pending_notification->ID, $pending_notification->post_title, $mail_list_type);
-		$this->debug_output .="<br/> working on news mail...<br/>";
+		$this->debug_output .="<br/> working on $mail_list_type mail...<br/>";
 		return $to;
 	}
 	
