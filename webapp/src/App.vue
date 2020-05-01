@@ -21,6 +21,7 @@
     <app-sidebar></app-sidebar>
     <app-footer></app-footer>
   </v-app>
+
 </template>
 <script src="./app.js"></script>
 <style lang="scss" src="./app.scss"></style>
