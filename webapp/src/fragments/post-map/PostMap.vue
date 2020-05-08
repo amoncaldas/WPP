@@ -3,8 +3,7 @@
     <div slot="header">
       <h2 v-html="title"></h2>
     </div>
-    <v-alert :value="info" outline type="info" style="color:white" >{{ info }}</v-alert>
-    <l-map ref="map" :max-zoom="maxZoom" :options="{gestureHandling:true}" style="z-index:3" :zoom="zoom" class="section-map" :style="{height: mapHeight + 'px'}">
+    <l-map ref="map" :max-zoom="maxZoom" :options="{gestureHandling:true}" style="z-index:3" :zoom="zoom" class="section-map" :style="{height: height + 'px'}">
       <l-marker v-for="(marker, index) in markers" :lat-lng="marker.position" :key="index+'-marker'" :icon="marker.icon">
         <l-popup v-if="marker.label">
           <div >

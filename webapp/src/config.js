@@ -1,9 +1,9 @@
 const config = {
-  devBaseAPIUrl: 'http://localhost:5003/wp-json/',
+  devBaseAPIUrl: 'https://localhost:5003/wp-json/',
   prodBaseAPIUrl: '/wp-json/',
   baseWpApiPath: 'wp/v2/',
-  mainMenuSlug: 'primary_menu_',
-  secondaryMenu: 'secondary_menu_',
+  mainMenuPrefix: 'primary_menu_',
+  secondaryMenuPrefix: 'secondary_menu_',
   setCustomMenuIcons: true
 }
 

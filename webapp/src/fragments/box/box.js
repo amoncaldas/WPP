@@ -116,7 +116,7 @@ export default {
       let boxMaximized = this.resetBoxMaximizedStack()
       if (this.maximized) {
         htmlNode.style.overflow = 'hidden'
-        this.$el.style.height = (window.innerHeight + 300) + 'px'
+        // this.$el.style.height = (window.innerHeight + 300) + 'px'
       } else {
         if (Object.keys(boxMaximized).length > 0) {
           htmlNode.style.overflow = 'hidden'
