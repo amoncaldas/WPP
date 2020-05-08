@@ -64,7 +64,7 @@ const mutations = {
 const actions = {
   fetchMainMenu ({getters, commit}) {
     return new Promise((resolve) => {
-      SiteMenu.loadItems(appConfig.mainMenuSlug).then((items) => {
+      SiteMenu.loadItems(appConfig.mainMenuPrefix).then((items) => {
         commit('mainMenu', items)
         resolve(items)
       })
@@ -72,7 +72,7 @@ const actions = {
   },
   fetchSecondaryMenu ({getters, commit}) {
     return new Promise((resolve) => {
-      SiteMenu.loadItems(appConfig.secondaryMenu).then((items) => {
+      SiteMenu.loadItems(appConfig.secondaryMenuPrefix).then((items) => {
         commit('secondaryMenu', items)
         resolve(items)
       })

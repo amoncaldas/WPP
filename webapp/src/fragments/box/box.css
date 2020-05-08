@@ -25,11 +25,14 @@
   left: 5px;
   z-index: 1002; /* when the box is maximized it must have a higher z-index then the floating menu */
   right: 5px;
-  margin-top: 100px;
+  margin-top: 0px;
   margin-left: 0px !important;
   margin-right: 0px !important;
   bottom: 5px;
   overflow-y: scroll;
+}
+.box-content.maximized >>> div {
+  margin-top: 0px;
 }
 
 .box-footer {

@@ -102,6 +102,9 @@ export default {
         return this.post.places[lastKey].title
       }
       return this.$t('postMap.title')
+    },
+    height () {
+      return this.mapHeight
     }
   },
 
@@ -187,10 +190,11 @@ export default {
         // if the map is maximized, then the height
         // will be the window height less an offset
         if (data.maximized) {
-          this.mapHeight = window.innerHeight - 300
+          this.mapHeight = window.innerHeight - 100
         } else { // if not, the height is fixed
           this.mapHeight = 300
         }
+        this.$forceUpdate()
         // After map container box is resized
         // we need to wait a little bit
         // to redraw the map and then
@@ -206,7 +210,7 @@ export default {
           })
         }, 500)
       }
-    },
+    }
   },
   mounted () {
     // Define a unique identifier to the map component instance

@@ -13,8 +13,8 @@
         </v-list-tile>
       </template>
       <template v-else-if="showMenuItem(item)">
-        <template v-for="itemLevel2 in item.items">
-          <v-expansion-panel v-if="itemLevel2.items && showMenuItem(itemLevel2)" :key="itemLevel2.href" class="no-shadow" :value="null">
+        <template v-for="(itemLevel2, index) in item.items">
+          <v-expansion-panel v-if="itemLevel2.items && showMenuItem(itemLevel2)" :key="itemLevel2.href + index" class="no-shadow" :value="null">
             <v-expansion-panel-content class="v-menu-expansion-panel level-2">
                 <div @click.prevent="nav(item)" slot="header"><h4 >{{ itemLevel2.title }}</h4></div>
                 <v-list-tile @click.prevent="nav(itemLevel3)" v-for='itemLevel3 in itemLevel2.items' :key="itemLevel3.href" :href="itemLevel3.href" class="v-menu-item" :class="itemClass" :title="itemLevel2.title">
