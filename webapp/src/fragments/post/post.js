@@ -78,21 +78,25 @@ export default {
       return this.post.title
     },
     excerpt () {
-      let excerpt = this.content
+      let excerpt = ''
       if (this.post.excerpt) {
         excerpt = this.post.excerpt
-        if (excerpt.rendered !== undefined) {
+        if (typeof excerpt === 'object' && excerpt.rendered !== undefined) {
           excerpt = excerpt.rendered
         }
-      }
+      } else {
+        excerpt = this.content
+        // If we are using the beginning of the
+        // content as excerpt, remove any html
+        excerpt = excerpt.replace(/<(?:.|\n)*?>/gm, '')
+        let maxLength = this.mode === 'compact' ? 150 : 300
 
-      excerpt = excerpt.replace(/<(?:.|\n)*?>/gm, '')
-      let maxLength = this.mode === 'compact' ? 150 : 300
-      if (excerpt.length > maxLength) {
-        excerpt = excerpt.substring(0, maxLength)
-        return excerpt.length > 0 ? `${excerpt} [...]` : excerpt
+        // if the excerpt is too long shrink it
+        if (excerpt.length > maxLength) {
+          excerpt = excerpt.substring(0, maxLength)
+          return excerpt.length > 0 ? `${excerpt} [...]` : excerpt
+        }
       }
-
       return excerpt
     },
     link () {
