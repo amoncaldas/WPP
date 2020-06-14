@@ -183,6 +183,17 @@ class WpWebAppTheme {
 					)
 				);
 			}
+			if (post_type_exists("map_route") === true) {
+				register_rest_field($post_type, 'routes',
+					array(
+						'get_callback'  => function ($post, $field_name, $request) {
+							$routes = $this->resolve_routes($post, $field_name, $request);
+							return $routes;
+						},
+						'schema' => null,
+					)
+				);
+			}
 			register_rest_field($post_type, 'author_member',
 				array(
 					'get_callback'  => function ($post, $field_name, $request) {
@@ -316,7 +327,7 @@ class WpWebAppTheme {
 	 * @param Array $post_arr
 	 * @param string $field_name
 	 * @param Object $request
-	 * @return array of palces
+	 * @return array of places
 	 */
 	public function resolve_places($post_arr, $field_name, $request) {
 		$place_ids = get_post_meta($post_arr["id"], "places", true);
@@ -344,6 +355,34 @@ class WpWebAppTheme {
 			}
 		}
 		return $places;
+	}	
+
+	/**
+	 * Resolve the the post routes
+	 *
+	 * @param Array $post_arr
+	 * @param string $field_name
+	 * @param Object $request
+	 * @return array of routes
+	 */
+	public function resolve_routes($post_arr, $field_name, $request) {
+		$route_ids = get_post_meta($post_arr["id"], "routes", true);
+		$routes = [];
+		if (is_array($route_ids) && count($route_ids) > 0) {			
+			foreach ($route_ids as $route_id) {				
+				$route_polyline = get_post_meta($route_id, "route_polyline", true);	
+				if($route_polyline) {
+					$route = [
+						"means_of_transportation" => get_post_meta($route_id, "means_of_transportation", true),
+						"polyline" => $route_polyline,
+						"title" => get_the_title($route_id),
+						"id" => $route_id
+					];
+					$routes[$route_id] = $route;
+				}
+			}
+		}
+		return $routes;
 	}	
 
 	/**

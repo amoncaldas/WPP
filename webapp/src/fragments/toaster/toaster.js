@@ -20,7 +20,10 @@ export default {
         this.snackbarY = snack.options.y || this.snackbarY
         this.snackbarX = snack.options.x || this.snackbarX
         this.snackbarMode = snack.options.mode || this.snackbarMode
-        this.snackbarTimeout = snack.options.timeout || this.snackbarTimeout
+
+        if (snack.options.timeout !== undefined && snack.options.timeout !== null) {
+          this.snackbarTimeout = snack.options.timeout
+        }
       }
 
       // Restart the timeout if it was already visible

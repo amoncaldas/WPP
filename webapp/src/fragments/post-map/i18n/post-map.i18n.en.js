@@ -12,6 +12,16 @@ export default {
     viewBasedOnEquivalentGeoJsonResponse: 'Visualization based on an equivalent GeoJSON response',
     polygonDetails: 'Polygon details',
     polygon: 'Polygon',
-    section: 'Section details'
+    section: 'Section details',
+    transportationMeans: {
+      bicycle: 'Bicycle',
+      foot: 'Foot',
+      train: 'Train',
+      ferry: 'Ferry',
+      bus: 'Bus',
+      sailboat: 'Sailboat',
+      car: 'Car',
+      airplane: 'Airplane'
+    }
   }
 }

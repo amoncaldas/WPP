@@ -24,6 +24,7 @@ class Loader {
 	 */
 	protected $providers = array(
 		'mail'        => 'WPMailSMTP\Providers\Mail\\',
+		'smtpcom'     => 'WPMailSMTP\Providers\SMTPcom\\',
 		'pepipostapi' => 'WPMailSMTP\Providers\PepipostAPI\\',
 		'sendinblue'  => 'WPMailSMTP\Providers\Sendinblue\\',
 		'mailgun'     => 'WPMailSMTP\Providers\Mailgun\\',
@@ -131,8 +132,8 @@ class Loader {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string      $provider
-	 * @param MailCatcher $phpmailer
+	 * @param string                 $provider  The provider name.
+	 * @param MailCatcher|\PHPMailer $phpmailer The MailCatcher object.
 	 *
 	 * @return MailerAbstract|null
 	 */

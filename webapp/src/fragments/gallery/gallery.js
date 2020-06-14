@@ -24,9 +24,13 @@ export default {
   computed: {
     mediasData () {
       let medias = []
-      for(let key in this.medias) {
+      for (let key in this.medias) {
         let media = this.medias[key]
         media.description = media.description || media.title
+        // Avoid repeat title as description
+        if (media.description === media.title) {
+          media.description = ''
+        }
         media.poster = media.url
         media.href = media.url
 
@@ -57,12 +61,12 @@ export default {
     }
   },
   methods: {
-    matchYoutubeUrl(url) {
-      var p = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
-      if(url.match(p)){
-          return url.match(p)[1];
+    matchYoutubeUrl (url) {
+      var p = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/
+      if (url.match(p)) {
+        return url.match(p)[1]
       }
-      return false;
+      return false
     }
   },
   components: {

@@ -1,17 +1,13 @@
 <?php
 
 /**
- * Class FamMail
- *
- * Description for class FamMail
- * WordPress options used: email_sender_name, email_sender_email, skip_email_sending_notification, deactivate_news_sending
+ * Class WppFollower
  *
  * @author: Amon Caldas
 */
 
 
 class WppFollower  {
-	public static $default_language = "pt-br";
 
 	// Defining follower values and keys
 	public static $follower_post_type = "follower";
@@ -77,7 +73,7 @@ class WppFollower  {
 			wp_trash_post($follower_id);
 			$message = "Name: ". $follower->post_title."<br/><br/>";
 			$message .= "Email: ". get_post_meta($follower_id, self::$follower_email_field, true);
-			WppMailer::notify_admin("Follower opt out", $message, self::$default_language);
+			WppMailer::notify_admin("Follower opt out", $message, get_default_locale());
 			return "deactivated";
 		}
 		return "not_found";

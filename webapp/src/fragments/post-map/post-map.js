@@ -19,6 +19,7 @@ L.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling)
 const tileProviders = [
   {
     name: 'Open Street Maps',
+    id: 'osm',
     visible: false,
     attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -27,12 +28,14 @@ const tileProviders = [
   {
     name: 'Satellite',
     visible: false,
+    id: 'satellite',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
     token: null
   },
   {
     name: 'Cycling',
+    id: 'cycling',
     visible: true,
     url: 'https://dev.{s}.tile.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
     attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -60,7 +63,8 @@ export default {
       mapData: null,
       info: null,
       boxGuid: null,
-      loaded: false
+      loaded: false,
+      transportationColorMap: []
     }
   },
   computed: {
@@ -77,30 +81,36 @@ export default {
         return this.mapData.markers
       }
     },
-    polyline () {
-      if (this.post && this.post.extra) {
-        if (this.post.extra.encodedpolyline) {
-          let polylineFromEncoded = GeoUtils.decodePolyline(this.post.extra.encodedpolyline)
-          return Array.isArray(polylineFromEncoded)? polylineFromEncoded : []
-        } else if (this.post.extra.polyline) {
-          let polylineFromArr = JSON.parse(this.post.extra.polyline)
+    routes () {
+      let routes = []
+      if (this.post.extra.has_route && this.post.routes) {
+        for (let key in this.post.routes) {
+          let route = this.post.routes[key]
+          let polylineFromArr = JSON.parse(route.polyline)
           if (Array.isArray(polylineFromArr)) {
-            return GeoUtils.switchLatLonIndex(polylineFromArr)
+            route.polyline = polylineFromArr
+          } else {
+            route.polyline = route
           }
-          return []
+          routes.push(route)
         }
       }
+      return routes
     },
     maxZoom () {
       return this.initialMaxZoom
     },
     title () {
-      if (Object.keys(this.post.places).length === 1) {
-        let keys = Object.keys(this.post.places)
-        let lastKey = keys[0]
-        return this.post.places[lastKey].title
+      if (this.post.extra && this.post.extra.map_title) {
+        return this.post.extra.map_title
+      } else {
+        if (Object.keys(this.post.places).length === 1) {
+          let keys = Object.keys(this.post.places)
+          let lastKey = keys[0]
+          return this.post.places[lastKey].title
+        }
+        return this.$t('postMap.title')
       }
-      return this.$t('postMap.title')
     },
     height () {
       return this.mapHeight
@@ -108,17 +118,124 @@ export default {
   },
 
   methods: {
+    buildTransportationColorMap () {
+      this.transportationColorMap = [
+        {
+          id: 'bicycle',
+          color: '#008000', // green,
+          title: this.$t('postMap.transportationMeans.bicycle')
+        },
+        {
+          id: 'foot',
+          color: '#808000', // olive
+          title: this.$t('postMap.transportationMeans.foot')
+        },
+        {
+          id: 'train',
+          color: '#800080', // purple
+          title: this.$t('postMap.transportationMeans.train')
+        },
+        {
+          id: 'ferry',
+          color: 'red', // green,
+          title: this.$t('postMap.transportationMeans.ferry')
+        },
+        {
+          id: 'bus',
+          color: '#008000', // maroom,
+          title: this.$t('postMap.transportationMeans.bus')
+        },
+        {
+          id: 'sailboat',
+          color: '#0000A0', // dark blue,
+          title: this.$t('postMap.transportationMeans.sailboat')
+        },
+        {
+          id: 'car',
+          color: '#FFA500', // orange,
+          title: this.$t('postMap.transportationMeans.car')
+        },
+        {
+          id: 'airplane',
+          color: '#000000', // black,
+          title: this.$t('postMap.transportationMeans.airplane')
+        }
+      ]
+    },
+    getColorByTransportation (transportation) {
+      let transportationFound = this.lodash.find(this.transportationColorMap, (t) => {
+        return t.id === transportation
+      })
+      if (transportationFound) {
+        return transportationFound.color
+      } else {
+        return 'grey'
+      }
+    },
+    addLegends () {
+      if (this.routes.length > 0) {
+        this.buildTransportationColorMap()
+        let legend = L.control({
+          position: 'bottomright'
+        })
+        let context = this
+        legend.onAdd = function () {
+          var div = L.DomUtil.create('div', 'map-legend')
+          for (let key in context.routes) {
+            let means = context.lodash.find(context.transportationColorMap, (m) => {
+              return m.id === context.routes[key].means_of_transportation
+            })
+            if (means) {
+              div.innerHTML += `<div class='item-container'><i style="background:${means.color}"></i>${means.title}</div><br>`
+            }
+          }
+          return div
+        }
+        legend.addTo(this.map)
+      }
+    },
     boxCreated (guid) {
       this.boxGuid = guid
     },
     loadMapData () {
       this.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
       this.mapData = { markers: GeoUtils.buildMarkers(this.getMarkersData(), this.post.extra.has_route, {mapIconUrl: this.$store.getters.options.map_icon_url}) }
-      this.mapData.polyline = this.post.route
-      this.dataBounds = GeoUtils.getBBoxAndMarkersBounds(this.dataBounds, this.mapData.markers)
-      this.loaded = true
+      let polylineData = []
+      for (let key in this.routes) {
+        if (this.routes[key].polyline) {
+          polylineData = polylineData.concat(this.routes[key].polyline)
+        }
+      }
+      this.dataBounds = GeoUtils.getBounds(this.dataBounds, this.mapData.markers, polylineData)
+
+      this.setActiveTilesProvider()
       this.fitFeaturesBounds()
       this.redrawMap()
+      this.loaded = true
+    },
+
+    /**
+     * Set the active tiles provider based on the
+     * back-end specified tiles provider
+     */
+    setActiveTilesProvider () {
+      if (this.post.extra.tiles_provider_id) {
+        // Check if the tiles provider defined is supported by the front-end
+        let tileProviderSupported = this.lodash.find(this.tileProviders, (tp) => {
+          return tp.id === this.post.extra.tiles_provider_id
+        })
+        // If the tile provider specified is supported by
+        // the the front end then set is as the only one visible
+        if (tileProviderSupported) {
+          for (let key in this.tileProviders) {
+            this.tileProviders[key].visible = false
+            let provider = this.tileProviders[key]
+            if (provider.id === this.post.extra.tiles_provider_id) {
+              this.tileProviders[key].visible = true
+            }
+          }
+        }
+      }
     },
 
      /**
@@ -164,12 +281,18 @@ export default {
         // then we can directly access it
         if (context.map) {
           context.map.fitBounds(context.dataBounds, {padding: [20, 20]})
+          if (context.markers.length === 1 && context.routes.length === 0) {
+            context.zoom = context.post.extra.zoom ? Number(context.post.extra.zoom) : context.zoom
+          }
         } else {
           // If not, it wil be available only in the next tick
           this.$nextTick(() => {
             if (context.$refs.map) {
               context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
               context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
+              if (context.markers.length === 1 && context.routes.length === 0) {
+                context.zoom = context.post.extra.zoom ? Number(context.post.extra.zoom) : context.zoom
+              }
             }
             resolve()
           })
@@ -215,6 +338,8 @@ export default {
     // Define a unique identifier to the map component instance
     this.guid = utils.guid()
 
+    this.buildTransportationColorMap()
+
     // When the box is created, it emit
     // an event to its parent telling the parent its guid
     this.$emit('onCreate', this.guid)
@@ -226,6 +351,13 @@ export default {
     this.eventBus.$on('redrawAndFitMap', (data) => {
       if (data.guid && data.guid === context.guid) {
         this.adjustMap(data.isMaximized)
+      }
+    })
+    this.$nextTick(() => {
+      if (context.$refs.map && context.routes.length > 0) {
+        // work as expected when wrapped in a $nextTick
+        context.map = context.$refs.map.mapObject
+        context.addLegends()
       }
     })
     // once the map component is mounted, load the map data

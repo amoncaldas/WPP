@@ -1,5 +1,19 @@
-.post-map {
-  min-height:300px;
-  width: 100%;
-  z-index:2
+.post-map >>> .map-legend {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 3px;
 }
+
+.post-map >>> .map-legend > .item-container {
+  display: inline-block;
+  color: white;
+  font-weight: 600;
+}
+
+.post-map >>> .map-legend > .item-container > i {
+  display: inline-block;
+  height: 10px;
+  width: 40px;
+  border: 1px solid antiquewhite;
+  margin-right: 5px;
+}
+

@@ -266,6 +266,14 @@ Options with `wpp_` prefix that are not present by default:
 - wpp_search_title_translation
 - wpp_use_and_data_policy_url_<locale> (like wpp_use_and_data_policy_url_en-us)
 
+## Custom post type supports used on back-end ##
+
+- parent_section (if the post type must have a parent section)
+- section_in_permalink (if the parent section must appear in the permalink)
+- notification (if the content must generate a notification)
+- feed (if the content must be listed in feed)
+- auto_related (if the post type must be listed as related to other posts automatically, based on section and categories)
+
 ## ACF extras ##
 
 Possible post extras:
@@ -292,8 +300,11 @@ Possible post extras:
 - prepend (integer, adding prepend post id)
 - append (integer, adding append post id)
 - hide_newsletter_sidebar (boolean)
+- tile_provider_id (`osm`, `satellite` or `cycling`)
+- zoom (a value from `1` to `18`)
 
 Only for pages:
+
 - has_top_highlighted
 - has_middle_highlighted
 - has_bottom_highlighted

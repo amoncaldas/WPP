@@ -179,6 +179,41 @@ const geoUtils = {
   },
 
   /**
+   * Build a bounding box the also includes the plaes and the polyline
+   * @param {Array} originalBbox
+   * @param {Array} places
+   * @returns {Matrix} polyline with arrays of lngLat
+   */
+  getBounds: (originalBbox, markers = [], polyline = []) => {
+    let boundsCollection = [{lon: originalBbox[0], lat: originalBbox[1]}, {lon: originalBbox[2], lat: originalBbox[3]}]
+
+    let minLat = originalBbox[1]
+    let maxLat = originalBbox[3]
+    let minLon = originalBbox[0]
+    let maxLon = originalBbox[2]
+
+    markers.forEach((marker) => {
+      boundsCollection.push({lat: marker.position.lat, lon: marker.position.lng})
+    })
+    if (Array.isArray(polyline)) {
+      polyline.forEach((lngLatArr) => {
+        boundsCollection.push({lat: lngLatArr[0], lon: lngLatArr[1]})
+      })
+    }
+
+    boundsCollection.forEach(latLon => {
+      minLat = latLon.lat > minLat ? minLat : latLon.lat
+      minLon = latLon.lon > minLon ? minLon : latLon.lon
+      maxLat = latLon.lat < maxLat ? maxLat : latLon.lat
+      maxLon = latLon.lon < maxLon ? maxLon : latLon.lon
+    })
+    return [
+      {lon: minLon, lat: minLat},
+      {lon: maxLon, lat: maxLat}
+    ]
+  },
+
+  /**
    * Get humanized tool tip string
    * @param {*} data {duration: Number, distance: Number, unit: String}
    * @returns {String} formatted tool tip
