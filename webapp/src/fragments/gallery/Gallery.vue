@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="gallery">
     <vue-gallery
       :images="mediasData"
       :index="galleryMediaIndex"

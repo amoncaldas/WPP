@@ -6,3 +6,7 @@
   overflow-y:hidden;
   cursor: pointer;
 }
+
+.gallery >>> .close > i {
+  color:white !important;
+}

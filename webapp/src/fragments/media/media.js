@@ -59,16 +59,27 @@ export default {
       return null
     },
     title () {
+      let title = ''
       if (this.mediaPost && this.mediaPost.title && this.mediaPost.title.rendered) {
-        return this.mediaPost.title.rendered
+        title = this.mediaPost.title.rendered
+      } else {
+        title = this.mediaPost.post_title
       }
-      return this.mediaPost.post_title
+      let decoded = this.decodeHtml(title)
+      return decoded
     },
     placeHolder () {
       return 'https://via.placeholder.com/1024x800.jpg?text=' + this.$t('media.image')
     },
     isListMode () {
       return this.mode === 'list'
+    }
+  },
+  methods: {
+    decodeHtml (html) {
+      var txt = document.createElement('textarea')
+      txt.innerHTML = html
+      return txt.value
     }
   }
 }

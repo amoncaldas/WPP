@@ -1,0 +1,77 @@
+[
+    {
+        "key": "group_5ee60dccc3eca",
+        "title": "Map routes",
+        "fields": [
+            {
+                "key": "field_5ee60e28e182e",
+                "label": "Means of transportation",
+                "name": "means_of_transportation",
+                "type": "select",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "bicycle": "Bicycle",
+                    "train": "train",
+                    "foot": "Foot",
+                    "ferry": "Ferry",
+                    "bus": "Bus",
+                    "sailboat": "Sailboat",
+                    "car": "Car",
+                    "airplane": "Airplane"
+                },
+                "default_value": [
+                    "bicycle"
+                ],
+                "allow_null": 0,
+                "multiple": 0,
+                "ui": 1,
+                "ajax": 0,
+                "return_format": "value",
+                "placeholder": ""
+            },
+            {
+                "key": "field_5ee60debe182d",
+                "label": "Route polyline",
+                "name": "route_polyline",
+                "type": "textarea",
+                "instructions": "Put here the array of array of coordinates that  corresponds the route polyline without any space between the elements",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "maxlength": "",
+                "rows": "",
+                "new_lines": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "map_route"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    }
+]

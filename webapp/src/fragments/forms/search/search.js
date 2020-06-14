@@ -33,9 +33,13 @@ export default {
     searchableSections () {
       let context = this
       let searchable = this.lodash.filter(this.$store.getters.sections, (s) => {
-        return s.path !== '/' && !s.extra.not_listed && s.extra.locale === context.$store.getters.locale
+        return s.path !== '/' && !s.extra.not_listed && s.locale === context.$store.getters.locale
       })
       return searchable
+    },
+    searchInputColumns () {
+      let columns = this.searchableSections.length > 1 ? 8 : 12
+      return columns
     }
   },
   methods: {

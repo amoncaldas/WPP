@@ -3,18 +3,20 @@
     <div slot="header">
       <h2 v-html="title"></h2>
     </div>
-    <l-map ref="map" :max-zoom="maxZoom" :options="{gestureHandling:true}" style="z-index:3" :zoom="zoom" class="section-map" :style="{height: height + 'px'}">
+    <l-map ref="map" :max-zoom="maxZoom" :options="{gestureHandling:true}" style="z-index:3" :zoom="zoom" class="post-map" :style="{height: height + 'px'}">
       <l-marker v-for="(marker, index) in markers" :lat-lng="marker.position" :key="index+'-marker'" :icon="marker.icon">
         <l-popup v-if="marker.label">
           <div >
-            {{marker.label}}
+            <span v-html="marker.label"></span>
             <v-icon v-if="marker.data" @click="markerInfoClick(marker)" color="info" class="notranslate right-btn-icon pointer">launch</v-icon>
           </div>
         </l-popup>
       </l-marker>
-      <l-polyline v-if="polyline" :lat-lngs="polyline" :weight="7" :color="routeColor">
-        <!-- <l-tooltip v-html="routeToolTip"></l-tooltip> -->
-      </l-polyline>
+      <template v-for="(route, index) in routes">
+        <l-polyline :key="index"  :lat-lngs="route.polyline" :weight="7" :color="getColorByTransportation(route.means_of_transportation)">
+          <!-- <l-tooltip v-html="routeToolTip"></l-tooltip> -->
+        </l-polyline>
+      </template>
        <l-control-layers
         :position="layersPosition"
         :collapsed="true" />

@@ -2,7 +2,7 @@
 # Version 0.1
 # 26.01.2018
 
-FROM wordpress:5.3-php7.1-apache
+FROM wordpress:5.4.2-php7.3-apache
 
 ARG DEBUG_SUPPORT=false
 ARG NOTIFICATIONS_TASK_SUPPORT=false

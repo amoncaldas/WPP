@@ -57,7 +57,7 @@ class Core {
 		$this->plugin_path = rtrim( plugin_dir_path( __DIR__ ), '/\\' );
 
 		if ( $this->is_not_loadable() ) {
-			$this->do_not_load();
+			add_action( 'admin_notices', 'wp_mail_smtp_insecure_php_version_notice' );
 
 			return;
 		}
@@ -89,71 +89,17 @@ class Core {
 	}
 
 	/**
-	 * What to do if plugin is not loaded.
-	 *
-	 * @since 1.5.0
-	 */
-	protected function do_not_load() {
-
-		add_action( 'admin_notices', function () {
-
-			?>
-			<div class="notice notice-error">
-				<p>
-					<?php
-					printf(
-						wp_kses( /* translators: %1$s - WPBeginner URL for recommended WordPress hosting. */
-							__( 'Your site is running an <strong>insecure version</strong> of PHP that is no longer supported. Please contact your web hosting provider to update your PHP version or switch to a <a href="%1$s" target="_blank" rel="noopener noreferrer">recommended WordPress hosting company</a>.', 'wp-mail-smtp' ),
-							array(
-								'a'      => array(
-									'href'   => array(),
-									'target' => array(),
-									'rel'    => array(),
-								),
-								'strong' => array(),
-							)
-						),
-						'https://www.wpbeginner.com/wordpress-hosting/'
-					);
-					?>
-					<br><br>
-					<?php
-					printf(
-						wp_kses( /* translators: %s - WPForms.com docs URL with more details. */
-							__( '<strong>Note:</strong> WP Mail SMTP plugin is disabled on your site until you fix the issue. <a href="%s" target="_blank" rel="noopener noreferrer">Read more for additional information.</a>', 'wp-mail-smtp' ),
-							array(
-								'a'      => array(
-									'href'   => array(),
-									'target' => array(),
-									'rel'    => array(),
-								),
-								'strong' => array(),
-							)
-						),
-						'https://wpforms.com/docs/supported-php-version/'
-					);
-					?>
-				</p>
-			</div>
-
-			<?php
-
-			// In case this is on plugin activation.
-			if ( isset( $_GET['activate'] ) ) { //phpcs:ignore
-				unset( $_GET['activate'] ); //phpcs:ignore
-			}
-		} );
-	}
-
-	/**
 	 * Assign all hooks to proper places.
 	 *
 	 * @since 1.0.0
 	 */
 	public function hooks() {
 
+		// Action Scheduler requires a special early loading procedure.
+		add_action( 'plugins_loaded', array( $this, 'load_action_scheduler' ), -10 );
+
 		// Activation hook.
-		add_action( 'activate_plugin', array( $this, 'activate' ), 10, 2 );
+		register_activation_hook( WPMS_PLUGIN_FILE, array( $this, 'activate' ) );
 
 		// Redefine PHPMailer.
 		add_action( 'plugins_loaded', array( $this, 'get_processor' ) );
@@ -163,6 +109,9 @@ class Core {
 		add_action( 'admin_init', array( $this, 'init_notifications' ) );
 
 		add_action( 'init', array( $this, 'init' ) );
+
+		// Initialize Action Scheduler tasks.
+		add_action( 'init', array( $this, 'get_tasks' ), 5 );
 
 		add_action( 'plugins_loaded', array( $this, 'get_pro' ) );
 	}
@@ -243,6 +192,25 @@ class Core {
 		}
 
 		return $this->pro;
+	}
+
+	/**
+	 * Get/Load the Tasks code of the plugin.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return \WPMailSMTP\Tasks\Tasks
+	 */
+	public function get_tasks() {
+
+		static $tasks;
+
+		if ( ! isset( $tasks ) ) {
+			$tasks = apply_filters( 'wp_mail_smtp_core_get_tasks', new Tasks\Tasks() );
+			$tasks->init();
+		}
+
+		return $tasks;
 	}
 
 	/**
@@ -362,7 +330,7 @@ class Core {
 	/**
 	 * Get the plugin's WP Site Health object.
 	 *
-	 * @since {VERSION}
+	 * @since 1.9.0
 	 *
 	 * @return SiteHealth
 	 */
@@ -395,7 +363,7 @@ class Core {
 		) {
 			WP::add_admin_notice(
 				sprintf(
-					wp_kses( /* translators: %1$s - WP Mail SMTP plugin name; %2$s - WPForms.com URL to a related doc. */
+					wp_kses( /* translators: %1$s - WP Mail SMTP plugin name; %2$s - WPMailSMTP.com URL to a related doc. */
 						__( 'Your site is running an outdated version of PHP that is no longer supported and may cause issues with %1$s. <a href="%2$s" target="_blank" rel="noopener noreferrer">Read more</a> for additional information.', 'wp-mail-smtp' ),
 						array(
 							'a' => array(
@@ -406,11 +374,11 @@ class Core {
 						)
 					),
 					'<strong>WP Mail SMTP</strong>',
-					'https://wpforms.com/docs/supported-php-version/'
+					'https://wpmailsmtp.com/docs/supported-php-versions-for-wp-mail-smtp/'
 				) .
 				'<br><br><em>' .
 				wp_kses(
-					__( '<strong>Please Note:</strong> Support for PHP 5.3-5.5 will be discontinued in 2020. After this, if no further action is taken, WP Mail SMTP functionality will be disabled.', 'wp-mail-smtp' ),
+					__( '<strong>Please Note:</strong> Support for PHP 5.5 will be discontinued in 2020. After this, if no further action is taken, WP Mail SMTP functionality will be disabled.', 'wp-mail-smtp' ),
 					array(
 						'strong' => array(),
 						'em'     => array(),
@@ -618,12 +586,9 @@ class Core {
 	 * What to do on plugin activation.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param string $plugin       Path to the plugin file relative to the plugins directory.
-	 * @param bool   $network_wide Whether to enable the plugin for all sites in the network
-	 *                             or just the current site. Multisite only. Default is false.
+	 * @since 2.0.0 Changed from general `plugin_activate` hook to this plugin specific activation hook.
 	 */
-	public function activate( $plugin, $network_wide ) {
+	public function activate() {
 
 		// Store the plugin version when initial install occurred.
 		add_option( 'wp_mail_smtp_initial_version', WPMS_PLUGIN_VER, '', false );
@@ -633,6 +598,13 @@ class Core {
 
 		// Save default options, only once.
 		Options::init()->set( Options::get_defaults(), true );
+
+		/**
+		 * Store the timestamp of first plugin activation.
+		 *
+		 * @since 2.1.0
+		 */
+		add_option( 'wp_mail_smtp_activated_time', time(), '', false );
 	}
 
 	/**
@@ -734,5 +706,31 @@ class Core {
 	public function is_blocked() {
 
 		return (bool) Options::init()->get( 'general', 'do_not_send' );
+	}
+
+	/**
+	 * Whether the white-labeling is enabled.
+	 * White-labeling disables the plugin "About us" page, it replaces any plugin marketing texts or images with
+	 * white label ones.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return bool
+	 */
+	public function is_white_labeled() {
+
+		return (bool) apply_filters( 'wp_mail_smtp_is_white_labeled', false );
+	}
+
+	/**
+	 * Require the action scheduler in an early plugins_loaded hook (-10).
+	 *
+	 * @see https://actionscheduler.org/usage/#load-order
+	 *
+	 * @since 2.1.0
+	 */
+	public function load_action_scheduler() {
+
+		require_once $this->plugin_path . '/vendor/woocommerce/action-scheduler/action-scheduler.php';
 	}
 }
