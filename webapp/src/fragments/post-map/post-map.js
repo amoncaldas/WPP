@@ -9,12 +9,12 @@ import { LMap, LPolyline, LTileLayer, LMarker, LTooltip, LPopup, LControlZoom, L
 import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
 
-import * as L from 'leaflet'
+import * as leaflet from 'leaflet'
 import { GestureHandling } from 'leaflet-gesture-handling'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css'
 
-L.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling)
+leaflet.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling)
 
 const tileProviders = [
   {
@@ -39,6 +39,22 @@ const tileProviders = [
     visible: true,
     url: 'https://dev.{s}.tile.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
     attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  },
+  {
+    name: 'Topography',
+    id: 'topography',
+    visible: false,
+    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+    token: null
+  },
+  {
+    name: 'Transport Dark',
+    visible: false,
+    id: 'transport-dark',
+    url: 'https://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=13efc496ac0b486ea05691c820824f5f',
+    attribution: 'Maps &copy; <a href="http://thunderforest.com/">Thunderforest</a>, Data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    token: null
   }
 ]
 
@@ -114,6 +130,14 @@ export default {
     },
     height () {
       return this.mapHeight
+    },
+    mapCenter () {
+      let center = leaflet.latLng(0, 0)
+      if (this.markers.length === 1) {
+        let marker = this.markers[0]
+        center = leaflet.latLng(marker.position.lat, marker.position.lng)
+      }
+      return center
     }
   },
 
@@ -175,12 +199,12 @@ export default {
     addLegends () {
       if (this.routes.length > 0) {
         this.buildTransportationColorMap()
-        let legend = L.control({
+        let legend = leaflet.control({
           position: 'bottomright'
         })
         let context = this
         legend.onAdd = function () {
-          var div = L.DomUtil.create('div', 'map-legend')
+          var div = leaflet.DomUtil.create('div', 'map-legend')
           for (let key in context.routes) {
             let means = context.lodash.find(context.transportationColorMap, (m) => {
               return m.id === context.routes[key].means_of_transportation
@@ -280,18 +304,20 @@ export default {
         // If te map object is already defined
         // then we can directly access it
         if (context.map) {
-          context.map.fitBounds(context.dataBounds, {padding: [20, 20]})
           if (context.markers.length === 1 && context.routes.length === 0) {
             context.zoom = context.post.extra.zoom ? Number(context.post.extra.zoom) : context.zoom
+          } else {
+            context.map.fitBounds(context.dataBounds, {padding: [20, 20]})
           }
         } else {
           // If not, it wil be available only in the next tick
           this.$nextTick(() => {
             if (context.$refs.map) {
               context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
-              context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
               if (context.markers.length === 1 && context.routes.length === 0) {
                 context.zoom = context.post.extra.zoom ? Number(context.post.extra.zoom) : context.zoom
+              } else {
+                context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
               }
             }
             resolve()
