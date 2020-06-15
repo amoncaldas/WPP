@@ -300,8 +300,23 @@ Possible post extras:
 - prepend (integer, adding prepend post id)
 - append (integer, adding append post id)
 - hide_newsletter_sidebar (boolean)
-- tile_provider_id (`osm`, `satellite` or `cycling`)
+- tile_provider_id (`osm`, `satellite`, `topography`, `transport-dark` or `cycling`)
 - zoom (a value from `1` to `18`)
+- places [object] containing child objects with place id and inside each, the props:
+  - link
+  - title
+  - id
+  - center_lat
+  - center_lng
+  - link
+  - locale
+  - title
+  - zoom
+- routes [array] each containing: (auto added from `map_route` post type)
+  - means_of_transportation
+  - polyline
+  - title
+  - id
 
 Only for pages:
 
