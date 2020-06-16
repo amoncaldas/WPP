@@ -89,11 +89,11 @@
       <template v-else>
         <div v-if="post.locale !== 'neutral' && post.locale !== $store.getters.locale" class="post-locale" :title="$t('post.contentLanguage')" :style="{'border-bottom-color': $vuetify.theme.accent}"> <v-icon class="notranslate">language</v-icon><span> {{post.locale | uppercase}}</span></div>
         <div v-if="post.extra.sponsored" class="post-sponsored" :title="$t('post.sponsored')" :style="{'border-bottom-color': $vuetify.theme.accent}">
-           <span :style="{color: $vuetify.theme.accent}"><i>{{$t('post.sponsored')}}</i></span>
+          <span :style="{color: $vuetify.theme.accent}"><i>{{$t('post.sponsored')}}</i></span>
           <br><br>
         </div>
         <v-layout row wrap v-if="mode === 'list'">
-          <v-flex sm3 style="padding-right:10px">
+          <v-flex sm3 style="padding-right:10px" @click="navigateToSingle()">
             <media :mode="mode" v-if="featuredMedia" :media="featuredMedia" :max-height="200"></media>
             <media :mode="mode" v-else-if="post.featured_media" :media-id="post.featured_media" :max-height="200"></media>
           </v-flex>
