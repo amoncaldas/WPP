@@ -5,6 +5,8 @@
 
 require_once("includes/wpp-locale.php");
 require_once("includes/wpp-section.php");
+require_once("includes/wpp-tag-filter.php");
+require_once("includes/wpp-parent-place-filter.php");
 
 
 /**
