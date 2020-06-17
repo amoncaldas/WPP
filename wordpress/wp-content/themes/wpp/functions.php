@@ -571,6 +571,9 @@ function after_init() {
 	add_theme_support( 'post-thumbnails');
 	add_action( 'login_head', 'wpp_login_logo' );	
 	add_filter( 'login_headerurl', 'wpp_loginlogo_url' );
+
+	// Apply tags to attachments
+	register_taxonomy_for_object_type( 'post_tag', 'attachment' );
 }
 
 update_site_url();

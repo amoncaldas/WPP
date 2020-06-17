@@ -1,9 +1,0 @@
-User-agent: *
-Disallow: /wp-admin/*.php$ 
-Disallow: /wp-includes/*.php$ 
-Disallow: /wp-content/FAMComponents/*.php$ 
-Disallow: /wp-content/cache/
-
-Sitemap: http://fazendoasmalas.com/sitemap.xml
-
-
