@@ -8,20 +8,20 @@
 */
 function wpp_apply_admin_tag_filter( $query ) {
  global $pagenow;
- if ( is_admin() && $pagenow == 'edit.php' && !empty($_GET['wpp_tag'])) {
+ if ( is_admin() && ($pagenow === 'edit.php' || $pagenow === 'upload.php') && !empty($_GET['wpp_tag'])) {
   $valid_post_types = get_post_types(array("public"=>true));
 
   if (in_array($query->query_vars['post_type'], $valid_post_types)) {
    $tax_query = [];
-   $term_id = $_GET['wpp_tag'];
-   $locale_query = array (
+   $term_slug = $_GET['wpp_tag'];
+   $tag_query = array (
     array(
-     'taxonomy' => 'tag',
-     'field' => 'term_id',
-     'terms' => $term_id
+     'taxonomy' => 'post_tag',
+     'field' => 'slug',
+     'terms' => $term_slug
     )
    );
-   $tax_query[] = $locale_query;
+   $tax_query[] = $tag_query;
    $query->set( 'tax_query', $tax_query );
   }
  }
@@ -41,14 +41,14 @@ function wpp_create_admin_tag_filter() {
 
  if (isset($current_post_type) && in_array($current_post_type, $valid_post_types)) {	
 
-  $available_tag_terms = get_tags(array('orderby' => 'id', 'order' => 'ASC'));
+  $available_tag_terms = get_terms( array( 'taxonomy' => 'post_tag', 'hide_empty' => false) );
 	
   if (is_array($available_tag_terms)) {
    $select = '<select name="wpp_tag"><option value="">Ignore tags</option>';
 
    $current = isset($_GET['wpp_tag']) ? $_GET['wpp_tag'] : '';
    foreach ($available_tag_terms as $tag_term) {
-    $select .= sprintf('<option value="%s"%s>%s</option>', $tag_term->term_id, $tag_term->term_id == $current ? ' selected="selected"' : '', $tag_term->name);
+    $select .= sprintf('<option value="%s"%s>%s</option>', $tag_term->slug, $tag_term->slug == $current ? ' selected="selected"' : '', $tag_term->name);
    }
    $select .= '</select>';
   }
