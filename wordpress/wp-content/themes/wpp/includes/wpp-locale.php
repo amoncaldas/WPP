@@ -81,9 +81,6 @@ function wpp_create_admin_locale_filter() {
 
    $current = isset($_GET['wpp_locale']) ? $_GET['wpp_locale'] : '';
    foreach ($available_locale_terms as $locale_term) {
-    if ($locale_term->slug === "neutral") {
-     continue;
-    }
     $select .= sprintf('<option value="%s"%s>%s</option>', $locale_term->term_id, $locale_term->term_id == $current ? ' selected="selected"' : '', $locale_term->name);
    }
    $select .= '</select>';
