@@ -35,6 +35,14 @@ function ModelService (endPoint, resourceName, options) {
   this.getName = () => {
     return resourceName
   }
+  /**
+   * Clone the current model service
+   * @returns {ModelService} service
+   */
+  this.clone = () => {
+    const service = new ModelService(this.endPoint, this.resourceName, this.options)
+    return service
+  }
 
   /**
    * Provides an accessor to get the endpoint
