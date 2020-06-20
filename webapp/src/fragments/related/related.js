@@ -71,7 +71,7 @@ export default {
       if (this.exclude.length > 0) {
         filters.exclude = this.exclude.join(',')
       }
-      let service = relatedService
+      let service = relatedService.clone()
       service.setEndPoint(service.getEndPoint().replace('<contentId>', this.contentId))
       service.query(filters).then((response) => {
         this.posts = response
