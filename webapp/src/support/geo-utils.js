@@ -93,7 +93,7 @@ const geoUtils = {
     let shadowUrl = require('leaflet/dist/images/marker-shadow.png')
     let iconSize = [28, 36]
 
-    if (options.mapIconUrl && (!options.isRoute || options.key === options.lastIndexKey)) {
+    if (options.mapIconUrl) {
       iconFile = options.mapIconUrl
       shadowUrl = null
       iconSize = [36, 36]

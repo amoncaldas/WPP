@@ -127,8 +127,8 @@ export default {
       return categories
     },
     tags () {
-      let categories = this.getTerms('post_tag')
-      return categories
+      let tags = this.getTerms('post_tag')
+      return tags
     },
     type () {
       let trans = this.$store.getters.options.post_type_translations[this.post.type]

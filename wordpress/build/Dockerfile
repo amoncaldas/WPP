@@ -47,10 +47,10 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
     mv wp-cli.phar /usr/local/bin/wp
 
 # Install NODEJS/NPM
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
 	apt-get update && \
 	apt-get install -y nodejs && \
-    npm install -g npm@5.8.0
+    npm install -g npm@6.14.5
 
 
 

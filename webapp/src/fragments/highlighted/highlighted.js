@@ -56,7 +56,7 @@ export default {
   methods: {
     loadPosts () {
       // @see http://v2.wp-api.org/reference/posts/
-      let service = highlightedtService
+      let service = highlightedtService.clone()
       let endpoint = service.getEndPointTemplate().replace('<contentId>', this.contentId)
 
       // Build a new endpoint

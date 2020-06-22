@@ -370,11 +370,13 @@ class WpWebAppTheme {
 		$routes = [];
 		if (is_array($route_ids) && count($route_ids) > 0) {			
 			foreach ($route_ids as $route_id) {				
-				$route_polyline = get_post_meta($route_id, "route_polyline", true);	
-				if($route_polyline) {
+				$route_content = get_post_meta($route_id, "route_content", true);
+				
+				if($route_content) {
 					$route = [
 						"means_of_transportation" => get_post_meta($route_id, "means_of_transportation", true),
-						"polyline" => $route_polyline,
+						"route_content_type" => get_post_meta($route_id, "route_content_type", true),
+						"route_content" => $route_content,						
 						"title" => get_the_title($route_id),
 						"id" => $route_id
 					];
