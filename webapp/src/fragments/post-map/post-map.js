@@ -9,6 +9,7 @@ import { LMap, LPolyline, LTileLayer, LMarker, LTooltip, LPopup, LControlZoom, L
 import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
 
+import FileExtractorBuilder from '@/support/file-data-extractors/file-extractor-builder'
 import * as leaflet from 'leaflet'
 import { GestureHandling } from 'leaflet-gesture-handling'
 import 'leaflet/dist/leaflet.css'
@@ -80,7 +81,8 @@ export default {
       info: null,
       boxGuid: null,
       loaded: false,
-      transportationColorMap: []
+      transportationColorMap: [],
+      mapRoutes: []
     }
   },
   computed: {
@@ -98,20 +100,10 @@ export default {
       }
     },
     routes () {
-      let routes = []
-      if (this.post.extra.has_route && this.post.routes) {
-        for (let key in this.post.routes) {
-          let route = this.post.routes[key]
-          let polylineFromArr = JSON.parse(route.polyline)
-          if (Array.isArray(polylineFromArr)) {
-            route.polyline = polylineFromArr
-          } else {
-            route.polyline = route
-          }
-          routes.push(route)
-        }
+      if (this.post.extra.has_route && Array.isArray(this.mapRoutes)) {
+        return this.mapRoutes
       }
-      return routes
+      return []
     },
     maxZoom () {
       return this.initialMaxZoom
@@ -138,6 +130,11 @@ export default {
         center = leaflet.latLng(marker.position.lat, marker.position.lng)
       }
       return center
+    }
+  },
+  watch: {
+    '$route': function () {
+      this.loadMapData()
     }
   },
 
@@ -186,6 +183,44 @@ export default {
         }
       ]
     },
+
+    buildRoutes () {
+      this.mapRoutes = []
+      return new Promise((resolve, reject) => {
+        if (this.post.extra.has_route && this.post.routes) {
+
+          for (let key in this.post.routes) {
+            let route = this.post.routes[key]
+
+            if (route.route_content_type === 'latlng_array') {
+              let polylineFromArr = JSON.parse(route.route_content)
+              if (Array.isArray(polylineFromArr)) {
+                route.polyline = polylineFromArr
+              } else {
+                route.polyline = route
+              }
+              this.mapRoutes.push(route)
+              resolve()
+            } else {
+              // xml, gpx, json, kml, latlng_array
+              let routeContentType = route.route_content_type === 'ors_json' ? 'json' : route.route_content_type
+              let data = {
+                mapRawData: route.route_content,
+                options: {}
+              }
+              let fileExtractorBuilder = new FileExtractorBuilder(routeContentType, data)
+              fileExtractorBuilder.buildMapData().then((mapViewData) => {
+                for (let routeKey in mapViewData.routes) {
+                  route.polyline = mapViewData.routes[routeKey].geometry.coordinates
+                  this.mapRoutes.push(route)
+                }
+                resolve()
+              })
+            }
+          }
+        }
+      })
+    },
     getColorByTransportation (transportation) {
       let transportationFound = this.lodash.find(this.transportationColorMap, (t) => {
         return t.id === transportation
@@ -222,20 +257,23 @@ export default {
       this.boxGuid = guid
     },
     loadMapData () {
-      this.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
-      this.mapData = { markers: GeoUtils.buildMarkers(this.getMarkersData(), this.post.extra.has_route, {mapIconUrl: this.$store.getters.options.map_icon_url}) }
-      let polylineData = []
-      for (let key in this.routes) {
-        if (this.routes[key].polyline) {
-          polylineData = polylineData.concat(this.routes[key].polyline)
+      let context = this
+      this.buildRoutes().then(() => {
+        context.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
+        context.mapData = { markers: GeoUtils.buildMarkers(context.getMarkersData(), context.post.extra.has_route, {mapIconUrl: context.$store.getters.options.map_icon_url}) }
+        let polylineData = []
+        for (let key in context.routes) {
+          if (context.routes[key].polyline) {
+            polylineData = polylineData.concat(context.routes[key].polyline)
+          }
         }
-      }
-      this.dataBounds = GeoUtils.getBounds(this.dataBounds, this.mapData.markers, polylineData)
+        context.dataBounds = GeoUtils.getBounds(context.dataBounds, context.mapData.markers, polylineData)
 
-      this.setActiveTilesProvider()
-      this.fitFeaturesBounds()
-      this.redrawMap()
-      this.loaded = true
+        context.setActiveTilesProvider()
+        context.fitFeaturesBounds()
+        context.redrawMap()
+        context.loaded = true
+      })
     },
 
     /**

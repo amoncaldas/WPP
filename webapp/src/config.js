@@ -1,5 +1,5 @@
 const config = {
-  devBaseAPIUrl: 'https://fam.eco/wp-json/',
+  devBaseAPIUrl: 'http://localhost:5003/wp-json/',
   prodBaseAPIUrl: '/wp-json/',
   baseWpApiPath: 'wp/v2/',
   mainMenuPrefix: 'primary_menu_',

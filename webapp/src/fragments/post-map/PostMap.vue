@@ -16,8 +16,8 @@
         <l-polyline :key="index"  :lat-lngs="route.polyline" :weight="10" color="white">
         </l-polyline>
       </template>
-      <template v-for="(route, index) in routes">
-        <l-polyline :key="index"  :lat-lngs="route.polyline" :weight="7" :color="getColorByTransportation(route.means_of_transportation)">
+      <template v-for="(route) in routes">
+        <l-polyline :key="route.id"  :lat-lngs="route.polyline" :weight="7" :color="getColorByTransportation(route.means_of_transportation)">
           <l-tooltip v-html="route.title"></l-tooltip>
         </l-polyline>
       </template>
