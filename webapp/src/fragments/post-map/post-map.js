@@ -201,7 +201,6 @@ export default {
               this.mapRoutes.push(route)
               resolve()
             } else {
-              // xml, gpx, json, kml, latlng_array
               let routeContentType = route.route_content_type === 'ors_json' ? 'json' : route.route_content_type
               let data = {
                 mapRawData: route.route_content,
@@ -213,6 +212,9 @@ export default {
                   route.polyline = mapViewData.routes[routeKey].geometry.coordinates
                   this.mapRoutes.push(route)
                 }
+                resolve()
+              }).catch(err => {
+                console.log(err)
                 resolve()
               })
             }
@@ -353,15 +355,17 @@ export default {
         } else {
           // If not, it wil be available only in the next tick
           this.$nextTick(() => {
-            if (context.$refs.map) {
-              context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
-              if (context.markers.length === 1 && context.routes.length === 0) {
-                context.zoom = context.post.extra.zoom ? Number(context.post.extra.zoom) : context.zoom
-              } else {
-                context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
+            setTimeout(() => {
+              if (context.$refs.map) {
+                context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
+                if (context.markers.length === 1 && context.routes.length === 0) {
+                  context.zoom = context.post.extra.zoom ? Number(context.post.extra.zoom) : context.zoom
+                } else {
+                  context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
+                }
               }
-            }
-            resolve()
+              resolve()
+            }, 200)
           })
         }
       })
@@ -421,11 +425,13 @@ export default {
       }
     })
     this.$nextTick(() => {
-      if (context.$refs.map && context.routes.length > 0) {
-        // work as expected when wrapped in a $nextTick
-        context.map = context.$refs.map.mapObject
-        context.addLegends()
-      }
+      setTimeout(() => {
+        if (context.$refs.map && context.routes.length > 0) {
+          // work as expected when wrapped in a $nextTick
+          context.map = context.$refs.map.mapObject
+          context.addLegends()
+        }
+      }, 200)
     })
     // once the map component is mounted, load the map data
     this.loadMapData()
