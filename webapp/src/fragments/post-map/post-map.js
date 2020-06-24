@@ -243,12 +243,14 @@ export default {
         let context = this
         legend.onAdd = function () {
           var div = leaflet.DomUtil.create('div', 'map-legend')
+          let addedMeans = []
           for (let key in context.routes) {
             let means = context.lodash.find(context.transportationColorMap, (m) => {
               return m.id === context.routes[key].means_of_transportation
             })
-            if (means) {
+            if (means && !addedMeans.includes(means.id)) {
               div.innerHTML += `<div class='item-container'><i style="background:${means.color}"></i>${means.title}</div><br>`
+              addedMeans.push(means.id)
             }
           }
           return div
