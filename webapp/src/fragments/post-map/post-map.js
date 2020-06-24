@@ -188,7 +188,6 @@ export default {
       this.mapRoutes = []
       return new Promise((resolve, reject) => {
         if (this.post.extra.has_route && this.post.routes) {
-
           for (let key in this.post.routes) {
             let route = this.post.routes[key]
 
@@ -218,6 +217,8 @@ export default {
               })
             }
           }
+        } else {
+          resolve()
         }
       })
     },
@@ -273,6 +274,8 @@ export default {
         context.fitFeaturesBounds()
         context.redrawMap()
         context.loaded = true
+      }).catch(err => {
+        console.log(err)
       })
     },
 

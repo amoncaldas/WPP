@@ -63,7 +63,8 @@ export default {
       }
     },
     hasPlaces () {
-      return this.post.places && Object.keys(this.post.places).length > 0
+      let has = this.post.places && Object.keys(this.post.places).length > 0
+      return has
     },
     related () {
       if (this.post && this.post.extra && this.post.extra.related && Array.isArray(this.post.extra.related)) {
