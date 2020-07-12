@@ -82,7 +82,9 @@ export default {
       boxGuid: null,
       loaded: false,
       transportationColorMap: [],
-      mapRoutes: []
+      mapRoutes: [],
+      showStops: true,
+      showStopsControlRef: null
     }
   },
   computed: {
@@ -96,6 +98,9 @@ export default {
     },
     markers () {
       if (this.mapData) {
+        if (!this.showStops) {
+          return []
+        }
         return this.mapData.markers
       }
     },
@@ -234,7 +239,7 @@ export default {
         return 'grey'
       }
     },
-    addLegends () {
+    addRouteLegends () {
       if (this.routes.length > 0) {
         this.buildTransportationColorMap()
         let legend = leaflet.control({
@@ -256,6 +261,38 @@ export default {
           return div
         }
         legend.addTo(this.map)
+      }
+    },
+    toggleShowStops () {
+      this.showStops = !this.showStops
+      this.map.removeControl(this.showStopsControlRef)
+      this.addShowStopsControl()
+      setTimeout(() => {
+        this.fitFeaturesBounds()
+      }, 100)
+    },
+    addShowStopsControl () {
+      if (this.routes.length > 0) {
+        let control = leaflet.control({ position: 'bottomleft' })
+        let context = this
+        control.onAdd = function () {
+          var stopsFragment = leaflet.DomUtil.create('div', 'map-show-stops')
+
+          let spanEl = document.createElement('span')
+          spanEl.innerText = context.showStops ? 'X' : ''
+          spanEl.title = context.$t('postMap.toggleShowStops')
+
+          let divEl = document.createElement('div')
+          divEl.innerText = context.$t('postMap.showStops')
+          divEl.className = 'show-stop-container'
+          divEl.title = context.$t('postMap.toggleShowStops')
+          divEl.onclick = () => { context.toggleShowStops() }
+          divEl.appendChild(spanEl)
+
+          stopsFragment.appendChild(divEl)
+          return stopsFragment
+        }
+        this.showStopsControlRef = control.addTo(this.map)
       }
     },
     boxCreated (guid) {
@@ -431,7 +468,8 @@ export default {
         if (context.$refs.map && context.routes.length > 0) {
           // work as expected when wrapped in a $nextTick
           context.map = context.$refs.map.mapObject
-          context.addLegends()
+          context.addRouteLegends()
+          context.addShowStopsControl()
         }
       }, 200)
     })

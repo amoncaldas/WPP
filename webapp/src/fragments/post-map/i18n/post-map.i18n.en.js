@@ -13,6 +13,8 @@ export default {
     polygonDetails: 'Polygon details',
     polygon: 'Polygon',
     section: 'Section details',
+    showStops: 'Show stops',
+    toggleShowStops: 'Show/hide stops',
     transportationMeans: {
       bicycle: 'Bicycle',
       foot: 'Foot',
