@@ -89,8 +89,8 @@ const geoUtils = {
    * @returns {Object} markerIcon
    */
   buildMarkerIcon: (color, options) => {
-    let iconFile = require(`./static/${color}-marker.png`)
-    let shadowUrl = require('leaflet/dist/images/marker-shadow.png')
+    let iconFile = require(`./static/${color}-marker.png`).default
+    let shadowUrl = require('leaflet/dist/images/marker-shadow.png').default
     let iconSize = [28, 36]
 
     if (options.mapIconUrl) {
