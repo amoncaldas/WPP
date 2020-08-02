@@ -203,6 +203,9 @@ export default {
               } else {
                 route.polyline = route
               }
+              if (route.coordinates_order === 'lng-lat') {
+                route.polyline = GeoUtils.switchLatLonIndex(route.polyline)
+              }
               this.mapRoutes.push(route)
               resolve()
             } else {
@@ -215,6 +218,9 @@ export default {
               fileExtractorBuilder.buildMapData().then((mapViewData) => {
                 for (let routeKey in mapViewData.routes) {
                   route.polyline = mapViewData.routes[routeKey].geometry.coordinates
+                  if (route.coordinates_order === 'lng-lat') {
+                    route.polyline = GeoUtils.switchLatLonIndex(route.polyline)
+                  }
                   this.mapRoutes.push(route)
                 }
                 resolve()
