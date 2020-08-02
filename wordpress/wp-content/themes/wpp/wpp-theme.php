@@ -375,7 +375,8 @@ class WpWebAppTheme {
 				if($route_content) {
 					$route = [
 						"means_of_transportation" => get_post_meta($route_id, "means_of_transportation", true),
-						"route_content_type" => get_post_meta($route_id, "route_content_type", true),
+            "route_content_type" => get_post_meta($route_id, "route_content_type", true),
+            "coordinates_order" => get_post_meta($route_id, "coordinates_order", true),
 						"route_content" => $route_content,						
 						"title" => get_the_title($route_id),
 						"id" => $route_id
