@@ -26,9 +26,7 @@
                     "car": "Car",
                     "airplane": "Airplane"
                 },
-                "default_value": [
-                    "bicycle"
-                ],
+                "default_value": "bicycle",
                 "allow_null": 0,
                 "multiple": 0,
                 "ui": 1,
@@ -37,7 +35,7 @@
                 "placeholder": ""
             },
             {
-                "key": "field_5ef0de31eaf77",
+                "key": "field_5ef0f5b53befd",
                 "label": "Route content type",
                 "name": "route_content_type",
                 "type": "select",
@@ -54,11 +52,9 @@
                     "gpx": "GPX",
                     "ors_json": "OpenRouteService JSON",
                     "kml": "KML",
-                    "latlng_array": "Array of latlng arrays"
+                    "coordinates_array": "Array of coordinates"
                 },
-                "default_value": [
-                    "ors_json"
-                ],
+                "default_value": "ors_json",
                 "allow_null": 0,
                 "multiple": 0,
                 "ui": 0,
@@ -71,7 +67,7 @@
                 "label": "Route content",
                 "name": "route_content",
                 "type": "textarea",
-                "instructions": "Put here the array of array of coordinates that  corresponds the route polyline without any space between the elements",
+                "instructions": "",
                 "required": 1,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -84,6 +80,51 @@
                 "maxlength": "",
                 "rows": "",
                 "new_lines": ""
+            },
+            {
+                "key": "field_5eecf014efc2a",
+                "label": "Distance in km",
+                "name": "distance_km",
+                "type": "number",
+                "instructions": "The route distance",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "min": "0.1",
+                "max": "",
+                "step": "0.1"
+            },
+            {
+                "key": "field_5f26ba82ab34d",
+                "label": "Coordinates order",
+                "name": "coordinates_order",
+                "type": "radio",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "lat-lng": "lat-lng",
+                    "lng-lat": "lng-lat"
+                },
+                "allow_null": 0,
+                "other_choice": 0,
+                "default_value": "lng-lat",
+                "layout": "vertical",
+                "return_format": "value",
+                "save_other_choice": 0
             }
         ],
         "location": [
