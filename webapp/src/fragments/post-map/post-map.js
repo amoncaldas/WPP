@@ -196,7 +196,7 @@ export default {
           for (let key in this.post.routes) {
             let route = this.post.routes[key]
 
-            if (route.route_content_type === 'latlng_array') {
+            if (route.route_content_type === 'coordinates_array') {
               let polylineFromArr = JSON.parse(route.route_content)
               if (Array.isArray(polylineFromArr)) {
                 route.polyline = polylineFromArr
