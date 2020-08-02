@@ -1,3 +1,4 @@
+import {Geocode, ReverseGeocode} from '@/support/ors-api-runner'
 import GeoUtils from '@/support/geo-utils'
 import lodash from 'lodash'
 /**
@@ -70,7 +71,16 @@ class Place {
     if (this.coordinates) {
       return this.coordinates
     }
-    return [this.lng, this.lat]
+    if (this.lat !== 0 && this.lng !== 0) {
+      return [this.lng, this.lat]
+    } else {
+      if (this.nameIsCoord()) {
+        let coords = this.getCoordsFromName()
+        return coords
+      } else {
+        return [0, 0]
+      }
+    }
   }
 
   /**
@@ -124,7 +134,7 @@ class Place {
    */
   equals (otherPlace) {
     let equals = true
-    if (!otherPlace || (otherPlace.lat !== this.lat || otherPlace.lng !== this.lng || otherPlace.placeName !== this.placeName)) {
+    if (!otherPlace || (otherPlace.lat !== this.lat || otherPlace.lng !== this.lng || otherPlace.properties.layer !== this.properties.layer)) {
       equals = false
     }
     return equals
@@ -173,14 +183,24 @@ class Place {
    * Check if the place contains coordinates as placeName
    */
   nameIsCoord () {
-    let containsCoords = false
+    let coords = this.getCoordsFromName()
+    if (coords) {
+      return true
+    }
+    return false
+  }
+
+  /**
+   * Get the coordinates from name
+   */
+  getCoordsFromName () {
     if (this.placeName && this.placeName.indexOf(',') > -1) {
       let parts = this.placeName.split(',')
       if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-        containsCoords = true
+        return parts
       }
     }
-    return containsCoords
+    return false
   }
 
   /**
@@ -190,6 +210,37 @@ class Place {
     let parts = this.placeName.split(',')
     let coords = `${parts[1]},${parts[0]}`
     this.placeName = coords
+  }
+
+  /**
+   * Resolve the coordinates of a place to a qualified location
+   * @param {Number} zoom
+   * @returns {Promise}
+   */
+  resolve (zoom = 10) {
+    let context = this
+    return new Promise((resolve, reject) => {
+      let promise = null
+      if (context.placeName && context.placeName.length > 0 && !context.nameIsCoord()) {
+        promise = Geocode(context.placeName)
+      } else {
+        promise = ReverseGeocode(context.lat, context.lng)
+      }
+      promise.then(places => {
+        let selectedPlace = Place.selectPlaceByZoomLevel(zoom, places)
+
+        if (selectedPlace) {
+          context.properties = selectedPlace.properties
+          context.placeName = selectedPlace.properties.label
+        }
+
+        context.unresolved = false
+        resolve(context)
+      }).catch(response => {
+        console.error(response)
+        reject(response)
+      })
+    })
   }
 
   /**
