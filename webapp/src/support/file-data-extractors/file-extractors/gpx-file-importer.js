@@ -2,12 +2,13 @@ import lodash from 'lodash'
 import {parseString} from 'xml2js'
 import MapViewData from '@/models/map-view-data'
 import Place from '@/models/place'
+import constants from '@/resources/constants'
 
 /**
- * XmlImported Map data Builder class
+ * GpxImporter
  * @param {*} data {mapRawData: {}, translations: {}}
  */
-class GpxImported {
+class GpxImporter {
   constructor (data) {
     this.fileRawContent = data.mapRawData
     this.options = data.options
@@ -36,16 +37,33 @@ class GpxImported {
   buildMapData = () => {
     let mapViewData = new MapViewData()
     let context = this
-    return new Promise((resolve) => {
-      this.parseFileContent().then((fileObject) => {
-        mapViewData.routes = context.getRoutes(fileObject)
-        mapViewData.places = context.buildPlaces(mapViewData.routes)
-        mapViewData.isRouteData = true
-        mapViewData.origin = 'fileImporter'
-        mapViewData.timestamp = context.options.timestamp
-        resolve(mapViewData)
-      })
+    return new Promise((resolve, reject) => {
+      try {
+        context.parseFileContent().then((fileObject) => {
+          mapViewData.routes = context.getRoutes(fileObject)
+          context.setPlaces(mapViewData, fileObject)
+          mapViewData.isRouteData = true
+          mapViewData.origin = constants.dataOrigins.fileImporter
+          mapViewData.timestamp = context.options.timestamp
+          mapViewData.mode = mapViewData.places.length === 1 ? constants.modes.roundTrip : constants.modes.directions
+          resolve(mapViewData)
+        })
+      } catch (error) {
+        reject(Error('invalid-file-content'))
+      }
     })
+  }
+
+  /**
+   * Set the mapViewData places
+   * @param {*} mapViewData
+   * @param {*} fileObject
+   */
+  setPlaces = (mapViewData, fileObject) => {
+    mapViewData.places = this.getPlaces(fileObject)
+    if (mapViewData.places.length === 0) {
+      mapViewData.places = this.buildPlaces(mapViewData.routes)
+    }
   }
 
   /**
@@ -85,20 +103,47 @@ class GpxImported {
   }
 
   /**
+   * Get the places from the fileObject
+   * @param {*} fileObject
+   * @returns {Array} of places
+   */
+  getPlaces = (fileObject) => {
+    let places = []
+    let wpts = lodash.get(fileObject, 'gpx.wpt')
+
+    if (wpts) {
+      for (let key in wpts) {
+        let latlon = wpts[key].$
+        let name = Array.isArray(wpts[key].name) ? wpts[key].name[0] : wpts[key].name
+        if (name.length === 0) {
+          name = Array.isArray(wpts[key].desc) ? wpts[key].desc[0] : wpts[key].desc
+        }
+        if (name.indexOf('=') > 0) {
+          name = name.split('=')[1]
+        }
+        let place = new Place(latlon.lat, latlon.lon, name)
+        places.push(place)
+      }
+    }
+    return places
+  }
+
+  /**
    * Get the polyline data if the response contains polyline data
    * @returns {Array} coordinates
    */
   getRoutes = (fileObject) => {
     let routes = []
-    let tracks = lodash.get(fileObject, 'gpx.trk')
+    let tracks = lodash.get(fileObject, 'gpx.trk') || lodash.get(fileObject, 'gpx.rte')
+    let creator = lodash.get(fileObject, 'gpx.$.creator')
     if (tracks) {
       for (let key in tracks) {
         let track = tracks[key]
-        let points = lodash.get(track, 'trkseg[0].trkpt')
+        let points = lodash.get(track, 'trkseg[0].trkpt') || track.rtept
         let coordinatesParsed = []
         for (let ptKey in points) {
           let latlon = points[ptKey].$
-          let point = [latlon.lon, latlon.lat]
+          let point = creator === 'openrouteservice' ? [latlon.lat, latlon.lon] : [latlon.lon, latlon.lat]
           let elev = points[ptKey].ele
           if (elev && elev.length > 0) {
             point.push(elev[0])
@@ -116,4 +161,4 @@ class GpxImported {
   }
 }
 // export the directions json builder class
-export default GpxImported
+export default GpxImporter

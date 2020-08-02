@@ -1,12 +1,13 @@
 import VueInstance from '@/main'
 import MapViewData from '@/models/map-view-data'
+import constants from '@/resources/constants'
 import Place from '@/models/place'
 import store from '@/store/store'
 /**
- * JsonImported Map data Builder class
+ * JsonImporter
  * @param {*} data {mapRawData: {}, translations: {}}
  */
-class JsonImported {
+class JsonImporter {
   constructor (data) {
     this.fileRawContent = data.mapRawData
     this.options = data.options
@@ -20,11 +21,20 @@ class JsonImported {
     let context = this
     return new Promise((resolve, reject) => {
       let mapViewData = new MapViewData()
-      let parsingResult = this.parseFileContentToMapViewData()
+      let parsingResult = context.parseFileContentToMapViewData()
       if (parsingResult) {
         mapViewData = parsingResult
 
-        mapViewData.origin = 'fileImporter'
+        if (!mapViewData.mode) {
+          mapViewData.mode = mapViewData.places.length === 1 ? constants.modes.roundTrip : constants.modes.directions
+        }
+
+        // Make sure that the mode defined
+        // in the imported file/object is valid
+        if (!constants.importableModes[mapViewData.mode]) {
+          reject(Error('invalid-file-content'))
+        }
+        mapViewData.origin = constants.dataOrigins.fileImporter
         mapViewData.timestamp = context.options.timestamp
       } else { // try to extract usable data from an old format exported file
         let content = JSON.parse(context.fileRawContent)
@@ -37,12 +47,12 @@ class JsonImported {
 
         // If the polyline data are found
         context.mapRawData = content
-        this.setRoutesSummaryData()
+        context.setRoutesSummaryData()
         mapViewData.places = context.buildPlaces()
         mapViewData.routes = context.mapRawData.routes || []
         mapViewData.isRouteData = true
         mapViewData.rawData = context.mapRawData
-        mapViewData.origin = 'fileImporter'
+        mapViewData.origin = constants.dataOrigins.fileImporter
         mapViewData.timestamp = context.options.timestamp
       }
       resolve(mapViewData)
@@ -60,19 +70,17 @@ class JsonImported {
 
     for (let key in mapViewData) {
       // skip loop if the property is from prototype
-      if (!mapViewData.hasOwnProperty(key)) {
-        continue
-      }
+      if (!mapViewData.hasOwnProperty(key)) continue
 
       // If an expected property
       // does not exist in the parsed content
       // the parsed object is invalid
-      if (content[key] === undefined && key !== 'polygons') {
+      if (key !== 'polygons' && key !== 'mode' && content[key] === undefined) {
         return false
       } else {
         if (key === 'places') {
           mapViewData.places = this.parsePlaces(content)
-        } else {
+        } else if (content[key] !== null && content[key] !== null) {
           mapViewData[key] = content[key]
         }
       }
@@ -149,4 +157,4 @@ class JsonImported {
   }
 }
 // export the directions json builder class
-export default JsonImported
+export default JsonImporter
