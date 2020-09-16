@@ -79,8 +79,6 @@ class WppUser {
      */
     public static function create_wp_user($request) {
         try {
-            $metas = $request->get_param('metas');
-
             $userData = array(
                 'username' => $request->get_param('username'),
                 'password' => $request->get_param('password'),
@@ -121,10 +119,7 @@ class WppUser {
                 $wp_user = get_user_by('email', $userData['email']);
                 return $wp_user;
             }
-            // In the case that the expected registered user was not found
-            // we return the reason why it was not registered
-            // Unfortunately the ProfilePress_Registration_Auth returns and html with the reason, so we strip it
-            $reason = strip_tags($response);
+            $reason = "User could not be registered";
             return $reason;
         }
         catch (Exception $e) {                
@@ -359,7 +354,7 @@ class WppUser {
     /**
 	 * Add custom data to the wp/v2/users/<user-id> endpoint
 	 *
-	 * @param Wp_User $user
+	 * @param Array $user
 	 * @param string $field_name
 	 * @param Object $request
 	 * @return array of metas to be added in the response
@@ -369,7 +364,26 @@ class WppUser {
 		unset($user["extra_capabilities"]);
 		unset($user["meta"]); 
 		$metas = $user;
-		$extra_meta = get_user_meta( $user['id']);
+        $extra_meta = get_user_meta( $user['id']);
+        
+        // set user properties, needed after WP upgrade from 5.2.2 to 5.5
+        $user_data = get_userdata($user['id']);
+        $key_map = [
+            'user_login' => 'username',
+            'nickname' => 'nickname',
+            'first_name' => 'first_name',
+            'last_name' => 'last_name',
+            'user_email' => 'email',
+            'user_registered' => 'registered_date',
+        ];
+        foreach ($key_map as $key => $new_key) {
+            if (!array_key_exists($new_key, $metas) && $user_data->has_prop($key)) {
+                $metas[$new_key] = $user_data->get($key);
+            }
+        }
+        if (!array_key_exists('roles', $metas)) {
+            $metas['roles'] = $user_data->roles;
+        }
 		
 		foreach ($extra_meta as $key => $value) {
 			if (in_array($key, ["website", "receive_news"])) {

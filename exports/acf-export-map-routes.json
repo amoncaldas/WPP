@@ -26,7 +26,9 @@
                     "car": "Car",
                     "airplane": "Airplane"
                 },
-                "default_value": "bicycle",
+                "default_value": [
+                    "bicycle"
+                ],
                 "allow_null": 0,
                 "multiple": 0,
                 "ui": 1,
@@ -54,7 +56,9 @@
                     "kml": "KML",
                     "coordinates_array": "Array of coordinates"
                 },
-                "default_value": "ors_json",
+                "default_value": [
+                    "ors_json"
+                ],
                 "allow_null": 0,
                 "multiple": 0,
                 "ui": 0,

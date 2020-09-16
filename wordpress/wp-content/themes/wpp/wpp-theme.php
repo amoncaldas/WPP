@@ -6,12 +6,7 @@
  *
  */
 
-// Require WP_Rest_Cache_Plugin caching class
-use \WP_Rest_Cache_Plugin\Includes\Caching\Caching;
-
 class WpWebAppTheme {
-	public $section_type_field_slug = "section_type";
-	public $section_type_home_field_value = "home";
 	public $WPP_SKIP_AFTER_SAVE = false;
 	public $WPP_SKIP_BEFORE_UPDATE = false;
 
@@ -29,7 +24,6 @@ class WpWebAppTheme {
 	 */
 	public function register_hooks() {
 		add_action('wp_insert_post', array($this,'after_save_content'), 10, 2 );
-		add_action('save_post', array($this,'wpp_clear_listing_wp_rest_cache'), 10, 2 );
 		add_filter('request', array($this, 'set_feed_types'));
 		add_action('rest_api_init', array($this, 'on_rest_api_init'));
 		add_filter('image_send_to_editor', array($this, 'set_image_before_send_to_editor'), 10, 6 );		
@@ -43,25 +37,6 @@ class WpWebAppTheme {
 		add_action("pre_post_update", array($this, 'before_update_draft_post'), 9, 2);
 		add_action('admin_enqueue_scripts', array($this, 'may_disable_autosave'));
 		add_filter('rest_prepare_comment', array($this, 'filter_rest_prepare_comment'), 10, 3 );		
-	}
-
-	/**
-	 * Try to remove listing post type endpoint cache on save post
-	 *
-	 * @param [type] $post_id
-	 * @param [type] $post
-	 * @return void
-	 */
-	public function wpp_clear_listing_wp_rest_cache ($post_id, $post) {
-		if (is_plugin_active("wp-rest-cache/wp-rest-cache.php")) {			
-			$post_type_object = get_post_type_object($post->post_type);
-			$rest_base = $post_type_object->rest_base;
-			$locale = $this->get_post_locale($post->to_array());
-			$endpoint = "/wp-json/wp/v2/$rest_base?_embed=&l=$locale";
-
-			$cachingPlugin = Caching::get_instance();
-			$cachingPlugin->delete_cache_by_endpoint($endpoint, $cachingPlugin::FLUSH_PARAMS, false); // FLUSH_PARAMS or FLUSH_LOOSE
-		}
 	}
 
 	/**
@@ -114,7 +89,7 @@ class WpWebAppTheme {
 				else { // if not, create a new post using the current post data
 					$data["import_id"] = $import_id;
 				
-			    // Remove the id to trigger a creation of a new post
+					// Remove the id to trigger a creation of a new post
 					unset($data["ID"]);
 					
 					// Avoid infinity loop
@@ -126,9 +101,9 @@ class WpWebAppTheme {
 					// Create new clone post with the specified id
 					
 					$inserted_id = wp_insert_post($data);
-			
-			    // Redefine the id from the inserted post
-				  $data["ID"] = $import_id;
+				
+					// Redefine the id from the inserted post
+					$data["ID"] = $import_id;
 
 					// This is not straight forward but we have
 					// to change the post id in the request
@@ -205,7 +180,14 @@ class WpWebAppTheme {
 		}
 	}
 
-	// define the rest_prepare_comment callback 
+	/**
+	 * Define the rest_prepare_comment callback 
+	 *
+	 * @param WP_REST_Response $response
+	 * @param String $comment
+	 * @param WP_REST_Request $request
+	 * @return WP_REST_Response
+	 */
 	public function filter_rest_prepare_comment( $response, $comment, $request ) { 
 		if (!isset($response->data["author_member"])) {
 			$response->data["author_member"] = $this->get_author_member($comment->user_id);
@@ -297,12 +279,12 @@ class WpWebAppTheme {
 	}
 
 	/**
-		* Check if query post type is part of public post types
-		*
-		* @param [type] $query_post_type
-		* @param [type] $public_post_types
-		* @return void
-		*/
+	 * Check if query post type is part of public post types
+	 *
+	 * @param [type] $query_post_type
+	 * @param [type] $public_post_types
+	 * @return void
+	*/
 	public function query_post_type_is_public ($query_post_type) {
 
 		//TODO: Change to: select post type by locale taxonomy support!
@@ -375,8 +357,8 @@ class WpWebAppTheme {
 				if($route_content) {
 					$route = [
 						"means_of_transportation" => get_post_meta($route_id, "means_of_transportation", true),
-            "route_content_type" => get_post_meta($route_id, "route_content_type", true),
-            "coordinates_order" => get_post_meta($route_id, "coordinates_order", true),
+            			"route_content_type" => get_post_meta($route_id, "route_content_type", true),
+            			"coordinates_order" => get_post_meta($route_id, "coordinates_order", true),
 						"route_content" => $route_content,						
 						"title" => get_the_title($route_id),
 						"id" => $route_id
@@ -488,7 +470,8 @@ class WpWebAppTheme {
 	 * @return void
 	 */
 	public function set_valid_post_name ($post) {
-		$get_valid_name = function($name) use (&$get_valid_name) {
+		$get_valid_name = function($post) use (&$get_valid_name) {
+			$name = $post->post_name;
 			$page = get_page_by_path($name);
 			if ($page) {
 				$integer_append = 1;
@@ -506,7 +489,7 @@ class WpWebAppTheme {
 		};
 
 		if(isset($post->post_name) && $post->post_name !== "") {
-			$valid_post_name = $get_valid_name($post->post_name);
+			$valid_post_name = $get_valid_name($post);
 			if($valid_post_name !== $post->post_name) {
 				$post->post_name = $valid_post_name;
 				wp_update_post( array('ID' => $post->ID, 'post_name' => $valid_post_name));
@@ -789,28 +772,30 @@ class WpWebAppTheme {
 	* @return void
 	*/
 	public function set_post_section ($post) {
-		$post_types_with_section = get_post_types_by_support("parent_section");
-
-		// Built in `post` also supports parent_section
-		$post_types_with_section[] = "post";
-
-		if (in_array($post->post_type, $post_types_with_section)) {
-			$parent_id = $this->get_parent_section_id($post->ID);
-
-			if ($post->post_parent === 0 && !$parent_id) {				
-				$sections = get_posts( array( 'post_type' => SECTION_POST_TYPE, 'orderby'  => 'id', 'order' => 'ASC'));		
-				if (count($sections) > 0) {
-					$parent_id = $sections[0]->ID;
-				}							
-			} 
-
-			// If we could find an available parent and this is not already the post parent
-			// set this parent as parent of the post
-			if($parent_id && $post->post_parent !== $parent_id) {
-				$this->WPP_SKIP_AFTER_SAVE = true;
-				$this->WPP_SKIP_BEFORE_UPDATE = true;
-				wp_update_post( array('ID' => $post->ID, 'post_parent' => $parent_id));
-				$post->post_parent = $parent_id;		
+		if ($post->post_status === "publish") {
+			$post_types_with_section = get_post_types_by_support("parent_section");
+	
+			// Built in `post` also supports parent_section
+			$post_types_with_section[] = "post";
+	
+			if (in_array($post->post_type, $post_types_with_section)) {
+				$parent_id = $this->get_parent_section_id($post->ID);
+	
+				if ($post->post_parent === 0 && !$parent_id) {				
+					$sections = get_posts( array( 'post_type' => SECTION_POST_TYPE, 'orderby'  => 'id', 'order' => 'ASC'));		
+					if (count($sections) > 0) {
+						$parent_id = $sections[0]->ID;
+					}							
+				} 
+	
+				// If we could find an available parent and this is not already the post parent
+				// set this parent as parent of the post
+				if($parent_id && $post->post_parent !== $parent_id) {
+					$this->WPP_SKIP_AFTER_SAVE = true;
+					$this->WPP_SKIP_BEFORE_UPDATE = true;
+					wp_update_post( array('ID' => $post->ID, 'post_parent' => $parent_id));
+					$post->post_parent = $parent_id;		
+				}
 			}
 		}
 	}

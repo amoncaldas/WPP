@@ -341,7 +341,7 @@ function allow_cors() {
  * @return void
  */
 function wpp_login_logo() { 
-	$og_image_url = network_site_url(trim(get_option("wpp_site_relative_logo_url")));
+	$og_image_url = network_site_url(trim(get_option("wpp_site_relative_login_logo_url")));
 	$login_style =  "
 		<style type='text/css'>
 			#login h1 a, .login h1 a {

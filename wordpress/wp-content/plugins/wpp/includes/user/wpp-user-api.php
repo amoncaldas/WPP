@@ -214,7 +214,7 @@ class WppUserApi {
   /**
    * Validate and register a user
    *
-   * @param array $request (injected)
+   * @param Object $request (injected)
    * @return array new token
    */
   public static function register_user($request) {        
@@ -370,7 +370,7 @@ class WppUserApi {
     delete_user_meta($wp_user->ID, 'status');
 
     // Set activation code
-    $activation_code = WppUser::set_activation_and_expiration($user_id);
+    $activation_code = WppUser::set_activation_and_expiration($wp_user->ID);
     
     // Send notifications to admin and to the user
     WppUser::send_new_user_notifications($wp_user->ID, $wp_user->data->user_email, $activation_code);

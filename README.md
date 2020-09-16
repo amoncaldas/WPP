@@ -250,10 +250,13 @@ All WPP Options starts with `wpp_` prefix, except:
 
 - git_hub_client_secret
 - recaptcha_secret
+- wpp_recaptcha_site_key
 
 Options with `wpp_` prefix that are not present by default:
 
 - wpp_signup_with_github
+- wpp_site_relative_login_logo_url
+- wpp_map_icon_url
 - wpp_meta_*
 - wpp_meta_name_*
 - archive_sections_sidebar

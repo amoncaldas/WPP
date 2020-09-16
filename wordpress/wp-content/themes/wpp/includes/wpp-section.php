@@ -22,10 +22,10 @@ class WpWebAppSection {
 	}
 	
 	/**
-		* Register custom types section and lang
-		*
-		* @return void
-		*/
+	 * Register custom types section and lang
+	 *
+	 * @return void
+	*/
 	public function register_section () {
 		$section_args = array (
 			'name' => SECTION_POST_TYPE,
@@ -75,10 +75,10 @@ class WpWebAppSection {
 	
 	
 	/**
-		* Create admin sections filter
-		*
-		* @return void
-		*/
+	 * Create admin sections filter
+	 *
+	 * @return void
+	*/
 	public function wpp_create_admin_sections_filter() {
 		global $wpdb;
 		$post_types_with_section = get_post_types_by_support("parent_section");
@@ -124,15 +124,15 @@ class WpWebAppSection {
 		* @return void
 		*/
 	public function wpp_admin_section_column_content($column_name, $post_ID) {
-			if ($column_name == "parent_section") {
-				$post = get_post($post_ID);	
-				if ($post) {
-					$parent_section = get_post($post->post_parent);
-					if ($parent_section) {
-						echo $parent_section->post_title;
-					}
+		if ($column_name == "parent_section") {
+			$post = get_post($post_ID);	
+			if ($post) {
+				$parent_section = get_post($post->post_parent);
+				if ($parent_section) {
+					echo $parent_section->post_title;
 				}
 			}
+		}
 	}
 	
 	/**
@@ -161,10 +161,7 @@ class WpWebAppSection {
 								"post_type"=> SECTION_POST_TYPE, 
 								"post_status"=> "publish",
 								"post_author"=> 1, // 1 is always the admin, the first user created
-								"post_title"=> $section_title,
-								"meta_input"=> array(
-									SECTION_TYPE_FIELD_SLUG => SECTION_POST_HOME_FIELD_VALUE
-								)
+								"post_title"=> $section_title
 							)
 						);
 						// Assign the default (the first one available)
@@ -183,15 +180,14 @@ class WpWebAppSection {
 		*/
 	public function wpp_get_home_sections ($lang_term_id) {
 		// Set the get posts args to retrieve the home section
+
+		$lang_term = get_term_by('id', $lang_term_id, LOCALE_TAXONOMY_SLUG);
+		$section_title = "Home | ". $lang_term->name;
+
 		$home_section_args = array(
 			"post_type"=> SECTION_POST_TYPE, 
 			"post_status"=> "publish", 
-			'meta_query' => array(
-				array(
-					'key'=> SECTION_TYPE_FIELD_SLUG,
-					'value'=> SECTION_POST_HOME_FIELD_VALUE
-				)
-			),
+			"post_title" => $section_title,
 			'tax_query' => array (
 				array(
 					'taxonomy' => LOCALE_TAXONOMY_SLUG, // defined in wpp-locale.php
@@ -212,22 +208,24 @@ class WpWebAppSection {
 		*/
 	public function set_unique_section_home ($post) {
 		if (SECTION_POST_TYPE === $post->post_type) {
-			$section_type = get_post_meta($post->ID, SECTION_TYPE_FIELD_SLUG, true);	
-
-			$post_langs_terms = wp_get_post_terms($post->ID, LOCALE_TAXONOMY_SLUG);
-
-			if (is_array($post_langs_terms)) {
-				$home_sections = $this->wpp_get_home_sections ($post_langs_terms[0]->term_id);
-				
-				if ($section_type === SECTION_POST_HOME_FIELD_VALUE && count($home_sections) > 1) {
-					$this->WPP_SKIP_AFTER_SECTION_SAVE = true;
-					foreach ($home_sections as $home_section) {
-						wp_update_post(array('ID' => $home_section->ID, 'meta_query' => array(array('key'=> SECTION_TYPE_FIELD_SLUG,'value'=> SECTION_POST_HOME_FIELD_VALUE))));
-					}
-					wp_update_post( array('ID' => $post->ID, 'meta_query' => array(array('key'=> SECTION_TYPE_FIELD_SLUG,'value'=> SECTION_POST_HOME_FIELD_VALUE))));
-					$this->WPP_SKIP_AFTER_SECTION_SAVE = false;
-				}
-			}
+      $post_langs_terms = wp_get_post_terms($post->ID, LOCALE_TAXONOMY_SLUG);
+  
+      if (is_array($post_langs_terms) && count($post_langs_terms) > 0) {
+        $current_section_title = "Home | ". $post_langs_terms[0]->name;
+        if ($post->post_title === $current_section_title) {
+          $home_sections = $this->wpp_get_home_sections ($post_langs_terms[0]->term_id); 
+          foreach ($home_sections as $home_section) {
+            if ($home_section->post_title === $current_section_title && $home_section->ID !== $post->ID) {
+              $this->WPP_SKIP_AFTER_SECTION_SAVE = true;
+              $new_title = $current_section_title."-".$post->ID;
+              $new_post_name = $post->post_name."-".$post->ID;
+              $new_guid = $post->guid === '/' ? "/section-".$post->ID : $post->guid;
+              wp_update_post( array('ID' => $post->ID, 'post_title' => $new_title, 'post_name' => $new_post_name, 'guid' => $new_guid));
+              $this->WPP_SKIP_AFTER_SECTION_SAVE = false;
+            }
+          }      
+        }
+      }
 		}
 	}
 		
