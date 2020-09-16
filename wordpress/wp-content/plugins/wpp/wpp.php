@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: WPP extras
- * Description: Add custom behaviors and functions to change WordPress and third party plugins regarding JWT authentication and wp rest api returning data. It assumes that the jwt-authentication-for-wp-rest-api, 
- * profilepress and pp-mailchimp plugins are installed adn active.
+ * Plugin Name: WPP
+ * Description: Add custom behaviors and functions to change WordPress and third party plugins regarding JWT authentication and wp rest api returning data. It assumes that the jwt-authentication-for-wp-rest-api
+ * plugin is installed
  * Version:     0.0.1
  *
  * Author:      Amon Caldas

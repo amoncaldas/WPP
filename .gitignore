@@ -22,14 +22,12 @@ wordpress/wp-content/debug.log
 # Ignore wordpress plugins
 wordpress/wp-content/themes/*
 
-# do not ignore FAM theme
+# do not ignore WPP theme
 !wordpress/wp-content/themes/wpp
 
 
 # Ignore all plugins ...
 wordpress/wp-content/plugins/*
-
-# wordpress/wp-content/fam/static_maps/
 
 ## ...except the pre-instaled plugins
 !wordpress/wp-content/plugins/disable-comments
@@ -44,7 +42,7 @@ wordpress/wp-content/plugins/*
 !wordpress/wp-content/plugins/acf-to-rest-api
 !wordpress/wp-content/plugins/wp-options-editor
 !wordpress/wp-content/plugins/classic-editor
-!wordpress/wp-content/plugins/acf-field-openstreetmap
+!wordpress/wp-content/plugins/acf-openstreetmap-field
 !wordpress/wp-content/plugins/user-role-editor
 !wordpress/wp-content/plugins/wp-rest-cache
 !wordpress/wp-content/plugins/imsanity
@@ -53,8 +51,9 @@ wordpress/wp-content/plugins/*
 
 
 
-## Do not ignore wpp plugin
+## Do not ignore wpp pluginS
 !wordpress/wp-content/plugins/wpp
+!wordpress/wp-content/plugins/wpp_rest_cache_auto_cleaner
 
 # Ignore files that contains custom enviroment config/data
 wordpress/wp-config.php
@@ -65,9 +64,25 @@ wordpress/wp-content/backups/
 wordpress/wp-content/blogs.dir/
 wordpress/wp-content/cache/
 wordpress/wp-content/upgrade/
-wordpress/wp-content/uploads/
 wordpress/wp-content/mu-plugins/
 
+# Ignore uploaded files
+wordpress/wp-content/uploads/
+# Except preloaded images
+!wordpress/wp-content/uploads/2019/03/monkey-in-my-room-150x150.jpg
+!wordpress/wp-content/uploads/2019/03/monkey-in-my-room-300x225.jpg
+!wordpress/wp-content/uploads/2019/03/monkey-in-my-room-768x576.jpg
+!wordpress/wp-content/uploads/2019/03/monkey-in-my-room-1024x768.jpg
+!wordpress/wp-content/uploads/2019/03/monkey-in-my-room.jpg
+!wordpress/wp-content/uploads/20120/09/monte-roraima-150x150.jpg
+!wordpress/wp-content/uploads/2020/09/monte-roraima-300x200.jpg
+!wordpress/wp-content/uploads/2020/09/monte-roraima-768x512.jpg
+!wordpress/wp-content/uploads/2020/09/monte-roraima-1024x683.jpg
+!wordpress/wp-content/uploads/2020/09/monte-roraima-1536x1024.jpg
+!wordpress/wp-content/uploads/2020/09/monte-roraima-2048x1365.jpg
+!wordpress/wp-content/uploads/2020/09/monte-roraima.jpg
+
+# Ignore other non essencial files
 wordpress/.htaccess
 wordpress/license.txt
 wordpress/readme.html

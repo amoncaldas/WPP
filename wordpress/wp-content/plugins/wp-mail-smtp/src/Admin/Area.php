@@ -99,6 +99,7 @@ class Area {
 		add_action( 'wp_ajax_wp_mail_smtp_ajax', [ $this, 'process_ajax' ] );
 
 		( new Review() )->hooks();
+		( new Education() )->hooks();
 	}
 
 	/**
@@ -128,7 +129,6 @@ class Area {
 				break;
 
 			case 'google_no_code_scope':
-			case 'microsoft_no_code':
 				WP::add_admin_notice(
 					esc_html__( 'There was an error while processing the authentication request. Please try again.', 'wp-mail-smtp' ),
 					WP::ADMIN_NOTICE_ERROR
@@ -147,12 +147,6 @@ class Area {
 			case 'google_site_linked':
 				WP::add_admin_notice(
 					esc_html__( 'You have successfully linked the current site with your Google API project. Now you can start sending emails through Gmail.', 'wp-mail-smtp' ),
-					WP::ADMIN_NOTICE_SUCCESS
-				);
-				break;
-			case 'microsoft_site_linked':
-				WP::add_admin_notice(
-					esc_html__( 'You have successfully linked the current site with your Microsoft API project. Now you can start sending emails through Outlook.', 'wp-mail-smtp' ),
 					WP::ADMIN_NOTICE_SUCCESS
 				);
 				break;
@@ -271,7 +265,7 @@ class Area {
 	 * @since 1.5.0 Added new assets for new pages.
 	 * @since 1.7.0 Added jQuery Confirm library css/js files.
 	 *
-	 * @param string $hook
+	 * @param string $hook Current hook.
 	 */
 	public function enqueue_assets( $hook ) {
 
@@ -305,9 +299,7 @@ class Area {
 					'title'         => esc_html__( 'Heads up!', 'wp-mail-smtp' ),
 					'content'       => wp_kses(
 						__( '<p>The Default (PHP) mailer is currently selected, but is not recommended because in most cases it does not resolve email delivery issues.</p><p>Please consider selecting and configuring one of the other mailers.</p>', 'wp-mail-smtp' ),
-						array(
-							'p' => true,
-						)
+						[ 'p' => [] ]
 					),
 					'save_button'   => esc_html__( 'Save Settings', 'wp-mail-smtp' ),
 					'cancel_button' => esc_html__( 'Cancel', 'wp-mail-smtp' ),
@@ -318,21 +310,23 @@ class Area {
 					'upgrade_icon_lock' => '<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="lock" class="svg-inline--fa fa-lock fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"></path></svg>',
 					'upgrade_title'     => esc_html__( '%name% is a PRO Feature', 'wp-mail-smtp' ),
 					'upgrade_button'    => esc_html__( 'Upgrade to Pro', 'wp-mail-smtp' ),
-					'upgrade_url'       => 'https://wpmailsmtp.com/lite-upgrade/?discount=SMTPLITEUPGRADE&utm_source=WordPress&utm_medium=plugin-settings&utm_campaign=liteplugin',
+					'upgrade_url'       => add_query_arg( 'discount', 'SMTPLITEUPGRADE', wp_mail_smtp()->get_upgrade_link( '' ) ),
 					'upgrade_bonus'     => '<p>' .
 											wp_kses(
 												__( '<strong>Bonus:</strong> WP Mail SMTP users get <span>$50 off</span> regular price,<br>applied at checkout.', 'wp-mail-smtp' ),
-												array(
-													'strong' => true,
-													'span'   => true,
-													'br'     => true,
-												)
+												[
+													'strong' => [],
+													'span'   => [],
+													'br'     => [],
+												]
 											)
 											. '</p>',
 					'upgrade_doc'       => '<a href="https://wpmailsmtp.com/docs/how-to-upgrade-wp-mail-smtp-to-pro-version/?utm_source=WordPress&amp;utm_medium=link&amp;utm_campaign=liteplugin" target="_blank" rel="noopener noreferrer" class="already-purchased">
 												' . esc_html__( 'Already purchased?', 'wp-mail-smtp' ) . '
 											</a>',
 				),
+				'all_mailers_supports'    => wp_mail_smtp()->get_providers()->get_supports_all(),
+				'nonce'                   => wp_create_nonce( 'wp-mail-smtp-admin' ),
 			)
 		);
 
@@ -437,6 +431,8 @@ class Area {
 		if ( ! $this->is_admin_page() ) {
 			return;
 		}
+
+		do_action( 'wp_mail_smtp_admin_header_before' );
 		?>
 
 		<div id="wp-mail-smtp-header-temp"></div>
@@ -591,6 +587,8 @@ class Area {
 			<h1 class="screen-reader-text">
 				<?php echo esc_html( $this->get_current_tab_title() ); ?>
 			</h1>
+
+			<?php do_action( 'wp_mail_smtp_admin_pages_before_content' ); ?>
 
 			<?php $this->display_current_tab_content(); ?>
 		</div>
@@ -893,7 +891,7 @@ class Area {
 		return add_query_arg(
 			'page',
 			$page,
-			admin_url( 'admin.php' )
+			WP::admin_url( 'admin.php' )
 		);
 	}
 

@@ -1,8 +1,8 @@
-# Author: Amon Caldas <amon@fazendoasmalas.com>
-# Version 0.1
-# 26.01.2018
+# Author: Amon Caldas <amoncaldas@gmail.com>
+# Version 0.2
+# 19.08.2020
 
-FROM wordpress:5.4.2-php7.3-apache
+FROM wordpress:5.5.1-php7.4-apache
 
 ARG DEBUG_SUPPORT=false
 ARG NOTIFICATIONS_TASK_SUPPORT=false
@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install nano -y && apt-get install cron -y && apt-
 RUN if ($DEBUG_SUPPORT == "true"); \
     then \
     echo "## DEBUG SUPPORT ENABLED, INSTALLING XDEBUG ###"; \
-    pecl install xdebug-2.5.0 && docker-php-ext-enable xdebug; \
+    pecl install xdebug-2.9.6 && docker-php-ext-enable xdebug; \
     fi
 
 # Install gnupg
@@ -32,7 +32,7 @@ RUN if ($DEBUG_SUPPORT == "true"); then \
     echo "xdebug.max_nesting_level = 300" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
     echo "xdebug.remote_enable = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
     echo "xdebug.remote_autostart = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
-    echo "xdebug.remote_host=172.17.0.1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+    echo "xdebug.remote_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
     # if your IDE has problems with the debug idekey you can comment out the following line
     echo "xdebug.idekey=docker" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
     sed -i 's/display_errors = Off/display_errors = On/' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \

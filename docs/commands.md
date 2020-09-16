@@ -14,7 +14,6 @@ docker cp $PWD/mysql/db-backup.sql wpp-mysql-local:/wpp-dump.sql
 docker exec wpp-mysql-local /bin/sh -c "mysql -uroot -padmin wordpress < wpp-dump.sql"
 ```
 
-
 ## Copy remote file to local file system ##
 
 ```sh
