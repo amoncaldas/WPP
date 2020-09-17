@@ -19,6 +19,10 @@ wp plugin install imsanity --allow-root --activate
 wp plugin install code-snippets --allow-root 
 wp plugin install wp-rollback --allow-root --activate
 
+wp plugin install disable-admin-notices --allow-root --activate
+wp plugin install glance-that --allow-root --activate
+wp plugin install iframe --allow-root --activate
+
 # wp plugin install quick-and-easy-post-creation-for-acf-relationship-fields --allow-root --activate
 
 

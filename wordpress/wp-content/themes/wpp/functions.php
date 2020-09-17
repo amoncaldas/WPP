@@ -341,19 +341,21 @@ function allow_cors() {
  * @return void
  */
 function wpp_login_logo() { 
-	$og_image_url = network_site_url(trim(get_option("wpp_site_relative_login_logo_url")));
-	$login_style =  "
-		<style type='text/css'>
-			#login h1 a, .login h1 a {
-				background-image: url($og_image_url);
-				width: 220px;
-				background-size: 250px;
-				background-repeat: no-repeat;
-				padding-bottom: 30px;
-				min-height: 220px;
-			}
-		</style>";
-		echo $login_style;
+	$logo_image_url = network_site_url(trim(get_option("wpp_site_relative_login_logo_url")));
+	if ($logo_image_url) {
+		$login_style =  "
+			<style type='text/css'>
+				#login h1 a, .login h1 a {
+					background-image: url($logo_image_url);
+					width: 220px;
+					background-size: 250px;
+					background-repeat: no-repeat;
+					padding-bottom: 30px;
+					min-height: 220px;
+				}
+			</style>";
+			echo $login_style;
+	}
 }
 
 /**
