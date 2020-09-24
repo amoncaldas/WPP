@@ -69,7 +69,7 @@
           <highlighted position="bottom" :columns-per-post="6" :content-id="post.id"> </highlighted>
         </template>
 
-        <template v-if="hasPlaces">
+        <template v-if="hasMap">
           <post-map @placeClicked="placeClicked" :post="post"></post-map>
           <br/>
         </template>

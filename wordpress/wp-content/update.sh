@@ -29,6 +29,9 @@ wp plugin install iframe --allow-root --activate
 # Activate wpp plugins
 wp plugin activate wpp --allow-root
 wp plugin activate wpp_rest_cache_auto_cleaner --allow-root
+wp plugin activate wpp_geo --allow-root
+wp plugin activate wp-options-editor --allow-root
+
 
 # Set htacess modifiable
 chmod 777 /var/www/html/.htaccess 

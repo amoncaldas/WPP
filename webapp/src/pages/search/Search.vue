@@ -1,7 +1,8 @@
 <template>
-  <v-container text-xs-center fluid-xs class="page-root search">
+  <v-container fluid class="page-root search">
+    <br><br>
     <v-slide-y-transition mode="out-in">
-     <search></search>
+      <search section-filter ></search>
     </v-slide-y-transition>
   </v-container>
 </template>

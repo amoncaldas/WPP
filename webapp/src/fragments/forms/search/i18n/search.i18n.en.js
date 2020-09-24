@@ -5,6 +5,8 @@ export default {
     results: 'Results',
     noResult: 'Nothing found',
     search: 'Search',
-    clear: 'Clear'
+    clear: 'Clear',
+    for: 'for',
+    in: 'in'
   }
 }

@@ -2,6 +2,15 @@
   <div>
     <box background="white" tag="section">
       <div slot="header">
+        <v-select v-if="selectableOrder" height="30" class="notranslate" style="float:right; margin-top:-9px"          
+          v-model="localOrder"
+          @change="orderChanged"
+          item-text="text"
+          item-value="value"
+          hide-details
+          :items="[{value: 'asc', text:'Asc'}, {value: 'desc', text:'Desc'}]"
+          :label="$t('posts.order')">
+        </v-select>   
         <h2>{{boxTitle | capitalize}}</h2>
       </div>
       <div slot="content" v-if="posts">

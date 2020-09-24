@@ -148,27 +148,6 @@ class WpWebAppTheme {
 					'schema' => null,
 				)
 			);
-			if (post_type_exists("place") === true) {
-				register_rest_field($post_type, 'places',
-					array(
-						'get_callback'  => function ($post, $field_name, $request) {
-							return $this->resolve_places($post, $field_name, $request);
-						},
-						'schema' => null,
-					)
-				);
-			}
-			if (post_type_exists("map_route") === true) {
-				register_rest_field($post_type, 'routes',
-					array(
-						'get_callback'  => function ($post, $field_name, $request) {
-							$routes = $this->resolve_routes($post, $field_name, $request);
-							return $routes;
-						},
-						'schema' => null,
-					)
-				);
-			}
 			register_rest_field($post_type, 'author_member',
 				array(
 					'get_callback'  => function ($post, $field_name, $request) {
@@ -302,73 +281,6 @@ class WpWebAppTheme {
 
 		return false;
 	}
-
-	/**
-	 * Resolve the the post places
-	 *
-	 * @param Array $post_arr
-	 * @param string $field_name
-	 * @param Object $request
-	 * @return array of places
-	 */
-	public function resolve_places($post_arr, $field_name, $request) {
-		$place_ids = get_post_meta($post_arr["id"], "places", true);
-		$places = [];
-		if (is_array($place_ids) && count($place_ids) > 0) {			
-			foreach ($place_ids as $place_id) {				
-				$location = get_post_meta($place_id, "location", true);	
-				if($location) {
-					$places[$place_id] = $location;
-					$places[$place_id]["title"] = get_the_title($place_id);
-					$locales = wp_get_post_terms($place_id, LOCALE_TAXONOMY_SLUG);
-					$places[$place_id][LOCALE_TAXONOMY_SLUG] = count($locales) > 0 ? $locales[0]->slug : null;
-					$places[$place_id]["link"] = get_permalink($place_id);
-				}
-			}
-		} else {			
-			$location = get_post_meta($post_arr["id"], "location", true);			
-			if($location) {
-				$title = is_array($post_arr["title"]) ? $post_arr["title"]["rendered"] : $post_arr["title"];
-				$places[$post_arr["id"]] = $location;
-				$places[$post_arr["id"]]["title"] = $title;
-				$locales = wp_get_post_terms($post_arr["id"], LOCALE_TAXONOMY_SLUG);
-				$places[$post_arr["id"]][LOCALE_TAXONOMY_SLUG] = count($locales) > 0 ? $locales[0]->slug : null;
-				$places[$post_arr["id"]]["link"] = $post_arr["link"];
-			}
-		}
-		return $places;
-	}	
-
-	/**
-	 * Resolve the the post routes
-	 *
-	 * @param Array $post_arr
-	 * @param string $field_name
-	 * @param Object $request
-	 * @return array of routes
-	 */
-	public function resolve_routes($post_arr, $field_name, $request) {
-		$route_ids = get_post_meta($post_arr["id"], "routes", true);
-		$routes = [];
-		if (is_array($route_ids) && count($route_ids) > 0) {			
-			foreach ($route_ids as $route_id) {				
-				$route_content = get_post_meta($route_id, "route_content", true);
-				
-				if($route_content) {
-					$route = [
-						"means_of_transportation" => get_post_meta($route_id, "means_of_transportation", true),
-            			"route_content_type" => get_post_meta($route_id, "route_content_type", true),
-            			"coordinates_order" => get_post_meta($route_id, "coordinates_order", true),
-						"route_content" => $route_content,						
-						"title" => get_the_title($route_id),
-						"id" => $route_id
-					];
-					$routes[$route_id] = $route;
-				}
-			}
-		}
-		return $routes;
-	}	
 
 	/**
 	 * Resolve the author linked member

@@ -62,9 +62,12 @@ export default {
         return media
       }
     },
-    hasPlaces () {
-      let has = this.post.places && Object.keys(this.post.places).length > 0
-      return has
+    hasMap () {
+      if (this.post.maps && Object.keys(this.post.maps).length > 0) {
+        return true
+      } else if (this.post.places && Object.keys(this.post.places).length > 0) {
+        return true
+      }
     },
     related () {
       if (this.post && this.post.extra && this.post.extra.related && Array.isArray(this.post.extra.related)) {

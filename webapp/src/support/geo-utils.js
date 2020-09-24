@@ -65,6 +65,9 @@ const geoUtils = {
 
       // Build the marker
       let markerIcon = geoUtils.buildMarkerIcon(coloredMarkerName, options)
+      if (markersData.place && markersData.place.extras && markersData.place.extras.map_icon_url) {
+        markerIcon = markersData.extras.map_icon_url
+      }
       let marker = { position: { lng: wayPoint[0], lat: wayPoint[1] }, icon: markerIcon }
 
       // if the way point array has the third parameter, it is its label

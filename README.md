@@ -320,6 +320,7 @@ Possible post extras:
   - polyline
   - title
   - id
+- map_icon_url
 
 Only for pages:
 

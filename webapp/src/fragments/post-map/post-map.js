@@ -105,7 +105,7 @@ export default {
       }
     },
     routes () {
-      if (this.post.extra.has_route && Array.isArray(this.mapRoutes)) {
+      if (this.mapRoutes && Array.isArray(this.mapRoutes)) {
         return this.mapRoutes
       }
       return []
@@ -114,15 +114,21 @@ export default {
       return this.initialMaxZoom
     },
     title () {
-      if (this.post.extra && this.post.extra.map_title) {
-        return this.post.extra.map_title
+      if (Object.keys(this.post.maps).length > 0) {
+        let keys = Object.keys(this.post.maps)
+        let firstKey = keys[0]
+        return this.post.maps[firstKey].title
       } else {
-        if (Object.keys(this.post.places).length === 1) {
-          let keys = Object.keys(this.post.places)
-          let lastKey = keys[0]
-          return this.post.places[lastKey].title
+        if (this.post.extra && this.post.extra.map_title) {
+          return this.post.extra.map_title
+        } else {
+          if (Object.keys(this.post.places).length === 1) {
+            let keys = Object.keys(this.post.places)
+            let lastKey = keys[0]
+            return this.post.places[lastKey].title
+          }
+          return this.$t('postMap.title')
         }
-        return this.$t('postMap.title')
       }
     },
     height () {
@@ -189,49 +195,66 @@ export default {
       ]
     },
 
-    buildRoutes () {
+    setRoutes () {
       this.mapRoutes = []
+      let context = this
       return new Promise((resolve, reject) => {
-        if (this.post.extra.has_route && this.post.routes) {
-          for (let key in this.post.routes) {
-            let route = this.post.routes[key]
-
-            if (route.route_content_type === 'coordinates_array') {
-              let polylineFromArr = JSON.parse(route.route_content)
-              if (Array.isArray(polylineFromArr)) {
-                route.polyline = polylineFromArr
-              } else {
-                route.polyline = route
-              }
-              if (route.coordinates_order === 'lng-lat') {
-                route.polyline = GeoUtils.switchLatLonIndex(route.polyline)
-              }
-              this.mapRoutes.push(route)
-              resolve()
-            } else {
-              let routeContentType = route.route_content_type === 'ors_json' ? 'json' : route.route_content_type
-              let data = {
-                mapRawData: route.route_content,
-                options: {}
-              }
-              let fileExtractorBuilder = new FileExtractorBuilder(routeContentType, data)
-              fileExtractorBuilder.buildMapData().then((mapViewData) => {
-                for (let routeKey in mapViewData.routes) {
-                  route.polyline = mapViewData.routes[routeKey].geometry.coordinates
-                  if (route.coordinates_order === 'lng-lat') {
-                    route.polyline = GeoUtils.switchLatLonIndex(route.polyline)
-                  }
-                  this.mapRoutes.push(route)
-                }
-                resolve()
-              }).catch(err => {
-                console.log(err)
-                resolve()
-              })
-            }
-          }
+        var routes
+        if (context.post.extra.has_route && context.post.routes) {
+          routes = context.post.routes
+        } else if (context.post.maps) {
+          // support for one map per post for now
+          let firstKey = Object.keys(this.post.maps)[0]
+          let map = this.post.maps[firstKey]
+          routes = map.routes
+        }
+        if (routes) {
+          context.buildRoutes(routes).then(() => {
+            resolve()
+          })
         } else {
           resolve()
+        }
+      })
+    },
+    buildRoutes (rawRoutes) {
+      return new Promise((resolve, reject) => {
+        for (let key in rawRoutes) {
+          let route = rawRoutes[key]
+
+          if (route.route_content_type === 'coordinates_array') {
+            let polylineFromArr = JSON.parse(route.route_content)
+            if (Array.isArray(polylineFromArr)) {
+              route.polyline = polylineFromArr
+            } else {
+              route.polyline = route
+            }
+            if (route.coordinates_order === 'lng-lat') {
+              route.polyline = GeoUtils.switchLatLonIndex(route.polyline)
+            }
+            this.mapRoutes.push(route)
+            resolve()
+          } else {
+            let routeContentType = route.route_content_type === 'ors_json' ? 'json' : route.route_content_type
+            let data = {
+              mapRawData: route.route_content,
+              options: {}
+            }
+            let fileExtractorBuilder = new FileExtractorBuilder(routeContentType, data)
+            fileExtractorBuilder.buildMapData().then((mapViewData) => {
+              for (let routeKey in mapViewData.routes) {
+                route.polyline = mapViewData.routes[routeKey].geometry.coordinates
+                if (route.coordinates_order === 'lng-lat') {
+                  route.polyline = GeoUtils.switchLatLonIndex(route.polyline)
+                }
+                this.mapRoutes.push(route)
+              }
+              resolve()
+            }).catch(err => {
+              console.log(err)
+              resolve()
+            })
+          }
         }
       })
     },
@@ -306,9 +329,11 @@ export default {
     },
     loadMapData () {
       let context = this
-      this.buildRoutes().then(() => {
+      this.setRoutes().then(() => {
         context.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
-        context.mapData = { markers: GeoUtils.buildMarkers(context.getMarkersData(), context.post.extra.has_route, {mapIconUrl: context.$store.getters.options.map_icon_url}) }
+        let iconUrl = context.$store.getters.options.map_icon_url
+        let hasRoute = this.mapRoutes.length > 0
+        context.mapData = { markers: GeoUtils.buildMarkers(context.getMarkersData(), hasRoute, {mapIconUrl: iconUrl}) }
         let polylineData = []
         for (let key in context.routes) {
           if (context.routes[key].polyline) {
@@ -355,10 +380,10 @@ export default {
      * @returns {Array} markers
      */
     getMarkersData () {
-      let markersData = []
-      if (this.post) {
-        for (let placeKey in this.post.places) {
-          let place = this.post.places[placeKey]
+      var buildMarkers = (places) => {
+        let markersData = []
+        for (let placeKey in places) {
+          let place = places[placeKey]
           if (place.markers && place.markers.length > 0) {
             let location = place.markers[0]
             markersData.push([location.lng, location.lat, place.title, place])
@@ -366,8 +391,18 @@ export default {
             markersData.push([place.lng, place.lat, place.title, place])
           }
         }
+        return markersData
       }
-      return markersData
+      if (this.post) {
+        if (this.post.places && this.post.places.length > 0) {
+          return buildMarkers(this.post.places)
+        } else if (this.post.maps) {
+          // support for only one map per post for now
+          let firstKey = Object.keys(this.post.maps)[0]
+          let map = this.post.maps[firstKey]
+          return buildMarkers(map.places)
+        }
+      }
     },
     redrawMap () {
       return new Promise((resolve, reject) => {
