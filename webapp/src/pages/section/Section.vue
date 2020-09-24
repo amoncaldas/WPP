@@ -11,7 +11,7 @@
       <div class="content" v-html="currentSection.extra.html_content"></div>
       <br>
     </template>
-    <template v-if="currentSection && currentSection.extra.has_places">
+    <template v-if="hasMap">
       <post-map @placeClicked="placeClicked"  :post="currentSection"></post-map>
       <br>
     </template>

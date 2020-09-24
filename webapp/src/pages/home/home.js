@@ -74,6 +74,13 @@ export default {
     maxCompact () {
       let max = this.currentSection.extra.max_compact_listing_posts !== undefined ? this.currentSection.extra.max_compact_listing_posts : 4
       return Number(max)
+    },
+    hasMap () {
+      if (this.currentSection.maps && Object.keys(this.currentSection.maps).length > 0) {
+        return true
+      } else if (this.currentSection.places && Object.keys(this.currentSection.places).length > 0) {
+        return true
+      }
     }
   }
 }

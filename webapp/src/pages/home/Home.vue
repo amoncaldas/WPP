@@ -14,8 +14,7 @@
       <sections-map v-if="currentSection && currentSection.extra.has_section_map"></sections-map>
       <br>
     </template>
-    <template v-if="currentSection && currentSection.extra.has_places">
-      <br>
+    <template v-if="hasMap">
       <post-map @placeClicked="placeClicked" :post="currentSection"></post-map>
       <br>
     </template>
