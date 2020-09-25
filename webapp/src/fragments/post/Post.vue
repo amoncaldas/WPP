@@ -69,8 +69,12 @@
           <highlighted position="bottom" :columns-per-post="6" :content-id="post.id"> </highlighted>
         </template>
 
-        <template v-if="hasMap">
-          <post-map @placeClicked="placeClicked" :post="post"></post-map>
+        <template v-if="hasPlaces">
+          <post-places @placeClicked="placeClicked" :post="post"></post-places>
+          <br/>
+        </template>
+        <template v-else-if="hasMaps">
+          <wpp-map v-for="(mapId, index) in post.extra.maps" :height-unit="post.extra.map_height_unit" :height="post.extra.map_height" :key="index" @placeClicked="placeClicked" :map-id="mapId"></wpp-map>
           <br/>
         </template>
         <box v-if="post.extra.medias" background="white" :no-top-border="noTopBorder">

@@ -11,9 +11,9 @@
       <div class="content" v-html="currentSection.extra.html_content"></div>
       <br>
     </template>
-    <template v-if="hasMap">
-      <post-map @placeClicked="placeClicked"  :post="currentSection"></post-map>
-      <br>
+    <template v-if="hasMaps">
+      <wpp-map v-for="mapId in currentSection.maps" :key="mapId" @placeClicked="placeClicked" :height-unit="currentSection.extra.map_height_unit" :height="currentSection.extra.map_height" :map-id="mapId"></wpp-map>
+      <br/>
     </template>
     <template v-if="currentSection.extra.compact_list_posts">
       <posts :max="maxCompact" mode="compact" :parent-id="currentSection.id" :columns-per-post="$vuetify.breakpoint.mdAndUp ? 4 : 6" :key="postType.endpoint" v-for="postType in compactListingPosts" :endpoint="postType.endpoint" :title="postType.title"></posts>

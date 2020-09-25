@@ -1,5 +1,4 @@
-import SectionsMap from '@/fragments/sections-map/SectionsMap'
-import PostMap from '@/fragments/post-map/PostMap'
+import WppMap from '@/fragments/wpp-map/WppMap'
 import Posts from '@/fragments/posts/Posts'
 import Slider from '@/fragments/slider/Slider'
 import Sections from '@/fragments/sections/Sections'
@@ -14,10 +13,9 @@ export default {
     currentSection: null
   }),
   components: {
-    SectionsMap,
     Posts,
     Slider,
-    PostMap,
+    WppMap,
     Sections,
     Highlighted
   },
@@ -75,10 +73,8 @@ export default {
       let max = this.currentSection.extra.max_compact_listing_posts !== undefined ? this.currentSection.extra.max_compact_listing_posts : 4
       return Number(max)
     },
-    hasMap () {
-      if (this.currentSection.maps && Object.keys(this.currentSection.maps).length > 0) {
-        return true
-      } else if (this.currentSection.places && Object.keys(this.currentSection.places).length > 0) {
+    hasMaps () {
+      if (this.currentSection.extra.maps && Object.keys(this.currentSection.extra.maps).length > 0) {
         return true
       }
     }

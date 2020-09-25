@@ -1,5 +1,5 @@
 /**
- * PostMap component.
+ * Wpp Map component.
  * Renders an leaflet map using the post map data
  * passed via props
  * @listens redrawAndFitMap [via eventBus] - event that will trigger an map redraw and refit bounds - expects {isMaximized: Boolean, guid: String}
@@ -8,8 +8,10 @@
 import { LMap, LPolyline, LTileLayer, LMarker, LTooltip, LPopup, LControlZoom, LControlAttribution, LControlScale, LControlLayers, LLayerGroup } from 'vue2-leaflet'
 import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
+import constants from '@/resources/constants'
 
 import FileExtractorBuilder from '@/support/file-data-extractors/file-extractor-builder'
+import PostService from '@/shared-services/post-service'
 import * as leaflet from 'leaflet'
 import { GestureHandling } from 'leaflet-gesture-handling'
 import 'leaflet/dist/leaflet.css'
@@ -17,63 +19,28 @@ import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css'
 
 leaflet.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling)
 
-const tileProviders = [
-  {
-    name: 'Open Street Maps',
-    id: 'osm',
-    visible: false,
-    attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    token: null
-  },
-  {
-    name: 'Satellite',
-    visible: false,
-    id: 'satellite',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-    token: null
-  },
-  {
-    name: 'Cycling',
-    id: 'cycling',
-    visible: true,
-    url: 'https://dev.{s}.tile.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
-    attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  },
-  {
-    name: 'Topography',
-    id: 'topography',
-    visible: false,
-    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-    attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-    token: null
-  },
-  {
-    name: 'Transport Dark',
-    visible: false,
-    id: 'transport-dark',
-    url: 'https://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=13efc496ac0b486ea05691c820824f5f',
-    attribution: 'Maps &copy; <a href="http://thunderforest.com/">Thunderforest</a>, Data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    token: null
-  }
-]
-
 export default {
   props: {
-    post: {
-      type: Object,
-      required: true
+    mapId: {
+      type: Number,
+      required: false
+    },
+    heightUnit: {
+      type: String,
+      default: 'px'
+    },
+    height: {
+      type: Number,
+      default: 300
     }
   },
   data () {
     return {
-      tileProviders: tileProviders,
+      tileProviders: constants.tileProviders,
       mapOptions: { zoomControl: true, attributionControl: true },
       layersPosition: 'topright',
       zoom: 13,
       map: null,
-      mapHeight: 300,
       initialMaxZoom: 18,
       routeColor: this.$vuetify.theme.secondary,
       guid: null,
@@ -114,25 +81,11 @@ export default {
       return this.initialMaxZoom
     },
     title () {
-      if (Object.keys(this.post.maps).length > 0) {
-        let keys = Object.keys(this.post.maps)
-        let firstKey = keys[0]
-        return this.post.maps[firstKey].title
-      } else {
-        if (this.post.extra && this.post.extra.map_title) {
-          return this.post.extra.map_title
-        } else {
-          if (Object.keys(this.post.places).length === 1) {
-            let keys = Object.keys(this.post.places)
-            let lastKey = keys[0]
-            return this.post.places[lastKey].title
-          }
-          return this.$t('postMap.title')
-        }
-      }
+      return this.mapData.title.rendered || this.mapData.title || this.$t('map.title')
     },
-    height () {
-      return this.mapHeight
+    mapHeight () {
+      let height = `${this.height}${this.heightUnit}`
+      return height
     },
     mapCenter () {
       let center = leaflet.latLng(0, 0)
@@ -155,42 +108,42 @@ export default {
         {
           id: 'bicycle',
           color: '#008000', // green,
-          title: this.$t('postMap.transportationMeans.bicycle')
+          title: this.$t('wppMap.transportationMeans.bicycle')
         },
         {
           id: 'foot',
           color: '#808000', // olive
-          title: this.$t('postMap.transportationMeans.foot')
+          title: this.$t('wppMap.transportationMeans.foot')
         },
         {
           id: 'train',
           color: '#800080', // purple
-          title: this.$t('postMap.transportationMeans.train')
+          title: this.$t('wppMap.transportationMeans.train')
         },
         {
           id: 'ferry',
           color: 'red', // green,
-          title: this.$t('postMap.transportationMeans.ferry')
+          title: this.$t('wppMap.transportationMeans.ferry')
         },
         {
           id: 'bus',
           color: '#008000', // maroom,
-          title: this.$t('postMap.transportationMeans.bus')
+          title: this.$t('wppMap.transportationMeans.bus')
         },
         {
           id: 'sailboat',
           color: '#0000A0', // dark blue,
-          title: this.$t('postMap.transportationMeans.sailboat')
+          title: this.$t('wppMap.transportationMeans.sailboat')
         },
         {
           id: 'car',
           color: '#FFA500', // orange,
-          title: this.$t('postMap.transportationMeans.car')
+          title: this.$t('wppMap.transportationMeans.car')
         },
         {
           id: 'airplane',
           color: '#000000', // black,
-          title: this.$t('postMap.transportationMeans.airplane')
+          title: this.$t('wppMap.transportationMeans.airplane')
         }
       ]
     },
@@ -199,64 +152,67 @@ export default {
       this.mapRoutes = []
       let context = this
       return new Promise((resolve, reject) => {
-        var routes
-        if (context.post.extra.has_route && context.post.routes) {
-          routes = context.post.routes
-        } else if (context.post.maps) {
-          // support for one map per post for now
-          let firstKey = Object.keys(this.post.maps)[0]
-          let map = this.post.maps[firstKey]
-          routes = map.routes
-        }
-        if (routes) {
-          context.buildRoutes(routes).then(() => {
-            resolve()
-          })
-        } else {
+        context.buildRoutes(context.mapData.routes).then(() => {
           resolve()
-        }
+        })
       })
     },
     buildRoutes (rawRoutes) {
+      let context = this
       return new Promise((resolve, reject) => {
         for (let key in rawRoutes) {
-          let route = rawRoutes[key]
+          let rawRoute = rawRoutes[key]
 
-          if (route.route_content_type === 'coordinates_array') {
-            let polylineFromArr = JSON.parse(route.route_content)
-            if (Array.isArray(polylineFromArr)) {
-              route.polyline = polylineFromArr
-            } else {
-              route.polyline = route
-            }
-            if (route.coordinates_order === 'lng-lat') {
-              route.polyline = GeoUtils.switchLatLonIndex(route.polyline)
-            }
-            this.mapRoutes.push(route)
+          if (rawRoute.route_content_type === 'coordinates_array') {
+            let route = context.buildRouteFromArray(rawRoute)
+            context.mapRoutes.push(route)
             resolve()
           } else {
-            let routeContentType = route.route_content_type === 'ors_json' ? 'json' : route.route_content_type
-            let data = {
-              mapRawData: route.route_content,
-              options: {}
-            }
-            let fileExtractorBuilder = new FileExtractorBuilder(routeContentType, data)
-            fileExtractorBuilder.buildMapData().then((mapViewData) => {
-              for (let routeKey in mapViewData.routes) {
-                route.polyline = mapViewData.routes[routeKey].geometry.coordinates
-                if (route.coordinates_order === 'lng-lat') {
-                  route.polyline = GeoUtils.switchLatLonIndex(route.polyline)
-                }
-                this.mapRoutes.push(route)
+            context.buildRoutesFromObject(rawRoute).then((route) => {
+              if (route) {
+                context.mapRoutes.push(route)
               }
-              resolve()
-            }).catch(err => {
-              console.log(err)
               resolve()
             })
           }
         }
       })
+    },
+    buildRoutesFromObject (route) {
+      return new Promise((resolve, reject) => {
+        let routeContentType = route.route_content_type === 'ors_json' ? 'json' : route.route_content_type
+        let data = {
+          mapRawData: route.route_content,
+          options: {}
+        }
+        let fileExtractorBuilder = new FileExtractorBuilder(routeContentType, data)
+        fileExtractorBuilder.buildMapData().then((mapViewData) => {
+          for (let routeKey in mapViewData.routes) {
+            route.polyline = mapViewData.routes[routeKey].geometry.coordinates
+            if (route.coordinates_order === 'lng-lat') {
+              route.polyline = GeoUtils.switchLatLonIndex(route.polyline)
+            }
+          }
+          resolve(route)
+        }).catch(err => {
+          console.log(err)
+          resolve()
+        })
+      })
+    },
+    buildRouteFromArray (rawRoute) {
+      if (rawRoute.route_content_type === 'coordinates_array') {
+        let polylineFromArr = JSON.parse(rawRoute.route_content)
+        if (Array.isArray(polylineFromArr)) {
+          rawRoute.polyline = polylineFromArr
+        } else {
+          rawRoute.polyline = rawRoute
+        }
+        if (rawRoute.coordinates_order === 'lng-lat') {
+          rawRoute.polyline = GeoUtils.switchLatLonIndex(rawRoute.polyline)
+        }
+        return rawRoute
+      }
     },
     getColorByTransportation (transportation) {
       let transportationFound = this.lodash.find(this.transportationColorMap, (t) => {
@@ -309,12 +265,12 @@ export default {
 
           let spanEl = document.createElement('span')
           spanEl.innerText = context.showStops ? 'X' : ''
-          spanEl.title = context.$t('postMap.toggleShowStops')
+          spanEl.title = context.$t('wppMap.toggleShowStops')
 
           let divEl = document.createElement('div')
-          divEl.innerText = context.$t('postMap.showStops')
+          divEl.innerText = context.$t('wppMap.showStops')
           divEl.className = 'show-stop-container'
-          divEl.title = context.$t('postMap.toggleShowStops')
+          divEl.title = context.$t('wppMap.toggleShowStops')
           divEl.onclick = () => { context.toggleShowStops() }
           divEl.appendChild(spanEl)
 
@@ -329,25 +285,30 @@ export default {
     },
     loadMapData () {
       let context = this
-      this.setRoutes().then(() => {
-        context.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
-        let iconUrl = context.$store.getters.options.map_icon_url
-        let hasRoute = this.mapRoutes.length > 0
-        context.mapData = { markers: GeoUtils.buildMarkers(context.getMarkersData(), hasRoute, {mapIconUrl: iconUrl}) }
-        let polylineData = []
-        for (let key in context.routes) {
-          if (context.routes[key].polyline) {
-            polylineData = polylineData.concat(context.routes[key].polyline)
-          }
-        }
-        context.dataBounds = GeoUtils.getBounds(context.dataBounds, context.mapData.markers, polylineData)
+      return new Promise((resolve, reject) => {
+        context.setRoutes().then(() => {
+          context.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
+          let iconUrl = context.$store.getters.options.map_icon_url
+          let hasRoute = context.mapRoutes.length > 0
+          context.mapData.markers = GeoUtils.buildMarkers(context.getMarkersData(), hasRoute, {mapIconUrl: iconUrl})
+          let polylineData = []
 
-        context.setActiveTilesProvider()
-        context.fitFeaturesBounds()
-        context.redrawMap()
-        context.loaded = true
-      }).catch(err => {
-        console.log(err)
+          // build the polyline
+          for (let key in context.routes) {
+            if (context.routes[key].polyline) {
+              polylineData = polylineData.concat(context.routes[key].polyline)
+            }
+          }
+          context.dataBounds = GeoUtils.getBounds(context.dataBounds, context.mapData.markers, polylineData)
+
+          context.setActiveTilesProvider()
+          context.fitFeaturesBounds()
+          context.redrawMap()
+          context.loaded = true
+          resolve()
+        }).catch(err => {
+          console.log(err)
+        })
       })
     },
 
@@ -356,10 +317,10 @@ export default {
      * back-end specified tiles provider
      */
     setActiveTilesProvider () {
-      if (this.post.extra.tiles_provider_id) {
+      if (this.mapData.extra.tiles_provider_id) {
         // Check if the tiles provider defined is supported by the front-end
         let tileProviderSupported = this.lodash.find(this.tileProviders, (tp) => {
-          return tp.id === this.post.extra.tiles_provider_id
+          return tp.id === this.mapData.extra.tiles_provider_id
         })
         // If the tile provider specified is supported by
         // the the front end then set is as the only one visible
@@ -367,7 +328,7 @@ export default {
           for (let key in this.tileProviders) {
             this.tileProviders[key].visible = false
             let provider = this.tileProviders[key]
-            if (provider.id === this.post.extra.tiles_provider_id) {
+            if (provider.id === this.mapData.extra.tiles_provider_id) {
               this.tileProviders[key].visible = true
             }
           }
@@ -380,29 +341,17 @@ export default {
      * @returns {Array} markers
      */
     getMarkersData () {
-      var buildMarkers = (places) => {
-        let markersData = []
-        for (let placeKey in places) {
-          let place = places[placeKey]
-          if (place.markers && place.markers.length > 0) {
-            let location = place.markers[0]
-            markersData.push([location.lng, location.lat, place.title, place])
-          } else if (place.lat && place.lng) {
-            markersData.push([place.lng, place.lat, place.title, place])
-          }
-        }
-        return markersData
-      }
-      if (this.post) {
-        if (this.post.places && this.post.places.length > 0) {
-          return buildMarkers(this.post.places)
-        } else if (this.post.maps) {
-          // support for only one map per post for now
-          let firstKey = Object.keys(this.post.maps)[0]
-          let map = this.post.maps[firstKey]
-          return buildMarkers(map.places)
+      let markersData = []
+      for (let placeKey in this.mapData.places) {
+        let place = this.mapData.places[placeKey]
+        if (place.markers && place.markers.length > 0) {
+          let location = place.markers[0]
+          markersData.push([location.lng, location.lat, place.title, place])
+        } else if (place.lat && place.lng) {
+          markersData.push([place.lng, place.lat, place.title, place])
         }
       }
+      return markersData
     },
     redrawMap () {
       return new Promise((resolve, reject) => {
@@ -427,28 +376,27 @@ export default {
         // If te map object is already defined
         // then we can directly access it
         if (context.map) {
-          if (context.markers.length === 1 && context.routes.length === 0) {
-            context.zoom = context.post.extra.zoom ? Number(context.post.extra.zoom) : context.zoom
-          } else {
-            context.map.fitBounds(context.dataBounds, {padding: [20, 20]})
-          }
+          context.fit()
         } else {
           // If not, it wil be available only in the next tick
           this.$nextTick(() => {
             setTimeout(() => {
               if (context.$refs.map) {
                 context.map = context.$refs.map.mapObject // work as expected when wrapped in a $nextTick
-                if (context.markers.length === 1 && context.routes.length === 0) {
-                  context.zoom = context.post.extra.zoom ? Number(context.post.extra.zoom) : context.zoom
-                } else {
-                  context.map.fitBounds(context.dataBounds, {padding: [20, 20], maxZoom: 18})
-                }
+                context.fit()
               }
               resolve()
             }, 200)
           })
         }
       })
+    },
+    fit () {
+      if (this.markers.length === 1 && this.routes.length === 0) {
+        this.zoom = this.post.extra.zoom ? Number(this.post.extra.zoom) : this.zoom
+      } else {
+        this.map.fitBounds(this.dataBounds, {padding: [20, 20], maxZoom: 18})
+      }
     },
     /**
      * emit marker details clicked event
@@ -505,17 +453,20 @@ export default {
       }
     })
     this.$nextTick(() => {
-      setTimeout(() => {
-        if (context.$refs.map && context.routes.length > 0) {
-          // work as expected when wrapped in a $nextTick
-          context.map = context.$refs.map.mapObject
-          context.addRouteLegends()
-          context.addShowStopsControl()
-        }
-      }, 200)
+      // once the map component is mounted, load the map data
+      let endpoint = `maps/${this.mapId}`
+      PostService.get(endpoint).then((post) => {
+        context.mapData = post
+        this.loadMapData().then(() => {
+          if (context.$refs.map && context.routes.length > 0) {
+            // work as expected when wrapped in a $nextTick
+            context.map = context.$refs.map.mapObject
+            context.addRouteLegends()
+            context.addShowStopsControl()
+          }
+        })
+      })
     })
-    // once the map component is mounted, load the map data
-    this.loadMapData()
   },
   components: {
     LMap,

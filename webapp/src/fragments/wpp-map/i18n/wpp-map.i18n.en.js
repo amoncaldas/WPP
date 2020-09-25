@@ -1,6 +1,6 @@
 export default {
-  sectionsMap: {
-    title: 'Places',
+  wppMap: {
+    title: 'Map',
     duration: 'Duration: ',
     distance: 'Distance: ',
     days: 'd',
@@ -13,10 +13,17 @@ export default {
     polygonDetails: 'Polygon details',
     polygon: 'Polygon',
     section: 'Section details',
-    gestureHandlingTexts: {
-      touch: 'Use two fingers to move the map',
-      scroll: 'Use ctrl + scroll to zoom the map',
-      scrollMac: 'Use \u2318 + scroll to zoom the map'
+    showStops: 'Show stops',
+    toggleShowStops: 'Show/hide stops',
+    transportationMeans: {
+      bicycle: 'Bicycle',
+      foot: 'Foot',
+      train: 'Train',
+      ferry: 'Ferry',
+      bus: 'Bus',
+      sailboat: 'Sailboat',
+      car: 'Car',
+      airplane: 'Airplane'
     }
   }
 }

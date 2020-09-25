@@ -9,14 +9,9 @@
       <highlighted position="middle" :columns-per-post="6" :content-id="currentSection.id"> </highlighted>
     </template>
     <div class="content" v-if="currentSection.extra.has_content" v-html="currentSection.extra.html_content"></div>
-    <template>
-      <br>
-      <sections-map v-if="currentSection && currentSection.extra.has_section_map"></sections-map>
-      <br>
-    </template>
-    <template v-if="hasMap">
-      <post-map @placeClicked="placeClicked" :post="currentSection"></post-map>
-      <br>
+    <template v-if="hasMaps">
+      <wpp-map v-for="mapId in currentSection.extra.maps" :key="mapId" @placeClicked="placeClicked" :height-unit="currentSection.extra.map_height_unit" :height="currentSection.extra.map_height" :map-id="mapId"></wpp-map>
+      <br/>
     </template>
     <template v-if="currentSection.extra.compact_list_posts">
       <br>

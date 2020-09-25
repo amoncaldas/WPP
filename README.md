@@ -256,6 +256,7 @@ Options with `wpp_` prefix that are not present by default:
 
 - wpp_signup_with_github
 - wpp_site_relative_login_logo_url
+- wpp_ors_api_key
 - wpp_map_icon_url
 - wpp_meta_*
 - wpp_meta_name_*

@@ -1,6 +1,7 @@
 import postService from '@/shared-services/post-service'
 import Media from '@/fragments/media/Media'
-import PostMap from '@/fragments/post-map/PostMap'
+import PostPlaces from '@/fragments/post-places/PostPlaces'
+import WppMap from '@/fragments/wpp-map/WppMap'
 import Gallery from '@/fragments/gallery/Gallery'
 import Comments from '@/fragments/comments/Comments'
 import utils from '@/support/utils'
@@ -62,10 +63,12 @@ export default {
         return media
       }
     },
-    hasMap () {
-      if (this.post.maps && Object.keys(this.post.maps).length > 0) {
-        return true
-      } else if (this.post.places && Object.keys(this.post.places).length > 0) {
+    hasPlaces () {
+      let has = this.post && this.post.extra.has_places
+      return has
+    },
+    hasMaps () {
+      if (this.post.extra && this.post.extra.maps && Object.keys(this.post.extra.maps).length > 0) {
         return true
       }
     },
@@ -210,12 +213,13 @@ export default {
   },
   components: {
     Media,
-    PostMap,
+    PostPlaces,
     Gallery,
     Comments,
     AuthorAndPlace,
     Sharer,
-    ReportError
+    ReportError,
+    WppMap
   },
   beforeCreate: function () {
     this.$options.components.Related = require('@/fragments/related/Related.vue').default
