@@ -2,19 +2,22 @@ import Posts from '@/fragments/posts/Posts'
 import Sections from '@/fragments/sections/Sections'
 import wpp from '@/support/wpp'
 import Section from '@/support/section'
+import Search from '@/fragments/forms/search/Search'
 
 export default {
   data: () => ({
-    postType: null,
+    postTypeEndpoint: null,
     loaded: false,
     currentSection: null,
     title: null,
     parentSectionId: null,
-    page: 1
+    page: 1,
+    order: 'asc'
   }),
   components: {
     Posts,
-    Sections
+    Sections,
+    Search
   },
   watch: {
     $route: {
@@ -22,6 +25,12 @@ export default {
         this.loadData()
       },
       deep: true
+    }
+  },
+  computed: {
+    postType () {
+      let postType = wpp.getPostTypeFromEndpoint(this.$store.getters.postTypeEndpoint)
+      return postType
     }
   },
   created () {
@@ -36,7 +45,7 @@ export default {
   methods: {
     loadData () {
       this.loaded = false
-      this.postType = null
+      this.postTypeEndpoint = null
       let context = this
       setTimeout(() => {
         let currentSection = Section.getCurrentSection()
@@ -46,11 +55,28 @@ export default {
           context.parentSectionId = currentSection.id
         }
         let translation = wpp.getArchiveTranslated()
-        context.postType = context.$store.getters.postTypeEndpoint
+        context.postTypeEndpoint = context.$store.getters.postTypeEndpoint
         context.title = translation
         context.eventBus.$emit('titleChanged', translation)
         context.loaded = true
       }, 100)
+    },
+    orderChanged (order) {
+      this.order = order
+      this.syncUrl()
+    },
+    pageChanged (page) {
+      this.page = page
+      this.syncUrl()
+    },
+    syncUrl () {
+      let sectionPath = this.$store.getters.currentSection.path
+      if (sectionPath !== '/') {
+        sectionPath = `${sectionPath}/`
+      }
+      let pathName = `${sectionPath}${this.$store.getters.postTypeEndpoint}`
+      let query = {order: this.order, page: this.page}
+      this.$router.push({path: pathName, query: query})
     }
   }
 }

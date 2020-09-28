@@ -1,4 +1,4 @@
-import PostMap from '@/fragments/post-map/PostMap'
+import WppMap from '@/fragments/wpp-map/WppMap'
 import Posts from '@/fragments/posts/Posts'
 import Slider from '@/fragments/slider/Slider'
 import Section from '@/support/section'
@@ -13,7 +13,7 @@ export default {
     currentSection: null
   }),
   components: {
-    PostMap,
+    WppMap,
     Posts,
     Slider,
     Sections,
@@ -62,6 +62,11 @@ export default {
     maxCompact () {
       let max = this.currentSection.extra.max_compact_listing_posts !== undefined ? this.currentSection.extra.max_compact_listing_posts : 4
       return Number(max)
+    },
+    hasMaps () {
+      if (this.currentSection.extra.maps && Object.keys(this.currentSection.extra.maps).length > 0) {
+        return true
+      }
     }
   }
 }

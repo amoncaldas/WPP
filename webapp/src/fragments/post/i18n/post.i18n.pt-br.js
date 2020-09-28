@@ -14,6 +14,7 @@ export default {
     availableAt: 'Disponível a partir de',
     lastUpdate: 'Última atualização',
     reportError: 'Encontrou um erro? Conte-nos!',
-    in: 'Em'
+    in: 'Em',
+    defaultMapTitle: 'Map'
   }
 }

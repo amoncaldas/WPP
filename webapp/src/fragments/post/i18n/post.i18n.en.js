@@ -14,6 +14,7 @@ export default {
     availableAt: 'Available at',
     lastUpdate: 'Last update',
     reportError: 'Found an error? Tell us!',
-    in: 'In'
+    in: 'In',
+    defaultMapTitle: 'Map'
   }
 }

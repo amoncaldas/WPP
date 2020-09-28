@@ -1,18 +1,18 @@
 <template>
   <div>
-    <br><br>
-    <v-form ref="form" @keyup.native.enter="submit">
+    <v-form ref="form" @submit.prevent>
        <v-layout row wrap>
         <v-flex xs12 v-bind="{['sm'+ searchInputColumns]: true}" >
-            <v-text-field height="60" box :style="{paddingRight: $vuetify.breakpoint.smAndDown? '0px': '5px'}"
-              :label="$t('searchComponent.placeholder')"
+            <v-text-field height="60" box 
+              :style="{paddingRight: $vuetify.breakpoint.smAndDown? '0px': '5px'}"
+              :label="placeHolder"
               ref="searchInput"
               class="search-box"
               v-model="term"
-              @keyup="search"
+              @keyup="runSearchWithEnter"
               hide-details>
               <template slot="append">
-                <v-icon class="notranslate" :title="$t('searchComponent.search')" v-if="term" @click="search()">search</v-icon>
+                <v-icon class="notranslate" :title="$t('searchComponent.search')" @click="doSearch()">search</v-icon>
                 <v-icon class="notranslate" :title="$t('searchComponent.clear')" v-if="term" @click="term = ''">clear</v-icon>
               </template>
             </v-text-field>
@@ -31,7 +31,7 @@
       </v-layout>
       <br>
       <template v-if="searched">
-        <h2 class="results-title" v-if="results.length > 0">{{$t('searchComponent.results')}}</h2>
+        <h2 class="results-title" v-if="results.length > 0">{{resultsTitle}}</h2>
         <h2 class="results-title" v-else>{{$t('searchComponent.noResult')}}</h2>
         <br>
       </template>

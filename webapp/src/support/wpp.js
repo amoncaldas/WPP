@@ -13,9 +13,9 @@ const logoUrl = () => {
  * Get the current post type title translated according the current locale
  * @returns {String} title
  */
-const getArchiveTranslated = () => {
+const getArchiveTranslated = (archiveType) => {
   let translations = store.getters.options.post_type_translations
-  let translation = store.getters.postTypeEndpoint
+  let translation = archiveType || store.getters.postTypeEndpoint
   let localesTranslation = lodash.find(translations, (locales) => {
     return lodash.find(locales, locale => {
       return locale.path === store.getters.postTypeEndpoint
@@ -26,6 +26,20 @@ const getArchiveTranslated = () => {
     translation = matchTranslation.title
   }
   return translation
+}
+
+/**
+ * Get the post type based on the endpoint
+ * @param endpoint
+ * @returns {String} post_type (key)
+ */
+const getPostTypeFromEndpoint = (endpoint) => {
+  for (let key in store.getters.options.post_type_translations) {
+    const translation = store.getters.options.post_type_translations[key][store.getters.locale]
+    if (translation.path === endpoint) {
+      return key
+    }
+  }
 }
 /**
  * Get the current endpoint translated according the current locale
@@ -48,5 +62,6 @@ const getCurrentEndpointTranslated = () => {
 export default {
   logoUrl,
   getArchiveTranslated,
-  getCurrentEndpointTranslated
+  getCurrentEndpointTranslated,
+  getPostTypeFromEndpoint
 }

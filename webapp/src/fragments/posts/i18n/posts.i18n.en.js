@@ -5,6 +5,9 @@ export default {
     categoriesFilter: 'Categories filter applied',
     tagsFilter: 'Tags filter applied',
     seeArchive: 'See all',
-    noContent: 'No content to list'
+    noContent: 'No content to list',
+    asc: 'Ascendent',
+    desc: 'Descendent',
+    order: 'Order'
   }
 }

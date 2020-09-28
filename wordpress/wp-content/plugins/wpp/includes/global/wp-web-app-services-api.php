@@ -107,6 +107,9 @@
         if($key === "wpp_site_relative_logo_url")  {
           $value = network_site_url(trim($value));
         }
+        if($key === "wpp_map_icon_url")  {
+          $value = network_site_url(trim($value));
+        }
         if ( strpos($key, "wpp_meta_name_") === 0) {
           $clean_key =  $meta_name = str_replace("wpp_meta_name_", "", $key);
           $wpp_options[$clean_key] = $value;
@@ -115,7 +118,7 @@
           $clean_key =  $meta_property_name = str_replace("wpp_meta_", "", $key);
           $wpp_options[$clean_key] = $value;
         } 
-        elseif ( strpos($key, "wpp_") === 0) {          
+        elseif ( strpos($key, "wpp_") === 0 && $key) {          
           $clean_key =  $meta_property_name = str_replace("wpp_", "", $key);
 
           $value =  $value === "yes" ? true : $value;
@@ -357,7 +360,14 @@
       // only posts of the passed post type
       $p_type = $request->get_param('ptype');
       if (isset($p_type)) {
-        $args['post_type'] = $p_type;
+        $args['post_type'] = [$p_type];
+      }
+
+      // If an specific post type was passed, 
+      // search only for this post type
+      $post_type = $request->get_param( 'post_type' );
+      if ($post_type) {
+        $args['post_type'] = [$post_type];
       }
 
       // Receive and set the exclude parameter from the $request

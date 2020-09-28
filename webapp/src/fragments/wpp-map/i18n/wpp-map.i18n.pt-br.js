@@ -1,5 +1,5 @@
 export default {
-  postMap: {
+  wppMap: {
     title: 'Mapa',
     duration: 'Duração: ',
     distance: 'Distancia: ',

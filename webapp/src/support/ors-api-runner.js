@@ -2,7 +2,6 @@ import OrsParamsParser from '@/support/map-data-services/ors-params-parser'
 import constants from '@/resources/constants'
 import Place from '@/models/place'
 import store from '@/store/store'
-import config from '@/config'
 
 import OrsApiClient from 'openrouteservice-js'
 
@@ -22,7 +21,7 @@ import OrsApiClient from 'openrouteservice-js'
  */
 const Directions = (places, customArgs = null) => {
   let directions = new OrsApiClient.Directions({
-    api_key: config.orsApiKey
+    api_key: store.getters.options.ors_api_key
   })
   let args = OrsParamsParser.buildRoutingArgs(places)
   if (customArgs) {
@@ -47,7 +46,7 @@ const Directions = (places, customArgs = null) => {
  */
 const Geocode = (term, size = 10) => {
   let client = new OrsApiClient.Geocode({
-    api_key: config.orsApiKey
+    api_key: store.getters.options.ors_api_key
   })
   let args = OrsParamsParser.buildAutocompleteArgs(term)
   args.size = size
@@ -70,7 +69,7 @@ const Geocode = (term, size = 10) => {
  */
 const ReverseGeocode = (lat, lng, size = 10) => {
   let client = new OrsApiClient.Geocode({
-    api_key: config.orsApiKey
+    api_key: store.getters.options.ors_api_key
   })
   let args = OrsParamsParser.buildReverseSearchArgs(lat, lng)
   args.size = size
@@ -101,7 +100,7 @@ const PlacesSearch = (term, quantity = 100, restrictArea = true) => {
     args.size = quantity
 
     let client = new OrsApiClient.Geocode({
-      api_key: config.orsApiKey
+      api_key: store.getters.options.ors_api_key
     })
 
     client.geocode(args).then(response => {
@@ -129,14 +128,14 @@ const PlacesSearch = (term, quantity = 100, restrictArea = true) => {
  */
 const Pois = () => {
   let pois = new OrsApiClient.Pois({
-    api_key: config.orsApiKey
+    api_key: store.getters.options.ors_api_key
   })
   return pois
 }
 
 const Isochrones = (places) => {
   var isochrones = new OrsApiClient.Isochrones({
-    api_key: store.getters.mapSettings.apiKey
+    api_key: store.getters.options.ors_api_key
   })
   return new Promise((resolve, reject) => {
     let args = OrsParamsParser.buildIsochronesArgs(places)

@@ -58,6 +58,18 @@ export default {
     mode: {
       type: String,
       default: 'block'
+    },
+    order: {
+      type: String,
+      default: 'desc' // or 'asc'
+    },
+    selectableOrder: {
+      type: Boolean,
+      default: false
+    },
+    externalPaging: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -67,17 +79,34 @@ export default {
       loaded: false,
       totalPages: null,
       firstLoad: true,
-      currentPage: 1
+      currentPage: 1,
+      localOrder: this.order
     }
   },
   watch: {
+    page: function () {
+      this.currentPage = this.page
+      if (this.externalPaging) {
+        this.loadPosts()
+      }
+    },
     currentPage: function () {
-      this.loadPosts()
+      if (this.externalPaging) {
+        this.$emit('paged', this.currentPage)
+      } else {
+        this.loadPosts()
+      }
     },
     endpoint: function () {
       this.loadPosts()
     },
     parentId: function () {
+      this.loadPosts()
+    },
+    order: function () {
+      this.localOrder = this.order
+    },
+    localOrder: function () {
       this.loadPosts()
     }
   },
@@ -106,12 +135,16 @@ export default {
     }
   },
   methods: {
+    orderChanged () {
+      this.$emit('orderChanged', this.localOrder)
+    },
     loadPosts () {
       this.loaded = false
       // @see http://v2.wp-api.org/reference/posts/
       let filters = {
         page: this.currentPage,
-        per_page: this.max
+        per_page: this.max,
+        order: this.localOrder
       }
 
       // Offset value in the query is causing
@@ -143,22 +176,24 @@ export default {
         filters.include = this.include.join(',')
       }
 
+      let context = this
+
       postService.query(filters, `/${this.endpoint}`).then((response) => {
-        this.posts = response
+        context.posts = response
         if (response.raw && response.data) {
-          this.posts = response.data
-          this.total = Number(response.headers['x-wp-total'])
-          this.totalPages = Number(response.headers['x-wp-totalpages'])
+          context.posts = response.data
+          context.total = Number(response.headers['x-wp-total'])
+          context.totalPages = Number(response.headers['x-wp-totalpages'])
         }
       }).catch(error => {
         console.log(error)
-        this.showError(this.$t('posts.thePostListCouldNotBeLoaded'))
+        context.showError(context.$t('posts.thePostListCouldNotBeLoaded'))
       }).finally(() => {
-        this.loaded = true
-        if (!this.firstLoad) {
+        context.loaded = true
+        if (!context.firstLoad) {
           VueScrollTo.scrollTo(this.$el, 1000, {})
         }
-        this.firstLoad = false
+        context.firstLoad = false
       })
     }
   },

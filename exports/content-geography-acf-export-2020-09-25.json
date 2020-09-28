@@ -1,0 +1,301 @@
+[
+    {
+        "key": "group_5c1a62490b577",
+        "title": "Content geography",
+        "fields": [
+            {
+                "key": "field_5c6d231b9def0",
+                "label": "Has places?",
+                "name": "has_places",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 1,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_5f6dcc1d9dc32",
+                "label": "Map title",
+                "name": "map_title",
+                "type": "text",
+                "instructions": "Optional. If not defined will be the single place name",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c6d231b9def0",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "maxlength": ""
+            },
+            {
+                "key": "field_5c6d234fcba1d",
+                "label": "Places",
+                "name": "places",
+                "type": "relationship",
+                "instructions": "",
+                "required": 1,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c6d231b9def0",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "place"
+                ],
+                "taxonomy": "",
+                "filters": [
+                    "search",
+                    "taxonomy"
+                ],
+                "elements": [
+                    "featured_image"
+                ],
+                "min": 1,
+                "max": "",
+                "return_format": "id"
+            },
+            {
+                "key": "field_5f6dc2180bab5",
+                "label": "Zoom",
+                "name": "zoom",
+                "type": "range",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c6d231b9def0",
+                            "operator": "==",
+                            "value": "1"
+                        },
+                        {
+                            "field": "field_5c6d234fcba1d",
+                            "operator": "<",
+                            "value": "2"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": 9,
+                "min": 1,
+                "max": 18,
+                "step": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_5f6dc28c135d5",
+                "label": "Tiles provider",
+                "name": "tiles_provider_id",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c6d231b9def0",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "osm": "Open Street Maps",
+                    "satellite": "Satellite",
+                    "cycling": "Cycling",
+                    "topography": "Topography",
+                    "transport-dark": "Transport dark"
+                },
+                "default_value": [],
+                "allow_null": 0,
+                "multiple": 0,
+                "ui": 0,
+                "return_format": "value",
+                "ajax": 0,
+                "placeholder": ""
+            },
+            {
+                "key": "field_5f6ca6805e5f8",
+                "label": "Maps",
+                "name": "maps",
+                "type": "relationship",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5c6d231b9def0",
+                            "operator": "!=",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "map"
+                ],
+                "taxonomy": "",
+                "filters": [
+                    "search"
+                ],
+                "elements": [
+                    "featured_image"
+                ],
+                "min": "",
+                "max": 1,
+                "return_format": "id"
+            },
+            {
+                "key": "field_5f6dce1f56311",
+                "label": "Map height",
+                "name": "map_height",
+                "type": "number",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5f6ca6805e5f8",
+                            "operator": ">",
+                            "value": "0"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": 300,
+                "placeholder": "Height value",
+                "prepend": "",
+                "append": "",
+                "min": "",
+                "max": "",
+                "step": ""
+            },
+            {
+                "key": "field_5f6dce6156312",
+                "label": "Map height unit",
+                "name": "map_height_unit",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_5f6ca6805e5f8",
+                            "operator": ">",
+                            "value": "0"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "px": "Pixels",
+                    "%": "Percent"
+                },
+                "default_value": [],
+                "allow_null": 0,
+                "multiple": 0,
+                "ui": 0,
+                "return_format": "value",
+                "ajax": 0,
+                "placeholder": ""
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "story"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "album"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "status"
+                }
+            ],
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "section"
+                }
+            ]
+        ],
+        "menu_order": 2,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": ""
+    }
+]
