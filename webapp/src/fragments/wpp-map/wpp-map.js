@@ -25,6 +25,10 @@ export default {
       type: Number,
       required: false
     },
+    mapData: {
+      type: Object,
+      required: false
+    },
     heightUnit: {
       type: String,
       default: 'px'
@@ -64,11 +68,11 @@ export default {
       }
     },
     markers () {
-      if (this.mapData) {
+      if (this.localMapData) {
         if (!this.showStops) {
           return []
         }
-        return this.mapData.markers
+        return this.localMapData.markers
       }
     },
     routes () {
@@ -81,7 +85,7 @@ export default {
       return this.initialMaxZoom
     },
     title () {
-      return this.mapData.title.rendered || this.mapData.title || this.$t('map.title')
+      return this.localMapData.title.rendered || this.localMapData.title || this.$t('map.title')
     },
     mapHeight () {
       let height = `${this.height}${this.heightUnit}`
@@ -152,29 +156,36 @@ export default {
       this.mapRoutes = []
       let context = this
       return new Promise((resolve, reject) => {
-        context.buildRoutes(context.mapData.routes).then(() => {
+        if (context.localMapData.routes && context.localMapData.routes.length > 0) {
+          context.buildRoutes(context.localMapData.routes).then(() => {
+            resolve()
+          })
+        } else {
           resolve()
-        })
+        }
       })
     },
     buildRoutes (rawRoutes) {
       let context = this
       return new Promise((resolve, reject) => {
+        let promises = []
         for (let key in rawRoutes) {
           let rawRoute = rawRoutes[key]
 
           if (rawRoute.route_content_type === 'coordinates_array') {
             let route = context.buildRouteFromArray(rawRoute)
             context.mapRoutes.push(route)
-            resolve()
           } else {
-            context.buildRoutesFromObject(rawRoute).then((route) => {
-              if (route) {
-                context.mapRoutes.push(route)
-              }
-              resolve()
-            })
+            promises.push(context.buildRoutesFromObject(rawRoute))
           }
+        }
+        if (promises.length > 0) {
+          Promise.all(promises).then((routes) => {
+            context.mapRoutes = context.mapRoutes.concat(routes)
+            resolve()
+          })
+        } else {
+          resolve()
         }
       })
     },
@@ -193,6 +204,7 @@ export default {
               route.polyline = GeoUtils.switchLatLonIndex(route.polyline)
             }
           }
+          delete route.route_content
           resolve(route)
         }).catch(err => {
           console.log(err)
@@ -290,7 +302,7 @@ export default {
           context.dataBounds = [{lon: 0, lat: 0}, {lon: 0, lat: 0}]
           let iconUrl = context.$store.getters.options.map_icon_url
           let hasRoute = context.mapRoutes.length > 0
-          context.mapData.markers = GeoUtils.buildMarkers(context.getMarkersData(), hasRoute, {mapIconUrl: iconUrl})
+          context.localMapData.markers = GeoUtils.buildMarkers(context.getMarkersData(), hasRoute, {mapIconUrl: iconUrl})
           let polylineData = []
 
           // build the polyline
@@ -299,7 +311,7 @@ export default {
               polylineData = polylineData.concat(context.routes[key].polyline)
             }
           }
-          context.dataBounds = GeoUtils.getBounds(context.dataBounds, context.mapData.markers, polylineData)
+          context.dataBounds = GeoUtils.getBounds(context.dataBounds, context.localMapData.markers, polylineData)
 
           context.setActiveTilesProvider()
           context.fitFeaturesBounds()
@@ -317,10 +329,10 @@ export default {
      * back-end specified tiles provider
      */
     setActiveTilesProvider () {
-      if (this.mapData.extra.tiles_provider_id) {
+      if (this.localMapData.extra.tiles_provider_id) {
         // Check if the tiles provider defined is supported by the front-end
         let tileProviderSupported = this.lodash.find(this.tileProviders, (tp) => {
-          return tp.id === this.mapData.extra.tiles_provider_id
+          return tp.id === this.localMapData.extra.tiles_provider_id
         })
         // If the tile provider specified is supported by
         // the the front end then set is as the only one visible
@@ -328,7 +340,7 @@ export default {
           for (let key in this.tileProviders) {
             this.tileProviders[key].visible = false
             let provider = this.tileProviders[key]
-            if (provider.id === this.mapData.extra.tiles_provider_id) {
+            if (provider.id === this.localMapData.extra.tiles_provider_id) {
               this.tileProviders[key].visible = true
             }
           }
@@ -342,8 +354,8 @@ export default {
      */
     getMarkersData () {
       let markersData = []
-      for (let placeKey in this.mapData.places) {
-        let place = this.mapData.places[placeKey]
+      for (let placeKey in this.localMapData.places) {
+        let place = this.localMapData.places[placeKey]
         if (place.markers && place.markers.length > 0) {
           let location = place.markers[0]
           markersData.push([location.lng, location.lat, place.title, place])
@@ -453,19 +465,33 @@ export default {
       }
     })
     this.$nextTick(() => {
-      // once the map component is mounted, load the map data
-      let endpoint = `maps/${this.mapId}`
-      PostService.get(endpoint).then((post) => {
-        context.mapData = post
-        this.loadMapData().then(() => {
-          if (context.$refs.map && context.routes.length > 0) {
+      // Use the map data if passed
+      if (context.mapData) {
+        context.localMapData = context.mapData
+        context.loadMapData().then(() => {
+          if (context.$refs.map) {
             // work as expected when wrapped in a $nextTick
             context.map = context.$refs.map.mapObject
-            context.addRouteLegends()
-            context.addShowStopsControl()
           }
         })
-      })
+      } else { // if not, load it
+        // once the map component is mounted,
+        // load the map data based on its id
+        let endpoint = `maps/${this.mapId}`
+        PostService.get(endpoint).then((post) => {
+          context.localMapData = post
+          this.loadMapData().then(() => {
+            if (context.$refs.map) {
+              // work as expected when wrapped in a $nextTick
+              context.map = context.$refs.map.mapObject
+              if (context.routes.length > 0) {
+                context.addRouteLegends()
+                context.addShowStopsControl()
+              }
+            }
+          })
+        })
+      }
     })
   },
   components: {

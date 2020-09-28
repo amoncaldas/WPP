@@ -70,7 +70,7 @@
         </template>
 
         <template v-if="hasPlaces">
-          <post-places @placeClicked="placeClicked" :post="post"></post-places>
+          <wpp-map @placeClicked="placeClicked" :map-data="placesMapData"></wpp-map>
           <br/>
         </template>
         <template v-else-if="hasMaps">

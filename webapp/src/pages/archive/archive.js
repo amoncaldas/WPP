@@ -70,8 +70,13 @@ export default {
       this.syncUrl()
     },
     syncUrl () {
+      let sectionPath = this.$store.getters.currentSection.path
+      if (sectionPath !== '/') {
+        sectionPath = `${sectionPath}/`
+      }
+      let pathName = `${sectionPath}${this.$store.getters.postTypeEndpoint}`
       let query = {order: this.order, page: this.page}
-      this.$router.push({path: location.pathname, query: query})
+      this.$router.push({path: pathName, query: query})
     }
   }
 }

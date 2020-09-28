@@ -1,6 +1,5 @@
 import postService from '@/shared-services/post-service'
 import Media from '@/fragments/media/Media'
-import PostPlaces from '@/fragments/post-places/PostPlaces'
 import WppMap from '@/fragments/wpp-map/WppMap'
 import Gallery from '@/fragments/gallery/Gallery'
 import Comments from '@/fragments/comments/Comments'
@@ -66,6 +65,38 @@ export default {
     hasPlaces () {
       let has = this.post && this.post.extra.has_places
       return has
+    },
+    /**
+     * Build map object
+     * based on post properties
+     * @returns {*} mapData {places: Array, title: String, extra: Object}
+     */
+    placesMapData () {
+      let mapData = {
+        places: this.post.places
+      }
+      // Define the map title
+      // based on the map title field,
+      // the only place name or the
+      // default map title
+      if (this.post.extra.map_title) {
+        mapData.title = this.post.extra.map_title
+      } else {
+        if (this.post.places.length === 1) {
+          let keys = Object.keys(this.post.places)
+          let firstKey = keys[0]
+          mapData.title = this.post.places[firstKey].title
+        } else {
+          mapData.title = this.$t('post.defaultMapTitle')
+        }
+      }
+      if (this.post.extra) {
+        mapData.extra = {
+          zoom: this.post.extra.zoom,
+          tiles_provider_id: this.post.extra.tiles_provider_id
+        }
+      }
+      return mapData
     },
     hasMaps () {
       if (this.post.extra && this.post.extra.maps && Object.keys(this.post.extra.maps).length > 0) {
@@ -213,7 +244,6 @@ export default {
   },
   components: {
     Media,
-    PostPlaces,
     Gallery,
     Comments,
     AuthorAndPlace,
