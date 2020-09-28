@@ -156,7 +156,7 @@ export default {
       this.mapRoutes = []
       let context = this
       return new Promise((resolve, reject) => {
-        if (context.localMapData.routes && context.localMapData.routes.length > 0) {
+        if (context.localMapData.routes && Object.keys(context.localMapData.routes).length > 0) {
           context.buildRoutes(context.localMapData.routes).then(() => {
             resolve()
           })
