@@ -7,6 +7,7 @@ export default {
     search: 'Search',
     clear: 'Clear',
     for: 'for',
-    in: 'in'
+    in: 'in',
+    typeSomethingToSearch: 'Type something if you want to perform a search'
   }
 }

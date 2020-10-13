@@ -110,7 +110,7 @@ export default {
         }
         this.$router.push({name: 'HomeOrSearch', query: query})
       } else {
-        this.showError(this.$t('searchComponent.typeSomethingtoSearch'))
+        this.showInfo(this.$t('searchComponent.typeSomethingToSearch'))
       }
     },
     loadData () {
