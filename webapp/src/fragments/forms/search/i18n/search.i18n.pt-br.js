@@ -5,6 +5,7 @@ export default {
     results: 'Resultados',
     noResult: 'Nenhum resultado',
     search: 'Buscar',
-    clear: 'Limpar'
+    clear: 'Limpar',
+    typeSomethingToSearch: 'Digite algo se quiser uma busca'
   }
 }
