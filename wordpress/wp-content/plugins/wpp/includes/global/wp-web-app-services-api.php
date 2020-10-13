@@ -107,7 +107,7 @@
         if($key === "wpp_site_relative_logo_url")  {
           $value = network_site_url(trim($value));
         }
-        if($key === "wpp_map_icon_url")  {
+        if($key === "wpp_map_icon_url" && strpos($value, "http") !== 0)  {
           $value = network_site_url(trim($value));
         }
         if ( strpos($key, "wpp_meta_name_") === 0) {
