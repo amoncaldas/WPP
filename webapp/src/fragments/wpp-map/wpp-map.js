@@ -126,12 +126,12 @@ export default {
         },
         {
           id: 'ferry',
-          color: 'red', // green,
+          color: 'red', // red,
           title: this.$t('wppMap.transportationMeans.ferry')
         },
         {
           id: 'bus',
-          color: '#008000', // maroom,
+          color: '#7c0a02', // maroom,
           title: this.$t('wppMap.transportationMeans.bus')
         },
         {
