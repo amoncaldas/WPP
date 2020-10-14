@@ -58,6 +58,9 @@ export default {
   computed: {
     boxTitle () {
       return this.title || this.$t('related.title')
+    },
+    postList () {
+      return this.posts
     }
   },
   methods: {
