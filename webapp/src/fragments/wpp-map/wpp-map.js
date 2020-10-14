@@ -492,7 +492,9 @@ export default {
               context.map = context.$refs.map.mapObject
               if (context.routes.length > 0) {
                 context.addRouteLegends()
-                context.addShowStopsControl()
+                if (context.markers.length > 0) {
+                  context.addShowStopsControl()
+                }
               }
             }
           })
