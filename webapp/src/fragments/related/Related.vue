@@ -6,7 +6,7 @@
     <div slot="content" v-if="posts">
       <v-container style="padding:5px" grid-list-lg fluid >
         <v-layout row wrap>
-          <template v-for="(post, index) in posts">
+          <template v-for="(post, index) in postList">
             <v-flex v-if="index < max"  v-bind="{['xs'+columnsPerPost]: true}"  :key="post.id">
               <post :key="post.id" :no-top-border="true" :show-type="true" :post-data="post"></post>
             </v-flex>
