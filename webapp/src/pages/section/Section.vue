@@ -12,7 +12,7 @@
       <br>
     </template>
     <template v-if="hasMaps">
-      <wpp-map v-for="mapId in currentSection.maps" :key="mapId" @placeClicked="placeClicked" :height-unit="currentSection.extra.map_height_unit" :height="currentSection.extra.map_height" :map-id="mapId"></wpp-map>
+      <wpp-map v-for="mapId in currentSection.extra.maps" :key="mapId" @placeClicked="placeClicked" :height-unit="currentSection.extra.map_height_unit" :height="currentSection.extra.map_height" :map-id="mapId"></wpp-map>
       <br/>
     </template>
     <template v-if="currentSection.extra.compact_list_posts">

@@ -74,7 +74,7 @@
           <br/>
         </template>
         <template v-else-if="hasMaps">
-          <wpp-map v-for="(mapId, index) in post.extra.maps" :height-unit="post.extra.map_height_unit" :height="post.extra.map_height" :key="index" @placeClicked="placeClicked" :map-id="mapId"></wpp-map>
+          <wpp-map v-for="mapId in post.extra.maps" :height-unit="post.extra.map_height_unit" :height="post.extra.map_height" :key="mapId" @placeClicked="placeClicked" :map-id="mapId"></wpp-map>
           <br/>
         </template>
         <box v-if="post.extra.medias" background="white" :no-top-border="noTopBorder">
