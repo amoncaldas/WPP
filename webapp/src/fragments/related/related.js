@@ -72,17 +72,20 @@ export default {
         filters.exclude = this.exclude.join(',')
       }
       let service = relatedService.clone()
-      service.setEndPoint(service.getEndPoint().replace('<contentId>', this.contentId))
+      let endpoint = service.getEndPoint().replace('<contentId>', this.contentId)
+      service.setEndPoint(endpoint)
+
+      let context = this
       service.query(filters).then((response) => {
-        this.posts = response
+        context.posts = response
         if (response.raw && response.data) {
-          this.posts = response.data
-          this.total = Number(response.headers['x-wp-total'])
-          this.totalPages = Number(response.headers['x-wp-totalpages'])
+          context.posts = response.data
+          context.total = Number(response.headers['x-wp-total'])
+          context.totalPages = Number(response.headers['x-wp-totalpages'])
         }
       }).catch(error => {
         console.log(error)
-        this.showError(this.$t('related.theRelatedListCouldNotBeLoaded'))
+        context.showError(context.$t('related.theRelatedListCouldNotBeLoaded'))
       })
     }
   },
