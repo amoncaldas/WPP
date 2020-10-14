@@ -48,14 +48,14 @@ export default {
       initialMaxZoom: 18,
       routeColor: this.$vuetify.theme.secondary,
       guid: null,
-      mapData: null,
       info: null,
       boxGuid: null,
       loaded: false,
       transportationColorMap: [],
       mapRoutes: [],
       showStops: true,
-      showStopsControlRef: null
+      showStopsControlRef: null,
+      localHeight: null
     }
   },
   computed: {
@@ -88,7 +88,7 @@ export default {
       return this.localMapData.title.rendered || this.localMapData.title || this.$t('map.title')
     },
     mapHeight () {
-      let height = `${this.height}${this.heightUnit}`
+      let height = `${this.localHeight}${this.heightUnit}`
       return height
     },
     mapCenter () {
@@ -103,6 +103,9 @@ export default {
   watch: {
     '$route': function () {
       this.loadMapData()
+    },
+    'height': function () {
+      this.localHeight = this.height
     }
   },
 
@@ -423,9 +426,9 @@ export default {
         // if the map is maximized, then the height
         // will be the window height less an offset
         if (data.maximized) {
-          this.mapHeight = window.innerHeight - 100
+          this.localHeight = window.innerHeight - 100
         } else { // if not, the height is fixed
-          this.mapHeight = 300
+          this.localHeight = 300
         }
         this.$forceUpdate()
         // After map container box is resized
@@ -448,6 +451,9 @@ export default {
   mounted () {
     // Define a unique identifier to the map component instance
     this.guid = utils.guid()
+
+    // Define the initial height
+    this.localHeight = this.height
 
     this.buildTransportationColorMap()
 
