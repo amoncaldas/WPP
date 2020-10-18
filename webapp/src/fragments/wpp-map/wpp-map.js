@@ -13,11 +13,11 @@ import constants from '@/resources/constants'
 import FileExtractorBuilder from '@/support/file-data-extractors/file-extractor-builder'
 import PostService from '@/shared-services/post-service'
 import * as leaflet from 'leaflet'
-import { GestureHandling } from 'leaflet-gesture-handling'
+import 'leaflet-gesture-handling'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css'
 
-leaflet.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling)
+// leaflet.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling)
 
 export default {
   props: {
@@ -34,7 +34,6 @@ export default {
       default: 'px'
     },
     height: {
-      type: Number,
       default: 300
     }
   },
@@ -55,18 +54,11 @@ export default {
       mapRoutes: [],
       showStops: true,
       showStopsControlRef: null,
-      localHeight: null
+      localHeight: null,
+      mapMaximized: false
     }
   },
   computed: {
-    options () {
-      let tooltip = this.routeToolTip
-      return {
-        onEachFeature: (feature, layer) => {
-          layer.bindTooltip(tooltip, { permanent: false, sticky: true })
-        }
-      }
-    },
     markers () {
       if (this.localMapData) {
         if (!this.showStops) {
@@ -105,7 +97,7 @@ export default {
       this.loadMapData()
     },
     'height': function () {
-      this.localHeight = this.height
+      this.localHeight = Number(this.height)
     }
   },
 
@@ -134,7 +126,7 @@ export default {
         },
         {
           id: 'bus',
-          color: '#7c0a02', // maroom,
+          color: '#1E90FF', // blue,
           title: this.$t('wppMap.transportationMeans.bus')
         },
         {
@@ -420,8 +412,24 @@ export default {
     markerInfoClick (marker) {
       this.$emit('placeClicked', marker.data)
     },
+    setGestureHandlingState () {
+      let context = this
+      this.$nextTick(() => {
+        if (context.map) {
+          // work as expected when wrapped in a $nextTick
+          if (context.mapMaximized) {
+            context.map.gestureHandling.disable()
+          } else {
+            context.map.gestureHandling.enable()
+          }
+        }
+      })
+    },
     adjustMap (data) {
       if (data.guid === this.boxGuid) {
+        this.mapMaximized = data.maximized
+        this.setGestureHandlingState()
+
         window.dispatchEvent(new Event('resize'))
         // if the map is maximized, then the height
         // will be the window height less an offset
@@ -478,6 +486,7 @@ export default {
           if (context.$refs.map) {
             // work as expected when wrapped in a $nextTick
             context.map = context.$refs.map.mapObject
+            context.setGestureHandlingState()
           }
         })
       } else { // if not, load it
@@ -490,6 +499,7 @@ export default {
             if (context.$refs.map) {
               // work as expected when wrapped in a $nextTick
               context.map = context.$refs.map.mapObject
+              context.setGestureHandlingState()
               if (context.routes.length > 0) {
                 context.addRouteLegends()
                 if (context.markers.length > 0) {
