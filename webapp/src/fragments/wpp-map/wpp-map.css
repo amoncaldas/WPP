@@ -1,9 +1,9 @@
-.post-map >>> .map-legend, .post-map >>> .map-show-stops {
+.post-map >>> .map-legend, .post-map >>> .map-show-route-stops {
   background: rgba(0, 0, 0, 0.4);
   padding: 3px;
 }
 
-.post-map >>> .map-legend > .item-container, .post-map >>> .map-show-stops > .show-stop-container {
+.post-map >>> .map-legend > .item-container, .post-map >>> .map-show-route-stops > .show-places-container {
   display: inline-block;
   color: white;
   font-weight: 600;
@@ -18,7 +18,7 @@
 }
 
 
-.post-map >>> .map-show-stops > .show-stop-container > span {
+.post-map >>> .map-show-route-stops > .show-places-container > span {
   height: 15px;
   width: 15px;
   border: 1px solid antiquewhite;
@@ -31,7 +31,7 @@
   font-size: 11px;
 }
 
-.post-map >>> .map-show-stops > .show-stop-container {
+.post-map >>> .map-show-route-stops > .show-places-container {
   cursor: pointer;
 }
 
