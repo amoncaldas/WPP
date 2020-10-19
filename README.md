@@ -322,6 +322,8 @@ Possible post extras:
   - title
   - id
 - map_icon_url
+- Maps:
+  - show_places_by_default
 
 Only for pages:
 
@@ -382,6 +384,14 @@ Follower extras:
 - mail_list (string)
 
 *Date ACF fields must have the return format `Ymd` to be correctly displayed*
+
+## Add post type ##
+
+1. Add the post type via admin using CPT plugin
+2. Add the translation and path in the wpp_post_type_translations option via WPP option
+3. Add the post type endpoint in the  wpp_post_type_endpoints option via WPP option
+4. Add the new post type in the `List post types`in the section fields via Advanced Custom Fields
+4. Remove the cache
 
 ## Admin credentials ##
 

@@ -52,8 +52,8 @@ export default {
       loaded: false,
       transportationColorMap: [],
       mapRoutes: [],
-      showStops: true,
-      showStopsControlRef: null,
+      showRoutePlaces: true,
+      showRoutePlacesControlRef: null,
       localHeight: null,
       mapMaximized: false
     }
@@ -61,7 +61,7 @@ export default {
   computed: {
     markers () {
       if (this.localMapData) {
-        if (!this.showStops) {
+        if (!this.showRoutePlaces) {
           return []
         }
         return this.localMapData.markers
@@ -121,7 +121,7 @@ export default {
         },
         {
           id: 'ferry',
-          color: 'red', // red,
+          color: '#C11B17', // red,
           title: this.$t('wppMap.transportationMeans.ferry')
         },
         {
@@ -256,35 +256,35 @@ export default {
       }
     },
     toggleShowStops () {
-      this.showStops = !this.showStops
-      this.map.removeControl(this.showStopsControlRef)
-      this.addShowStopsControl()
+      this.showRoutePlaces = !this.showRoutePlaces
+      this.map.removeControl(this.showRoutePlacesControlRef)
+      this.addShowRoutePlacesControl()
       setTimeout(() => {
         this.fitFeaturesBounds()
       }, 100)
     },
-    addShowStopsControl () {
+    addShowRoutePlacesControl () {
       if (this.routes.length > 0) {
         let control = leaflet.control({ position: 'bottomleft' })
         let context = this
         control.onAdd = function () {
-          var stopsFragment = leaflet.DomUtil.create('div', 'map-show-stops')
+          var showPlacesFragment = leaflet.DomUtil.create('div', 'map-show-route-stops')
 
           let spanEl = document.createElement('span')
-          spanEl.innerText = context.showStops ? 'X' : ''
-          spanEl.title = context.$t('wppMap.toggleShowStops')
+          spanEl.innerText = context.showRoutePlaces ? 'X' : ''
+          spanEl.title = context.$t('wppMap.toggleShowRoutePlaces')
 
           let divEl = document.createElement('div')
-          divEl.innerText = context.$t('wppMap.showStops')
-          divEl.className = 'show-stop-container'
+          divEl.innerText = context.$t('wppMap.showRoutePlaces')
+          divEl.className = 'show-places-container'
           divEl.title = context.$t('wppMap.toggleShowStops')
           divEl.onclick = () => { context.toggleShowStops() }
           divEl.appendChild(spanEl)
 
-          stopsFragment.appendChild(divEl)
-          return stopsFragment
+          showPlacesFragment.appendChild(divEl)
+          return showPlacesFragment
         }
-        this.showStopsControlRef = control.addTo(this.map)
+        this.showRoutePlacesControlRef = control.addTo(this.map)
       }
     },
     boxCreated (guid) {
@@ -495,6 +495,9 @@ export default {
         let endpoint = `maps/${this.mapId}`
         PostService.get(endpoint).then((post) => {
           context.localMapData = post
+          if (typeof context.localMapData.extra.show_places_by_default === 'boolean') {
+            context.showRoutePlaces = context.localMapData.extra.show_places_by_default
+          }
           this.loadMapData().then(() => {
             if (context.$refs.map) {
               // work as expected when wrapped in a $nextTick
@@ -502,8 +505,8 @@ export default {
               context.setGestureHandlingState()
               if (context.routes.length > 0) {
                 context.addRouteLegends()
-                if (context.markers.length > 0) {
-                  context.addShowStopsControl()
+                if (context.localMapData.extra.has_places && context.localMapData.places.length > 0 && context.routes.length > 0) {
+                  context.addShowRoutePlacesControl()
                 }
               }
             }
