@@ -277,7 +277,7 @@ export default {
           let divEl = document.createElement('div')
           divEl.innerText = context.$t('wppMap.showRoutePlaces')
           divEl.className = 'show-places-container'
-          divEl.title = context.$t('wppMap.toggleShowStops')
+          divEl.title = context.$t('wppMap.toggleShowRoutePlaces')
           divEl.onclick = () => { context.toggleShowStops() }
           divEl.appendChild(spanEl)
 
@@ -453,6 +453,22 @@ export default {
             }, 500)
           })
         }, 500)
+      }
+    },
+    polylineDashedArray (route) {
+      let dashedArray
+      let means = route.means_of_transportation
+      if (means === 'ferry' || means === 'airplane' || means === 'sailboat') {
+        dashedArray = '10, 20'
+        return dashedArray
+      }
+    },
+    polylineDashedOffset (route) {
+      let offset
+      let means = route.means_of_transportation
+      if (means === 'ferry' || means === 'airplane' || means === 'sailboat') {
+        offset = '0'
+        return offset
       }
     }
   },
