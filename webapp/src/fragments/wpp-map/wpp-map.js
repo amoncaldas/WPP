@@ -505,7 +505,8 @@ export default {
               context.setGestureHandlingState()
               if (context.routes.length > 0) {
                 context.addRouteLegends()
-                if (context.localMapData.extra.has_places && context.localMapData.places.length > 0 && context.routes.length > 0) {
+                let placesCount = Object.keys(context.localMapData.places).length
+                if (context.localMapData.extra.has_places && placesCount > 0 && context.routes.length > 0) {
                   context.addShowRoutePlacesControl()
                 }
               }
