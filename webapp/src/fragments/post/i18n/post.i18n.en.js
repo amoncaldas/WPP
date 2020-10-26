@@ -13,7 +13,7 @@ export default {
     available: 'Available',
     availableAt: 'Available at',
     lastUpdate: 'Last update',
-    reportError: 'Found an error? Tell us!',
+    reportError: 'Did you find an error? Tell us!',
     in: 'In',
     defaultMapTitle: 'Map'
   }

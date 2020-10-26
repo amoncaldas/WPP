@@ -13,11 +13,19 @@
         </l-popup>
       </l-marker>
       <template v-for="(route, index) in routes">
-        <l-polyline :key="index"  :lat-lngs="route.polyline" :weight="10" color="white">
+        <l-polyline :key="index"  
+        :lat-lngs="route.polyline" 
+        :weight="10" color="white"
+        :dash-array="polylineDashedArray(route)"
+        :dash-offset="polylineDashedOffset(route)"
+        >
         </l-polyline>
       </template>
       <template v-for="(route) in routes">
-        <l-polyline :key="route.id"  :lat-lngs="route.polyline" :weight="7" :color="getColorByTransportation(route.means_of_transportation)">
+        <l-polyline :key="route.id"  :lat-lngs="route.polyline" :weight="7" 
+          :color="getColorByTransportation(route.means_of_transportation)"
+          :dash-array="polylineDashedArray(route)"
+          :dash-offset="polylineDashedOffset(route)"          >
           <l-tooltip v-html="route.title"></l-tooltip>
         </l-polyline>
       </template>
