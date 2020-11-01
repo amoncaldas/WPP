@@ -12,8 +12,8 @@ export default {
     polygonDetails: 'Detalhes do polígono',
     polygon: 'Polígono',
     section: 'Detalhes da seção',
-    showRoutePlaces: 'Show route places',
-    toggleShowRoutePlaces: 'Show/hide route places',
+    showRoutePlaces: 'Mostrar locais da rota',
+    toggleShowRoutePlaces: 'Mostrar/ocultar locais da rota',
     transportationMeans: {
       bicycle: 'Bicicleta',
       foot: 'A pé',
