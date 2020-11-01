@@ -9,7 +9,6 @@ export default {
     seconds: 'sec',
     meters: 'meters',
     locationDetails: 'Location details',
-    viewBasedOnEquivalentGeoJsonResponse: 'Visualization based on an equivalent GeoJSON response',
     polygonDetails: 'Polygon details',
     polygon: 'Polygon',
     section: 'Section details',
