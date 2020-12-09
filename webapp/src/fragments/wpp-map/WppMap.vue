@@ -43,6 +43,16 @@
         layer-type="base"/>
     </l-map>
   </box>
+  <box v-else tag="div" background="white">
+    <div slot="header">
+      <h2 v-html="$t('wppMap.aMapWillBeLoadedHere')"></h2>
+    </div>
+    <div class="map-place-holder" :style="{height: mapHeight}">
+      <v-layout fill-height align-center justify-center ma-0 >
+        <v-progress-circular indeterminate color="black"></v-progress-circular>
+      </v-layout>
+    </div>
+  </box>
 </template>
 
 <script src="./wpp-map.js"></script>

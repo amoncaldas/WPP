@@ -23,6 +23,7 @@ export default {
       sailboat: 'Veleiro',
       car: 'Carro',
       airplane: 'Avião'
-    }
+    },
+    aMapWillBeLoadedHere: 'Um mapa vai ser carregado aqui'
   }
 }

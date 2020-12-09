@@ -34,7 +34,8 @@ import {
   VAlert,
   VImg,
   VPagination,
-  VTextarea
+  VTextarea,
+  VProgressCircular
 } from 'vuetify'
 
 Vue.use(Vuetify, {
@@ -70,7 +71,8 @@ Vue.use(Vuetify, {
     VAlert,
     VImg,
     VPagination,
-    VTextarea
+    VTextarea,
+    VProgressCircular
   }
 })
 
