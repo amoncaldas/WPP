@@ -23,6 +23,7 @@ export default {
       sailboat: 'Sailboat',
       car: 'Car',
       airplane: 'Airplane'
-    }
+    },
+    aMapWillBeLoadedHere: 'A map will be loaded here'
   }
 }
