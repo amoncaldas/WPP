@@ -1,8 +1,10 @@
-import ModelService from '@/core/model-service'
+import {ModelService} from 'vue-rest-crud'
+import CrudHttpOptions from '@/common/crud-http-options'
 
 let options = {
   pk: 'term_id',
-  raw: true // we dont need each menu resource to be converted to a Model (@/core/model), because it is a read-only resource
+  http: CrudHttpOptions,
+  raw: true
 }
 const menuService = new ModelService('wp-api-menus/v2/menus', 'menu', options)
 

@@ -1,7 +1,7 @@
 import commentService from './comment-service'
 import LoginOrRegister from '@/fragments/login-or-register/LoginOrRegister'
 import VueRecaptcha from 'vue-recaptcha'
-import {CRUD, CRUDData} from '@/core/crud'
+import VueRestCrud from 'vue-rest-crud'
 import utils from '@/support/utils'
 
 export default {
@@ -17,7 +17,7 @@ export default {
       skipAutoIndexAfterAllEvents: true,
       savedMsg: this.$t('comments.commentSent')
     }
-    CRUD.set(this, commentService, options)
+    VueRestCrud.Controller.set(this, commentService, options)
   },
   watch: {
     $route: function () {
@@ -49,7 +49,7 @@ export default {
   },
   data () {
     return {
-      ...CRUDData, // adds: resource, resources, crudReady
+      ...VueRestCrud.Data, // adds: resource, resources, crudReady
       comments: [],
       total: null,
       totalPages: null,

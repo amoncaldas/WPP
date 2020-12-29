@@ -1,5 +1,6 @@
-import httpApi from '@/common/http-api'
-import appConfig from '@/config'
+import appConfig from '@/config/config'
+import CrudHttpOptions from '@/common/crud-http-options'
+import {CrudHttpApi} from 'vue-rest-crud'
 
 const state = {
   sections: [],
@@ -37,7 +38,8 @@ const actions = {
       if (getters.sections.length > 0) {
         resolve(getters.sections)
       }
-      httpApi.get(appConfig.baseWpApiPath + 'sections?_embed&per_page=100&order=asc').then((response) => {
+      let crudHttpApi = new CrudHttpApi(CrudHttpOptions)
+      crudHttpApi.http.get(appConfig.baseWpApiPath + 'sections?_embed&per_page=100&order=asc').then((response) => {
         var parser = document.createElement('a')
         let sections = response.data
         var regex = new RegExp('/', 'g')

@@ -1,5 +1,7 @@
-import httpApi from '@/common/http-api'
 import socialAuth from '@/common/social-auth'
+import CrudHttpOptions from '@/common/crud-http-options'
+import {CrudHttpApi} from 'vue-rest-crud'
+
 import auth from '@/support/auth'
 
 /* JWT AUTH api end point used to retrieve/send data */
@@ -45,7 +47,9 @@ export default {
           password: this.password
         }
 
-        httpApi.post(authEndpoint, authData).then(userData => {
+        let crudHttpApi = new CrudHttpApi(CrudHttpOptions)
+
+        crudHttpApi.http.post(authEndpoint, authData).then(userData => {
           if (userData.data.token) {
             auth.setUserAndRedirect(this, userData.data, this.onAuthenticate)
           } else {

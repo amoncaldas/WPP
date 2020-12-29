@@ -1,7 +1,9 @@
-import ModelService from '@/core/model-service'
+import {ModelService} from 'vue-rest-crud'
+import CrudHttpOptions from '@/common/crud-http-options'
 
 let options = {
   raw: true,
+  http: CrudHttpOptions,
   transformResponse: (response) => {
     if (response.data) {
       var parser = document.createElement('a')

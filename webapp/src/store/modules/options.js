@@ -1,4 +1,5 @@
-import httpApi from '@/common/http-api'
+import VueRestCrud from 'vue-rest-crud'
+import CrudHttpOptions from '@/common/crud-http-options'
 
 const state = {
   options: []
@@ -22,7 +23,8 @@ const actions = {
       if (getters.options.length > 0) {
         resolve(getters.options)
       }
-      httpApi.get('wpp/v1/services/options').then((response) => {
+      let vueRestCrud = new VueRestCrud.CrudHttpApi(CrudHttpOptions)
+      vueRestCrud.http.get('wpp/v1/services/options').then((response) => {
         let options = response.data
         commit('options', options)
         resolve(options)

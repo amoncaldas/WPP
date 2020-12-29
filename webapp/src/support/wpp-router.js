@@ -1,5 +1,5 @@
 import store from '@/store/store'
-import appConfig from '@/config'
+import appConfig from '@/config/config'
 
 const wppRouter = {
   getSectionEndpoints: () => {

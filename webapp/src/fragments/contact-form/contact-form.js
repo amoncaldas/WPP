@@ -1,6 +1,6 @@
 import contactService from './contact-form-service'
 import VueRecaptcha from 'vue-recaptcha'
-import {CRUD, CRUDData} from '@/core/crud'
+import VueRestCrud from 'vue-rest-crud'
 import pattern from '@/support/pattern'
 
 export default {
@@ -13,11 +13,11 @@ export default {
       savedMsg: this.$t('contactForm.msgSent'),
       saveFailedMsg: this.$t('contactForm.sendErrorMsg')
     }
-    CRUD.set(this, contactService, options)
+    VueRestCrud.Controller.set(this, contactService, options)
   },
   data () {
     return {
-      ...CRUDData, // adds: resource, resources, crudReady
+      ...VueRestCrud.Data, // adds: resource, resources, crudReady
       verifiedCaptcha: false,
       resource: {},
       context: null,
