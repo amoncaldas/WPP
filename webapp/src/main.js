@@ -23,7 +23,7 @@ import VueAuthenticate from 'vue-authenticate'
 import socialAuth from '@/common/social-auth'
 import VueAnalytics from 'vue-analytics'
 import VueMoment from 'vue-moment'
-import theme from '@/common/theme'
+import theme from '@/config/theme'
 import wrapperTag from '@/fragments/wrapper/wrapper-tag'
 import wppRouter from '@/support/wpp-router'
 /**

@@ -8,6 +8,7 @@
 import { LMap, LPolyline, LTileLayer, LMarker, LTooltip, LPopup, LControlZoom, LControlAttribution, LControlScale, LControlLayers, LLayerGroup } from 'vue2-leaflet'
 import utils from '@/support/utils'
 import GeoUtils from '@/support/geo-utils'
+import theme from '@/config/theme'
 import constants from '@/resources/constants'
 
 import FileExtractorBuilder from '@/support/file-data-extractors/file-extractor-builder'
@@ -106,42 +107,42 @@ export default {
       this.transportationColorMap = [
         {
           id: 'bicycle',
-          color: '#008000', // green,
+          color: theme.transportationColors.bicycle,
           title: this.$t('wppMap.transportationMeans.bicycle')
         },
         {
           id: 'foot',
-          color: '#808000', // olive
+          color: theme.transportationColors.foot,
           title: this.$t('wppMap.transportationMeans.foot')
         },
         {
           id: 'train',
-          color: '#800080', // purple
+          color: theme.transportationColors.train,
           title: this.$t('wppMap.transportationMeans.train')
         },
         {
           id: 'ferry',
-          color: '#C11B17', // red,
+          color: theme.transportationColors.ferry,
           title: this.$t('wppMap.transportationMeans.ferry')
         },
         {
           id: 'bus',
-          color: '#1E90FF', // blue,
+          color: theme.transportationColors.bus,
           title: this.$t('wppMap.transportationMeans.bus')
         },
         {
           id: 'sailboat',
-          color: '#0000A0', // dark blue,
+          color: theme.transportationColors.sailboat,
           title: this.$t('wppMap.transportationMeans.sailboat')
         },
         {
           id: 'car',
-          color: '#FFA500', // orange,
+          color: theme.transportationColors.car,
           title: this.$t('wppMap.transportationMeans.car')
         },
         {
           id: 'airplane',
-          color: '#000000', // black,
+          color: theme.transportationColors.airplane,
           title: this.$t('wppMap.transportationMeans.airplane')
         }
       ]
