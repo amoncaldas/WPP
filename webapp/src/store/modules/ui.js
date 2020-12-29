@@ -1,6 +1,6 @@
 import SiteMenu from '@/common/site-menu'
 import utils from '@/support/utils'
-import appConfig from '@/config'
+import appConfig from '@/config/config'
 
 const state = {
   leftSideBarOpen: false,

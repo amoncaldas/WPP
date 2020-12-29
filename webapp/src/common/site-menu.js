@@ -1,5 +1,5 @@
 import menuManager from '@/support/menu-manager'
-import appConfig from '@/config'
+import appConfig from '@/config/config'
 import store from '@/store/store'
 
 /**

@@ -1,7 +1,9 @@
-import ModelService from '@/core/model-service'
+import CrudHttpOptions from '@/common/crud-http-options'
+import {ModelService} from 'vue-rest-crud'
 
 let options = {
-  pk: 'id',
+  raw: true,
+  http: CrudHttpOptions,
   transformResponse: (response) => {
     // These user's data are brought by default by the wp api
     // but we don't want then in our object

@@ -1,7 +1,9 @@
-import ModelService from '@/core/model-service'
+import {ModelService, CrudHttpApi} from 'vue-rest-crud'
+import CrudHttpOptions from '@/common/crud-http-options'
 
 let options = {
-  raw: true, // we dont need each menu resource to be converted to a Model (@/core/model), because it is a read-only resource,
+  raw: true,
+  http: CrudHttpOptions,
   transformResponse: (response) => {
     if (response.data && Array.isArray(response.data)) {
       var parser = document.createElement('a')

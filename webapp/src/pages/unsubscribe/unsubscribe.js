@@ -1,11 +1,11 @@
 import unsubscribeService from './unsubscribe-service'
-import {CRUD, CRUDData} from '@/core/crud'
+import VueRestCrud from 'vue-rest-crud'
 
 export default {
   data: () => ({
     loaded: false,
     unsubscribeError: false,
-    ...CRUDData // adds: resource, resources, crudReady
+    ...VueRestCrud.Data // adds: resource, resources, crudReady
   }),
   computed: {
     info () {
@@ -38,7 +38,7 @@ export default {
       410: this.$t('unsubscribe.wrongUserEmailOrAlreadyUnsubscribed') // Do not show error message, but run a custom function instead of it
     }
     // Set up the CRUD fr this component
-    CRUD.set(this, unsubscribeService, crudOptions)
+    VueRestCrud.Controller.set(this, unsubscribeService, crudOptions)
 
     // Set the properties that are gonna be used by the CRUD to update/activate the user
     this.resource.code = this.$route.params.code
