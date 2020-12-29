@@ -11,6 +11,10 @@
 *.iws
 *.iml
 
+### webapp config files ###
+/webapp/src/config/config.js
+/webapp/src/config/theme.js
+
 ### mac os x ####
 .DS_Store
 

@@ -93,19 +93,19 @@ This solution includes a component that allows creating/editing sections. Each s
 
 See more about the front-end on the [Front-end app readme](webapp/README.md)
 
-## Wpp plugin ##
+## Wpp plug-in ##
 
-Some custom plugins were created and added to wordpress to achieve the desired functionalities. They are:
+Some custom plug-ins were created and added to WordPress to achieve the desired functionalities. They are:
 
-1. `wpp` - This plugin is custom wpp solution and is intended to contain customizations to WordPress hooks/events, custom rest-api endpoints as well as customize third parties plugins that are supposed to be installed.
+1. `wpp` - This plug-in is custom wpp solution and is intended to contain customizations to WordPress hooks/events, custom rest-api endpoints as well as customize third parties plugins that are supposed to be installed.
     - It registers custom wp api end-points related to user registration and custom wpp data regarding the business logic, like sectors and usernames available (in `wp-api` folder). The **dashboard app uses these endpoints** to communicate with the back-end during user registration and profile update.
-    - It also register custom actions for wordpress rest_api_init  to customize the response and return custom user data as well as custom error messages when the user api is called. In addition it also adds a filter to the jwt_auth_token_before_dispatch event thrown by the `jwt-authentication-for-wp-rest-api` plugin (in includes/users.php).
+    - It also register custom actions for WordPress rest_api_init  to customize the response and return custom user data as well as custom error messages when the user api is called. In addition it also adds a filter to the jwt_auth_token_before_dispatch event thrown by the `jwt-authentication-for-wp-rest-api` plugin (in includes/users.php).
 
 ## Customization and updates ##
 
-We keep a file in the `wp-content` mapped volume/folder named `update.sh`. This file is responsible for update the current installation, including anything related to wordpress world, like plugins, themes and etc and the stuff related to the decoupled front-end(s). This update.sh file is an ordinary shell script file and any linux command can be executed there, considering we are inside the docker-container.
+We keep a file in the `wp-content` mapped volume/folder named `update.sh`. This file is responsible for update the current installation, including anything related to WordPress world, like plug-ins, themes and etc and the stuff related to the decoupled front-end(s). This update.sh file is an ordinary shell script file and any Linux command can be executed there, considering we are inside the docker-container.
 
-To manage and update the WordPress stuff we use the pre-installed WP CLI tool that allows to run several tasks in a programmatic way in a wordpress installation, like add, activate and delete plugins, add users, change user's password, update options, change menu and so on. check the full list at [WP CLI commands](https://developer.wordpress.org/cli/commands/)
+To manage and update the WordPress stuff we use the pre-installed WP CLI tool that allows to run several tasks in a programmatic way in a WordPress installation, like add, activate and delete plug-ins, add users, change user's password, update options, change menu and so on. check the full list at [WP CLI commands](https://developer.wordpress.org/cli/commands/)
 
 Example to add and activate a plug-in:
 
@@ -232,6 +232,16 @@ docker-compose -f local.docker-compose.yml up -d
 
 ```sh
 docker exec wpp-website-local /bin/sh -c 'cd wp-content && sh update.sh'
+```
+
+If you want to run the webapp in dev mode, do the following:
+
+- From the example files, create a copy of `config.js` and `theme.js` files in `/webapp/src/config` folder, without the `-example` in their names.
+- Make sure the local.docker-compose.yml is running
+- run, in webapp folder:
+
+```sh
+npm run dev
 ```
 
 ## Debug ##
