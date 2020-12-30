@@ -1,3 +1,4 @@
+/* eslint-disable */
 import MapViewData from '@/models/map-view-data'
 import constants from '@/resources/constants'
 import store from '@/store/store'

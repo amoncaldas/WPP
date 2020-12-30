@@ -1,12 +1,12 @@
 import activateService from './activate-service'
-import VueRestCrud from 'vue-rest-crud'
+import VueRestClient from 'vue-rest-client'
 
 export default {
   data: () => ({
     passHidden: true,
     loaded: false,
     activationError: false,
-    ...VueRestCrud.Data // adds: resource, resources, crudReady
+    ...VueRestClient.CrudData // adds: resource, resources, crudReady and modelService
   }),
   computed: {
     info () {
@@ -63,7 +63,7 @@ export default {
         410: this.alreadyActivatedError // Do not show error message, but run a custom function instead of it
       }
       // Set up the CRUD fr this component
-      VueRestCrud.Controller.set(this, activateService, crudOptions)
+      VueRestClient.Controller.set(this, activateService, crudOptions)
 
       // Set the properties that are gonna be used by the CRUD to update/activate the user
       this.resource.userId = this.$route.params.userId

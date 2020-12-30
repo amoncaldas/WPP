@@ -1,9 +1,9 @@
-import {ModelService} from 'vue-rest-crud'
-import CrudHttpOptions from '@/common/crud-http-options'
+import {ModelService} from 'vue-rest-client'
+import HttpClientOptions from '@/common/http-client-options'
 
 let options = {
   pk: 'term_id',
-  http: CrudHttpOptions,
+  httpClientOptions: HttpClientOptions,
   raw: true
 }
 const menuService = new ModelService('wp-api-menus/v2/menus', 'menu', options)

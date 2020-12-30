@@ -1,3 +1,4 @@
+/* eslint-disable */
 import lodash from 'lodash'
 import {parseString} from 'xml2js'
 import MapViewData from '@/models/map-view-data'

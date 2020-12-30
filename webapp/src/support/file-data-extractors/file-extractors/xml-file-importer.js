@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import {parseString} from 'xml2js'
 import MapViewData from '@/models/map-view-data'
 import constants from '@/resources/constants'

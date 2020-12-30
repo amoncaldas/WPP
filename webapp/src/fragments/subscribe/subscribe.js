@@ -1,5 +1,5 @@
 import VueRecaptcha from 'vue-recaptcha'
-import VueRestCrud from 'vue-rest-crud'
+import VueRestClient from 'vue-rest-client'
 import subscribeService from './subscribe-service'
 import pattern from '@/support/pattern'
 
@@ -7,7 +7,7 @@ export default {
   data: () => ({
     name: '',
     email: '',
-    ...VueRestCrud.Data, // adds: resource, resources, crudReady
+    ...VueRestClient.CrudData, // adds: resource, resources, crudReady and modelService
     verifiedCaptcha: false,
     resource: {},
     ready: false,
@@ -24,7 +24,7 @@ export default {
       saveFailedMsg: this.$t('subscribe.failWhileTryingToSubscribe'),
       409: this.$t('subscribe.thisEmailIsAlreadySubscribed')
     }
-    VueRestCrud.Controller.set(this, subscribeService, options)
+    VueRestClient.Controller.set(this, subscribeService, options)
   },
   props: {
     topBorder: {

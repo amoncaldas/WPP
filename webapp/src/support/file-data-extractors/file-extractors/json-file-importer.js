@@ -1,3 +1,4 @@
+/* eslint-disable */
 import VueInstance from '@/main'
 import MapViewData from '@/models/map-view-data'
 import constants from '@/resources/constants'

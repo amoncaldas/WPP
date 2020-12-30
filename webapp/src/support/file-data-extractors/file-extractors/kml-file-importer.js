@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {parseString} from 'xml2js'
 import MapViewData from '@/models/map-view-data'
 import Place from '@/models/place'
