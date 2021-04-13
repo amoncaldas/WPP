@@ -31,9 +31,6 @@
   bottom: 5px;
   overflow-y: scroll;
 }
-.box-content.maximized >>> div {
-  margin-top: 0px;
-}
 
 .box-footer {
   padding-left: 10px;

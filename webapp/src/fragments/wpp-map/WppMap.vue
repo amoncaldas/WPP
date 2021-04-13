@@ -3,7 +3,7 @@
     <div slot="header">
       <h2 v-html="title"></h2>
     </div>
-    <l-map ref="map" :max-zoom="maxZoom" :center="mapCenter" style="z-index:3" :zoom="zoom" class="post-map" :style="{height: mapHeight}">
+    <l-map ref="map" :max-zoom="maxZoom" :center="mapCenter" style="z-index:3; min-height: 300px" :zoom="zoom" class="post-map" :style="{height: mapHeight}">
       <l-marker v-for="(marker, index) in markers" :lat-lng="marker.position" :key="index+'-marker'" :icon="marker.icon">
         <l-popup v-if="marker.label">
           <div >
@@ -43,7 +43,7 @@
         layer-type="base"/>
     </l-map>
   </box>
-  <box v-else tag="div" background="white">
+  <box v-else tag="div" background="white" @boxCreated="boxCreated">
     <div slot="header">
       <h2 v-html="$t('wppMap.aMapWillBeLoadedHere')"></h2>
     </div>

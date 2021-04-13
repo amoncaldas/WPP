@@ -13,6 +13,7 @@ class MapViewData {
     this.polygons = []
     this.options = {} // {origin: String, apiVersion: String, contentType: String, timestamp: timestamp, options: {avoid_polygons: Object, avoid_features: Array}},
     this.places = [] // array of Place objects @see /src/models/place
+    this.pois = [] // array of Place objects @see /src/models/place
     this.routes = [] // array of route objects containing route data and summary
     this.origin = 'response' // where the data comes from
     this.mode = constants.modes.directions // default mode is directions
@@ -29,6 +30,7 @@ class MapViewData {
   static build (geoJson) {
     return new MapViewData(geoJson)
   }
+
   /**
    * Check if the object has places
    * @param {*} lng
@@ -37,6 +39,16 @@ class MapViewData {
   hasPlaces () {
     return this.places.length > 0
   }
+
+  /**
+   * Check if the object has places
+   * @param {*} lng
+   * @param {*} lat
+   */
+  hasPois () {
+    return this.pois.length > 0
+  }
+
   /**
    * Check if the object has routes
    * @param {*} lng
@@ -45,29 +57,39 @@ class MapViewData {
   hasRoutes () {
     return this.routes.length > 0
   }
+
   /**
    * Create a clone object
    * @returns  {MapViewData}
    */
   clone () {
-    let clone = new MapViewData()
-    let propertiesToClone = ['origin', 'isRouteData', 'timestamp', 'mode']
+    const mapViewDataClone = new MapViewData()
+    const propertiesToClone = ['origin', 'isRouteData', 'timestamp', 'mode']
 
-    for (let key in propertiesToClone) {
-      let prop = propertiesToClone[key]
-      clone[prop] = this[prop]
+    for (const key in propertiesToClone) {
+      const prop = propertiesToClone[key]
+      mapViewDataClone[prop] = this[prop]
     }
 
-    clone.rawData = utils.clone(this.rawData)
-    clone.routes = utils.clone(this.routes)
-    clone.polygons = utils.clone(this.polygons)
-    clone.options = utils.clone(this.options)
+    mapViewDataClone.rawData = utils.clone(this.rawData)
+    mapViewDataClone.routes = utils.clone(this.routes)
+    mapViewDataClone.polygons = utils.clone(this.polygons)
+    mapViewDataClone.options = utils.clone(this.options)
 
-    for (let key in this.places) {
-      let place = this.places[key]
-      clone.places.push(place.clone())
+    for (let i = 0; i < this.places.length; i++) {
+      if (this.places[i] instanceof Place) {
+        const place = this.places[i]
+        mapViewDataClone.places.push(place.clone())
+      }
     }
-    return clone
+
+    for (let k = 0; k < this.pois.length; k++) {
+      if (this.pois[k] instanceof Place) {
+        const place = this.pois[k]
+        mapViewDataClone.pois.push(place.clone())
+      }
+    }
+    return mapViewDataClone
   }
 
   /**
@@ -76,10 +98,10 @@ class MapViewData {
    * @returns {MapViewData} mapViewAta
    */
   static buildFromGeojson (geoJson) {
-    let mapViewAta = new MapViewData()
+    const mapViewAta = new MapViewData()
 
-    for (let fKey in geoJson.features) {
-      let feature = {
+    for (const fKey in geoJson.features) {
+      const feature = {
         properties: geoJson.features[fKey].properties,
         geometry: {
           coordinates: geoJson.features[fKey].geometry.coordinates
@@ -89,13 +111,14 @@ class MapViewData {
         case 'LineString':
           mapViewAta.routes.push(feature)
           break
-        case 'Point':
-          let lat = feature.geometry.coordinates[0]
-          let lon = feature.geometry.coordinates[1]
-          let place = new Place(lat, lon, feature.properties.label, {properties: feature.properties})
+        case 'Point': {
+          const lat = feature.geometry.coordinates[0]
+          const lon = feature.geometry.coordinates[1]
+          const place = new Place(lat, lon, feature.properties.label, { properties: feature.properties })
           feature.latlngs = feature.geometry.coordinates
           mapViewAta.places.push(place)
           break
+        }
         case 'Polygon':
           mapViewAta.polygons.push(feature)
           break
@@ -109,11 +132,11 @@ class MapViewData {
    * @returns {Object} geojson
    */
   getGeoJson () {
-    let geoJsonData = { type: 'FeatureCollection', features: [] }
+    const geoJsonData = { type: 'FeatureCollection', features: [] }
 
     // Build and add routes/linestring features to the geojson
-    for (let rKey in this.routes) {
-      let routeFeature = {
+    for (const rKey in this.routes) {
+      const routeFeature = {
         type: 'Feature',
         properties: this.routes[rKey].properties,
         geometry: {
@@ -125,10 +148,10 @@ class MapViewData {
     }
 
     // Build and add places/points features to the geojson
-    for (let plaKey in this.places) {
-      let placeFeature = {
+    for (const plaKey in this.places) {
+      const placeFeature = {
         type: 'Feature',
-        properties: {label: this.places[plaKey].placeName},
+        properties: { label: this.places[plaKey].placeName },
         geometry: {
           type: 'Point',
           coordinates: this.places[plaKey].coordinates
@@ -138,10 +161,10 @@ class MapViewData {
     }
 
     // Build and add polygons features to the geojson
-    for (let polKey in this.polygons) {
-      let polygon = this.polygons[polKey]
+    for (const polKey in this.polygons) {
+      const polygon = this.polygons[polKey]
 
-      let polygonFeature = {
+      const polygonFeature = {
         type: 'Feature',
         properties: polygon.properties,
         geometry: polygon.geometry
@@ -153,5 +176,5 @@ class MapViewData {
     return geoJsonData
   }
 }
-// export the directions json builder class
+// export the MapViewData class
 export default MapViewData

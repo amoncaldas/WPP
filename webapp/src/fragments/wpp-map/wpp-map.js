@@ -81,6 +81,9 @@ export default {
       return this.localMapData.title.rendered || this.localMapData.title || this.$t('map.title')
     },
     mapHeight () {
+      if (this.mapMaximized) {
+        return `${window.innerHeight - 80}px`
+      }
       let height = `${this.localHeight}${this.heightUnit}`
       return height
     },
