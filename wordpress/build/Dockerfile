@@ -2,7 +2,7 @@
 # Version 0.2
 # 19.08.2020
 
-FROM wordpress:5.5.1-php7.4-apache
+FROM wordpress:5.7-php7.4-apache
 
 ARG DEBUG_SUPPORT=false
 ARG NOTIFICATIONS_TASK_SUPPORT=false
