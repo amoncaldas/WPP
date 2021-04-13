@@ -1,6 +1,6 @@
 import socialAuth from '@/common/social-auth'
-import CrudHttpOptions from '@/common/crud-http-options'
-import {CrudHttpApi} from 'vue-rest-crud'
+import HttpClientOptions from '@/common/http-client-options'
+import {HttpClient} from 'vue-rest-client'
 
 import auth from '@/support/auth'
 
@@ -47,9 +47,9 @@ export default {
           password: this.password
         }
 
-        let crudHttpApi = new CrudHttpApi(CrudHttpOptions)
+        let httpClient = new HttpClient(HttpClientOptions)
 
-        crudHttpApi.http.post(authEndpoint, authData).then(userData => {
+        httpClient.http.post(authEndpoint, authData).then(userData => {
           if (userData.data.token) {
             auth.setUserAndRedirect(this, userData.data, this.onAuthenticate)
           } else {

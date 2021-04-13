@@ -1,12 +1,12 @@
 import activateService from './activate-service'
-import VueRestCrud from 'vue-rest-crud'
+import VueRestClient from 'vue-rest-client'
 
 export default {
   data: () => ({
     passHidden: true,
     loaded: false,
     activationError: false,
-    ...VueRestCrud.Data // adds: resource, resources, crudReady
+    ...VueRestClient.CrudData // adds: resource, resources, crudReady and modelService
   }),
   computed: {
     info () {
@@ -56,14 +56,14 @@ export default {
       let crudOptions = {
         queryOnStartup: false,
         skipAutoIndexAfterAllEvents: true,
-        updatedMsg: this.$t('activate.accountActivated'),
+        resourceUpdatedMsg: this.$t('activate.accountActivated'),
         skipFormValidation: true,
         409: this.$t('activate.wrongUserIdOrActivationCode'), // CONFLICT - activation code does not belong to specified user id
         404: this.$t('activate.wrongUserId'), // NOT FOUND - user not found by its id
         410: this.alreadyActivatedError // Do not show error message, but run a custom function instead of it
       }
       // Set up the CRUD fr this component
-      VueRestCrud.Controller.set(this, activateService, crudOptions)
+      VueRestClient.Controller.set(this, activateService, crudOptions)
 
       // Set the properties that are gonna be used by the CRUD to update/activate the user
       this.resource.userId = this.$route.params.userId

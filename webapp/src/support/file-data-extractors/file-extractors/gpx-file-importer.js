@@ -1,5 +1,6 @@
+/* eslint-disable no-undef */
 import lodash from 'lodash'
-import {parseString} from 'xml2js'
+import { parseString } from 'xml2js'
 import MapViewData from '@/models/map-view-data'
 import Place from '@/models/place'
 import constants from '@/resources/constants'
@@ -20,7 +21,7 @@ class GpxImporter {
    */
   parseFileContent = () => {
     return new Promise((resolve, reject) => {
-      parseString(this.fileRawContent, {trim: true}, function (err, parsedXml) {
+      parseString(this.fileRawContent, { trim: true }, function (err, parsedXml) {
         if (err) {
           reject(err)
         } else {
@@ -35,8 +36,8 @@ class GpxImporter {
    * @returns {Promise} that returns in the resolve mapData object
    */
   buildMapData = () => {
-    let mapViewData = new MapViewData()
-    let context = this
+    const mapViewData = new MapViewData()
+    const context = this
     return new Promise((resolve, reject) => {
       try {
         context.parseFileContent().then((fileObject) => {
@@ -72,30 +73,30 @@ class GpxImporter {
    * @returns {Array} places
   */
   buildPlaces = (routes) => {
-    let places = []
+    const places = []
 
     if (routes.length > 0) {
       // If there are less then 15, so we get all
       if (routes[0].length < 16) {
-        for (let key in routes[0]) {
-          let latlng = routes[0][key].geometry.coordinates
-          let lng = latlng[1]
-          let lat = latlng[0]
-          let place = new Place(lng, lat)
+        for (const key in routes[0]) {
+          const latlng = routes[0][key].geometry.coordinates
+          const lng = latlng[0]
+          const lat = latlng[1]
+          const place = new Place(lng, lat)
           places.push(place)
         }
       } else { // if there are more then 15, only the first and the last
-        let firstCoords = routes[0].geometry.coordinates[0]
-        let lastCoords = (routes[0].geometry.coordinates[routes[0].geometry.coordinates.length - 1])
+        const firstCoords = routes[0].geometry.coordinates[0]
+        const lastCoords = (routes[0].geometry.coordinates[routes[0].geometry.coordinates.length - 1])
 
-        let firstLng = firstCoords[1]
-        let firstLat = firstCoords[0]
-        let firstPlace = new Place(firstLng, firstLat, '', {resolve: true})
+        const firstLng = firstCoords[0]
+        const firstLat = firstCoords[1]
+        const firstPlace = new Place(firstLng, firstLat, '', { resolve: true })
         places.push(firstPlace)
 
-        let lastLng = lastCoords[1]
-        let lastLat = lastCoords[0]
-        let lastPlace = new Place(lastLng, lastLat, '', {resolve: true})
+        const lastLng = lastCoords[0]
+        const lastLat = lastCoords[1]
+        const lastPlace = new Place(lastLng, lastLat, '', { resolve: true })
         places.push(lastPlace)
       }
     }
@@ -108,12 +109,12 @@ class GpxImporter {
    * @returns {Array} of places
    */
   getPlaces = (fileObject) => {
-    let places = []
-    let wpts = lodash.get(fileObject, 'gpx.wpt')
+    const places = []
+    const wpts = lodash.get(fileObject, 'gpx.wpt')
 
     if (wpts) {
-      for (let key in wpts) {
-        let latlon = wpts[key].$
+      for (const key in wpts) {
+        const latlon = wpts[key].$
         let name = Array.isArray(wpts[key].name) ? wpts[key].name[0] : wpts[key].name
         if (name.length === 0) {
           name = Array.isArray(wpts[key].desc) ? wpts[key].desc[0] : wpts[key].desc
@@ -121,7 +122,7 @@ class GpxImporter {
         if (name.indexOf('=') > 0) {
           name = name.split('=')[1]
         }
-        let place = new Place(latlon.lat, latlon.lon, name)
+        const place = new Place(latlon.lon, latlon.lat, name)
         places.push(place)
       }
     }
@@ -133,22 +134,28 @@ class GpxImporter {
    * @returns {Array} coordinates
    */
   getRoutes = (fileObject) => {
-    let routes = []
-    let tracks = lodash.get(fileObject, 'gpx.trk') || lodash.get(fileObject, 'gpx.rte')
-    let creator = lodash.get(fileObject, 'gpx.$.creator')
+    const routes = []
+    const tracks = lodash.get(fileObject, 'gpx.trk') || lodash.get(fileObject, 'gpx.rte')
+    const creator = lodash.get(fileObject, 'gpx.$.creator')
     if (tracks) {
-      for (let key in tracks) {
-        let track = tracks[key]
-        let points = lodash.get(track, 'trkseg[0].trkpt') || track.rtept
-        let coordinatesParsed = []
-        for (let ptKey in points) {
-          let latlon = points[ptKey].$
-          let point = creator === 'openrouteservice' ? [latlon.lat, latlon.lon] : [latlon.lon, latlon.lat]
-          let elev = points[ptKey].ele
-          if (elev && elev.length > 0) {
-            point.push(elev[0])
+      const coordinatesParsed = []
+      for (const key in tracks) {
+        const track = tracks[key]
+        let segments = track.trkseg || [track.rtept]
+        for (let key in segments) {
+          let points = segments[key].trkpt || segments[key]
+
+          if (points) {
+            for (const ptKey in points) {
+              const latlon = points[ptKey].$
+              const point = creator === 'openrouteservice' ? [latlon.lat, latlon.lon] : [latlon.lon, latlon.lat]
+              const elev = points[ptKey].ele
+              if (elev && elev.length > 0) {
+                point.push(elev[0])
+              }
+              coordinatesParsed.push(point)
+            }
           }
-          coordinatesParsed.push(point)
         }
         routes.push({
           geometry: {

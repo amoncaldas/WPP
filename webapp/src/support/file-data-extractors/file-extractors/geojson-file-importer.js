@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import MapViewData from '@/models/map-view-data'
 import constants from '@/resources/constants'
 import store from '@/store/store'
@@ -16,10 +17,10 @@ class GeojsonImporter {
    * @returns {Promise} that returns in the resolve mapData object
    */
   buildMapData = () => {
-    let context = this
+    const context = this
     return new Promise((resolve, reject) => {
       try {
-        let mapViewData = context.buildMapViewData()
+        const mapViewData = context.buildMapViewData()
 
         if (mapViewData) {
           mapViewData.rawData = context.fileRawContent
@@ -47,8 +48,8 @@ class GeojsonImporter {
    * @returns {Object}
    */
   buildMapViewData = () => {
-    let geojson = JSON.parse(this.fileRawContent)
-    let mapViewData = MapViewData.buildFromGeojson(geojson)
+    const geojson = JSON.parse(this.fileRawContent)
+    const mapViewData = MapViewData.buildFromGeojson(geojson)
     return mapViewData
   }
 
@@ -56,8 +57,8 @@ class GeojsonImporter {
    * Adjust summary data
    */
   setRoutesSummaryData = (mapViewData) => {
-    for (let key in mapViewData.routes) {
-      let summary = Object.assign({}, mapViewData.routes[key].properties.summary)
+    for (const key in mapViewData.routes) {
+      const summary = Object.assign({}, mapViewData.routes[key].properties.summary)
       summary.descent = mapViewData.routes[key].properties.descent
       summary.ascent = mapViewData.routes[key].properties.ascent
       summary.unit = store.getters.mapSettings.unit

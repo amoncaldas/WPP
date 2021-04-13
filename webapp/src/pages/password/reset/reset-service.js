@@ -1,9 +1,9 @@
-import {ModelService} from 'vue-rest-crud'
-import CrudHttpOptions from '@/common/crud-http-options'
+import {ModelService} from 'vue-rest-client'
+import HttpClientOptions from '@/common/http-client-options'
 
 let options = {
   raw: true,
-  http: CrudHttpOptions,
+  httpClientOptions: HttpClientOptions,
   pk: 'key'
 }
 const passwordResetService = new ModelService('wpp/v1/user/password/reset', 'password', options)

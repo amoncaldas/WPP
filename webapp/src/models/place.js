@@ -1,17 +1,17 @@
-import {Geocode, ReverseGeocode} from '@/support/ors-api-runner'
 import GeoUtils from '@/support/geo-utils'
 import lodash from 'lodash'
 /**
  * Place model class
- * @param {*} lat
- * @param {*} lng
- * @param {*} placeName
- * @param {*} options
+ * @param {Number} lat - default null
+ * @param {Number} lng - default null
+ * @param {String} placeName
+ * @param {Object} options
  */
 class Place {
-  constructor (lng = 0, lat = 0, placeName = '', options = {}) {
-    this.lng = Number(lng)
-    this.lat = Number(lat)
+  constructor (lng = null, lat = null, placeName = '', options = {}) {
+    this.lng = lng !== null ? Number(lng) : lng
+    this.lat = lat !== null ? Number(lat) : lat
+
     this.placeName = placeName
 
     // if the place must be resolved (do a request and convert the lng,lat to a qualified place name)
@@ -44,8 +44,14 @@ class Place {
     // The index of the Place
     this.index = null
 
-    if (lng !== 0 && lat !== 0) {
-      this.coordinates = [Number(lng), Number(lat)]
+    // The if a route should be routed directly to this Place
+    this.direct = options.direct || false
+
+    // If it is a POI
+    this.isPoi = options.isPoi
+
+    if (this.lng !== null && this.lat !== null) {
+      this.coordinates = [this.lng, this.lat]
 
       // Build a place name using coordinates
       if (this.placeName === '') {
@@ -64,10 +70,12 @@ class Place {
     this.lat = Number(lat)
     this.coordinates = [Number(lng), Number(lat)]
   }
+
   /**
    * Returns an array containing lng and lat
+   * @returns {Array} containing [lng, lat]
    */
-  getLnglat () {
+  getLngLatArr () {
     if (this.coordinates) {
       return this.coordinates
     }
@@ -75,12 +83,32 @@ class Place {
       return [this.lng, this.lat]
     } else {
       if (this.nameIsCoord()) {
-        let coords = this.getCoordsFromName()
+        const coords = this.getCoordsFromName()
         return coords
       } else {
         return [0, 0]
       }
     }
+  }
+
+  /**
+   * Returns LatLng object
+   * @returns {LatLng}
+   */
+  getLatLng () {
+    if (this.nameIsCoord()) {
+      let coords = this.getCoordsFromName()
+      return GeoUtils.buildLatLong(coords[1], coords[0])
+    }
+    return GeoUtils.buildLatLong(this.lat, this.lng)
+  }
+
+   /**
+   * Returns an array containing lat and lng
+   * @returns {Array} containing [lat, lng]
+   */
+  getLatLngArr () {
+    return this.getLngLatArr().reverse()
   }
 
   /**
@@ -145,8 +173,8 @@ class Place {
    * @returns {Place}
    */
   clone () {
-    let clone = new Place(this.lng, this.lat, this.placeName)
-    let propertiesToClone = [
+    const clone = new Place(this.lng, this.lat, this.placeName)
+    const propertiesToClone = [
       'unresolved',
       'suggestions',
       'coordinates',
@@ -156,11 +184,13 @@ class Place {
       'placeId',
       'fromBrowser',
       'skipShowData',
-      'index'
+      'index',
+      'direct',
+      'isPoi'
     ]
 
-    for (let key in propertiesToClone) {
-      let prop = propertiesToClone[key]
+    for (const key in propertiesToClone) {
+      const prop = propertiesToClone[key]
       clone[prop] = this[prop]
     }
     return clone
@@ -172,8 +202,8 @@ class Place {
    * @returns {Number} index
    */
   findIndex (places) {
-    let context = this
-    let index = lodash.findIndex(places, (p) => {
+    const context = this
+    const index = lodash.findIndex(places, (p) => {
       return p.lat === context.lat && p.lng === context.lng && p.placeName === context.placeName
     })
     return index
@@ -183,7 +213,7 @@ class Place {
    * Check if the place contains coordinates as placeName
    */
   nameIsCoord () {
-    let coords = this.getCoordsFromName()
+    const coords = this.getCoordsFromName()
     if (coords) {
       return true
     }
@@ -195,7 +225,7 @@ class Place {
    */
   getCoordsFromName () {
     if (this.placeName && this.placeName.indexOf(',') > -1) {
-      let parts = this.placeName.split(',')
+      const parts = this.placeName.split(',')
       if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
         return parts
       }
@@ -207,40 +237,9 @@ class Place {
    * Set the place coordinates as place name
    */
   setCoordsAsName () {
-    let parts = this.placeName.split(',')
-    let coords = `${parts[1]},${parts[0]}`
+    const parts = this.placeName.split(',')
+    const coords = `${parts[1]},${parts[0]}`
     this.placeName = coords
-  }
-
-  /**
-   * Resolve the coordinates of a place to a qualified location
-   * @param {Number} zoom
-   * @returns {Promise}
-   */
-  resolve (zoom = 10) {
-    let context = this
-    return new Promise((resolve, reject) => {
-      let promise = null
-      if (context.placeName && context.placeName.length > 0 && !context.nameIsCoord()) {
-        promise = Geocode(context.placeName)
-      } else {
-        promise = ReverseGeocode(context.lat, context.lng)
-      }
-      promise.then(places => {
-        let selectedPlace = Place.selectPlaceByZoomLevel(zoom, places)
-
-        if (selectedPlace) {
-          context.properties = selectedPlace.properties
-          context.placeName = selectedPlace.properties.label
-        }
-
-        context.unresolved = false
-        resolve(context)
-      }).catch(response => {
-        console.error(response)
-        reject(response)
-      })
-    })
   }
 
   /**
@@ -255,9 +254,9 @@ class Place {
     let selectedPlace = null
     if (Array.isArray(places) && places.length > 0) {
       selectedPlace = places[0]
-      for (let key in places) {
-        let placeZoom = GeoUtils.zoomLevelByLayer(places[key].properties.layer)
-        let selectedPlaceZoom = GeoUtils.zoomLevelByLayer(selectedPlace.properties.layer)
+      for (const key in places) {
+        const placeZoom = GeoUtils.zoomLevelByLayer(places[key].properties.layer)
+        const selectedPlaceZoom = GeoUtils.zoomLevelByLayer(selectedPlace.properties.layer)
 
         // If the difference betwen the reference zoom and
         // the current feature zoom is smaller than the
@@ -277,10 +276,17 @@ class Place {
    * @returns {Array} of Places
    */
   static placesFromFeatures (features) {
-    let places = []
-    for (let key in features) {
-      let feature = features[key]
-      let place = new Place(feature.geometry.coordinates[0], feature.geometry.coordinates[1], feature.properties.label)
+    const places = []
+    for (const key in features) {
+      const feature = features[key]
+
+      let placeName = null
+      if (feature.properties.label) {
+        placeName = feature.properties.label
+      } else if (feature.properties.osm_tags && feature.properties.osm_tags.name) {
+        placeName = feature.properties.osm_tags.name
+      }
+      const place = new Place(feature.geometry.coordinates[0], feature.geometry.coordinates[1], placeName)
       place.properties = feature.properties
       place.inputIndex = key
       place.skipShowData = true
@@ -298,5 +304,5 @@ class Place {
     return new Place(lng, lat, placeName, options)
   }
 }
-// export the directions json builder class
+// export the place class
 export default Place

@@ -1,5 +1,5 @@
 import userService from '@/shared-services/user-service'
-import VueRestCrud from 'vue-rest-crud'
+import VueRestClient from 'vue-rest-client'
 import pattern from '@/support/pattern'
 
 // Custom endpoints used to run custom queries in user service
@@ -15,7 +15,7 @@ export default {
       resourceUpdatedMsg: this.$t('user.profileUpdated'),
       resourceSavedMsg: this.$t('user.accountCreated')
     }
-    VueRestCrud.Controller.set(this, userService, options)
+    VueRestClient.Controller.set(this, userService, options)
 
     if (this.userId) {
       this.mode = 'edit'
@@ -68,7 +68,7 @@ export default {
   },
   data () {
     return {
-      ...VueRestCrud.Data, // adds: resource, resources, crudReady
+      ...VueRestClient.CrudData, // adds: resource, resources, crudReady and modelService
       passVisibility: true,
       sectors: [],
       mode: 'create',

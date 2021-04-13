@@ -1,3 +1,4 @@
+/* eslint-disable */
 import xmlImporter from './file-extractors/xml-file-importer'
 import gpxImporter from './file-extractors/gpx-file-importer'
 import jsonImporter from './file-extractors/json-file-importer'

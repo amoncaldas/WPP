@@ -1,9 +1,9 @@
-import {ModelService, CrudHttpApi} from 'vue-rest-crud'
-import CrudHttpOptions from '@/common/crud-http-options'
+import {ModelService, HttpClient} from 'vue-rest-client'
+import HttpClientOptions from '@/common/http-client-options'
 
 let options = {
   raw: true,
-  http: CrudHttpOptions,
+  httpClientOptions: HttpClientOptions,
   transformResponse: (response) => {
     if (response.data && Array.isArray(response.data)) {
       var parser = document.createElement('a')

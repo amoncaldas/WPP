@@ -1,7 +1,7 @@
 import store from '@/store/store'
 import main from '@/main'
 
-const showMenuItem = (item) => {
+const showMenuItem = function(item) {
   // a custom show menu item function can be passed
   // if passed, use the custom one. If not, use the default
   if (this.showMenuItemFn) {
@@ -14,7 +14,7 @@ const showMenuItem = (item) => {
     }
   }
 }
-const navigate = (to) => {
+const navigate = function(to) {
   if (to.href !== '#') {
     if (to.external) {
       window.open(to.href, '_blank')
@@ -29,7 +29,7 @@ const getHref = (to) => {
   return to.href
 }
 
-const isItemActive = (item) => {
+const isItemActive = function(item) {
   item.active = false
   let activeRoute = location.hash.replace('#', '')
   let itemRoute = item.href.replace('/dev/#', '')

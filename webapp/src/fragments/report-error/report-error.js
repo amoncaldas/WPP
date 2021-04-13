@@ -1,6 +1,6 @@
 import reportErrorService from './report-error-service'
 import VueRecaptcha from 'vue-recaptcha'
-import VueRestCrud from 'vue-rest-crud'
+import VueRestClient from 'vue-rest-client'
 
 export default {
   name: 'report-error',
@@ -14,7 +14,7 @@ export default {
     return {
       visible: true,
       active: true,
-      ...VueRestCrud.CRUDData, // adds: resource, resources, crudReady
+      ...VueRestClient.CRUDData, // adds: resource, resources, crudReady
       verifiedCaptcha: false,
       resource: {},
       context: null,
@@ -26,10 +26,10 @@ export default {
     let options = {
       queryOnStartup: false,
       skipAutoIndexAfterAllEvents: true,
-      savedMsg: this.$t('reportError.msgSent'),
-      saveFailedMsg: this.$t('reportError.sendErrorMsg')
+      resourceSavedMsg: this.$t('reportError.msgSent'),
+      failWhileTryingToSaveResourceMsg: this.$t('reportError.sendErrorMsg')
     }
-    VueRestCrud.Controller.set(this, reportErrorService, options)
+    VueRestClient.Controller.set(this, reportErrorService, options)
     this.resource.url = location.href
   },
 

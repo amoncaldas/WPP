@@ -1,8 +1,10 @@
-import {parseString} from 'xml2js'
+/* eslint-disable no-undef */
+import { parseString } from 'xml2js'
 import MapViewData from '@/models/map-view-data'
 import constants from '@/resources/constants'
 import Place from '@/models/place'
 import lodash from 'lodash'
+import appConfig from '@/config/config'
 
 /**
  * XmlImporter Map data Builder class
@@ -20,7 +22,7 @@ class XmlImporter {
    */
   parseFileContent = () => {
     return new Promise((resolve, reject) => {
-      parseString(this.fileRawContent, {trim: true}, function (err, parsedXml) {
+      parseString(this.fileRawContent, { trim: true }, function (err, parsedXml) {
         if (err) {
           reject(err)
         } else {
@@ -35,14 +37,14 @@ class XmlImporter {
    * @returns {Promise} that returns in the resolve mapData object
    */
   buildMapData = () => {
-    let mapViewData = new MapViewData()
-    let context = this
+    const mapViewData = new MapViewData()
+    const context = this
     return new Promise((resolve, reject) => {
       try {
         context.parseFileContent().then((fileObject) => {
           context.mapRawData = fileObject
           mapViewData.routes = context.getRoutes(fileObject)
-          mapViewData.places = context.setPlaces(mapViewData, fileObject)
+          context.setPlaces(mapViewData, fileObject)
           mapViewData.isRouteData = true
           mapViewData.origin = constants.dataOrigins.fileImporter
           mapViewData.timestamp = context.options.timestamp
@@ -61,7 +63,13 @@ class XmlImporter {
    * @param {*} fileObject
    */
   setPlaces = (mapViewData, fileObject) => {
-    mapViewData.places = this.getPlaces(fileObject)
+    let places = this.getPlaces(fileObject)
+    if (places.length > appConfig.maxPlaceInputs) {
+      mapViewData.pois = places
+    } else {
+      mapViewData.places = places
+    }
+
     if (mapViewData.places.length === 0) {
       mapViewData.places = this.buildPlaces(mapViewData.routes)
     }
@@ -73,17 +81,20 @@ class XmlImporter {
    * @returns {Array} of places
    */
   getPlaces = (fileObject) => {
-    let places = []
-    let placeMarks = lodash.get(fileObject, 'kml.Document[0].Placemark')
+    const places = []
+    const placeMarks = lodash.get(fileObject, 'kml.Document[0].Placemark') || lodash.get(fileObject, 'kml.Document[0].Folder[0].Placemark')
 
     if (placeMarks) {
-      for (let key in placeMarks) {
+      for (const key in placeMarks) {
         if (placeMarks[key].Point) {
-          let coordinatesStr = placeMarks[key].Point[0].coordinates[0]
-          let coordinatesaArr = coordinatesStr.split(',')
-          let latlon = {lat: coordinatesaArr[0], lon: coordinatesaArr[1]}
-          let name = lodash.get(placeMarks[key], 'ExtendedData[0].Data[0].value[0]')
-          let place = new Place(latlon.lat, latlon.lon, name)
+          const coordinatesStr = placeMarks[key].Point[0].coordinates[0]
+          const coordinatesaArr = coordinatesStr.split(',')
+          const latlon = { lat: coordinatesaArr[0], lon: coordinatesaArr[1] }
+          let name = placeMarks[key].name || lodash.get(placeMarks[key], 'ExtendedData[0].Data[0].value[0]')
+          if (Array.isArray(name) && name.length > 0) {
+            name = name[0]
+          }
+          const place = new Place(latlon.lat, latlon.lon, name)
           places.push(place)
         }
       }
@@ -96,30 +107,30 @@ class XmlImporter {
    * @returns {Array} places
    */
   buildPlaces = (routes) => {
-    let places = []
+    const places = []
 
     if (routes.length > 0) {
       // If there are less then 15, so we get all
       if (routes[0].length < 16) {
-        for (let key in routes[0]) {
-          let latlng = routes[0][key].geometry.coordinates
-          let lng = latlng[1]
-          let lat = latlng[0]
-          let place = new Place(lng, lat)
+        for (const key in routes[0]) {
+          const latlng = routes[0][key].geometry.coordinates
+          const lng = latlng[0]
+          const lat = latlng[1]
+          const place = new Place(lng, lat)
           places.push(place)
         }
       } else { // if there are more then 15, only the first and the last
-        let firstCoords = routes[0].geometry.coordinates[0]
-        let lastCoords = (routes[0].geometry.coordinates[routes[0].geometry.coordinates.length - 1])
+        const firstCoords = routes[0].geometry.coordinates[0]
+        const lastCoords = (routes[0].geometry.coordinates[routes[0].geometry.coordinates.length - 1])
 
-        let firstLng = firstCoords[1]
-        let firstLat = firstCoords[0]
-        let firstPlace = new Place(firstLng, firstLat, '', {resolve: true})
+        const firstLng = firstCoords[0]
+        const firstLat = firstCoords[1]
+        const firstPlace = new Place(firstLng, firstLat, '', { resolve: true })
         places.push(firstPlace)
 
-        let lastLng = lastCoords[1]
-        let lastLat = lastCoords[0]
-        let lastPlace = new Place(lastLng, lastLat, '', {resolve: true})
+        const lastLng = lastCoords[0]
+        const lastLat = lastCoords[1]
+        const lastPlace = new Place(lastLng, lastLat, '', { resolve: true })
         places.push(lastPlace)
       }
     }
@@ -131,27 +142,35 @@ class XmlImporter {
    * @returns {Array} routes
    */
   getRoutes (fileObject) {
-    let routes = []
-    let rtes = lodash.get(fileObject, 'gpx.rte')
+    const routes = []
+    const rtes = lodash.get(fileObject, 'gpx.rte') || lodash.get(fileObject, 'gpx.trk')
     if (rtes) {
-      for (let key in rtes) {
-        let rte = rtes[key]
-        let coordinatesParsed = []
-        for (let ptKey in rte.rtept) {
-          let latlon = rte.rtept[ptKey].$
-          let point = [latlon.lon, latlon.lat]
-          let elev = rte.rtept[ptKey].ele
-          if (elev && elev.length > 0) {
-            point.push(elev[0])
+      const coordinatesParsed = []
+      for (const key in rtes) {
+        const rte = rtes[key]
+
+        let segments = rte.trkseg || [rte.rtept]
+
+        for (let key in segments) {
+          let ptsCollection = segments[key].trkpt || segments[key]
+          if (ptsCollection) {
+            for (const ptKey in ptsCollection) {
+              const latlon = ptsCollection[ptKey].$
+              const point = [latlon.lon, latlon.lat]
+              const elev = ptsCollection[ptKey].ele
+              if (elev && elev.length > 0) {
+                point.push(elev[0])
+              }
+              coordinatesParsed.push(point)
+            }
           }
-          coordinatesParsed.push(point)
         }
-        routes.push({
-          geometry: {
-            coordinates: coordinatesParsed
-          }
-        })
       }
+      routes.push({
+        geometry: {
+          coordinates: coordinatesParsed
+        }
+      })
     }
     return routes
   }

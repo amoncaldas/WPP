@@ -1,5 +1,5 @@
 import passwordResetService from './reset-service'
-import VueRestCrud from 'vue-rest-crud'
+import VueRestClient from 'vue-rest-client'
 
 export default {
   data: () => ({
@@ -9,7 +9,7 @@ export default {
     resetIsValid: false,
     passHidden: true,
     loaded: false,
-    ...VueRestCrud.Data // adds: resource, resources, crudReady
+    ...VueRestClient.CrudData // adds: resource, resources, crudReady and modelService
   }),
   computed: {
     passwordRules () {
@@ -58,7 +58,7 @@ export default {
     }
   },
   created () {
-    VueRestCrud.Controller.set(this, passwordResetService, { queryOnStartup: false, skipAutoIndexAfterAllEvents: true })
+    VueRestClient.Controller.set(this, passwordResetService, { queryOnStartup: false, skipAutoIndexAfterAllEvents: true })
 
     this.resource.key = this.$route.params.key
     this.resource.login = this.$route.params.login

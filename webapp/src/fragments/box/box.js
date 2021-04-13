@@ -104,7 +104,9 @@ export default {
 
     // When the box is created, it sends
     // an event to its parent telling the parent its guid
-    this.$emit('boxCreated', this.guid)
+    setTimeout(() => {
+      context.$emit('boxCreated', context.guid)
+    }, 100)
   },
   watch: {
     /**
