@@ -26,8 +26,8 @@ export default {
     let options = {
       queryOnStartup: false,
       skipAutoIndexAfterAllEvents: true,
-      savedMsg: this.$t('reportError.msgSent'),
-      saveFailedMsg: this.$t('reportError.sendErrorMsg')
+      resourceSavedMsg: this.$t('reportError.msgSent'),
+      failWhileTryingToSaveResourceMsg: this.$t('reportError.sendErrorMsg')
     }
     VueRestClient.Controller.set(this, reportErrorService, options)
     this.resource.url = location.href

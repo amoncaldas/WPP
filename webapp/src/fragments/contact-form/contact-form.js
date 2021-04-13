@@ -10,8 +10,8 @@ export default {
     let options = {
       queryOnStartup: false,
       skipAutoIndexAfterAllEvents: true,
-      savedMsg: this.$t('contactForm.msgSent'),
-      saveFailedMsg: this.$t('contactForm.sendErrorMsg')
+      resourceSavedMsg: this.$t('contactForm.msgSent'),
+      failWhileTryingToSaveResourceMsg: this.$t('contactForm.sendErrorMsg')
     }
     VueRestClient.Controller.set(this, contactService, options)
   },

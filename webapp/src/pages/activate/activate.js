@@ -56,7 +56,7 @@ export default {
       let crudOptions = {
         queryOnStartup: false,
         skipAutoIndexAfterAllEvents: true,
-        updatedMsg: this.$t('activate.accountActivated'),
+        resourceUpdatedMsg: this.$t('activate.accountActivated'),
         skipFormValidation: true,
         409: this.$t('activate.wrongUserIdOrActivationCode'), // CONFLICT - activation code does not belong to specified user id
         404: this.$t('activate.wrongUserId'), // NOT FOUND - user not found by its id

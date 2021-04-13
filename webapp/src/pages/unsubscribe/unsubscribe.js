@@ -31,7 +31,7 @@ export default {
     let crudOptions = {
       queryOnStartup: false,
       skipAutoIndexAfterAllEvents: true,
-      updatedMsg: this.$t('unsubscribe.unsubscribed'),
+      resourceUpdatedMsg: this.$t('unsubscribe.unsubscribed'),
       skipFormValidation: true,
       409: this.$t('unsubscribe.wrongUserEmailOrAlreadyUnsubscribed'), // CONFLICT - activation code does not belong to specified user id
       404: this.$t('unsubscribe.wrongUserEmailOrAlreadyUnsubscribed'), // NOT FOUND - user not found by its id

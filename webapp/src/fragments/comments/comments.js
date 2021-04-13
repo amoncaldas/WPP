@@ -15,7 +15,7 @@ export default {
     let options = {
       queryOnStartup: false,
       skipAutoIndexAfterAllEvents: true,
-      savedMsg: this.$t('comments.commentSent')
+      resourceSavedMsg: this.$t('comments.commentSent')
     }
     VueRestClient.Controller.set(this, commentService, options)
   },

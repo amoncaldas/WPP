@@ -20,8 +20,8 @@ export default {
     let options = {
       queryOnStartup: false,
       skipAutoIndexAfterAllEvents: true,
-      savedMsg: this.$t('subscribe.subscriptionRegistered'),
-      saveFailedMsg: this.$t('subscribe.failWhileTryingToSubscribe'),
+      resourceSavedMsg: this.$t('subscribe.subscriptionRegistered'),
+      failWhileTryingToSaveResourceMsg: this.$t('subscribe.failWhileTryingToSubscribe'),
       409: this.$t('subscribe.thisEmailIsAlreadySubscribed')
     }
     VueRestClient.Controller.set(this, subscribeService, options)
