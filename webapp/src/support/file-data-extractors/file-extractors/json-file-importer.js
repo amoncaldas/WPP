@@ -39,6 +39,7 @@ class JsonImporter {
         mapViewData.timestamp = context.options.timestamp
       } else { // try to extract usable data from an old format exported file
         const content = JSON.parse(context.fileRawContent)
+        context.coordinates = lodash.get(content, 'rawData.features[0].geometry.coordinates')
         if (!content) {
           reject(Error('invalid-file-content'))
         }
