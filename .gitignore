@@ -107,3 +107,4 @@ scripts/clean-docker-images.sh
 ## Web apps ##
 webapp/*/node_modules/*
 webapp/*/test/unit/coverage/*
+webapp/src/vrc/*
