@@ -6,7 +6,7 @@
       </div>
       <div slot="content">
         <br>
-        <v-form ref="form" v-if="open">
+        <v-form ref="vrcForm" v-if="open">
           <v-layout row wrap class="comment-box">
             <v-flex xs2 sm1>
               <img class="max-100" :src="commenterAvatar" :alt="commenterName" :title="commenterName">

@@ -1,7 +1,7 @@
 <template>
   <box tag="section" :no-top-border="!topBorder">
     <h1 slot="header" class="headline">{{ $t('authentication.signIn') | uppercase }}</h1>
-    <v-form slot="content" ref="form" @keyup.native.enter="submit">
+    <v-form slot="content" ref="vrcForm" @keyup.native.enter="submit">
       <div>
         <a class="social-gh" v-if="$store.getters.options.signup_with_github" @click="socialAuthentication('github')">
           <div></div>
