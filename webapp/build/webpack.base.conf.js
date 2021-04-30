@@ -51,7 +51,15 @@ module.exports = {
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test'), resolve('node_modules/webpack-dev-server/client')],
         options: {
-          plugins: [ '@babel/plugin-proposal-object-rest-spread' ]
+          plugins: [ '@babel/plugin-proposal-object-rest-spread' ],
+          presets: [
+            '@babel/preset-env',
+            '@babel/react',{
+              'plugins': [
+                '@babel/plugin-proposal-class-properties'
+              ]
+            }
+          ]
         }
       },
       {

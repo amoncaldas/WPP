@@ -3,7 +3,7 @@
     <v-slide-y-transition mode="out-in">
       <v-layout row wrap>
         <v-flex xs12 xl6 sm12 md8 lg8 md10 offset-md2>
-          <v-form ref="form" @keyup.native.enter="submit">
+          <v-form ref="vrcForm" @keyup.native.enter="submit">
             <box >
               <h1 slot="header" class="headline">{{ $t('reset.requestPasswordReset') | uppercase }}</h1>
               <div slot="content">

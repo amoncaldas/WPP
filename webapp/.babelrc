@@ -18,7 +18,12 @@
     "theme": "default",
     "css": true
   }],
-  ["@babel/plugin-proposal-class-properties"]],
+  [
+    "@babel/plugin-proposal-class-properties",
+    {
+      "loose": true
+    }
+  ]],
   "env": {
     "test": {
       "presets": ["@babel/preset-env"],

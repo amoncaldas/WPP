@@ -5,7 +5,7 @@
         <h2>{{$t('reportError.title')}}</h2>
       </div>
       <div slot="content">
-        <v-form ref="form">
+        <v-form ref="vrcForm">
           <v-text-field :label="$t('reportError.url')" v-model="resource.url" disabled autofocus required></v-text-field>
           <v-textarea auto-grow class="report-error-message" :height="$vuetify.breakpoint.mdAndUp ? 200 : 100" type="text"
             hide-details counter :label="$t('reportError.yourMsg')" box :title="$t('reportError.yourMsg')"

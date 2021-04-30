@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" v-if="crudReady" @keyup.native.enter="submit">
+  <v-form ref="vrcForm" v-if="crudReady" @keyup.native.enter="submit">
     <v-text-field
       :label="$t('user.username')"
       ref="username"

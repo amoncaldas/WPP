@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-form ref="form" @submit.prevent>
+    <v-form ref="vrcForm" @submit.prevent>
        <v-layout row wrap>
         <v-flex xs12 v-bind="{['sm'+ searchInputColumns]: true}" >
             <v-text-field height="60" box 

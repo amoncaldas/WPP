@@ -404,7 +404,7 @@ export default {
     },
     fit () {
       if (this.markers.length === 1 && this.routes.length === 0) {
-        this.zoom = this.post.extra.zoom ? Number(this.post.extra.zoom) : this.zoom
+        this.zoom = this.localMapData.extra.zoom ? Number(this.localMapData.extra.zoom) : this.zoom
       } else {
         this.map.fitBounds(this.dataBounds, {padding: [20, 20], maxZoom: 18})
       }

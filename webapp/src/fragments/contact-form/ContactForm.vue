@@ -5,7 +5,7 @@
         <h2>{{$t('contactForm.title')}}</h2>
       </div>
       <div slot="content">
-        <v-form ref="form">
+        <v-form ref="vrcForm">
           <v-text-field :label="$t('contactForm.subject')" v-model="resource.subject" autofocus required></v-text-field>
           <v-text-field
             :label="$t('contactForm.name')"

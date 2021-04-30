@@ -1,7 +1,7 @@
 <template>
   <box tag="section" :no-top-border="!topBorder">
     <h1 slot="header" class="headline">{{ $t('subscribe.pageTitle') }}</h1>
-    <v-form slot="content" ref="form" @keyup.native.enter="submit">
+    <v-form slot="content" ref="vrcForm" @keyup.native.enter="submit">
       <div>
         <v-text-field
           :label="$t('subscribe.name')"
