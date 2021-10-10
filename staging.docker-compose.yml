@@ -7,16 +7,16 @@ networks:
 services:
     wordpress:
         container_name: wpp-imoveis-staging
-        image: wpp-custom-wordpress-staging
+        image: wpp-imoveis-custom-wordpress-staging
         networks:
-          - wpp-staging
+          - wpp-imoveis-staging
         restart: always
         build:
           context: wordpress/build
           args:
             DEBUG_SUPPORT: "false"
         ports:
-          - 8081:80        
+          - 8090:80        
         environment:
           WORDPRESS_DB_PASSWORD: admin
           SITE_URL: http://imoveis-staging.fazendoasmalas.com
@@ -26,9 +26,9 @@ services:
           - ./webapp:/var/www/webapp
     mysql:
         container_name: wpp-imoveis-mysql-staging
-        image: wpp-custom-mysql-staging
+        image: wpp-imoveis-custom-mysql-staging
         networks:
-          - wpp-staging
+          - wpp-imoveis-staging
         restart: always
         build:
           context: mysql/

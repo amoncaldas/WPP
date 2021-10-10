@@ -6,10 +6,10 @@ networks:
 
 services:
     wordpress:
-        container_name: wpp-website-local
-        image: wpp-custom-wordpress-local
+        container_name: wpp-imoveis-local
+        image: wpp-imoveis-custom-wordpress-local
         networks:
-          - wpp
+          - wpp-imoveis
         build:
           context: wordpress/build
           args:
@@ -25,10 +25,10 @@ services:
           - ./wordpress/wp-content:/var/www/html/wp-content
           - ./webapp:/var/www/webapp
     mysql:
-        container_name: wpp-mysql-local
-        image: wpp-custom-mysql-local
+        container_name: wpp-imoveis-mysql-local
+        image: wpp-imoveis-custom-mysql-local
         networks:
-          - wpp
+          - wpp-imoveis
         build:
           context: mysql/
           args:
@@ -40,6 +40,6 @@ services:
       image: adminer
       container_name: wpp-adminer
       networks:
-        - wpp
+        - wpp-imoveis
       ports:
         - 5001:8080

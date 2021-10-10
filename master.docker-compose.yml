@@ -7,9 +7,9 @@ networks:
 services:
     wordpress-c:
         container_name: wpp-imoveis-production
-        image: wpp-custom-wordpress-prod
+        image: wpp-imoveis-custom-wordpress-prod
         networks:
-          - wpp-prod
+          - wpp-imoveis-prod
         restart: always
         build:
           context: wordpress/build
@@ -19,7 +19,7 @@ services:
           - 8089:80
         environment:
           WORDPRESS_DB_PASSWORD: admin
-          SITE_URL: http://imoveis.fazendoasmalas.com.br
+          SITE_URL: https://imoveis.fazendoasmalas.com.br
           ENABLE_DEBUG: "false" # enable/disable debug mode in wordpress at run time
         volumes:
           - ./wordpress/wp-content:/var/www/html/wp-content
@@ -29,12 +29,12 @@ services:
           options:
             max-size: "500m"
             max-file: "3"
-        
+
     mysql:
         container_name: wpp-imoveis-mysql-production
-        image: wpp-custom-mysql-prod
+        image: wpp-imoveis-custom-mysql-prod
         networks:
-          - wpp-prod
+          - wpp-imoveis-prod
         restart: always
         build:
           context: mysql/
