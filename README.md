@@ -1,6 +1,6 @@
-# Docker Wordpress and webapp #
+# WPP - a Wordpress based webapp with decoupled VueJS and SPA front-end #
 
-Basic structure for a docker-wordpress/webapp infrastructure that encompasses a Wordpress installation with a Single Page Application under the /dev url.
+WPP is a software that encompass WordPress as a admin and API solution, connected to a decoupled VueJS/SPA webapp. It includes a custom WordPress plugin that, depending on the user agent, allows rendering the webpages as pure html (for SEO) and several other integrations for authentication, user dashboard on the SPA app, map, menu and slide components.
 
 ## Sections ##
 
