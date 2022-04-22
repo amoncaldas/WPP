@@ -50,7 +50,7 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
 - wp-config.php mapped to an external file
 - wp-content folder mapped to an external folder
 - Customization and updates via update.sh and wp-cli
-- Decoupled front-end with Vuejs and SPA
+- Decoupled front-end with VueJS and SPA
 - Auto fix wordpress url to match the one defined in the docker-compose yml file
 - Auto update state via wp-cli
 
@@ -58,52 +58,51 @@ Basic structure for a docker-wordpress/webapp infrastructure that encompasses a 
 
 Some important features are described in this section
 
-### Auto update WordPress URL ###
+- Auto update WordPress
 
-WordPress store in db absolute urls and therefore we check if the url defined in the docker-compose yml file matches the one stored by WordPress. If not, we update it automatically. Like this we can run the same project and db in multiples environments, like `local`, `staging` and `production`. See [https://codex.wordpress.org/Changing_The_Site_URL](https://codex.wordpress.org/Changing_The_Site_URL)
+  WordPress store in db absolute urls and therefore we check if the url defined in the docker-compose yml file matches the one stored by WordPress. If not, we update it automatically. Like this we can run the same project and db in multiples environments, like `local`, `staging` and `production`. See [https://codex.wordpress.org/Changing_The_Site_URL](https://codex.wordpress.org/Changing_The_Site_URL)
 
-### Decoupled front-end ###
+- Decoupled front-end
 
-This solution includes a decoupled front-end dashboard built using VueJS and a custom base front-end application. The front-end communicates with the wordpress rest json api (including the custom endpoints created by the [custom plugins](#custom-plugins)) to get and send data.
+  This solution includes a decoupled front-end dashboard built using VueJS and a custom base front-end application. The front-end communicates with the wordpress rest json api (including the custom endpoints created by the [custom plugins](#custom-plugins)) to get and send data.
 
-### Contact form ###
+- Contact form
 
-This solution includes a decoupled front-end contact form with captcha and the back-end services to process it
+  This solution includes a decoupled front-end contact form with captcha and the back-end services to process it
 
-### Visitor dashboard ###
+- Visitor dashboard
 
-This solution includes a decoupled front-end visitor dashboard and the back-end services to process it
+  A decoupled front-end visitor dashboard and the back-end services to process it
 
-### Map component ###
+- Map component
 
-This solution includes a map component. Several map can be created on the admin to display a place, list of places and static routes. The icon of the place can be customized and each place displayed on the map can be linked to a content and is navigable (clickable)
+  A map component that allows the creation  of map views on the admin to display a place, list of places and static routes. The icon of the place can be customized and each place displayed on the map can be linked to a content and is navigable (clickable)
 
-### Image slider and gallery ###
+- Image slider and gallery
 
-This solution includes a slider component and a gallery component
+  This solution includes a slider component and a gallery component
 
-### Members ###
+- Members
 
-This solution includes member component that allows creating members and listing them on any page or post. It is also possible to link a member to a user/author
+  This solution includes member component that allows creating members and listing them on any page or post. It is also possible to link a member to a user/author
 
-### Site sections ###
+- Site sections
 
-This solution includes a component that allows creating/editing sections. Each section can have its appearance customized and content can be created under it.
+  This solution includes a component that allows creating/editing sections. Each section can have its appearance customized and content can be created under it.
 
 
 See more about the front-end on the [Front-end app readme](webapp/README.md)
 
-## Wpp plug-in ##
+## Wpp WordPress plug-in ##
 
-Some custom plug-ins were created and added to WordPress to achieve the desired functionalities. They are:
+This plug-in is custom wpp solution and is intended to contain customizations to WordPress hooks/events, custom rest-api endpoints as well as customize third parties plugins that are supposed to be installed.
 
-1. `wpp` - This plug-in is custom wpp solution and is intended to contain customizations to WordPress hooks/events, custom rest-api endpoints as well as customize third parties plugins that are supposed to be installed.
-    - It registers custom wp api end-points related to user registration and custom wpp data regarding the business logic, like sectors and usernames available (in `wp-api` folder). The **dashboard app uses these endpoints** to communicate with the back-end during user registration and profile update.
-    - It also register custom actions for WordPress rest_api_init  to customize the response and return custom user data as well as custom error messages when the user api is called. In addition it also adds a filter to the jwt_auth_token_before_dispatch event thrown by the `jwt-authentication-for-wp-rest-api` plugin (in includes/users.php).
+  - It registers custom wp api end-points related to user registration and custom wpp data regarding the business logic, like sectors and usernames available (in `wp-api` folder). The **dashboard app uses these endpoints** to communicate with the back-end during user registration and profile update.
+  - It also register custom actions for WordPress rest_api_init  to customize the response and return custom user data as well as custom error messages when the user api is called. In addition it also adds a filter to the jwt_auth_token_before_dispatch event thrown by the `jwt-authentication-for-wp-rest-api` plugin (in includes/users.php).
 
 ## Customization and updates ##
 
-We keep a file in the `wp-content` mapped volume/folder named `update.sh`. This file is responsible for update the current installation, including anything related to WordPress world, like plug-ins, themes and etc and the stuff related to the decoupled front-end(s). This update.sh file is an ordinary shell script file and any Linux command can be executed there, considering we are inside the docker-container.
+We keep a file in the `wp-content` mapped volume/folder named `update.sh`. This file is responsible for update the current installation, including anything related to WordPress world, like plug-ins, themes and the stuff related to the decoupled front-end. The `update.sh` file is an ordinary shell script file and any Linux command can be executed there, considering you run it inside the docker-container.
 
 To manage and update the WordPress stuff we use the pre-installed WP CLI tool that allows to run several tasks in a programmatic way in a WordPress installation, like add, activate and delete plug-ins, add users, change user's password, update options, change menu and so on. check the full list at [WP CLI commands](https://developer.wordpress.org/cli/commands/)
 
@@ -405,5 +404,5 @@ Follower extras:
 
 ## Admin credentials ##
 
-username: wppadmin
-pass: T9y6jGS3C9^7#VvNYXzAMuw#
+- Default username: wppadmin
+- Default password: T9y6jGS3C9^7#VvNYXzAMuw#

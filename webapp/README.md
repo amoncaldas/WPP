@@ -4,9 +4,9 @@ This application encompasses two main needs:
 
 - Creation of a base Vue SPA with common features/components to be used in multiple front-end apps
 
-The base application is built using VueJS, vuetify and a set of custom components, directives and services. The created structure allows the creation of specific needs to be contained in a feature folder, following a feature-by-folder
+The base application is built using VueJS, Vuetify and a set of custom components, directives and services. The created structure allows the creation of specific needs to be contained in a feature folder, following a feature-by-folder
 approach. So, all the business specific logic for the developer's dashboard are contained in the src/page's folder.
-This app uses single file components and others non native javascript code that are transpilled to native javascript during the build process. That is way this needs to be compiled before run, either in dev mode or production mode. This VueJS single file components allows a better code organization, week and clear coupling between components and an easier code understanding.
+This app uses single file components and others non native javascript code that are transpiled to native javascript during the build process. That is way this needs to be compiled before run, either in dev mode or production mode. This VueJS single file components allows a better code organization, week and clear coupling between components and an easier code understanding.
 
 ## Sections ##
 
@@ -85,186 +85,10 @@ What is ready for use and included in the base Vue SPA:
   - `bg.js` (to background color to component using theme color identifier or html color)
   - `top-border` (to add an small border to the element using theme color identifier or html color)
 
-### Core/CRUD ###
 
-The generic crud solution allows the communication with a back-end api with minimum code. You just need to define the endpoint of a resource and add the curd to a component by instantiating it to a vue.js component. You can also use directly a model instance or the model service to retrieve/send data not implementing the crud behaviors in your VueJS component/page. The solution is composed of four main classes/files:
+#### CRUD and form validation ####
 
-- [core/crud.js](#src/core/crud.js)
-- [core/form.js](#src/core/form.js)
-- [core/model-service.js](#src/core/model-service.js)
-- [core/model.js](#src/core/model.js)
-
-#### Model Service ####
-
-Model service class that allows the running of REST api actions in a remote server for a defined endpoint resource.
-It is intended to be used in conjunction with the Model class @see @/core/model to read more
-
-Params:
-
-1. @param string - `endPoint` the relative url of the resource
-1. @param string - `resourceName` the resource name (used to build the default confirmation messages)
-1. @param {} options - `optional` options that allows to customize the model service behavior
-
-The options object may contain the following attributes:
-
-- `transformRequest` (function): executed before the request is made. Useful to change data in special circumstances.
-    This function will receive an object with the endpoint and filters (when available) attributes. It is not intended to replace the axios
-    request interceptor!
-- `transformResponse` (function): executed after the request is made, passing the original response object received.
-    Useful if it necessary to modify the data returned before transforming them in a Model instance
-- `raw` (boolean): defines if the default transformation of the results into Model instances must be skipped.
-    If it is true, the active record will not work with the returned items. Useful when you just want to get data, and not destroy/update them
-- `pk` (string): overwrites the default primary key attribute, that is 'id'. Use it if your model on the remote server uses a different field as primary key
-
-How to create a model service to represent a resource in the back-end:
-
-```js
-// file my-model-service.js
-
-import ModelService from '@/core/model-service'
-
-let options = {
-  pk: 'my-pk-field-name' // necessary only if different of `id`
-}
-const myModelService = new ModelService('relative/url/to/resource/endpoint', 'My resource nice name', options)
-
-export default myModelService
-```
-
-After this my-model-service.js file is created, you can import it anywhere in the app, and use the following methods:
-
-- `getName` - returns the model nice name
-
-- `getEndPoint` - returns the endpoint defined for the model service
-
-- `query(filters)` - receives an array of query filters and returns a promise, that when resolved, passes a collection of resources
-
-- `customQuery(customOptions, endPoint)` - receives an endpoint, an array of query filters and an object with custom options and returns a promise, that when resolved, passes a collection of resources. The customOptions allows the overwrite of the instance options only for the executed request. The `customOptions` and `endPoint` parameters are optional and will be replaced by the instance options endpoint if are null. The following options attributes can defined:
-  - `query` (object): containing key -> value attributes to be used as query string)
-  - `data` (object): containing key -> value attributes to be used as post data)
-  - `verb` (string): verb to be used - default is 'get'
-  - `transformRequest`: function to be called back on transformRequest event
-
-- `get(pkValue)` - get a resource identified by its primary key value
-
-Example of model service usage:
-
-```js
-import myModelService from './my-model-service'
-
-export default {
-  created () {
-    // Get the available policies (type of tokens) and store on the data tokenType's key
-    myModelService.query().then((models) => {
-      this.myModels = models
-      // by default, each model is an instance of Model @/core/model
-      // having the $save, $update, $destroy methods
-    })
-  }
-}
-```
-
-#### Form validation ####
-
-The crud solution uses the form.js to validate a form before submitting the form. But, it is possible to disable this by passing the `skipFormValidation:true` in the options object passed to the crud constructor. Is the default behavior is on, the slution will look for a form reference, in your component context, named `form` *(like vm.$refs.form, where vm is the component context passed to the crud)*. Iy is also possible to specify a alternative form ref name, by setting the `formRef:<my-form-ref-name>(string)` in the options object passed to the constructor of crud.
-
-
-It is also possible to use the form validation apart from the crud component. You just have to import it, create a new instance passing:
-
-- the `formRef` object,
-- the `context` object (the component **this**)
-- the optional `options` object.
-
- Then, just run the `validate` method. It will run the default form object passed in the formRef validation and also check for the `required` attribute in each input and validate it. If any field is invalid, it will highlight it, set the `valid` status as false and also add a string to the inputs the error bucket using input label and crud translations for `required`.
-
-#### Adding CRUD functionalities to a component ####
-
-The CRUD class allows to add common extended CRUD actions (get, index, save, update, destroy)
-to a component that uses the RESTFull API pattern. It is intended to be used in conjunction with the class ModelService (required by the constructor)
-
-This crud class implements the full cycle to get and send data to/from a remote server, including before destroy confirmation dialog,
-refresh listed data after save, destroy and update and success and confirmation messages.
-
-EXPORTS: this javascript module exports two objects: CRUDData and CRUD.
-
-The crud setter expects the following parameters:
-
-1. @param {} `vm` - the component instance, that can be passed using `this`
-1. @param {} `modelService`  - an instance of the ModelService class representing the service that provides the data service to a resource. @see @/core/model-service
-1. @param {} `options` - object with optional parameters that allows to customize the CRUD behavior
-
-The options object may contain the following attributes:
-
-- `queryOnStartup` (boolean): if the index action must be ran on the first CRUD run
-- `indexFailedMsg` (string): custom message to be displayed on index action failure
-- `getFailedMsg` (string): custom message to be displayed on get single item action failure
-- `saveFailedMsg` (string): custom message to be displayed on save action failure
-- `updatedMsg` (string): custom message to be displayed on update action failure
-- `confirmDestroyTitle` (string): custom title to be displayed on the confirm dialog shown before destroy action
-- `confirmDestroyText` (string): custom text to be displayed on the confirm dialog shown before destroy action
-- `destroyedMsg` (string): custom message to be displayed after an resource has been destroyed
-- `destroyFailedMsg` (string): custom message to be displayed on destroy action failure
-- `destroyAbortedMsg` (string): custom message to be displayed when a destroy is aborted
-- `skipFormValidation` (boolean): skips the auto form validation
-- `skipFormValidation` (boolean): skips the auto form validation
-- `skipAutoIndexAfterAllEvents` (boolean) : skips the auto resources reload after data change events (update, destroy and save)
-- `skipAutoIndexAfterSave` (boolean) : skips the auto resources reload after save
-- `skipAutoIndexAfterUpdate` (boolean) : skips the auto resources reload after update
-- `skipAutoIndexAfterDestroy` (boolean) : skips the auto resources reload after destroy
-- `skipServerMessages` (boolean) : skip using server returned message and use only front end messages do display toasters
-- `skipShowValidationMsg` (boolean) : skit showing the validation error message via toaster when a form is invalid
-- `formRef` (string, optional) : the alternative name of the form ref you are using in the template. Used to auto validate the form. If not provided, it is assumed that the form ref name is `form`
-- `[http-error-status-code-number]` : defines the message to be used when an http error status code is returned by a request (only available fot status code from `300` to `505`)
-
-Example of adding CRUD to a component:
-
-```js
-import {CRUD, CRUDData} from '@/core/crud'
-import myModelService from './my-model-service'
-
-// Then, inside your default export
-
-export default {
-  data: () => ({
-    // create the crud data objects (resource, resources and modelService) using three dots notation
-    ...CRUDData
-  })
-
-  // The second one must be used to instantiate the crud class on the vue created event, like this:
-  created () {
-    // extend this component, adding CRUD functionalities
-    let options = {...}
-    CRUD.set(this, myModelService, options)
-  }
-}
-```
-
-A toast  message is shown after each action using the following priority: server response message,
-custom message specified in options or the default one (defined @crud/i18n/crud.i18n.en.js)
-
-Crud events optional functions:
-
-If the vue `component` to which you are adding the CRUD has one of the following defined methods, it is gonna be called by the CRUD. If it returns false, the execution will be rejected and stopped
-
-- `beforeIndex`
-- `beforeGet`
-- `beforeSave`
-- `beforeUpdate`
-- `beforeDestroy`
-- `beforeShowError`
-
-If the vue `component` to which you are adding the CRUD has one of the following defined methods, it is gonna be called by the CRUD passing the related data
-
-- `afterIndex`
-- `afterGet`
-- `afterSave`
-- `afterUpdate`
-- `afterDestroy`
-- `afterError`
-
-Form validation:
-If the vue `component` to which you are adding the CRUD has a `$ref` named `form` and it does not have the option `skipFormValidation` defined as `true`, the auto form validation will be ran before saving and updating.
-
+A component called VueRestClient is included in this front-end and it facilitates the creation of forms, CRUD operations and validation. Please check the [VueRestClient documentation](https://github.com/amoncaldas/vue-rest-client) for more details
 ### Authentication and authorization ###
 
 A custom authentication/authorization feature is included in the app. The logic related to this is mainly placed inside the `/pages/auth`.
@@ -429,21 +253,6 @@ All the VueJS components created (including the fragments) will have, by default
 - `$store` - accessor to app store that used vuex
 
 - `lodash` - accessor to lodash lib, useful for manipulate arrays an objects.
-
-## Dashboard ##
-
-### Pages ###
-
-- `activate` - the page land when the user clicks in the activation link sent to the email. It gets the data from the url and and run a request to the back-end to activate the user account. If the user id is wrong or the activation code is not valid any more, it will show a corresponding error.
-- `api-docs` - the API documentation parser and interface builder that creates the interactive documentation playground, allowing a user to explore all the API endpoints, resources and responses on the fly, live. This page is composed of several sub-components, specialized services and adapters (responsible for adapting a provided API doc for the interface builder). Among others, this page uses the `@/fragments/ors-map` and `@/fragments/ors-table` components
-- `Auth` - page where the authentication component resides
-- `Home` - page where the user is redirected to after login. This page contains a tab component, with two tabs:
-  - `tokens` - where the user token a listed and where s/he can remove/create tokens and also see the token usage and quota
-  - `profile` - where the user can see and edit his/her own profile, including password. It uses the `@/fragments/forms/User.vue` form component.
-- `password` a folder that contains the password request and reset components
-  - `request` - allow the user to request a password reset link
-  - `reset` - allow the user to redefine the password after clicking the email link sent after requesting a password reset.
-- `signup` - where the user can create an account filling the form or via single-click using a github account. It uses the `@/fragments/forms/User.vue` form component.
 
 ### Menu ###
 
